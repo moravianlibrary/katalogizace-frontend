@@ -1,0 +1,117 @@
+import { DatePipe, NgClass } from '@angular/common';
+import { Component, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
+import {
+  BookRecordInfo,
+  PaginatedBooksResponse,
+  TaskState,
+} from '../../models/book';
+import { BooksService } from '../../services/books.service';
+
+@Component({
+  standalone: true,
+  selector: 'app-books-list',
+  imports: [NgClass, DatePipe],
+  templateUrl: 'books-list.component.html',
+})
+export class BooksListComponent {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private books = inject(BooksService);
+
+  // stav UI
+  loading = signal<boolean>(false);
+  error = signal<string | null>(null);
+  data = signal<PaginatedBooksResponse | null>(null);
+
+  // query params -> signály
+  page = signal<number>(1);
+  pageSize = signal<number>(20);
+
+  totalPages = computed(() =>
+    this.data()
+      ? Math.max(1, Math.ceil(this.data()!.total / this.data()!.page_size))
+      : 1,
+  );
+
+  constructor() {
+    // sleduj URL query parametre
+    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((qp) => {
+      const p = Number(qp.get('page') ?? '1');
+      const ps = Number(qp.get('page_size') ?? '20');
+      this.page.set(isNaN(p) || p < 1 ? 1 : p);
+      this.pageSize.set(isNaN(ps) || ps < 1 ? 20 : ps);
+      this.load();
+    });
+  }
+
+  load() {
+    this.loading.set(true);
+    this.error.set(null);
+
+    this.books
+      .listBooks({
+        page: this.page(),
+        page_size: this.pageSize(),
+        // state: undefined, batch_id: undefined // ľahko doplniteľné
+      })
+      .pipe(takeUntilDestroyed())
+      .subscribe({
+        next: (resp) => {
+          this.data.set(resp);
+          this.loading.set(false);
+        },
+        error: (err) => {
+          this.error.set('Nepodarilo sa načítať zoznam kníh.');
+          console.error(err);
+          this.loading.set(false);
+        },
+      });
+  }
+
+  goPrev() {
+    if (!this.data() || !this.data()!.has_prev) return;
+    this.navigateWithQuery({ page: Math.max(1, this.page() - 1) });
+  }
+
+  goNext() {
+    if (!this.data() || !this.data()!.has_next) return;
+    this.navigateWithQuery({ page: this.page() + 1 });
+  }
+
+  navigateWithQuery(partial: { page?: number; page_size?: number }) {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        page: this.page(),
+        page_size: this.pageSize(),
+        ...partial,
+      },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  trackById(_i: number, b: BookRecordInfo) {
+    return b.book_id;
+  }
+
+  stateBadgeClass(state?: TaskState | null) {
+    switch (state) {
+      case 'new':
+        return 'bg-slate-100 text-slate-700';
+      case 'scheduled':
+        return 'bg-indigo-100 text-indigo-700';
+      case 'in_progress':
+        return 'bg-blue-100 text-blue-700';
+      case 'ready':
+        return 'bg-amber-100 text-amber-800';
+      case 'failed':
+        return 'bg-red-100 text-red-700';
+      case 'completed':
+        return 'bg-green-100 text-green-700';
+      default:
+        return 'bg-slate-100 text-slate-600';
+    }
+  }
+}
