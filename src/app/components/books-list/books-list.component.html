@@ -1,72 +1,81 @@
-<section class="space-y-4">
-  <div class="flex items-center justify-between">
-    <h1 class="text-xl font-semibold">Knihy</h1>
-    <!-- místo pro budoucí filtry (state/batch) -->
-  </div>
-
-  @if (loading()) {
-    <div class="text-sm">Načítám…</div>
-  } @else if (error()) {
-    <div class="text-sm text-red-600">{{ error() }}</div>
-  } @else if (!data() || data()!.books.length === 0) {
-    <div class="text-sm text-slate-500">Zatím žádné záznamy.</div>
-  } @else {
-    <div class="overflow-x-auto rounded border">
-      <table class="min-w-full text-sm">
-        <thead class="bg-slate-50 text-slate-700">
-          <tr>
-            <th class="px-3 py-2 text-left">ID</th>
-            <th class="px-3 py-2 text-left">Vytvořeno</th>
-            <th class="px-3 py-2 text-left">Upraveno</th>
-            <th class="px-3 py-2 text-left">Stav</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (b of data()!.books; track b.book_id) {
-            <tr class="border-t">
-              <td class="px-3 py-2 font-mono text-xs">{{ b.book_id }}</td>
-              <td class="px-3 py-2">{{ b.created_at | date: "medium" }}</td>
-              <td class="px-3 py-2">{{ b.modified_at | date: "medium" }}</td>
-              <td class="px-3 py-2">
-                <span
-                  class="inline-flex items-center rounded px-2 py-0.5 text-xs font-medium"
-                  [ngClass]="stateBadgeClass(b.state)"
-                >
-                  {{ b.state || "—" }}
-                </span>
-              </td>
-            </tr>
-          } @empty {
-            <tr>
-              <td class="px-3 py-4 text-center text-slate-500" colspan="4">
-                Zatím žádné záznamy.
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-
+<main class="mx-auto max-w-7xl px-4 py-4">
+  <section class="space-y-4">
     <div class="flex items-center justify-between">
-      <div class="text-xs text-slate-600">
-        Celkem: {{ data()!.total }} • Strana {{ page() }} / {{ totalPages() }}
-      </div>
-      <div class="flex gap-2">
-        <button
-          class="rounded border px-3 py-1 text-sm disabled:opacity-40"
-          [disabled]="!data()!.has_prev"
-          (click)="goPrev()"
-        >
-          Předchozí
-        </button>
-        <button
-          class="rounded border px-3 py-1 text-sm disabled:opacity-40"
-          [disabled]="!data()!.has_next"
-          (click)="goNext()"
-        >
-          Další
-        </button>
-      </div>
+      <h1 class="text-xl font-semibold">Knihy</h1>
+      <!-- místo pro budoucí filtry (state/batch) -->
     </div>
-  }
-</section>
+
+    @if (loading()) {
+      <div class="text-sm">Načítám…</div>
+    } @else if (error()) {
+      <div class="text-sm text-red-600">{{ error() }}</div>
+    } @else if (!data() || data()!.books.length === 0) {
+      <div class="text-sm text-slate-500">Zatím žádné záznamy.</div>
+    } @else {
+      <div class="overflow-x-auto rounded border">
+        <table class="min-w-full text-sm">
+          <thead class="bg-slate-50 text-slate-700">
+            <tr>
+              <th class="px-3 py-2 text-left">ID</th>
+              <th class="px-3 py-2 text-left">Vytvořeno</th>
+              <th class="px-3 py-2 text-left">Upraveno</th>
+              <th class="px-3 py-2 text-left">Stav</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (b of data()!.books; track b.book_id) {
+              <tr
+                class="cursor-pointer border-t hover:bg-slate-50"
+                (click)="open(b.book_id)"
+                (keyup.enter)="open(b.book_id)"
+                (keyup.space)="open(b.book_id)"
+                role="button"
+                tabindex="0"
+              >
+                <td class="px-3 py-2 font-mono text-xs">{{ b.book_id }}</td>
+                <td class="px-3 py-2">{{ b.created_at | date: "medium" }}</td>
+                <td class="px-3 py-2">{{ b.modified_at | date: "medium" }}</td>
+                <td class="px-3 py-2">
+                  <span
+                    class="inline-flex items-center rounded px-2 py-0.5 text-xs font-medium"
+                    [ngClass]="stateBadgeClass(b.state)"
+                  >
+                    {{ b.state || "—" }}
+                  </span>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td class="px-3 py-4 text-center text-slate-500" colspan="4">
+                  Zatím žádné záznamy.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <div class="text-xs text-slate-600">
+          Celkem: {{ data()!.total }} • Strana {{ page() }} / {{ totalPages() }}
+        </div>
+        <div class="flex gap-2">
+          <button
+            class="rounded border px-3 py-1 text-sm disabled:opacity-40"
+            [disabled]="!data()!.has_prev"
+            (click)="goPrev()"
+          >
+            Předchozí
+          </button>
+          <button
+            class="rounded border px-3 py-1 text-sm disabled:opacity-40"
+            [disabled]="!data()!.has_next"
+            (click)="goNext()"
+          >
+            Další
+          </button>
+        </div>
+      </div>
+    }
+  </section>
+</main>

@@ -20,12 +20,10 @@ export class BooksListComponent {
   private router = inject(Router);
   private books = inject(BooksService);
 
-  // stav UI
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
   data = signal<PaginatedBooksResponse | null>(null);
 
-  // query params -> signály
   page = signal<number>(1);
   pageSize = signal<number>(20);
 
@@ -36,7 +34,6 @@ export class BooksListComponent {
   );
 
   constructor() {
-    // sleduj URL query parametre
     this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((qp) => {
       const p = Number(qp.get('page') ?? '1');
       const ps = Number(qp.get('page_size') ?? '20');
@@ -113,5 +110,9 @@ export class BooksListComponent {
       default:
         return 'bg-slate-100 text-slate-600';
     }
+  }
+
+  open(id: string) {
+    this.router.navigate(['/books', id]);
   }
 }
