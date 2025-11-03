@@ -1,4 +1,4 @@
-<section class="p-6">
-  <h2 class="text-lg font-semibold">Editing panel</h2>
-  <pre>{{ result() | json }}</pre>
+<section class="flex h-screen flex-col gap-5 p-6">
+  <app-navigation-buttons></app-navigation-buttons>
+  <pre class="overflow-auto">{{ result() | json }}</pre>
 </section>
