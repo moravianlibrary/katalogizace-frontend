@@ -8,8 +8,10 @@
       <app-editing-panel [result]="result()" />
     </div>
 
-    <div class="h-screen overflow-auto">
-      <app-working-panel />
+    <div class="shadow-s z-2 h-screen overflow-auto">
+      <app-working-panel
+        [existingRecords]="result()?.existing_marc_records ?? []"
+      />
     </div>
   </div>
 </section>
