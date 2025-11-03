@@ -15,3 +15,7 @@
 @utility shadow-l {
   box-shadow: var(--shadow-l);
 }
+
+* {
+  box-sizing: border-box;
+}
