@@ -46,14 +46,10 @@ export class BooksService {
     );
   }
 
-  getBookImage(
-    bookId: string,
-    imageId: string,
-    opts?: { thumbnail?: boolean },
-  ) {
+  getBookImage(bookId: string, imageId: string, thumbnail: boolean) {
     const url = `${this.baseUrl}/books/${bookId}/images/${imageId}`;
     let params = new HttpParams();
-    if (opts?.thumbnail) params = params.set('thumbnail', 'false');
+    params = params.set('thumbnail', String(thumbnail));
     return this.http.get(url, { params, responseType: 'blob' });
   }
 }
