@@ -1,9 +1,13 @@
-import { Component } from '@angular/core';
+import { JsonPipe } from '@angular/common';
+import { Component, input } from '@angular/core';
+import { BookResultResponse } from '../../models/book';
 
 @Component({
   standalone: true,
   selector: 'app-editing-panel',
-  imports: [],
+  imports: [JsonPipe],
   templateUrl: './editing-panel.component.html',
 })
-export class EditingPanelComponent {}
+export class EditingPanelComponent {
+  result = input<BookResultResponse | null>(null);
+}

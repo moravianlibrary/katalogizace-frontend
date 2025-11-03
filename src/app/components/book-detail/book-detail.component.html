@@ -1,16 +1,13 @@
 <section class="h-screen">
   <div class="grid h-screen grid-cols-1 md:grid-cols-3">
-    <!-- Images panel -->
     <div class="h-screen overflow-auto border-r">
       <app-images-view [bookId]="bookId" />
     </div>
 
-    <!-- Editing panel (placeholder) -->
-    <div class="h-screen overflow-auto border-r">
-      <app-editing-panel />
+    <div class="z-1 h-screen overflow-auto bg-[#EFF2F5]">
+      <app-editing-panel [result]="result()" />
     </div>
 
-    <!-- Working panel (placeholder) -->
     <div class="h-screen overflow-auto">
       <app-working-panel />
     </div>
