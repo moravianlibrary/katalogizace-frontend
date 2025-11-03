@@ -1,0 +1,24 @@
+<td class="p-2 font-bold text-gray-800">
+  {{ nf().tag }}
+</td>
+
+<td class="p-2 font-semibold text-gray-800">
+  {{ nf().ind1 }}
+</td>
+
+<td class="p-2 font-semibold text-gray-800">
+  {{ nf().ind2 }}
+</td>
+
+<td class="p-2">
+  @if (nf().subfields?.length) {
+    <div class="flex flex-wrap gap-x-2 gap-y-1">
+      @for (sf of nf().subfields; track sf.code) {
+        <span>
+          <span class="font-semibold text-gray-800">|{{ sf.code }}</span>
+          <span class="ml-1">{{ sf.value }}</span>
+        </span>
+      }
+    </div>
+  }
+</td>
