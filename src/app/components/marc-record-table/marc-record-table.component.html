@@ -1,0 +1,26 @@
+<table class="w-full border-collapse text-sm">
+  <colgroup>
+    <col class="w-16" />
+    <col class="w-10" />
+    <col class="w-10" />
+    <col />
+  </colgroup>
+
+  <tbody>
+    @for (sf of record().special_fields; track sf.tag) {
+      <tr
+        class="border-b-[0.5px] border-gray-500"
+        [sf]="sf"
+        appMarcRowSpecial
+      ></tr>
+    }
+
+    @for (nf of record().normal_fields; track nf.tag) {
+      <tr
+        class="border-b-[0.5px] border-gray-500 align-top"
+        [nf]="nf"
+        appMarcRowNormal
+      ></tr>
+    }
+  </tbody>
+</table>
