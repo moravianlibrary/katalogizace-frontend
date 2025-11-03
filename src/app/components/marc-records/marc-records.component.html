@@ -1,6 +1,6 @@
 <section class="flex h-full flex-col">
   <h4 class="mb-5 text-3xl">Záznamy</h4>
-  <div class="flex border-b-[0.5px] border-gray-500">
+  <div class="flex overflow-x-auto border-b-[0.5px] border-gray-500">
     @if (existingRecords().length) {
       @for (i of existingRecords(); track $index) {
         <button
