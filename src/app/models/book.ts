@@ -10,12 +10,19 @@ export type TaskState =
 
 export type MarcTag = `${number}${number}${number}` | string;
 
+export interface ImgItem {
+  id: string;
+  url: string;
+  loading: boolean;
+  error?: string | null;
+}
+
 export interface BookCommon {
   book_id: UUID;
   created_at?: string;
   modified_at?: string;
   state?: TaskState;
-  image_ids?: UUID[];
+  image_ids: UUID[] | null;
   hatchet_workflow_id?: string | null;
   batch_id?: string | null;
   error_message?: string | null;
