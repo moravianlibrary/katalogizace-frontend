@@ -1,0 +1,19 @@
+@if (!item() || item().loading) {
+  <div class="h-full w-full animate-pulse bg-gray-200"></div>
+} @else if (item().error) {
+  <div class="text-md grid h-full place-items-center text-red-600">
+    {{ item().error }}
+  </div>
+} @else if (item().url) {
+  <div class="relative h-full w-full overflow-hidden">
+    <img
+      class="mx-auto block h-full w-auto object-contain select-none"
+      [src]="item().url!"
+      alt="Book image"
+    />
+  </div>
+} @else {
+  <div class="grid h-full place-items-center text-sm text-gray-500">
+    Vyberte obrázek
+  </div>
+}
