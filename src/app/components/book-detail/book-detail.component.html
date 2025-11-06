@@ -1,7 +1,7 @@
 <section class="h-screen">
   <div class="grid h-screen grid-cols-1 md:grid-cols-3">
-    <div class="h-screen overflow-auto border-r">
-      <app-images-view [bookId]="bookId" />
+    <div class="shadow-s z-2 h-screen">
+      <app-images-view [bookId]="bookId" [imageIds]="result()!.image_ids" />
     </div>
 
     <div class="z-1 h-screen overflow-auto bg-[#EFF2F5]">
