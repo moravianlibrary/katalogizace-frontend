@@ -1,0 +1,26 @@
+<div class="h-full w-full overflow-x-auto overflow-y-hidden">
+  <div class="flex h-full min-w-max items-center justify-center gap-3">
+    @for (it of items(); track it.id) {
+      <button
+        class="h-full shrink-0 cursor-pointer"
+        (click)="onPick(it.id)"
+        type="button"
+        title="{{ it.id }}"
+      >
+        @if (it.loading) {
+          <div class="h-full w-full animate-pulse bg-gray-200"></div>
+        } @else if (it.error) {
+          <span class="px-2 text-center text-red-600">Chyba</span>
+        } @else {
+          <img
+            class="pointer-events-none block h-full w-auto object-contain select-none"
+            [class.border-4]="selectedId() === it.id"
+            [class.border-gray-500]="selectedId() === it.id"
+            [src]="it.url"
+            alt="thumb"
+          />
+        }
+      </button>
+    }
+  </div>
+</div>
