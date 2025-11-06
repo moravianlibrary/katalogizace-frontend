@@ -60,7 +60,7 @@ export class BooksListComponent {
           this.loading.set(false);
         },
         error: (err) => {
-          this.error.set('Nepodarilo sa načítať zoznam kníh.');
+          this.error.set('Nepodařilo se načíst seznam knih.');
           console.error(err);
           this.loading.set(false);
         },
