@@ -1,12 +1,12 @@
 <section class="flex h-full flex-col">
   <h4 class="mb-5 text-3xl">Záznamy</h4>
   <div class="flex overflow-x-auto border-b-[0.5px] border-gray-500">
-    @if (existingRecords().length) {
-      @for (i of existingRecords(); track $index) {
+    @if (records().length) {
+      @for (rec of records(); track $index) {
         <button
           class="text-md cursor-pointer bg-gray-100 p-4 font-medium"
           [class.rounded-tl-lg]="$index === 0"
-          [class.rounded-tr-lg]="$index + 1 === existingRecords().length"
+          [class.rounded-tr-lg]="$index + 1 === records().length"
           [class.border-b-3]="activeIndex() === $index"
           [class.border-[#30B0C7]]="activeIndex() === $index"
           [class.text-gray-800]="activeIndex() === $index"
@@ -14,7 +14,7 @@
           (click)="setActive($index)"
           type="button"
         >
-          Nalezený {{ $index + 1 }}
+          {{ $index === 0 ? "Vyčtený" : "Nalezený " + $index }}
         </button>
       }
     } @else {
@@ -23,12 +23,12 @@
   </div>
 
   <div class="flex-1 overflow-auto">
-    @if (existingRecords().length) {
-      <app-marc-record-table [record]="existingRecords()[activeIndex()]" />
+    @if (records().length) {
+      <app-marc-record-table [record]="records()[activeIndex()]" />
     }
   </div>
 
-  @if (existingRecords().length) {
+  @if (records().length && activeIndex() != 0) {
     <div class="mt-4 flex justify-end">
       <button
         class="text-md cursor-pointer rounded-lg bg-[#30B0C7] px-4 py-3 font-medium text-white"

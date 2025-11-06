@@ -1,13 +1,14 @@
 import { Component, input } from '@angular/core';
-import { ExistingMarcRecord } from '../../models/book';
-import { MarcRecordsTabsComponent } from '../marc-records/marc-records.component';
+import { ExistingMarcRecord, ExtractedMarcRecord } from '../../models/book';
+import { MarcRecordsComponent } from '../marc-records/marc-records.component';
 
 @Component({
   standalone: true,
   selector: 'app-working-panel',
-  imports: [MarcRecordsTabsComponent],
+  imports: [MarcRecordsComponent],
   templateUrl: './working-panel.component.html',
 })
 export class WorkingPanelComponent {
   existingRecords = input<ExistingMarcRecord[]>([]);
+  extractedRecord = input<ExtractedMarcRecord | null>(null);
 }

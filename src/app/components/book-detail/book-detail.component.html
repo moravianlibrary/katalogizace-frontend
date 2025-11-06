@@ -11,6 +11,7 @@
     <div class="shadow-s z-2 h-screen overflow-auto">
       <app-working-panel
         [existingRecords]="result()?.existing_marc_records ?? []"
+        [extractedRecord]="result()?.extracted_marc_record ?? null"
       />
     </div>
   </div>
