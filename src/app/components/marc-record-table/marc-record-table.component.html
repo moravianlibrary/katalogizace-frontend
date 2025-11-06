@@ -7,7 +7,7 @@
   </colgroup>
 
   <tbody>
-    @for (sf of record().special_fields; track sf.tag) {
+    @for (sf of record().special_fields; track $index) {
       <tr
         class="border-b-[0.5px] border-gray-500"
         [sf]="sf"
@@ -15,7 +15,7 @@
       ></tr>
     }
 
-    @for (nf of record().normal_fields; track nf.tag) {
+    @for (nf of record().normal_fields; track $index) {
       <tr
         class="border-b-[0.5px] border-gray-500 align-top"
         [nf]="nf"
