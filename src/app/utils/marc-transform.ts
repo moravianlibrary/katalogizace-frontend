@@ -10,13 +10,6 @@ function pickCandidate(f: ExtractedMarcField) {
   return f.candidates.find((c) => c.id === f.selected_candidate_id)!;
 }
 
-function compareTags(a: string, b: string): number {
-  const na = Number(a),
-    nb = Number(b);
-  if (!Number.isNaN(na) && !Number.isNaN(nb)) return na - nb;
-  return a.localeCompare(b);
-}
-
 const SPECIAL_TAGS = new Set(['001', '003', '005', '006', '007', '008']);
 function isControlTag(tag: string): boolean {
   return SPECIAL_TAGS.has(tag);
@@ -55,8 +48,8 @@ export function extractedToExisting(
     }
   }
 
-  special.sort((a, b) => compareTags(a.tag, b.tag));
-  normal.sort((a, b) => compareTags(a.tag, b.tag));
+  special.sort((a, b) => a.tag.localeCompare(b.tag));
+  normal.sort((a, b) => a.tag.localeCompare(b.tag));
 
   const existing: ExistingMarcRecord = {
     record_id: 'extracted-synthetic',
