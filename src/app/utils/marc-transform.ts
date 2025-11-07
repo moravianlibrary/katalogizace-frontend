@@ -7,7 +7,13 @@ import {
 } from '../models/book';
 
 function pickCandidate(f: ExtractedMarcField) {
-  return f.candidates.find((c) => c.id === f.selected_candidate_id)!;
+  const cand = f.candidates.find((c) => c.id === f.selected_candidate_id);
+  if (!cand) {
+    console.warn(
+      `Missing candidate ${f.selected_candidate_id} in field ${f.id}`,
+    );
+  }
+  return cand!;
 }
 
 const SPECIAL_TAGS = new Set(['001', '003', '005', '006', '007', '008']);
