@@ -8,14 +8,14 @@
         title="{{ it.id }}"
       >
         @if (it.loading) {
-          <div class="h-full w-full animate-pulse bg-gray-200"></div>
+          <div class="bg-main-bright h-full w-full animate-pulse"></div>
         } @else if (it.error) {
-          <span class="px-2 text-center text-red-600">Chyba</span>
+          <span class="text-error px-2 text-center">Chyba</span>
         } @else {
           <img
             class="pointer-events-none block h-full w-auto object-contain select-none"
             [class.border-4]="selectedId() === it.id"
-            [class.border-gray-500]="selectedId() === it.id"
+            [class.border-tertiary-default]="selectedId() === it.id"
             [src]="it.url"
             alt="thumb"
           />

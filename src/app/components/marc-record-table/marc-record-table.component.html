@@ -9,7 +9,7 @@
   <tbody>
     @for (sf of record().special_fields; track $index) {
       <tr
-        class="border-b-[0.5px] border-gray-500"
+        class="border-tertiary-default border-b-[0.5px]"
         [sf]="sf"
         appMarcRowSpecial
       ></tr>
@@ -17,7 +17,7 @@
 
     @for (nf of record().normal_fields; track $index) {
       <tr
-        class="border-b-[0.5px] border-gray-500 align-top"
+        class="border-tertiary-default border-b-[0.5px]"
         [nf]="nf"
         appMarcRowNormal
       ></tr>

@@ -1,16 +1,16 @@
 <section class="flex h-full flex-col">
   <h2 class="mb-5">Záznamy</h2>
-  <div class="flex overflow-x-auto border-b-[0.5px] border-gray-500">
+  <div class="border-tertiary-default flex overflow-x-auto border-b-[0.5px]">
     @if (records().length) {
       @for (rec of records(); track $index) {
         <button
-          class="text-md cursor-pointer bg-gray-100 p-4 font-medium"
+          class="bg-main-light text-md cursor-pointer p-4 font-medium"
           [class.rounded-tl-lg]="$index === 0"
           [class.rounded-tr-lg]="$index + 1 === records().length"
           [class.border-b-3]="activeIndex() === $index"
-          [class.border-[#30B0C7]]="activeIndex() === $index"
-          [class.text-gray-800]="activeIndex() === $index"
-          [class.text-gray-600]="activeIndex() !== $index"
+          [class.border-primary-default]="activeIndex() === $index"
+          [class.text-secondary]="activeIndex() === $index"
+          [class.text-light]="activeIndex() !== $index"
           (click)="setActive($index)"
           type="button"
         >
@@ -18,7 +18,7 @@
         </button>
       }
     } @else {
-      <div class="p-4 text-sm text-gray-600">Žádné záznamy</div>
+      <div class="text-md text-light p-4">Žádné záznamy</div>
     }
   </div>
 
@@ -31,7 +31,7 @@
   @if (records().length && activeIndex() != 0) {
     <div class="mt-4 flex justify-end">
       <button
-        class="text-md cursor-pointer rounded-lg bg-[#30B0C7] px-4 py-3 font-medium text-white"
+        class="bg-main-primary-default text-on-color text-sm-tight cursor-pointer rounded-lg px-4 py-3 font-medium"
         type="button"
       >
         Převzít celý záznam

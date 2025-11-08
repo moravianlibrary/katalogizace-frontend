@@ -1,7 +1,7 @@
 @if (!item() || item().loading) {
-  <div class="h-full w-full animate-pulse bg-gray-200"></div>
+  <div class="bg-main-bright h-full w-full animate-pulse"></div>
 } @else if (item().error) {
-  <div class="text-md grid h-full place-items-center text-red-600">
+  <div class="text-md text-error grid h-full place-items-center">
     {{ item().error }}
   </div>
 } @else if (item().url) {
@@ -13,7 +13,7 @@
     />
   </div>
 } @else {
-  <div class="grid h-full place-items-center text-sm text-gray-500">
+  <div class="text-light grid h-full place-items-center text-sm">
     Vyberte obrázek
   </div>
 }

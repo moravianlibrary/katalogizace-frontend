@@ -1,12 +1,12 @@
-<td class="p-2 font-bold text-gray-800">
+<td class="text-secondary p-2 font-bold">
   {{ nf().tag }}
 </td>
 
-<td class="p-2 font-semibold text-gray-800">
+<td class="text-secondary p-2 font-bold">
   {{ nf().ind1 }}
 </td>
 
-<td class="p-2 font-semibold text-gray-800">
+<td class="text-secondary p-2 font-bold">
   {{ nf().ind2 }}
 </td>
 
@@ -15,7 +15,7 @@
     <div class="flex flex-wrap gap-x-2 gap-y-1">
       @for (sf of nf().subfields; track $index) {
         <span>
-          <span class="font-semibold text-gray-800">|{{ sf.code }}</span>
+          <span class="text-secondary font-bold">|{{ sf.code }}</span>
           <span class="ml-1">{{ sf.value }}</span>
         </span>
       }

@@ -1,20 +1,17 @@
 <main class="mx-auto max-w-7xl px-4 py-4">
   <section class="space-y-4">
-    <div class="flex items-center justify-between">
-      <h1 class="text-xl font-semibold">Knihy</h1>
-      <!-- místo pro budoucí filtry (state/batch) -->
-    </div>
+    <h1>Knihy</h1>
 
     @if (loading()) {
-      <div class="text-sm">Načítám…</div>
+      <div class="text-md">Načítám…</div>
     } @else if (error()) {
-      <div class="text-sm text-red-600">{{ error() }}</div>
+      <div class="text-md text-error">{{ error() }}</div>
     } @else if (!data() || data()!.books.length === 0) {
-      <div class="text-sm text-slate-500">Zatím žádné záznamy.</div>
+      <div class="text-md">Zatím žádné záznamy.</div>
     } @else {
       <div class="overflow-x-auto rounded border">
-        <table class="min-w-full text-sm">
-          <thead class="bg-slate-50 text-slate-700">
+        <table class="text-md min-w-full">
+          <thead class="bg-main-bright text-secondary">
             <tr>
               <th class="px-3 py-2 text-left">ID</th>
               <th class="px-3 py-2 text-left">Vytvořeno</th>
@@ -25,7 +22,7 @@
           <tbody>
             @for (b of data()!.books; track b.book_id) {
               <tr
-                class="border-t hover:bg-slate-50"
+                class="hover:bg-main-light border-t"
                 [class.cursor-pointer]="b.state === 'completed'"
                 [attr.tabindex]="b.state === 'completed' ? 0 : null"
                 [attr.role]="b.state === 'completed' ? 'button' : null"
@@ -33,12 +30,12 @@
                 (keyup.enter)="b.state === 'completed' && open(b.book_id)"
                 (keyup.space)="b.state === 'completed' && open(b.book_id)"
               >
-                <td class="px-3 py-2 font-mono text-xs">{{ b.book_id }}</td>
+                <td class="px-3 py-2">{{ b.book_id }}</td>
                 <td class="px-3 py-2">{{ b.created_at | date: "medium" }}</td>
                 <td class="px-3 py-2">{{ b.modified_at | date: "medium" }}</td>
                 <td class="px-3 py-2">
                   <span
-                    class="inline-flex items-center rounded px-2 py-0.5 text-xs font-medium"
+                    class="inline-flex items-center rounded px-2 py-0.5 text-sm font-medium"
                     [ngClass]="stateBadgeClass(b.state)"
                   >
                     {{ b.state || "—" }}
@@ -47,7 +44,7 @@
               </tr>
             } @empty {
               <tr>
-                <td class="px-3 py-4 text-center text-slate-500" colspan="4">
+                <td class="px-3 py-4 text-center" colspan="4">
                   Zatím žádné záznamy.
                 </td>
               </tr>
@@ -56,20 +53,20 @@
         </table>
       </div>
 
-      <div class="flex items-center justify-between">
-        <div class="text-xs text-slate-600">
+      <div class="flex items-center justify-between text-sm">
+        <div class="text-light">
           Celkem: {{ data()!.total }} • Strana {{ page() }} / {{ totalPages() }}
         </div>
         <div class="flex gap-2">
           <button
-            class="rounded border px-3 py-1 text-sm disabled:opacity-40"
+            class="rounded border px-3 py-1 disabled:opacity-40"
             [disabled]="!data()!.has_prev"
             (click)="goPrev()"
           >
             Předchozí
           </button>
           <button
-            class="rounded border px-3 py-1 text-sm disabled:opacity-40"
+            class="rounded border px-3 py-1 disabled:opacity-40"
             [disabled]="!data()!.has_next"
             (click)="goNext()"
           >
