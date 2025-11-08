@@ -2,13 +2,13 @@
   <div class="flex justify-between gap-4">
     <div class="flex items-center gap-3">
       <div
-        class="border-tertiary-default text-s inline-flex h-10 w-15 items-center justify-center rounded-lg border font-bold"
+        class="border-tertiary-default inline-flex h-10 w-15 items-center justify-center rounded-lg border text-sm font-bold"
       >
         {{ field().tag }}
       </div>
 
       <input
-        class="border-tertiary-default text-s h-10 w-10.5 rounded-lg border text-center font-medium"
+        class="border-tertiary-default h-10 w-10.5 rounded-lg border text-center text-sm font-medium"
         [(ngModel)]="field().ind1"
         (ngModelChange)="field().ind1 = $event"
         maxlength="1"
@@ -16,7 +16,7 @@
       />
 
       <input
-        class="border-tertiary-default text-s h-10 w-10.5 rounded-lg border text-center font-medium"
+        class="border-tertiary-default h-10 w-10.5 rounded-lg border text-center text-sm font-medium"
         [(ngModel)]="field().ind2"
         (ngModelChange)="field().ind2 = $event"
         maxlength="1"
@@ -151,13 +151,13 @@
         class="border-tertiary-default flex items-center gap-2 rounded-lg border px-4 py-2.5"
       >
         <span
-          class="text-secondary text-s inline-flex w-4 items-center justify-center font-bold"
+          class="text-secondary inline-flex w-4 items-center justify-center text-sm font-bold"
         >
           |{{ sf.code }}
         </span>
 
         <input
-          class="placeholder:text-disable text-s flex-1 bg-transparent text-base outline-none"
+          class="placeholder:text-disable flex-1 bg-transparent text-base text-sm outline-none"
           [ngModel]="sf.value"
           (ngModelChange)="sf.value = $event"
           placeholder="Aa"
