@@ -1,0 +1,9 @@
+<div class="flex flex-col gap-5">
+  @if (fields().length === 0) {
+    <div class="text-light text-sm">Žádná vyčtená pole.</div>
+  } @else {
+    @for (f of fields(); track $index) {
+      <app-extracted-field-card [field]="f" />
+    }
+  }
+</div>
