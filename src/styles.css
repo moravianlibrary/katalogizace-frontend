@@ -628,7 +628,7 @@ h4,
 h5,
 h6 {
   font-family: var(--font-plex);
-  font-weight: 500;
+  font-weight: var(--font-weight-regular);
   color: var(--color-gray-1000);
 }
 
