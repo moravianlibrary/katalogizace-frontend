@@ -136,3 +136,16 @@ export interface BatchBooksResponse {
   total_count: number;
   state_counts?: Record<TaskState, number>;
 }
+
+export type UiSubfield = { code: string; value: string };
+
+export type UiFieldWithMeta = {
+  tag: string;
+  ind1: string | null;
+  ind2: string | null;
+  subfields: UiSubfield[];
+  candidateId: string;
+  score: number;
+
+  //extractedFieldId?: string;
+};
