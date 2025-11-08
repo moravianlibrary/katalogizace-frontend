@@ -1,5 +1,5 @@
 <section class="flex h-screen flex-col gap-5 p-6">
   <app-navigation-buttons></app-navigation-buttons>
   <app-extracted-fields [extracted]="result()?.extracted_marc_record ?? null" />
-  <pre class="overflow-auto">{{ result() | json }}</pre>
+  <pre class="min-h-200 overflow-auto">{{ result() | json }}</pre>
 </section>
