@@ -313,7 +313,7 @@
   background-color: var(--color-green-400);
 }
 @utility bg-main-success-rate-90-100 {
-  background-color: var(--color-green-500);
+  background-color: var(--color-green-600);
 }
 
 /* ========== TEXT ========== */
@@ -409,7 +409,7 @@
   color: var(--color-green-400);
 }
 @utility text-success-rate-90-100 {
-  color: var(--color-green-500);
+  color: var(--color-green-600);
 }
 
 /* ========== BORDER ========== */
@@ -510,7 +510,7 @@
   border-color: var(--color-green-400);
 }
 @utility border-success-rate-90-100 {
-  border-color: var(--color-green-500);
+  border-color: var(--color-green-600);
 }
 
 /* ========== ICON ========== */
@@ -613,7 +613,7 @@
   fill: var(--color-green-400);
 }
 @utility icon-success-rate-90-100 {
-  fill: var(--color-green-500);
+  fill: var(--color-green-600);
 }
 
 * {
