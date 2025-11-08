@@ -4,6 +4,7 @@ import {
   ExistingMarcRecordSpecialField,
   ExtractedMarcField,
   ExtractedMarcRecord,
+  UiFieldWithMeta,
 } from '../models/book';
 
 function pickCandidate(f: ExtractedMarcField) {
@@ -71,4 +72,59 @@ export function extractedToExisting(
   };
 
   return existing;
+}
+
+export function extractedToUiFields(
+  extracted: ExtractedMarcRecord | null,
+  includeControl: boolean,
+): UiFieldWithMeta[] {
+  if (!extracted) return [];
+
+  const out: UiFieldWithMeta[] = [];
+
+  for (const [tag, fields] of Object.entries(extracted)) {
+    if (!Array.isArray(fields) || fields.length === 0) continue;
+
+    const isControl = isControlTag(tag);
+    if (isControl && !includeControl) continue;
+
+    for (const f of fields) {
+      if (!f?.candidates?.length) continue;
+      const cand = pickCandidate(f);
+      const rep = cand.marc_representation;
+
+      if (isControl) {
+        const value =
+          (rep.subfields && rep.subfields.length
+            ? rep.subfields.map((sf) => sf.value).join(' ')
+            : '') || '';
+
+        out.push({
+          tag,
+          ind1: null,
+          ind2: null,
+          subfields: [{ code: '', value }],
+          candidateId: cand.id,
+          score: cand.score,
+          //extractedFieldId: f.id,
+        });
+      } else {
+        out.push({
+          tag,
+          ind1: rep.ind1 ?? null,
+          ind2: rep.ind2 ?? null,
+          subfields: (rep.subfields ?? []).map((sf) => ({
+            code: sf.code,
+            value: sf.value,
+          })),
+          candidateId: cand.id,
+          score: cand.score,
+          //extractedFieldId: f.id,
+        });
+      }
+    }
+  }
+
+  out.sort((a, b) => a.tag.localeCompare(b.tag));
+  return out;
 }
