@@ -4,7 +4,7 @@
     @if (records().length) {
       @for (rec of records(); track $index) {
         <button
-          class="bg-main-light text-md cursor-pointer p-4 font-medium"
+          class="bg-main-light text-md inline-flex cursor-pointer p-4 font-medium"
           [class.rounded-tl-lg]="$index === 0"
           [class.rounded-tr-lg]="$index + 1 === records().length"
           [class.border-b-3]="activeIndex() === $index"
