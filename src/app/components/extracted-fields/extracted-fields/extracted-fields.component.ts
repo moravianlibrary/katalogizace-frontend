@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, input } from '@angular/core';
 import { ExtractedMarcRecord, UiFieldWithMeta } from '../../../models/book';
 import { extractedToUiFields } from '../../../utils/marc-transform';
@@ -7,7 +6,7 @@ import { ExtractedFieldCardComponent } from '../extracted-field-card/extracted-f
 @Component({
   standalone: true,
   selector: 'app-extracted-fields',
-  imports: [CommonModule, ExtractedFieldCardComponent],
+  imports: [ExtractedFieldCardComponent],
   templateUrl: './extracted-fields.component.html',
 })
 export class ExtractedFieldsComponent {
