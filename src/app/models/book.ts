@@ -144,8 +144,9 @@ export type UiFieldWithMeta = {
   ind1: string | null;
   ind2: string | null;
   subfields: UiSubfield[];
-  candidateId: string;
+  candidateId: UUID;
   score: number;
+  candidates: MarcCandidate[] | null;
 
   //extractedFieldId?: string;
 };

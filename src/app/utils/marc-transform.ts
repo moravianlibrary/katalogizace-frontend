@@ -106,6 +106,7 @@ export function extractedToUiFields(
           subfields: [{ code: '', value }],
           candidateId: cand.id,
           score: cand.score,
+          candidates: f.candidates,
           //extractedFieldId: f.id,
         });
       } else {
@@ -119,6 +120,7 @@ export function extractedToUiFields(
           })),
           candidateId: cand.id,
           score: cand.score,
+          candidates: f.candidates,
           //extractedFieldId: f.id,
         });
       }
