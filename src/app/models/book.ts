@@ -140,13 +140,12 @@ export interface BatchBooksResponse {
 export type UiSubfield = { code: string; value: string };
 
 export type UiFieldWithMeta = {
+  extractedFieldId: UUID;
   tag: string;
   ind1: string | null;
   ind2: string | null;
   subfields: UiSubfield[];
   candidateId: UUID;
   score: number;
-  candidates: MarcCandidate[] | null;
-
-  //extractedFieldId?: string;
+  candidates: MarcCandidate[];
 };
