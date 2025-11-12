@@ -1,0 +1,91 @@
+<div class="flex h-full flex-col gap-4">
+  <h2>{{ title() }}</h2>
+
+  <div class="min-h-0 flex-1 overflow-auto">
+    <table class="w-full border-collapse text-sm">
+      <colgroup>
+        <col class="w-12" />
+        <col class="w-12" />
+        <col />
+        <col class="w-12" />
+      </colgroup>
+
+      <thead class="bg-main-base sticky top-0">
+        <tr class="border-tertiary-default border-b-[0.5px]">
+          <th class="text-secondary p-2 text-left font-bold">Ind1</th>
+          <th class="text-secondary p-2 text-left font-bold">Ind2</th>
+          <th class="text-secondary p-2 text-left font-bold">Podpole</th>
+          <th class="text-secondary p-2 text-left font-bold">Skóre</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (candidate of sortedCandidates(); track candidate.id) {
+          <tr
+            class="border-tertiary-default cursor-pointer border-b-[0.5px]"
+            [class.bg-main-light]="selectedId() === candidate.id"
+            (click)="onRowClick(candidate.id)"
+          >
+            <td class="text-secondary p-2 text-center align-text-top font-bold">
+              {{ candidate.marc_representation.ind1 ?? "" }}
+            </td>
+
+            <td class="text-secondary p-2 text-center align-text-top font-bold">
+              {{ candidate.marc_representation.ind2 ?? "" }}
+            </td>
+
+            <td class="p-2 align-text-top">
+              @if (candidate.marc_representation.subfields?.length) {
+                <div class="flex flex-wrap gap-x-2 gap-y-1">
+                  @for (
+                    sf of candidate.marc_representation.subfields;
+                    track $index
+                  ) {
+                    <span>
+                      <span class="text-secondary font-bold"
+                        >|{{ sf.code }}</span
+                      >
+                      <span class="ml-1">{{ sf.value }}</span>
+                    </span>
+                  }
+                </div>
+              }
+            </td>
+
+            <td class="p-2">
+              <div class="flex h-full items-center justify-center">
+                <span
+                  class="h-4 w-4 rounded-full"
+                  [ngClass]="scoreClass(candidate.score)"
+                  title="score {{ candidate.score | number: '1.2-2' }}"
+                ></span>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td class="p-4 text-center text-slate-500" colspan="4">
+              Žádní kandidáti.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-2 flex items-center justify-between">
+    <button
+      class="border-tertiary-default text-sm-tight text-secondary cursor-pointer rounded-lg border px-4 py-3 font-medium"
+      (click)="onClose()"
+    >
+      Zavřít
+    </button>
+    <button
+      class="bg-main-primary-default disabled:bg-main-primary-disable text-sm-tight text-on-color cursor-pointer rounded-lg px-4 py-3 font-medium disabled:cursor-not-allowed"
+      [disabled]="!selectedId()"
+      (click)="onConfirm()"
+    >
+      Potvrdit výběr
+    </button>
+  </div>
+</div>
