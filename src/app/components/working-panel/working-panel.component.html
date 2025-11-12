@@ -1,6 +1,8 @@
-<div class="h-screen overflow-auto p-6">
-  <app-marc-records
-    [existingRecords]="existingRecords()"
-    [extractedRecord]="extractedRecord()"
-  ></app-marc-records>
-</div>
+<section class="h-screen overflow-auto p-6">
+  @if (state().mode === "records") {
+    <app-marc-records
+      [existingRecords]="existingRecords()"
+      [extractedRecord]="extractedRecord()"
+    />
+  }
+</section>

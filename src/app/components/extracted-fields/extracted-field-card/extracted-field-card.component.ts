@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, input } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { UiFieldWithMeta } from '../../../models/book';
+import { WorkingPanelService } from '../../../services/working-panel.service';
 
 @Component({
   standalone: true,
@@ -11,6 +12,7 @@ import { UiFieldWithMeta } from '../../../models/book';
 })
 export class ExtractedFieldCardComponent {
   field = input.required<UiFieldWithMeta>();
+  private wps = inject(WorkingPanelService);
 
   private readonly SCORE_CLASS: Record<number, string> = {
     0: 'bg-main-success-rate-0-10',
@@ -35,7 +37,9 @@ export class ExtractedFieldCardComponent {
     ];
   }
 
-  onShowCandidates() {}
+  onShowCandidates() {
+    this.wps.showCandidates(this.field().tag, this.field().candidates!);
+  }
   onAddSubfield() {}
   onDeleteField() {}
 }
