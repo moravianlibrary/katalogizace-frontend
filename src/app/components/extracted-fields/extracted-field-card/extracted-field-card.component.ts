@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, input } from '@angular/core';
+import { Component, effect, inject, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { UiFieldWithMeta } from '../../../models/book';
 import { WorkingPanelService } from '../../../services/working-panel.service';
@@ -38,8 +38,34 @@ export class ExtractedFieldCardComponent {
   }
 
   onShowCandidates() {
-    this.wps.showCandidates(this.field().tag, this.field().candidates!);
+    this.wps.showCandidates(
+      this.field().tag,
+      this.field().extractedFieldId,
+      this.field().candidates!,
+      this.field().candidateId,
+    );
   }
   onAddSubfield() {}
   onDeleteField() {}
+
+  private applyFx = effect(() => {
+    const evt = this.wps.applyCandidate();
+    if (!evt) {
+      return;
+    }
+
+    const f = this.field();
+    if (evt.fieldId !== f.extractedFieldId) {
+      return;
+    }
+
+    const rep = evt.candidate.marc_representation;
+    f.ind1 = rep.ind1 ?? '';
+    f.ind2 = rep.ind2 ?? '';
+    f.subfields = rep.subfields ?? [];
+    f.candidateId = evt.candidate.id;
+    f.score = evt.candidate.score;
+
+    this.wps.applyCandidate.set(null);
+  });
 }

@@ -4,5 +4,11 @@
       [existingRecords]="existingRecords()"
       [extractedRecord]="extractedRecord()"
     />
+  } @else if (state().mode === "candidates") {
+    <app-candidates-table
+      [title]="'Výběr kandidátů pole ' + state().tag"
+      [candidates]="state().candidates ?? []"
+      [selectedCandidateId]="state().selectedCandidateId ?? null"
+    />
   }
 </section>
