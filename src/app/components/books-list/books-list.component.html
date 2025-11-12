@@ -59,14 +59,14 @@
         </div>
         <div class="flex gap-2">
           <button
-            class="rounded border px-3 py-1 disabled:opacity-40"
+            class="cursor-pointer rounded border px-3 py-1 disabled:opacity-40"
             [disabled]="!data()!.has_prev"
             (click)="goPrev()"
           >
             Předchozí
           </button>
           <button
-            class="rounded border px-3 py-1 disabled:opacity-40"
+            class="cursor-pointer rounded border px-3 py-1 disabled:opacity-40"
             [disabled]="!data()!.has_next"
             (click)="goNext()"
           >

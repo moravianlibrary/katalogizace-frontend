@@ -1,12 +1,8 @@
 import { DatePipe, NgClass } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import {
-  BookRecordInfo,
-  PaginatedBooksResponse,
-  TaskState,
-} from '../../models/book';
+import { PaginatedBooksResponse, TaskState } from '../../models/book';
 import { BooksService } from '../../services/books.service';
 
 @Component({
@@ -19,6 +15,7 @@ export class BooksListComponent {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private books = inject(BooksService);
+  private destroyRef = inject(DestroyRef);
 
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
@@ -53,7 +50,7 @@ export class BooksListComponent {
         page_size: this.pageSize(),
         // state: undefined, batch_id: undefined // ľahko doplniteľné
       })
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (resp) => {
           this.data.set(resp);
@@ -69,12 +66,16 @@ export class BooksListComponent {
 
   goPrev() {
     if (!this.data() || !this.data()!.has_prev) return;
-    this.navigateWithQuery({ page: Math.max(1, this.page() - 1) });
+    const prevPage = Math.max(1, this.page() - 1);
+    this.page.set(prevPage);
+    this.navigateWithQuery({ page: prevPage });
   }
 
   goNext() {
     if (!this.data() || !this.data()!.has_next) return;
-    this.navigateWithQuery({ page: this.page() + 1 });
+    const nextPage = this.page() + 1;
+    this.page.set(nextPage);
+    this.navigateWithQuery({ page: nextPage });
   }
 
   navigateWithQuery(partial: { page?: number; page_size?: number }) {
@@ -87,10 +88,6 @@ export class BooksListComponent {
       },
       queryParamsHandling: 'merge',
     });
-  }
-
-  trackById(_i: number, b: BookRecordInfo) {
-    return b.book_id;
   }
 
   stateBadgeClass(state?: TaskState | null) {
