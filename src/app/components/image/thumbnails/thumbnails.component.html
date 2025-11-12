@@ -10,7 +10,9 @@
         @if (it.loading) {
           <div class="bg-main-bright h-full w-full animate-pulse"></div>
         } @else if (it.error) {
-          <span class="text-error px-2 text-center">Chyba</span>
+          <span class="text-error px-2 text-center">
+            {{ it.error }}
+          </span>
         } @else {
           <img
             class="pointer-events-none block h-full w-auto object-contain select-none"
