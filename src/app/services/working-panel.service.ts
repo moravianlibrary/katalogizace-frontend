@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { MarcCandidate } from '../models/book';
+import { MarcCandidate, Step } from '../models/book';
 
 export type PanelMode = 'records' | 'candidates' | 'provenance' | 'delete';
 
@@ -8,7 +8,7 @@ export interface PanelState {
   tag?: string;
   title?: string;
   candidates?: MarcCandidate[];
-  steps?: { kind: string; description: string }[];
+  steps?: Step[];
   fieldId?: string;
   subfields?: { code: string; value: string }[];
   selectedCandidateId?: string;
@@ -81,5 +81,9 @@ export class WorkingPanelService {
     });
 
     this.showRecords();
+  }
+
+  showProvenance(title: string, steps: Step[]) {
+    this.setMode('provenance', { title, steps });
   }
 }
