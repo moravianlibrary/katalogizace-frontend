@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, effect, inject, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { UiFieldWithMeta } from '../../../models/book';
+import { UiFieldWithMeta, UiSubfield } from '../../../models/book';
 import { WorkingPanelService } from '../../../services/working-panel.service';
 
 @Component({
@@ -13,6 +13,8 @@ import { WorkingPanelService } from '../../../services/working-panel.service';
 export class ExtractedFieldCardComponent {
   field = input.required<UiFieldWithMeta>();
   private wps = inject(WorkingPanelService);
+
+  private newSubfields = new Set<UiSubfield>();
 
   private readonly SCORE_CLASS: Record<number, string> = {
     0: 'bg-main-success-rate-0-10',
@@ -45,8 +47,40 @@ export class ExtractedFieldCardComponent {
       this.field().candidateId,
     );
   }
-  onAddSubfield() {}
+
+  onAddSubfield() {
+    const f = this.field();
+    if (!f.subfields) {
+      f.subfields = [];
+    }
+
+    const sf = { code: '', value: '' };
+    f.subfields.push(sf);
+    this.newSubfields.add(sf);
+  }
+
   onDeleteField() {}
+
+  isCodeEditable(sf: UiSubfield): boolean {
+    return this.newSubfields.has(sf);
+  }
+
+  hasCodeCollision(sf: UiSubfield): boolean {
+    const f = this.field();
+    const code = (sf.code ?? '').trim();
+    if (!code) {
+      return false;
+    }
+
+    const subfields = f.subfields ?? [];
+    let count = 0;
+    for (const other of subfields) {
+      if ((other.code ?? '').trim() === code) {
+        count++;
+      }
+    }
+    return count > 1;
+  }
 
   private applyFx = effect(() => {
     const evt = this.wps.applyCandidate();
