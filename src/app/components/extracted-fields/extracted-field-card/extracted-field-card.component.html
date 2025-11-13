@@ -161,7 +161,10 @@
         <div
           class="flex items-center gap-2 rounded-lg border px-4 py-2.5"
           [class.border-error]="hasCodeCollision(sf)"
-          [class.border-tertiary-default]="!hasCodeCollision(sf)"
+          [class.border-tertiary-disable]="isValueDisabled(sf)"
+          [class.border-tertiary-default]="
+            !hasCodeCollision(sf) && !isValueDisabled(sf)
+          "
         >
           <span
             class="text-secondary inline-flex items-center text-sm font-bold"
@@ -169,7 +172,7 @@
             |
             @if (isCodeEditable(sf)) {
               <input
-                class="placeholder:text-disable w-4 items-center justify-center bg-transparent text-center text-sm font-bold outline-none"
+                class="w-4 items-center justify-center bg-transparent text-center text-sm font-bold outline-none placeholder:text-gray-300"
                 [(ngModel)]="sf.code"
                 maxlength="1"
                 placeholder="a"
@@ -183,8 +186,9 @@
           </span>
 
           <input
-            class="placeholder:text-disable flex-1 bg-transparent text-base text-sm outline-none"
+            class="disabled:text-disable flex-1 bg-transparent text-base text-sm outline-none placeholder:text-gray-300 disabled:cursor-not-allowed"
             [ngModel]="sf.value"
+            [disabled]="isValueDisabled(sf)"
             (ngModelChange)="sf.value = $event"
             placeholder="Aa"
           />

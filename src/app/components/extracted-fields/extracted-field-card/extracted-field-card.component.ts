@@ -121,4 +121,8 @@ export class ExtractedFieldCardComponent {
       this.wps.state().fieldId === this.field().extractedFieldId
     );
   }
+
+  isValueDisabled(sf: { code: string }) {
+    return sf.code === '7';
+  }
 }
