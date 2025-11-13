@@ -14,7 +14,7 @@ export class ExtractedFieldCardComponent {
   field = input.required<UiFieldWithMeta>();
   provenance = input<Record<string, Step[]>>({});
 
-  private wps = inject(WorkingPanelService);
+  wps = inject(WorkingPanelService);
 
   private newSubfields = new Set<UiSubfield>();
 
@@ -112,6 +112,13 @@ export class ExtractedFieldCardComponent {
     }
     const steps = this.provenance()[f.candidateId] ?? [];
     const title = `Jak jsme získali pole ${f.tag}?`;
-    this.wps.showProvenance(title, steps);
+    this.wps.showProvenance(title, steps, f.extractedFieldId);
+  }
+
+  get isActive() {
+    return (
+      this.wps.state().mode !== 'records' &&
+      this.wps.state().fieldId === this.field().extractedFieldId
+    );
   }
 }

@@ -83,7 +83,7 @@ export class WorkingPanelService {
     this.showRecords();
   }
 
-  showProvenance(title: string, steps: Step[]) {
-    this.setMode('provenance', { title, steps });
+  showProvenance(title: string, steps: Step[], fieldId: string) {
+    this.setMode('provenance', { title, steps, fieldId });
   }
 }
