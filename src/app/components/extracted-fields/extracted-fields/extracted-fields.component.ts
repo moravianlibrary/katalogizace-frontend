@@ -1,5 +1,9 @@
 import { Component, computed, input } from '@angular/core';
-import { ExtractedMarcRecord, UiFieldWithMeta } from '../../../models/book';
+import {
+  ExtractedMarcRecord,
+  Step,
+  UiFieldWithMeta,
+} from '../../../models/book';
 import { extractedToUiFields } from '../../../utils/marc-transform';
 import { ExtractedFieldCardComponent } from '../extracted-field-card/extracted-field-card.component';
 
@@ -11,6 +15,7 @@ import { ExtractedFieldCardComponent } from '../extracted-field-card/extracted-f
 })
 export class ExtractedFieldsComponent {
   extracted = input<ExtractedMarcRecord | null>(null);
+  provenance = input<Record<string, Step[]>>({});
 
   fields = computed<UiFieldWithMeta[]>(() => {
     const src = this.extracted();

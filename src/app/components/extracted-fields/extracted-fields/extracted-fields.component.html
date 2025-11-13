@@ -3,7 +3,7 @@
     <div class="text-light text-sm">Žádná vyčtená pole.</div>
   } @else {
     @for (f of fields(); track $index) {
-      <app-extracted-field-card [field]="f" />
+      <app-extracted-field-card [field]="f" [provenance]="provenance()" />
     }
   }
 </div>

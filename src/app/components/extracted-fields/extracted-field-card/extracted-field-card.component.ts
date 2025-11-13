@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, effect, inject, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { UiFieldWithMeta, UiSubfield } from '../../../models/book';
+import { Step, UiFieldWithMeta, UiSubfield } from '../../../models/book';
 import { WorkingPanelService } from '../../../services/working-panel.service';
 
 @Component({
@@ -12,6 +12,8 @@ import { WorkingPanelService } from '../../../services/working-panel.service';
 })
 export class ExtractedFieldCardComponent {
   field = input.required<UiFieldWithMeta>();
+  provenance = input<Record<string, Step[]>>({});
+
   private wps = inject(WorkingPanelService);
 
   private newSubfields = new Set<UiSubfield>();
@@ -102,4 +104,14 @@ export class ExtractedFieldCardComponent {
 
     this.wps.applyCandidate.set(null);
   });
+
+  onShowProvenance() {
+    const f = this.field();
+    if (!f.candidateId) {
+      return;
+    }
+    const steps = this.provenance()[f.candidateId] ?? [];
+    const title = `Jak jsme získali pole ${f.tag}?`;
+    this.wps.showProvenance(title, steps);
+  }
 }

@@ -3,11 +3,16 @@ import { ExistingMarcRecord, ExtractedMarcRecord } from '../../models/book';
 import { WorkingPanelService } from '../../services/working-panel.service';
 import { CandidatesTableComponent } from '../candidates-table/candidates-table.component';
 import { MarcRecordsComponent } from '../marc-records/marc-records.component';
+import { ProvenanceTimelineComponent } from '../provenance-timeline/provenance-timeline.component';
 
 @Component({
   standalone: true,
   selector: 'app-working-panel',
-  imports: [MarcRecordsComponent, CandidatesTableComponent],
+  imports: [
+    MarcRecordsComponent,
+    CandidatesTableComponent,
+    ProvenanceTimelineComponent,
+  ],
   templateUrl: './working-panel.component.html',
 })
 export class WorkingPanelComponent {

@@ -1,4 +1,7 @@
 <section class="flex h-screen flex-col gap-5 p-6">
   <app-navigation-buttons></app-navigation-buttons>
-  <app-extracted-fields [extracted]="result()?.extracted_marc_record ?? null" />
+  <app-extracted-fields
+    [extracted]="result()?.extracted_marc_record ?? null"
+    [provenance]="result()?.provenance ?? {}"
+  />
 </section>

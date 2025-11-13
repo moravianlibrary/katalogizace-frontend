@@ -10,5 +10,10 @@
       [candidates]="state().candidates ?? []"
       [selectedCandidateId]="state().selectedCandidateId ?? null"
     />
+  } @else if (state().mode === "provenance") {
+    <app-provenance-timeline
+      [title]="state().title ?? ''"
+      [steps]="state().steps ?? []"
+    />
   }
 </section>
