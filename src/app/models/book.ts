@@ -119,6 +119,20 @@ export type StepKind =
   | 'transliteration'
   | 'human_edit';
 
+export const STEP_KIND_LABELS: Record<StepKind, string> = {
+  extraction: 'Extrakce',
+  assignment: 'Přiřazení',
+  ocr: 'OCR',
+  disambiguation: 'Disambiguace',
+  normalization: 'Normalizace',
+  authority_search: 'Hledání autorit',
+  authority_match: 'Spárování autorit',
+  dedup_search: 'Hledání duplicit',
+  dedup_match: 'Spárování duplicit',
+  transliteration: 'Transliterace',
+  human_edit: 'Ruční úprava',
+};
+
 export interface Step {
   kind: StepKind;
   description: string;
