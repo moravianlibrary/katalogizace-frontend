@@ -1,0 +1,9 @@
+@if (toast.message()) {
+  <div
+    class="fixed right-4 bottom-4 rounded-lg px-4 py-3 text-sm shadow-md"
+    [class.bg-main-success]="toast.kind() === 'success'"
+    [class.bg-main-error]="toast.kind() === 'error'"
+  >
+    {{ toast.message() }}
+  </div>
+}
