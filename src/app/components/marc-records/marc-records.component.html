@@ -1,6 +1,6 @@
 <section class="flex h-full flex-col">
   <h2 class="mb-5">Záznamy</h2>
-  <div class="border-tertiary-default flex overflow-x-auto border-b-[0.5px]">
+  <div class="border-tertiary-default flex overflow-x-auto">
     @if (records().length) {
       @for (rec of records(); track $index) {
         <button
