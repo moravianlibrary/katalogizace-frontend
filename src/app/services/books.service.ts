@@ -4,6 +4,8 @@ import { environment } from '../../environments/environment';
 import {
   BookResultResponse,
   BookStatusResponse,
+  BookUploadResponse,
+  LastEditedRecord,
   PaginatedBooksResponse,
   TaskState,
 } from '../models/book';
@@ -37,6 +39,13 @@ export class BooksService {
   getBookStatus(bookId: string) {
     return this.http.get<BookStatusResponse>(
       `${this.baseUrl}/books/${bookId}/status`,
+    );
+  }
+
+  submitRevision(bookId: string, record: LastEditedRecord) {
+    return this.http.post<BookUploadResponse>(
+      `${this.baseUrl}/books/${bookId}/revision`,
+      record,
     );
   }
 
