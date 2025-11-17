@@ -156,7 +156,7 @@ export interface BatchBooksResponse {
   state_counts?: Record<TaskState, number>;
 }
 
-export type UiSubfield = { code: string; value: string };
+export type UiSubfield = { code: string; value: string; isManual?: boolean };
 
 export type UiFieldWithMeta = {
   extractedFieldId: UUID;

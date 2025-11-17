@@ -63,4 +63,8 @@ export class NavigationButtonsComponent {
       },
     });
   }
+
+  toggleView() {
+    this.recordState.toggleViewMode();
+  }
 }

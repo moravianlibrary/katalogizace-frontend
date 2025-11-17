@@ -1,5 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import {
+  ExistingMarcRecord,
   ExistingMarcRecordNormalField,
   ExtractedMarcRecord,
   LastEditedRecord,
@@ -7,10 +8,23 @@ import {
 } from '../models/book';
 import { extractedToUiFields } from '../utils/marc-transform';
 
+export type RecordViewMode = 'cards' | 'table';
+
 let manualFieldCounter = 0;
 @Injectable({ providedIn: 'root' })
 export class RecordStateService {
   readonly uiFields = signal<UiFieldWithMeta[]>([]);
+
+  readonly viewMode = signal<RecordViewMode>('cards');
+
+  touch() {
+    const current = this.uiFields();
+    this.uiFields.set([...current]);
+  }
+
+  toggleViewMode() {
+    this.viewMode.update((m) => (m === 'cards' ? 'table' : 'cards'));
+  }
 
   loadFromExtracted(extracted: ExtractedMarcRecord | null) {
     if (!extracted) {
@@ -140,4 +154,31 @@ export class RecordStateService {
       normal_fields: normalFields,
     };
   }
+
+  readonly recordPreview = computed<ExistingMarcRecord | null>(() => {
+    const fields = this.uiFields().filter((f) => f.tag?.trim());
+    if (!fields.length) return null;
+
+    return {
+      record_id: 'preview',
+      leader: '',
+      source: 'user_edit',
+      quality_assessment: {
+        required_present: 0,
+        required_total: 0,
+        required_if_applicable_present: 0,
+        required_if_applicable_total: 0,
+      },
+      special_fields: [],
+      normal_fields: fields.map((f) => ({
+        tag: f.tag,
+        ind1: f.ind1 ?? '',
+        ind2: f.ind2 ?? '',
+        subfields:
+          f.subfields
+            ?.filter((sf) => sf.code?.trim())
+            .map((sf) => ({ code: sf.code, value: sf.value ?? '' })) ?? [],
+      })),
+    };
+  });
 }

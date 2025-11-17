@@ -15,6 +15,7 @@
           <input
             class="w-full bg-transparent text-center text-sm font-bold outline-none"
             [(ngModel)]="field().tag"
+            (ngModelChange)="field().tag = $event; notifyChange()"
             maxlength="3"
             placeholder="000"
           />
@@ -26,7 +27,7 @@
       <input
         class="border-tertiary-default h-10 w-10.5 rounded-lg border text-center text-sm font-medium outline-none"
         [(ngModel)]="field().ind1"
-        (ngModelChange)="field().ind1 = $event"
+        (ngModelChange)="field().ind1 = $event; notifyChange()"
         maxlength="1"
         placeholder=" "
       />
@@ -34,7 +35,7 @@
       <input
         class="border-tertiary-default h-10 w-10.5 rounded-lg border text-center text-sm font-medium outline-none"
         [(ngModel)]="field().ind2"
-        (ngModelChange)="field().ind2 = $event"
+        (ngModelChange)="field().ind2 = $event; notifyChange()"
         maxlength="1"
         placeholder=" "
       />
@@ -185,6 +186,7 @@
               <input
                 class="w-4 items-center justify-center bg-transparent text-center text-sm font-bold outline-none placeholder:text-gray-300"
                 [(ngModel)]="sf.code"
+                (ngModelChange)="sf.code = $event; notifyChange()"
                 maxlength="1"
                 placeholder="a"
               />
@@ -198,9 +200,9 @@
 
           <input
             class="disabled:text-disable flex-1 bg-transparent text-base text-sm outline-none placeholder:text-gray-300 disabled:cursor-not-allowed"
-            [ngModel]="sf.value"
+            [(ngModel)]="sf.value"
             [disabled]="isValueDisabled(sf)"
-            (ngModelChange)="sf.value = $event"
+            (ngModelChange)="sf.value = $event; notifyChange()"
             placeholder="Aa"
           />
         </div>

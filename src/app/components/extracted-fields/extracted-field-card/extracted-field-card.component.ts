@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, effect, inject, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Step, UiFieldWithMeta, UiSubfield } from '../../../models/book';
+import { RecordStateService } from '../../../services/record-state.service';
 import { WorkingPanelService } from '../../../services/working-panel.service';
 
 @Component({
@@ -16,7 +17,11 @@ export class ExtractedFieldCardComponent {
 
   wps = inject(WorkingPanelService);
 
-  private newSubfields = new Set<UiSubfield>();
+  private recordState = inject(RecordStateService);
+
+  notifyChange() {
+    this.recordState.touch();
+  }
 
   private readonly SCORE_CLASS: Record<number, string> = {
     0: 'bg-main-success-rate-0-10',
@@ -56,15 +61,15 @@ export class ExtractedFieldCardComponent {
       f.subfields = [];
     }
 
-    const sf = { code: '', value: '' };
+    const sf = { code: '', value: '', isManual: true };
     f.subfields.push(sf);
-    this.newSubfields.add(sf);
+    this.notifyChange();
   }
 
   onDeleteField() {}
 
   isCodeEditable(sf: UiSubfield): boolean {
-    return this.newSubfields.has(sf);
+    return !!sf.isManual;
   }
 
   hasCodeCollision(sf: UiSubfield): boolean {
@@ -103,6 +108,7 @@ export class ExtractedFieldCardComponent {
     f.score = evt.candidate.score;
 
     this.wps.applyCandidate.set(null);
+    this.notifyChange();
   });
 
   onShowProvenance() {
