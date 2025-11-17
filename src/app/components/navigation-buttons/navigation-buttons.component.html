@@ -1,6 +1,6 @@
 <div class="flex items-center justify-between gap-4">
   <button
-    class="border-tertiary-default bg-main-base inline-flex cursor-pointer items-center justify-center rounded-lg border p-3"
+    class="border-tertiary-default bg-main-base inline-flex cursor-pointer items-center justify-center rounded-lg border p-2.75"
     (click)="goBack()"
     type="button"
     aria-label="Zpět"
@@ -23,5 +23,36 @@
         d="M10.3538 2.36642C10.549 2.56168 10.549 2.87826 10.3538 3.07352L6.00711 7.42019C5.68904 7.73826 5.68904 8.26168 6.00711 8.57975L10.3538 12.9264C10.549 13.1217 10.549 13.4383 10.3538 13.6335C10.1585 13.8288 9.84193 13.8288 9.64667 13.6335L5.3 9.28686C4.59141 8.57826 4.59141 7.42168 5.3 6.71308L9.64667 2.36642C9.84193 2.17116 10.1585 2.17116 10.3538 2.36642Z"
       />
     </svg>
+  </button>
+
+  <button
+    class="bg-main-primary-default text-on-color disabled:bg-main-primary-disable text-sm-tight inline-flex gap-3 rounded-lg px-4 py-3 font-medium hover:cursor-pointer disabled:cursor-not-allowed"
+    [disabled]="isSaving()"
+    (click)="onSave()"
+    type="button"
+  >
+    @if (isSaving()) {
+      Ukládám…
+    } @else {
+      <span> Uložit </span>
+      <svg
+        class="icon-on-color"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M18.5529 7.5068C18.8328 7.20146 18.8121 6.72703 18.5068 6.44714C18.2015 6.16724 17.727 6.18787 17.4471 6.49321L9.75 14.8901L6.55287 11.4023C6.27298 11.097 5.79855 11.0763 5.49321 11.3562C5.18787 11.6361 5.16724 12.1105 5.44714 12.4159L9.19714 16.5068C9.3392 16.6618 9.53977 16.75 9.75 16.75C9.96023 16.75 10.1608 16.6618 10.3029 16.5068L18.5529 7.5068Z"
+        />
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M18.5529 7.5068C18.8328 7.20146 18.8121 6.72703 18.5068 6.44714C18.2015 6.16724 17.727 6.18787 17.4471 6.49321L9.75 14.8901L6.55287 11.4023C6.27298 11.097 5.79855 11.0763 5.49321 11.3562C5.18787 11.6361 5.16724 12.1105 5.44714 12.4159L9.19714 16.5068C9.3392 16.6618 9.53977 16.75 9.75 16.75C9.96023 16.75 10.1608 16.6618 10.3029 16.5068L18.5529 7.5068Z"
+        />
+      </svg>
+    }
   </button>
 </div>

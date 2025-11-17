@@ -1,10 +1,11 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, computed, effect, inject, input } from '@angular/core';
 import {
   ExtractedMarcRecord,
+  LastEditedRecord,
   Step,
   UiFieldWithMeta,
 } from '../../../models/book';
-import { extractedToUiFields } from '../../../utils/marc-transform';
+import { RecordStateService } from '../../../services/record-state.service';
 import { ExtractedFieldCardComponent } from '../extracted-field-card/extracted-field-card.component';
 
 @Component({
@@ -15,12 +16,17 @@ import { ExtractedFieldCardComponent } from '../extracted-field-card/extracted-f
 })
 export class ExtractedFieldsComponent {
   extracted = input<ExtractedMarcRecord | null>(null);
+  lastEdited = input<LastEditedRecord | null>(null);
   provenance = input<Record<string, Step[]>>({});
 
-  fields = computed<UiFieldWithMeta[]>(() => {
-    const src = this.extracted();
-    if (!src) return [];
-    // ! zatial bez special fields
-    return extractedToUiFields(src, false);
+  private recordState = inject(RecordStateService);
+
+  fields = computed<UiFieldWithMeta[]>(() => this.recordState.uiFields());
+
+  private _ = effect(() => {
+    this.recordState.loadFromExtractedAndLast(
+      this.extracted(),
+      this.lastEdited(),
+    );
   });
 }
