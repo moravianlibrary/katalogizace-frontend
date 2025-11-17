@@ -106,6 +106,26 @@ export class RecordStateService {
     const fields = this.uiFields();
     if (!fields.length) return null;
 
+    const normalFields = fields
+      .filter((f) => f.tag.trim().length === 3)
+      .map((f) => {
+        const cleanedSubfields = (f.subfields ?? []).filter(
+          (sf) => sf.code.trim().length === 1 && sf.value.trim().length > 0,
+        );
+
+        return {
+          tag: f.tag.trim(),
+          ind1: f.ind1?.trim() ?? '',
+          ind2: f.ind2?.trim() ?? '',
+          subfields: cleanedSubfields,
+        };
+      })
+      .filter((nf) => nf.subfields.length > 0);
+
+    if (normalFields.length === 0) {
+      return null;
+    }
+
     return {
       record_id: `frontend-${bookId}`,
       leader: '',
@@ -117,12 +137,7 @@ export class RecordStateService {
         required_if_applicable_total: 0,
       },
       special_fields: [],
-      normal_fields: fields.map((f) => ({
-        tag: f.tag,
-        ind1: f.ind1 ?? '',
-        ind2: f.ind2 ?? '',
-        subfields: f.subfields ?? [],
-      })),
+      normal_fields: normalFields,
     };
   }
 }
