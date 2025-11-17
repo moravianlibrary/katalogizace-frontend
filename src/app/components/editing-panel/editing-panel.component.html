@@ -2,9 +2,11 @@
   <app-navigation-buttons
     [bookId]="result()?.book_id ?? ''"
   ></app-navigation-buttons>
-  <app-extracted-fields
-    [extracted]="result()?.extracted_marc_record ?? null"
-    [lastEdited]="result()?.last_edited_record ?? null"
-    [provenance]="result()?.provenance ?? {}"
-  />
+  <div class="min-h-0 flex-1 overflow-auto">
+    <app-extracted-fields
+      [extracted]="result()?.extracted_marc_record ?? null"
+      [lastEdited]="result()?.last_edited_record ?? null"
+      [provenance]="result()?.provenance ?? {}"
+    />
+  </div>
 </section>
