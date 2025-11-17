@@ -11,7 +11,16 @@
       <div
         class="border-tertiary-default inline-flex h-10 w-15 items-center justify-center rounded-lg border text-sm font-bold"
       >
-        {{ field().tag }}
+        @if (field().isManual) {
+          <input
+            class="w-full bg-transparent text-center text-sm font-bold outline-none"
+            [(ngModel)]="field().tag"
+            maxlength="3"
+            placeholder="000"
+          />
+        } @else {
+          {{ field().tag }}
+        }
       </div>
 
       <input
@@ -32,16 +41,18 @@
     </div>
 
     <div class="flex items-center gap-2">
-      <button
-        class="inline-flex h-10 w-11 cursor-pointer items-center justify-center rounded-lg px-2 py-1.5"
-        (click)="onShowProvenance()"
-      >
-        <span
-          class="h-5 w-5 rounded-full"
-          [ngClass]="scoreClass(field().score)"
-          title="score {{ field().score | number: '1.2-2' }}"
-        ></span>
-      </button>
+      @if (!field().isManual) {
+        <button
+          class="inline-flex h-10 w-11 cursor-pointer items-center justify-center rounded-lg px-2 py-1.5"
+          (click)="onShowProvenance()"
+        >
+          <span
+            class="h-5 w-5 rounded-full"
+            [ngClass]="scoreClass(field().score)"
+            title="score {{ field().score | number: '1.2-2' }}"
+          ></span>
+        </button>
+      }
 
       @if (field().candidates.length > 1) {
         <button

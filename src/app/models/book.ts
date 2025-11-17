@@ -167,4 +167,5 @@ export type UiFieldWithMeta = {
   candidateId: UUID;
   score: number;
   candidates: MarcCandidate[];
+  isManual: boolean;
 };

@@ -37,7 +37,7 @@ export class NavigationButtonsComponent {
   }
 
   addField() {
-    /* TODO */
+    this.recordState.addField();
   }
 
   onSave() {

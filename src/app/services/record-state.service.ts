@@ -7,6 +7,7 @@ import {
 } from '../models/book';
 import { extractedToUiFields } from '../utils/marc-transform';
 
+let manualFieldCounter = 0;
 @Injectable({ providedIn: 'root' })
 export class RecordStateService {
   readonly uiFields = signal<UiFieldWithMeta[]>([]);
@@ -33,33 +34,72 @@ export class RecordStateService {
 
     const fields = extractedToUiFields(extracted, false);
 
-    if (lastEdited && lastEdited.normal_fields?.length) {
-      const byTag: Record<string, ExistingMarcRecordNormalField[]> = {};
+    if (!lastEdited?.normal_fields?.length) {
+      this.uiFields.set(fields);
+      return;
+    }
 
-      for (const nf of lastEdited.normal_fields) {
-        if (!byTag[nf.tag]) byTag[nf.tag] = [];
-        byTag[nf.tag].push(nf);
-      }
+    const byTag: Record<string, ExistingMarcRecordNormalField[]> = {};
+    for (const nf of lastEdited.normal_fields) {
+      if (!byTag[nf.tag]) byTag[nf.tag] = [];
+      byTag[nf.tag].push(nf);
+    }
 
-      const counters: Record<string, number> = {};
+    const counters: Record<string, number> = {};
+    const used = new Set<ExistingMarcRecordNormalField>();
 
-      for (const f of fields) {
-        const list = byTag[f.tag];
-        if (!list || list.length === 0) continue;
+    for (const f of fields) {
+      const list = byTag[f.tag];
+      if (!list || list.length === 0) continue;
 
-        const idx = counters[f.tag] ?? 0;
-        if (idx >= list.length) continue;
+      const idx = counters[f.tag] ?? 0;
+      if (idx >= list.length) continue;
 
-        const edited = list[idx];
-        counters[f.tag] = idx + 1;
+      const edited = list[idx];
+      counters[f.tag] = idx + 1;
+      used.add(edited);
 
-        f.ind1 = edited.ind1 ?? '';
-        f.ind2 = edited.ind2 ?? '';
-        f.subfields = edited.subfields ?? [];
-      }
+      f.ind1 = edited.ind1 ?? '';
+      f.ind2 = edited.ind2 ?? '';
+      f.subfields = edited.subfields ?? [];
+    }
+
+    for (const nf of lastEdited.normal_fields) {
+      if (used.has(nf)) continue;
+
+      fields.push({
+        extractedFieldId: '',
+        tag: nf.tag,
+        ind1: nf.ind1 ?? '',
+        ind2: nf.ind2 ?? '',
+        subfields: nf.subfields ?? [],
+
+        candidateId: '',
+        score: 0,
+        candidates: [],
+        isManual: true,
+      } as UiFieldWithMeta);
     }
 
     this.uiFields.set(fields);
+  }
+
+  addField() {
+    const current = this.uiFields();
+
+    const newField: UiFieldWithMeta = {
+      extractedFieldId: `manual-${manualFieldCounter++}`,
+      tag: '',
+      ind1: '',
+      ind2: '',
+      subfields: [],
+      candidateId: '',
+      candidates: [],
+      score: 0,
+      isManual: true,
+    };
+
+    this.uiFields.set([...current, newField]);
   }
 
   buildExistingRecord(bookId: string): LastEditedRecord | null {
