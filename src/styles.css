@@ -279,9 +279,12 @@
   background-color: var(--color-gray-300);
 }
 
-/* Error */
+/* Stavové farby */
 @utility bg-main-error {
   background-color: var(--color-red-500);
+}
+@utility bg-main-success {
+  background-color: var(--color-green-500);
 }
 
 /* Success rate */
