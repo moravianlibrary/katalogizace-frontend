@@ -44,6 +44,7 @@ export type ExtractedMarcRecord = Record<MarcTag, ExtractedMarcField[]>;
 export interface BookResultResponse extends BookCommon {
   extracted_marc_record?: Record<string, ExtractedMarcField[]> | null;
   existing_marc_records?: ExistingMarcRecord[];
+  last_edited_record: LastEditedRecord | null;
   provenance?: Record<UUID, Step[]>;
 }
 
@@ -71,6 +72,10 @@ export interface ExistingMarcRecord {
   quality_assessment: QualityScore;
   special_fields?: ExistingMarcRecordSpecialField[];
   normal_fields?: ExistingMarcRecordNormalField[];
+}
+
+export interface LastEditedRecord extends ExistingMarcRecord {
+  source: string;
 }
 
 export interface QualityScore {
