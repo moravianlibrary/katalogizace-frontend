@@ -1,30 +1,78 @@
 <section class="flex h-full flex-col">
   <h2 class="mb-5">Záznamy</h2>
-  <div class="border-tertiary-default flex overflow-x-auto">
-    @if (records().length) {
-      @for (rec of records(); track $index) {
-        <button
-          class="bg-main-light text-md inline-flex cursor-pointer p-4 font-medium"
-          [class.rounded-tl-lg]="$index === 0"
-          [class.rounded-tr-lg]="$index + 1 === records().length"
-          [class.border-b-3]="activeIndex() === $index"
-          [class.border-primary-default]="activeIndex() === $index"
-          [class.text-secondary]="activeIndex() === $index"
-          [class.text-light]="activeIndex() !== $index"
-          (click)="setActive($index)"
-          type="button"
-        >
-          {{ $index === 0 ? "Vyčtený" : "Nalezený " + $index }}
-        </button>
-      }
-    } @else {
-      <div class="text-md text-light p-4">Žádné záznamy</div>
-    }
-  </div>
 
-  <div class="flex-1 overflow-auto">
-    @if (records().length) {
-      <app-marc-record-table [record]="records()[activeIndex()]" />
+  <div class="overflow-auto">
+    @if (!records().length) {
+      <p class="text-light p-4 text-sm">Žádné existující záznamy.</p>
+    } @else {
+      <div class="text-secondary p-2 text-sm font-bold">
+        <div
+          class="grid grid-cols-[1fr_2fr_1fr_1fr] items-center gap-3 text-left"
+        >
+          <div>Zdroj</div>
+          <div>Autor (100|a)</div>
+          <div>Roky (100|d)</div>
+          <div></div>
+        </div>
+      </div>
+
+      @for (rec of records(); track rec.record_id; let i = $index) {
+        <div
+          class="border-tertiary-default border-b"
+          [class.border-t]="i === 0"
+        >
+          <button
+            class="hover:bg-main-bright bg-main-light w-full px-2 py-3 hover:cursor-pointer"
+            [class.bg-main-bright]="expandedIndex() === i"
+            [class.bg-main-light]="expandedIndex() !== i"
+            (click)="toggleRow(i)"
+            type="button"
+          >
+            <div
+              class="grid grid-cols-[1fr_2fr_1fr_1fr] items-center gap-3 text-left text-sm"
+            >
+              <div class="truncate">
+                {{ rec.source || "Vyčtený" }}
+              </div>
+
+              <div class="truncate">
+                {{ getAuthorName(rec) || "" }}
+              </div>
+
+              <div class="truncate">
+                {{ getAuthorYears(rec) || "" }}
+              </div>
+
+              <div class="flex items-center justify-end">
+                <svg
+                  class="icon-secondary-default transition-transform duration-150"
+                  [ngClass]="{ 'rotate-180': expandedIndex() === i }"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M3.5286 5.5286C3.78895 5.26825
+                 4.21106 5.26825 4.47141 5.5286L8 9.05719
+                 L11.5286 5.5286C11.7889 5.26825 12.2111 5.26825
+                 12.4714 5.5286C12.7318 5.78895 12.7318 6.21106
+                 12.4714 6.47141L8.47141 10.4714C8.21106 10.7318
+                 7.78895 10.7318 7.5286 10.4714L3.5286 6.47141
+                 C3.26825 6.21106 3.26825 5.78895 3.5286 5.5286Z"
+                  />
+                </svg>
+              </div>
+            </div>
+          </button>
+
+          @if (expandedIndex() === i) {
+            <app-marc-record-table [record]="rec" />
+          }
+        </div>
+      }
     }
   </div>
 

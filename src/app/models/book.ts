@@ -69,6 +69,7 @@ export interface CandidateMarcRepresentation {
 export interface ExistingMarcRecord {
   record_id: string;
   leader: string;
+  source: string;
   quality_assessment: QualityScore;
   special_fields?: ExistingMarcRecordSpecialField[];
   normal_fields?: ExistingMarcRecordNormalField[];

@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component, computed, input, signal } from '@angular/core';
 import { ExistingMarcRecord, ExtractedMarcRecord } from '../../models/book';
 import { extractedToExisting } from '../../utils/marc-transform';
@@ -6,7 +7,7 @@ import { MarcRecordTableComponent } from '../marc-record-table/marc-record-table
 @Component({
   standalone: true,
   selector: 'app-marc-records',
-  imports: [MarcRecordTableComponent],
+  imports: [MarcRecordTableComponent, CommonModule],
   templateUrl: './marc-records.component.html',
 })
 export class MarcRecordsComponent {
@@ -28,5 +29,23 @@ export class MarcRecordsComponent {
 
   setActive(i: number) {
     this.activeIndex.set(i);
+  }
+
+  expandedIndex = signal<number | null>(0);
+
+  toggleRow(index: number) {
+    this.expandedIndex.update((current) => (current === index ? null : index));
+  }
+
+  getAuthorName(rec: ExistingMarcRecord): string {
+    const f100 = rec.normal_fields?.find((f) => f.tag === '100');
+    if (!f100) return '';
+    return f100.subfields?.find((sf) => sf.code === 'a')?.value ?? '';
+  }
+
+  getAuthorYears(rec: ExistingMarcRecord): string {
+    const f100 = rec.normal_fields?.find((f) => f.tag === '100');
+    if (!f100) return '';
+    return f100.subfields?.find((sf) => sf.code === 'd')?.value ?? '';
   }
 }

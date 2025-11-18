@@ -61,6 +61,7 @@ export function extractedToExisting(
   const existing: ExistingMarcRecord = {
     record_id: 'extracted-synthetic',
     leader: '',
+    source: '',
     quality_assessment: {
       required_present: 0,
       required_total: 0,
