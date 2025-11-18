@@ -36,3 +36,8 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Build
+/src/environments/environment.local.ts
+src/assets/env.json
+build-info.json

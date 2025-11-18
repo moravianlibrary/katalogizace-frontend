@@ -1,14 +1,18 @@
 import { HttpInterceptorFn } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { inject } from '@angular/core';
+import { EnvironmentService } from '../services/environment.service';
 
 export const apiKeyInterceptor: HttpInterceptorFn = (req, next) => {
-  const isApi = req.url.startsWith(environment.API_BASE_URL);
+  const envService = inject(EnvironmentService);
+  const apiBaseUrl = envService.get('apiServiceBaseUrl');
+
+  const isApi = req.url.startsWith(apiBaseUrl);
   const augmented = isApi
     ? req.clone({
-        setHeaders: {
-          'KATALOGIZACE-API-KEY': environment.KATALOGIZACE_API_KEY,
-        },
-      })
+      setHeaders: {
+        'KATALOGIZACE-API-KEY': envService.get('apiServiceKey'),
+      },
+    })
     : req;
   return next(augmented);
 };

@@ -1,6 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
 import {
   BookResultResponse,
   BookStatusResponse,
@@ -9,11 +8,13 @@ import {
   PaginatedBooksResponse,
   TaskState,
 } from '../models/book';
+import { EnvironmentService } from './environment.service';
 
 @Injectable({ providedIn: 'root' })
 export class BooksService {
   private http = inject(HttpClient);
-  private baseUrl = environment.API_BASE_URL;
+  private envService = inject(EnvironmentService);
+  private apiBaseUrl = this.envService.get('apiServiceBaseUrl');
 
   listBooks(
     opts: {
@@ -31,32 +32,32 @@ export class BooksService {
     if (state) params = params.set('state', state);
     if (batch_id) params = params.set('batch_id', batch_id);
 
-    return this.http.get<PaginatedBooksResponse>(`${this.baseUrl}/books/`, {
+    return this.http.get<PaginatedBooksResponse>(`${this.apiBaseUrl}/books/`, {
       params,
     });
   }
 
   getBookStatus(bookId: string) {
     return this.http.get<BookStatusResponse>(
-      `${this.baseUrl}/books/${bookId}/status`,
+      `${this.apiBaseUrl}/books/${bookId}/status`,
     );
   }
 
   submitRevision(bookId: string, record: LastEditedRecord) {
     return this.http.post<BookUploadResponse>(
-      `${this.baseUrl}/books/${bookId}/revision`,
+      `${this.apiBaseUrl}/books/${bookId}/revision`,
       record,
     );
   }
 
   getBookResult(bookId: string) {
     return this.http.get<BookResultResponse>(
-      `${this.baseUrl}/books/${bookId}/result`,
+      `${this.apiBaseUrl}/books/${bookId}/result`,
     );
   }
 
   getBookImage(bookId: string, imageId: string, thumbnail: boolean) {
-    const url = `${this.baseUrl}/books/${bookId}/images/${imageId}`;
+    const url = `${this.apiBaseUrl}/books/${bookId}/images/${imageId}`;
     let params = new HttpParams();
     params = params.set('thumbnail', String(thumbnail));
     return this.http.get(url, { params, responseType: 'blob' });
