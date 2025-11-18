@@ -19,7 +19,7 @@ export class NavigationButtonsComponent {
 
   private books = inject(BooksService);
   private toast = inject(ToastService);
-  private recordState = inject(RecordStateService);
+  recordState = inject(RecordStateService);
 
   isSaving = signal(false);
 
