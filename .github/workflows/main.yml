@@ -1,0 +1,254 @@
+---
+name: Main workflow
+# This workflow requires following secrets and variables to be set
+# SECRETS
+# https://github.com/ -> project -> /settings/secrets/actions
+# - GHCR_TOKEN
+# - SSH_PRIVATE_KEY
+# - DOCKER_HOST_URI
+
+# VARIABLES
+# - APP_DEV_MODE
+# - APP_ENV_NAME
+# - APP_ENV_CODE
+# - APP_API_SERVICE_URL
+# - APP_API_SERVICE_KEY
+# this workflow uses actions:
+# https://github.com/marketplace/actions/create-json
+# https://github.com/trineracz/deploy-docker-with-terraform
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches:
+      - dev
+      - main
+    tags:
+      - 'v*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  set_environment:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.check_branch_and_tag.outputs.environment }}
+    steps:
+      - name: Dump VARS context
+        env:
+          VARS_CONTEXT: ${{ toJson(vars) }}
+        run: echo "$VARS_CONTEXT"
+
+      - name: "Check the branch and tag"
+        id: check_branch_and_tag
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "Use PRODUCTION environment"
+            echo "environment=production" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+            echo "Use TEST environment"
+            echo "environment=test" >> $GITHUB_OUTPUT
+          elif echo "${{ github.ref }}" | grep -E '^refs/tags/v'; then
+            echo "Use STAGING environment"
+            echo "environment=staging" >> $GITHUB_OUTPUT
+          else
+            echo "Branch name: ${{ github.ref_name }}, REF: ${{ github.ref }}"
+            echo "Nothing to do. Exit"
+            exit 0
+          fi
+
+  set_variables:
+    runs-on: ubuntu-latest
+    needs: set_environment
+    if: ${{ needs.set_environment.outputs.environment != '' }}
+    environment: ${{ needs.set_environment.outputs.environment }}
+    outputs:
+      ref_name: ${{ steps.set_vars.outputs.ref_name }}
+      docker_container_suffix: ${{ steps.set_vars.outputs.docker_container_suffix }}
+      docker_image: ${{ steps.set_vars.outputs.docker_image }}
+      # JSON list of docker containers' names and domains
+      # where they should be deployed in `deploy` job
+      docker_names: ${{ steps.set_docker_names.outputs.docker_names }}
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Dump VARS context
+      env:
+        VARS_CONTEXT: ${{ toJson(vars) }}
+      run: |
+        echo "$VARS_CONTEXT"
+        echo "environment: ${{ needs.set_environment.outputs.environment }}"
+    # variable GITHUB_REF=refs/tags/v1.3 is set if
+    # git tag v1.3 commmand was run before
+
+    # GITHUB_REF=refs/heads/main
+    # if it's just commit in `main` branch
+    - name: Set vars
+      id: set_vars
+      run: |
+        REF_NAME=$(echo $GITHUB_REF_NAME | grep -oE '([a-z0-9\-\.]*?)$')
+        (
+          echo "ref_name=$REF_NAME"
+          echo "docker_container_suffix=${REF_NAME//\./_}"
+          echo "docker_image=ghcr.io/${GITHUB_REPOSITORY,,}-$REF_NAME"
+        ) | tee --append "$GITHUB_OUTPUT" > "GITHUB_ENV"
+
+    - name: Set docker names for dev branch
+      uses: jsdaniell/create-json@v1.2.3
+      with:
+        name: 'docker_names.json'
+        # https://ai-katalogizace.test.trinera.cloud/
+        json:
+          '{"include": [
+            {
+              "name": "ai_katalogizace_${{ steps.set_vars.outputs.ref_name }}",
+              "domain": "ai-katalogizace.test.trinera.cloud"
+            }
+          ]}'
+      if:
+        github.ref == 'refs/heads/dev'
+
+    - name: Set docker names for main branch
+      uses: jsdaniell/create-json@v1.2.3
+      with:
+        name: 'docker_names.json'
+        json:
+          '{"include": [
+            {
+              "name": "ai_katalogizace_${{ steps.set_vars.outputs.ref_name }}",
+              "domain": "ai-katalogizace.app.trinera.cloud"
+            }
+          ]}'
+      if:
+        github.ref == 'refs/heads/main'
+
+    - name: "Set docker names for tag v*"
+      uses: jsdaniell/create-json@v1.2.3
+      with:
+        name: 'docker_names.json'
+        json:
+          '{"include": [
+            {
+              name: "ai_katalogizace_${{ steps.set_vars.outputs.docker_container_suffix }}",
+              domain: "${{ steps.set_vars.outputs.ref_name }}.ai-katalogizace.app.trinera.cloud"
+            }
+          ]}'
+      if:
+        startsWith(github.ref, 'refs/tags/v')
+
+    - name: Upload docker_names artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-names-artifact
+        path: docker_names.json
+
+    - name: Set docker_names output
+      id: set_docker_names
+      run: |
+          echo "docker_names=$(cat docker_names.json)" > "$GITHUB_OUTPUT"
+
+    # - name: Debug
+    #   env:
+    #     REF_NAME: ${{ steps.set_vars.outputs.ref_name }}
+    #   run: |
+    #     echo "REF_NAME: ${REF_NAME}"
+
+  build:
+    if:
+      github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    needs: set_variables
+    runs-on: ubuntu-latest
+    environment: ${{ needs.set_environment.outputs.environment }}
+    env:
+      DOCKER_IMAGE: ${{ needs.set_variables.outputs.docker_image }}
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Log in to ghcr.io
+      run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+    - name: Build the Docker image
+      run: |
+        docker build \
+          --tag "${DOCKER_IMAGE}:latest" \
+          --tag "${DOCKER_IMAGE}:$(date +%Y%m%d%H%M)" \
+          --file Dockerfile .
+
+    - name: Push image to GHCR
+      run: >
+        docker push --all-tags "${DOCKER_IMAGE}"
+
+  deploy:
+    name: deploy
+    needs:
+      - set_environment
+      - set_variables
+      - build
+    runs-on: ubuntu-latest
+    environment: ${{ needs.set_environment.outputs.environment }}
+    env:
+      DOCKER_IMAGE: ${{ needs.set_variables.outputs.docker_image }}
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is
+    # ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    strategy:
+      matrix: ${{ fromJSON(needs.set_variables.outputs.docker_names) }}
+    steps:
+      - run: echo "Matrix - Container ${{ matrix.name }}, Domain ${{ matrix.domain }}"
+
+      - name: Configure SSH
+        run: |
+          eval `ssh-agent -s`
+          ssh-add - <<< "${{ secrets.SSH_PRIVATE_KEY }}"
+          echo "SSH_AUTH_SOCK=${SSH_AUTH_SOCK}" >> $GITHUB_ENV
+
+      - uses: actions/checkout@v4
+
+      - name: Dump VARS context
+        env:
+          VARS_CONTEXT: ${{ toJson(vars) }}
+        run: |
+          echo "$VARS_CONTEXT"
+          echo "environment: ${{ needs.set_environment.outputs.environment }}"
+
+      - name: 'Deploy with Terraform'
+        id: deploy_with_terraform
+        uses: trineracz/deploy-docker-with-terraform@v1.0.0
+        env:
+          TF_VAR_APP_DEV_MODE: ${{ vars.APP_DEV_MODE }}
+          TF_VAR_APP_ENV_NAME: ${{ vars.APP_ENV_NAME }}
+          TF_VAR_APP_ENV_CODE: ${{ vars.APP_ENV_CODE }}
+          TF_VAR_APP_API_SERVICE_URL: ${{ vars.APP_API_SERVICE_URL }}
+          TF_VAR_APP_API_SERVICE_KEY: ${{ vars.APP_API_SERVICE_KEY }}
+        with:
+          TERRAFORM_DOCKER_IMAGE: ${DOCKER_IMAGE}
+          TERRAFORM_DOCKER_CONTAINER_NAME: ${{ matrix.name }}
+          TERRAFORM_DEPLOY_DOMAIN: ${{ matrix.domain }}
+          TERRAFORM_DOCKER_HOST_URI: ${{ secrets.DOCKER_HOST_URI }}
+          TERRAFORM_GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          TERRAFORM_GHCR_USERNAME: ${{ github.actor }}
+  check_assets:
+    needs:
+      - set_variables
+      - deploy
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJSON(needs.set_variables.outputs.docker_names) }}
+    steps:
+      - run: echo "Matrix - Container ${{ matrix.name }}, Domain ${{ matrix.domain }}"
+      - name: Check assets/env.json
+        run: |
+          curl -s -o env.json "https://${{ matrix.domain }}/assets/env.json"
+          jq '.environmentName | if  . =="" or . == null then error("empty environmentName") else . end' env.json
+          jq '.environmentCode | if  . =="" or . == null then error("empty environmentCode") else . end' env.json
+          jq 'if .devMode | type != "boolean" then error("devMode is not boolean") else . end' env.json
+      - name: Check assets/build-info.json
+        run: |
+          curl -s -o build-info.json "https://${{ matrix.domain }}/assets/build-info.json"
+          jq '.git_commit_hash | if  . =="" or . == null then error("empty git_commit_hash") else . end' build-info.json
+          jq '.build_date | if  . =="" or . == null then error("empty build_date") else . end' build-info.json
