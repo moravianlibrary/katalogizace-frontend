@@ -2,39 +2,124 @@
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.15.
 
-## Development server
+## Development
 
-To start a local development server, run:
+### Run
 
-```bash
-ng serve
+`npm run start`
+
+for a local dev server. Navigate to `http://localhost:4200/`.
+The application will automatically reload if you change any of the source files.
+
+## Build & Run
+
+### Build
+
+First define configuration in environment variables
+
+```shell
+export APP_DEV_MODE=false
+export APP_ENV_NAME="local npm run build"
+export APP_ENV_CODE="l-nrb"
+export APP_API_SERVICE_URL="https://ai-katalogizace-api.trinera.cloud"
+export APP_API_SERVICE_KEY="API-KEY"
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
-## Code scaffolding
+Now run `npm run build` to build the project. 
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+The build artifacts will be stored in the `dist/` directory.
 
-```bash
-ng generate component component-name
+The environment configuration from `APP_*` variables will be stored into `dist/katalogizace-frontend/assets/env.json`
+
+### Run
+
+To test the the app you've just built 
+
+`npx serve dist/katalogizace-frontend/browser -l 8181` 
+
+And open in browser
+
+`http://localhost:8181`
+
+## Docker Build & Run
+
+### Build
+```
+docker build -t katalogizace-frontend .
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
+possibly including version tag  
+```
+docker build -t trinera/katalogizace-frontend:0.0.0 .
 ```
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
+or including version tag and tag `latest`
+```
+docker build -t trinera/katalogizace-frontend:latest -t trinera/katalogizace-frontend:0.0.0 .
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### Push to Dockerhub
+
+Only if you have write access to Dockerhub repository trinera/katalogizace-frontend.
+You don't need this to run localy built Docker image.
+
+```
+docker push trinera/katalogizace-frontend:0.0.0
+docker push trinera/anakon:latest
+```
+
+### Run Docker image
+
+#### Local image
+
+Run locally built Docker image
+
+##### Run
+```
+docker run -p 1234:80 \
+  -e APP_DEV_MODE=false \
+  -e APP_API_SERVICE_URL=https://ai-katalogizace-api.trinera.cloud \
+  -e APP_API_SERVICE_KEY=API-KEY \
+trinera/katalogizace-frontend
+```
+
+##### Run exact version:
+```
+docker run -p 1234:80 \
+  -e APP_DEV_MODE=false \
+  -e APP_API_SERVICE_URL=https://ai-katalogizace-api.trinera.cloud \
+  -e APP_API_SERVICE_KEY=API-KEY \
+trinera/katalogizace-frontend:latest
+```
+or
+
+```
+docker run -p 1234:80 \
+  -e APP_DEV_MODE=false \
+  -e APP_API_SERVICE_URL=https://ai-katalogizace-api.trinera.cloud \
+  -e APP_API_SERVICE_KEY=API-KEY \
+trinera/katalogizace-frontend:0.0.0
+```
+
+#### Image pulled from Docker Hub
+
+Run image that someone built and pushed to Dockerhub.
+
+##### Run
+
+```
+docker pull trinera/katalogizace-frontend:latest
+docker run -p 1234:80 \
+  -e APP_DEV_MODE=false \
+  -e APP_API_SERVICE_URL=https://ai-katalogizace-api.trinera.cloud \
+  -e APP_API_SERVICE_KEY=API-KEY \
+trinera/katalogizace-frontend
+```
+
+And open in browser
+
+`http://localhost:1234`
 
 ## Running unit tests
 
