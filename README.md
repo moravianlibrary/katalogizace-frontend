@@ -51,12 +51,12 @@ docker build -t katalogizace-frontend .
 
 possibly including version tag  
 ```
-docker build -t trinera/katalogizace-frontend:0.0.0 .
+docker build -t trinera/katalogizace-frontend:1.0.0 .
 ```
 
 or including version tag and tag `latest`
 ```
-docker build -t trinera/katalogizace-frontend:latest -t trinera/katalogizace-frontend:0.0.0 .
+docker build -t trinera/katalogizace-frontend:latest -t trinera/katalogizace-frontend:1.0.0 .
 ```
 
 ### Push to Dockerhub
@@ -65,7 +65,7 @@ Only if you have write access to Dockerhub repository trinera/katalogizace-front
 You don't need this to run localy built Docker image.
 
 ```
-docker push trinera/katalogizace-frontend:0.0.0
+docker push trinera/katalogizace-frontend:1.0.0
 docker push trinera/anakon:latest
 ```
 
@@ -99,7 +99,7 @@ docker run -p 1234:80 \
   -e APP_DEV_MODE=false \
   -e APP_API_SERVICE_URL=https://ai-katalogizace-api.trinera.cloud \
   -e APP_API_SERVICE_KEY=API-KEY \
-trinera/katalogizace-frontend:0.0.0
+trinera/katalogizace-frontend:1.0.0
 ```
 
 #### Image pulled from Docker Hub
