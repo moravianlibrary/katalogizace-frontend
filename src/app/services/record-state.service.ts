@@ -26,6 +26,63 @@ export class RecordStateService {
     this.viewMode.update((m) => (m === 'cards' ? 'table' : 'cards'));
   }
 
+  loadFromExistingRecord(rec: ExistingMarcRecord | null) {
+    if (!rec) {
+      this.uiFields.set([]);
+      return;
+    }
+
+    const current = this.uiFields();
+
+    const byTag: Record<string, UiFieldWithMeta[]> = {};
+    for (const f of current) {
+      if (!byTag[f.tag]) byTag[f.tag] = [];
+      byTag[f.tag].push(f);
+    }
+
+    const counters: Record<string, number> = {};
+    const result: UiFieldWithMeta[] = [];
+
+    for (const [idx, nf] of (rec.normal_fields ?? []).entries()) {
+      const list = byTag[nf.tag] ?? [];
+      const usedIdx = counters[nf.tag] ?? 0;
+
+      let field: UiFieldWithMeta;
+
+      if (usedIdx < list.length) {
+        field = list[usedIdx];
+        counters[nf.tag] = usedIdx + 1;
+      } else {
+        field = {
+          extractedFieldId: `from-record-${rec.record_id}-${idx}`,
+          tag: nf.tag,
+          ind1: '',
+          ind2: '',
+          subfields: [],
+          candidateId: '',
+          candidates: [],
+          score: 0,
+          isManual: true,
+        };
+      }
+
+      field.tag = nf.tag;
+      field.ind1 = nf.ind1 ?? '';
+      field.ind2 = nf.ind2 ?? '';
+      field.subfields =
+        nf.subfields?.map((sf) => ({
+          code: sf.code,
+          value: sf.value,
+        })) ?? [];
+
+      field.isManual = true;
+
+      result.push(field);
+    }
+
+    this.uiFields.set(result);
+  }
+
   loadFromExtracted(extracted: ExtractedMarcRecord | null) {
     if (!extracted) {
       this.uiFields.set([]);

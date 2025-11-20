@@ -16,17 +16,17 @@
         </div>
       </div>
 
-      @for (rec of records(); track rec.record_id; let i = $index) {
+      @for (rec of records(); track $index) {
         <div
           class="border-tertiary-default"
-          [class.border-t]="i === 0"
-          [class.border-b]="expandedIndex() !== i"
+          [class.border-t]="$index === 0"
+          [class.border-b]="expandedIndex() !== $index"
         >
           <button
             class="hover:bg-main-bright bg-main-light w-full px-2 py-3 hover:cursor-pointer"
-            [class.bg-main-bright]="expandedIndex() === i"
-            [class.bg-main-light]="expandedIndex() !== i"
-            (click)="toggleRow(i)"
+            [class.bg-main-bright]="expandedIndex() === $index"
+            [class.bg-main-light]="expandedIndex() !== $index"
+            (click)="toggleRow($index)"
             type="button"
           >
             <div
@@ -47,7 +47,7 @@
               <div class="flex items-center justify-end">
                 <svg
                   class="icon-secondary-default transition-transform duration-150"
-                  [ngClass]="{ 'rotate-180': expandedIndex() === i }"
+                  [ngClass]="{ 'rotate-180': expandedIndex() === $index }"
                   xmlns="http://www.w3.org/2000/svg"
                   width="24"
                   height="24"
@@ -69,7 +69,7 @@
             </div>
           </button>
 
-          @if (expandedIndex() === i) {
+          @if (expandedIndex() === $index) {
             <app-marc-record-table [record]="rec" />
           }
         </div>
@@ -77,13 +77,16 @@
     }
   </div>
 
-  @if (records().length && activeIndex() != 0) {
+  @if (
+    records().length > 0 && expandedIndex() !== null && expandedIndex() === 0
+  ) {
     <div class="mt-4 flex justify-end">
       <button
         class="bg-main-primary-default text-on-color text-sm-tight cursor-pointer rounded-lg px-4 py-3 font-medium"
+        (click)="onTakeRecord()"
         type="button"
       >
-        Převzít celý záznam
+        Převzít vyčtený záznam
       </button>
     </div>
   }
