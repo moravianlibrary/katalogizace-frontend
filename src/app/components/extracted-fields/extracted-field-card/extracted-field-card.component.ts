@@ -77,21 +77,21 @@ export class ExtractedFieldCardComponent {
     return !!sf.isManual;
   }
 
-  hasCodeCollision(sf: UiSubfield): boolean {
-    const f = this.field();
-    const code = (sf.code ?? '').trim();
-    if (!code) {
-      return false;
-    }
-
-    const subfields = f.subfields ?? [];
-    let count = 0;
-    for (const other of subfields) {
-      if ((other.code ?? '').trim() === code) {
-        count++;
+  hasCodeCollision(sf: UiSubfield, f: UiFieldWithMeta): boolean {
+    if (
+      (f.tag === '100' || f.tag === '700') &&
+      (sf.code === 'a' || sf.code === 'd')
+    ) {
+      const subfields = f.subfields ?? [];
+      let count = 0;
+      for (const other of subfields) {
+        if ((other.code ?? '').trim() === sf.code) {
+          count++;
+        }
       }
+      return count > 1;
     }
-    return count > 1;
+    return false;
   }
 
   private applyFx = effect(() => {
