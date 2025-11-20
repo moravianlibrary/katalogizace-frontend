@@ -173,9 +173,9 @@
         <div
           class="flex items-center gap-2 rounded-lg border px-4 py-2.5"
           [class.border-error]="hasCodeCollision(sf)"
-          [class.border-tertiary-disable]="isValueDisabled(sf)"
+          [class.border-tertiary-disable]="isValueDisabled(sf, field())"
           [class.border-tertiary-default]="
-            !hasCodeCollision(sf) && !isValueDisabled(sf)
+            !hasCodeCollision(sf) && !isValueDisabled(sf, field())
           "
         >
           <span
@@ -201,7 +201,7 @@
           <input
             class="disabled:text-disable flex-1 bg-transparent text-base text-sm outline-none placeholder:text-gray-300 disabled:cursor-not-allowed"
             [(ngModel)]="sf.value"
-            [disabled]="isValueDisabled(sf)"
+            [disabled]="isValueDisabled(sf, field())"
             (ngModelChange)="sf.value = $event; notifyChange()"
             placeholder="Aa"
           />

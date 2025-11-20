@@ -1,7 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, effect, inject, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Step, UiFieldWithMeta, UiSubfield } from '../../../models/book';
+import {
+  MarcSubfield,
+  Step,
+  UiFieldWithMeta,
+  UiSubfield,
+} from '../../../models/book';
 import { RecordStateService } from '../../../services/record-state.service';
 import { WorkingPanelService } from '../../../services/working-panel.service';
 
@@ -128,7 +133,14 @@ export class ExtractedFieldCardComponent {
     );
   }
 
-  isValueDisabled(sf: { code: string }) {
-    return sf.code === '7';
+  isValueDisabled(sf: MarcSubfield, f: UiFieldWithMeta) {
+    return (
+      sf.code === '7' &&
+      (f.tag === '100' ||
+        f.tag === '700' ||
+        f.tag === '600' ||
+        f.tag === '650' ||
+        f.tag === '655')
+    );
   }
 }
