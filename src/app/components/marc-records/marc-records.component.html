@@ -18,8 +18,9 @@
 
       @for (rec of records(); track rec.record_id; let i = $index) {
         <div
-          class="border-tertiary-default border-b"
+          class="border-tertiary-default"
           [class.border-t]="i === 0"
+          [class.border-b]="expandedIndex() !== i"
         >
           <button
             class="hover:bg-main-bright bg-main-light w-full px-2 py-3 hover:cursor-pointer"
