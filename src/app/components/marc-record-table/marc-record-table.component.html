@@ -7,12 +7,19 @@
   </colgroup>
 
   <tbody>
+    @if (record().leader) {
+      <tr
+        class="border-tertiary-default border-y-[0.5px]"
+        [leader]="record().leader"
+        appMarcRowLeader
+      ></tr>
+    }
+
     @for (sf of record().special_fields; track $index) {
       <tr
         class="border-tertiary-default border-b-[0.5px]"
-        [class.border-t-[0.5px]]="$index === 0"
         [ngClass]="{
-          'border-t-[0.5px]': $index === 0,
+          'border-t-[0.5px]': $index === 0 && !record().leader,
         }"
         [sf]="sf"
         appMarcRowSpecial
@@ -24,7 +31,9 @@
         class="border-tertiary-default border-b-[0.5px]"
         [ngClass]="{
           'border-t-[0.5px]':
-            $index === 0 && record().special_fields?.length === 0,
+            $index === 0 &&
+            record().special_fields?.length === 0 &&
+            !record().leader,
         }"
         [nf]="nf"
         appMarcRowNormal
