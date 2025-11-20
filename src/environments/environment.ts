@@ -8,5 +8,4 @@ export const environment = {
 
   apiServiceBaseUrl: '', // pro produkci ziskej z promenne APP_API_SERVICE_URL (přes env.json)
   apiServiceKey: '', // pro produkci ziskej z promenne APP_API_SERVICE_KEY (přes env.json)
-
 };
