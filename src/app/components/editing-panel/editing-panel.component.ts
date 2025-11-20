@@ -1,4 +1,4 @@
-import { Component, effect, inject, input } from '@angular/core';
+import { Component, computed, effect, inject, input } from '@angular/core';
 import { BookResultResponse } from '../../models/book';
 import { RecordStateService } from '../../services/record-state.service';
 import { ExtractedFieldsComponent } from '../extracted-fields/extracted-fields/extracted-fields.component';
@@ -23,6 +23,8 @@ export class EditingPanelComponent {
   viewMode = this.recordState.viewMode;
   recordPreview = this.recordState.recordPreview;
   uiFields = this.recordState.uiFields;
+
+  hasLastEdited = computed(() => !!this.result()?.last_edited_record);
 
   constructor() {
     effect(
