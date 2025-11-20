@@ -46,6 +46,7 @@ export class RecordStateService {
       return;
     }
 
+    // ! zatiaľ bez special fields – rovnako ako doteraz
     const fields = extractedToUiFields(extracted, false);
 
     if (!lastEdited?.normal_fields?.length) {
@@ -76,6 +77,7 @@ export class RecordStateService {
       f.ind1 = edited.ind1 ?? '';
       f.ind2 = edited.ind2 ?? '';
       f.subfields = edited.subfields ?? [];
+      f.isManual = true;
     }
 
     for (const nf of lastEdited.normal_fields) {
