@@ -47,14 +47,6 @@ export class MarcRecordsComponent {
   }
 
   onTakeRecord() {
-    const idx = this.expandedIndex();
-    if (idx === null) return;
-
-    const list = this.records();
-    if (idx !== 0) return;
-
-    const rec = list[idx];
-
-    this.recordState.loadFromExistingRecord(rec);
+    this.recordState.loadFromExtracted(this.extractedRecord());
   }
 }
