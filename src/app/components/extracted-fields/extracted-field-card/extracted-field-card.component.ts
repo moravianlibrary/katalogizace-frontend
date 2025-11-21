@@ -71,7 +71,9 @@ export class ExtractedFieldCardComponent {
     this.notifyChange();
   }
 
-  onDeleteField() {}
+  onDeleteField() {
+    this.recordState.removeField(this.field().extractedFieldId);
+  }
 
   isCodeEditable(sf: UiSubfield): boolean {
     return !!sf.isManual;

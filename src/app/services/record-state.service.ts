@@ -175,6 +175,11 @@ export class RecordStateService {
     this.uiFields.set([...current, newField]);
   }
 
+  removeField(fieldId: string) {
+    const current = this.uiFields();
+    this.uiFields.set(current.filter((f) => f.extractedFieldId !== fieldId));
+  }
+
   buildExistingRecord(bookId: string): LastEditedRecord | null {
     const fields = this.uiFields();
     if (!fields.length) return null;
