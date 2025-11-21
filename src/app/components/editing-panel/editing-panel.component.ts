@@ -27,20 +27,17 @@ export class EditingPanelComponent {
   hasLastEdited = computed(() => !!this.result()?.last_edited_record);
 
   constructor() {
-    effect(
-      () => {
-        const r = this.result();
-        if (!r) {
-          this.recordState.uiFields.set([]);
-          return;
-        }
+    effect(() => {
+      const r = this.result();
+      if (!r) {
+        this.recordState.uiFields.set([]);
+        return;
+      }
 
-        this.recordState.loadFromExtractedAndLast(
-          r.extracted_marc_record ?? null,
-          r.last_edited_record ?? null,
-        );
-      },
-      { allowSignalWrites: true },
-    );
+      this.recordState.loadFromExtractedAndLast(
+        r.extracted_marc_record ?? null,
+        r.last_edited_record ?? null,
+      );
+    });
   }
 }
