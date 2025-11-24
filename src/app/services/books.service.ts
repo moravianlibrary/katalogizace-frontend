@@ -62,4 +62,27 @@ export class BooksService {
     params = params.set('thumbnail', String(thumbnail));
     return this.http.get(url, { params, responseType: 'blob' });
   }
+
+  uploadImages(files: File[], batchId?: string) {
+    const formData = new FormData();
+    files.forEach((file) => formData.append('image_files', file));
+
+    let params = new HttpParams();
+    if (batchId) {
+      params = params.set('batch_id', batchId);
+    }
+
+    const apiKey = this.envService.get('apiServiceKey');
+
+    return this.http.post<BookUploadResponse>(
+      `${this.apiBaseUrl}/books/upload-images`,
+      formData,
+      {
+        params,
+        headers: {
+          'KATALOGIZACE-API-KEY': apiKey,
+        },
+      },
+    );
+  }
 }

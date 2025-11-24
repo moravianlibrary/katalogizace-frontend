@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PaginatedBooksResponse, TaskState } from '../../models/book';
 import { BooksService } from '../../services/books.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   standalone: true,
@@ -16,6 +17,9 @@ export class BooksListComponent {
   private router = inject(Router);
   private books = inject(BooksService);
   private destroyRef = inject(DestroyRef);
+  private toast = inject(ToastService);
+
+  isUploading = false;
 
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
@@ -111,5 +115,27 @@ export class BooksListComponent {
 
   open(id: string) {
     this.router.navigate(['/books', id]);
+  }
+
+  onUploadImages(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    const files = Array.from(input.files);
+
+    this.isUploading = true;
+
+    this.books.uploadImages(files).subscribe({
+      next: () => {
+        this.toast.show('Obrázky byly úspěšně nahrány.', 'success');
+      },
+      error: () => {
+        this.toast.show('Nahrávání obrázků se nezdařilo.', 'error');
+      },
+      complete: () => {
+        this.isUploading = false;
+        input.value = '';
+      },
+    });
   }
 }

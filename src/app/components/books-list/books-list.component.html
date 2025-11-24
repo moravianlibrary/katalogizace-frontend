@@ -1,6 +1,27 @@
 <main class="mx-auto max-w-7xl px-4 py-4">
   <section class="space-y-4">
     <h1>Knihy</h1>
+    <button
+      class="bg-main-primary-default text-on-color rounded-xl px-4 py-3 disabled:opacity-50"
+      [disabled]="isUploading"
+      (click)="!isUploading && fileInput.click()"
+      type="button"
+    >
+      @if (isUploading) {
+        Nahrávam…
+      } @else {
+        Nahrát obrázky
+      }
+    </button>
+
+    <input
+      #fileInput
+      (change)="onUploadImages($event)"
+      type="file"
+      multiple
+      accept="image/*"
+      hidden
+    />
 
     @if (loading()) {
       <div class="text-md">Načítám…</div>
