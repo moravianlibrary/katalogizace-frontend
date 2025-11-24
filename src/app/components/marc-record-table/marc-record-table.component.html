@@ -27,17 +27,19 @@
     }
 
     @for (nf of record().normal_fields; track $index) {
-      <tr
-        class="border-tertiary-default border-b-[0.5px]"
-        [ngClass]="{
-          'border-t-[0.5px]':
-            $index === 0 &&
-            record().special_fields?.length === 0 &&
-            !record().leader,
-        }"
-        [nf]="nf"
-        appMarcRowNormal
-      ></tr>
+      @if (nf.tag != "910") {
+        <tr
+          class="border-tertiary-default border-b-[0.5px]"
+          [ngClass]="{
+            'border-t-[0.5px]':
+              $index === 0 &&
+              record().special_fields?.length === 0 &&
+              !record().leader,
+          }"
+          [nf]="nf"
+          appMarcRowNormal
+        ></tr>
+      }
     }
   </tbody>
 </table>
