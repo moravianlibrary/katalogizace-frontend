@@ -25,6 +25,7 @@ export class NavigationButtonsComponent {
 
   goBack() {
     this.wps.showRecords();
+    this.recordState.resetViewMode();
 
     this.router
       .navigate(['..'], {

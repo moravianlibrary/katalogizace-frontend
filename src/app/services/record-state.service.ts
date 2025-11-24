@@ -25,6 +25,10 @@ export class RecordStateService {
     this.viewMode.update((m) => (m === 'cards' ? 'table' : 'cards'));
   }
 
+  resetViewMode() {
+    this.viewMode.set('cards');
+  }
+
   loadFromExistingRecord(rec: ExistingMarcRecord | null) {
     if (!rec) {
       this.uiFields.set([]);
