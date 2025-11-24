@@ -177,7 +177,7 @@ export class RecordStateService {
       isManual: true,
     };
 
-    this.uiFields.set([...current, newField]);
+    this.uiFields.set([newField, ...current]);
   }
 
   removeField(fieldId: string) {
