@@ -10,7 +10,6 @@ import { extractedToUiFields } from '../utils/marc-transform';
 
 export type RecordViewMode = 'cards' | 'table';
 
-let manualFieldCounter = 0;
 @Injectable({ providedIn: 'root' })
 export class RecordStateService {
   readonly uiFields = signal<UiFieldWithMeta[]>([]);
@@ -161,7 +160,7 @@ export class RecordStateService {
     const current = this.uiFields();
 
     const newField: UiFieldWithMeta = {
-      extractedFieldId: `manual-${manualFieldCounter++}`,
+      extractedFieldId: `manual-${crypto.randomUUID()}`,
       tag: '',
       ind1: '',
       ind2: '',
