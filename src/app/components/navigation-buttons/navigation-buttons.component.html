@@ -79,13 +79,15 @@
     </button>
 
     <button
-      class="bg-main-base text-secondary border-primary-default text-sm-tight inline-flex gap-3 rounded-lg border px-3.75 py-2.75 font-medium text-nowrap hover:cursor-pointer"
+      class="bg-main-base text-secondary border-primary-default text-sm-tight disabled:text-disable disabled:border-primary-disable inline-flex gap-3 rounded-lg border px-3.75 py-2.75 font-medium text-nowrap hover:cursor-pointer disabled:cursor-not-allowed"
+      [disabled]="recordState.viewMode() === 'table'"
       (click)="addField()"
       type="button"
     >
       Přidat pole
       <svg
-        class="icon-primary-default"
+        [class.icon-primary-disable]="recordState.viewMode() === 'table'"
+        [class.icon-primary-default]="recordState.viewMode() === 'cards'"
         width="16"
         height="16"
         viewBox="0 0 16 16"
