@@ -165,7 +165,13 @@ export class RecordStateService {
       tag: '',
       ind1: '',
       ind2: '',
-      subfields: [],
+      subfields: [
+        {
+          code: '',
+          value: '',
+          isManual: true,
+        },
+      ],
       candidateId: '',
       candidates: [],
       score: 0,
