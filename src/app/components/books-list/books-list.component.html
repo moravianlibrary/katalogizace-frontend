@@ -1,18 +1,21 @@
 <main class="mx-auto max-w-7xl px-4 py-4">
   <section class="space-y-4">
-    <h1>Knihy</h1>
-    <button
-      class="bg-main-primary-default text-on-color rounded-xl px-4 py-3 disabled:opacity-50"
-      [disabled]="isUploading"
-      (click)="!isUploading && fileInput.click()"
-      type="button"
-    >
-      @if (isUploading) {
-        Nahrávam…
-      } @else {
-        Nahrát obrázky
-      }
-    </button>
+    <div class="flex flex-row items-center justify-between gap-6">
+      <h1>Knihy</h1>
+
+      <button
+        class="bg-main-primary-default text-on-color hover:bg-main-primary-hover active:bg-main-primary-pressed disabled:bg-main-primary-disable disabled:text-btn-primary-disable cursor-pointer rounded-xl px-4 py-3 font-medium disabled:cursor-not-allowed disabled:opacity-50"
+        [disabled]="isUploading"
+        (click)="!isUploading && fileInput.click()"
+        type="button"
+      >
+        @if (isUploading) {
+          Nahrávám…
+        } @else {
+          Nahrát obrázky
+        }
+      </button>
+    </div>
 
     <input
       #fileInput
@@ -80,14 +83,14 @@
         </div>
         <div class="flex gap-2">
           <button
-            class="cursor-pointer rounded border px-3 py-1 disabled:opacity-40"
+            class="cursor-pointer rounded border px-3 py-1 disabled:cursor-not-allowed disabled:opacity-40"
             [disabled]="!data()!.has_prev"
             (click)="goPrev()"
           >
             Předchozí
           </button>
           <button
-            class="cursor-pointer rounded border px-3 py-1 disabled:opacity-40"
+            class="cursor-pointer rounded border px-3 py-1 disabled:cursor-not-allowed disabled:opacity-40"
             [disabled]="!data()!.has_next"
             (click)="goNext()"
           >
