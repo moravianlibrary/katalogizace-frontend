@@ -33,7 +33,7 @@
     } @else if (!data() || data()!.books.length === 0) {
       <div class="text-md">Zatím žádné záznamy.</div>
     } @else {
-      <div class="overflow-x-auto rounded border">
+      <div class="border-tertiary-default overflow-x-auto rounded-lg border">
         <table class="text-md min-w-full">
           <thead class="bg-main-bright text-secondary">
             <tr>
@@ -46,7 +46,7 @@
           <tbody>
             @for (b of data()!.books; track b.book_id) {
               <tr
-                class="hover:bg-main-light border-t"
+                class="hover:bg-main-light border-tertiary-default border-t"
                 [class.cursor-pointer]="b.state === 'completed'"
                 [attr.tabindex]="b.state === 'completed' ? 0 : null"
                 [attr.role]="b.state === 'completed' ? 'button' : null"
