@@ -44,7 +44,7 @@ export class BooksService {
   }
 
   submitRevision(bookId: string, record: LastEditedRecord) {
-    return this.http.post<BookUploadResponse>(
+    return this.http.post<LastEditedRecord>(
       `${this.apiBaseUrl}/books/${bookId}/revision`,
       record,
     );

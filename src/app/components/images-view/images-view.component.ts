@@ -1,5 +1,5 @@
 import { Component, computed, inject, input, signal } from '@angular/core';
-import { ImgItem, UUID } from '../../models/book';
+import { ApiImageItem, ImgItem, PageType } from '../../models/book';
 import { BooksService } from '../../services/books.service';
 import { ImageLargePreviewComponent } from '../image/preview/preview.component';
 import { ImageThumbnailsComponent } from '../image/thumbnails/thumbnails.component';
@@ -13,7 +13,7 @@ export class ImagesViewComponent {
   private bookService = inject(BooksService);
 
   bookId = input<string | null>(null);
-  imageIds = input<UUID[] | null>(null);
+  images = input<ApiImageItem[] | null>(null);
 
   items = signal<ImgItem[]>([]);
   selectedId = signal<string | null>(null);
@@ -25,18 +25,41 @@ export class ImagesViewComponent {
     return this.items().find((x) => x.id === id) ?? null;
   });
 
+  pageTypeLabel(pt: PageType | null): string {
+    switch (pt) {
+      case 'TitlePage':
+        return 'Titulní strana';
+      case 'TableOfContents':
+        return 'Obsah';
+      case 'FrontCover':
+        return 'Přední obálka';
+      case 'BackCover':
+        return 'Zadní obálka';
+      case 'Impressum':
+        return 'Tiráž';
+      case 'EndPage':
+        return 'Poslední čísl. strana';
+      case 'Unknown':
+      default:
+        return 'Neznámý typ stránky';
+    }
+  }
+
   ngOnInit() {
-    const ids = this.imageIds() ?? [];
+    const apiImages = this.images() ?? [];
+
     this.items.set(
-      ids.map<ImgItem>((id) => ({
-        id,
+      apiImages.map<ImgItem>((img) => ({
+        id: img.image_id,
         url: '',
         loading: true,
         error: null,
+        pageType: this.pageTypeLabel(img.page_type),
       })),
     );
 
-    for (const id of ids) {
+    for (const img of apiImages) {
+      const id = img.image_id;
       this.bookService.getBookImage(this.bookId()!, id, true).subscribe({
         next: (blob) => {
           const url = URL.createObjectURL(blob);
@@ -62,9 +85,10 @@ export class ImagesViewComponent {
       });
     }
 
-    if (ids.length) {
-      this.selectedId.set(ids[0]);
-      this.ensureFull(ids[0]);
+    if (apiImages.length) {
+      const firstId = apiImages[0].image_id;
+      this.selectedId.set(firstId);
+      this.ensureFull(firstId);
     }
   }
 

@@ -14,7 +14,21 @@ export interface ImgItem {
   id: string;
   url: string;
   loading: boolean;
-  error?: string | null;
+  error: string | null;
+  pageType: string;
+}
+
+export type PageType =
+  | 'TitlePage'
+  | 'TableOfContents'
+  | 'FrontCover'
+  | 'BackCover'
+  | 'Impressum'
+  | 'EndPage'
+  | 'Unknown';
+export interface ApiImageItem {
+  image_id: UUID;
+  page_type: PageType | null;
 }
 
 export interface BookCommon {
@@ -22,7 +36,7 @@ export interface BookCommon {
   created_at?: string;
   modified_at?: string;
   state?: TaskState;
-  image_ids: UUID[] | null;
+  images: ApiImageItem[] | null;
   hatchet_workflow_id?: string | null;
   batch_id?: string | null;
   error_message?: string | null;
@@ -75,9 +89,7 @@ export interface ExistingMarcRecord {
   normal_fields?: ExistingMarcRecordNormalField[];
 }
 
-export interface LastEditedRecord extends ExistingMarcRecord {
-  source: string;
-}
+export interface LastEditedRecord extends ExistingMarcRecord {}
 
 export interface QualityScore {
   required_present: number;
@@ -108,7 +120,7 @@ export interface BookUploadResponse {
   state: TaskState;
   hatchet_workflow_id?: string | null;
   batch_id?: string | null;
-  image_ids?: UUID[];
+  images?: ApiImageItem[];
   created_at: string;
 }
 

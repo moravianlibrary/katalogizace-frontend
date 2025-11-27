@@ -1,4 +1,3 @@
-// src/app/components/book-detail/thumbnails.component.ts
 import { CommonModule } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 import { ImgItem } from './../../../models/book';
