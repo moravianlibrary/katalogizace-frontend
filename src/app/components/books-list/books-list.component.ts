@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PaginatedBooksResponse, TaskState } from '../../models/book';
 import { BooksService } from '../../services/books.service';
 import { ToastService } from '../../services/toast.service';
+import { WorkingPanelService } from '../../services/working-panel.service';
 
 @Component({
   standalone: true,
@@ -18,6 +19,7 @@ export class BooksListComponent {
   private books = inject(BooksService);
   private destroyRef = inject(DestroyRef);
   private toast = inject(ToastService);
+  private wps = inject(WorkingPanelService);
 
   isUploading = false;
 
@@ -115,6 +117,7 @@ export class BooksListComponent {
 
   open(id: string) {
     this.router.navigate(['/books', id]);
+    this.wps.setMode('records');
   }
 
   onUploadImages(event: Event) {
