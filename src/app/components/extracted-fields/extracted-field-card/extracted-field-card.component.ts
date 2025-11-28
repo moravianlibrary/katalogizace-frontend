@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject, input } from '@angular/core';
+import { Component, effect, ElementRef, inject, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   MarcSubfield,
@@ -23,6 +23,8 @@ export class ExtractedFieldCardComponent {
   wps = inject(WorkingPanelService);
 
   private recordState = inject(RecordStateService);
+
+  constructor(private host: ElementRef<HTMLElement>) {}
 
   notifyChange() {
     this.recordState.touch();
@@ -69,6 +71,8 @@ export class ExtractedFieldCardComponent {
     const sf = { code: '', value: '', isManual: true };
     f.subfields.push(sf);
     this.notifyChange();
+
+    this.focusNewSubfieldCode();
   }
 
   onDeleteField() {
@@ -144,5 +148,63 @@ export class ExtractedFieldCardComponent {
         f.tag === '650' ||
         f.tag === '655')
     );
+  }
+
+  onInputAutoAdvance(event: Event): void {
+    const input = event.target as HTMLInputElement | null;
+    if (!input) return;
+
+    const max = input.maxLength;
+    if (max > 0 && input.value.length >= max) {
+      this.focusNextEditableInput(input);
+    }
+  }
+
+  private focusNextEditableInput(current: HTMLInputElement): void {
+    const all = Array.from(
+      this.host.nativeElement.querySelectorAll<HTMLInputElement>(
+        'input[data-editable="true"]',
+      ),
+    );
+
+    const idx = all.indexOf(current);
+    if (idx === -1) return;
+
+    const next = all[idx + 1];
+    if (next && !next.disabled) {
+      next.focus();
+      const len = next.value.length;
+      try {
+        next.setSelectionRange(len, len);
+      } catch {
+        // ignore selection errors
+      }
+    }
+  }
+
+  private focusNewSubfieldCode(): void {
+    setTimeout(() => {
+      const codes = this.host.nativeElement.querySelectorAll<HTMLInputElement>(
+        'input[data-role="subfield-code"][data-editable="true"]',
+      );
+      const last = codes[codes.length - 1];
+      if (last) {
+        last.focus();
+        last.select();
+      }
+    });
+  }
+
+  onEnterSubfieldValue(index: number, event: Event): void {
+    const e = event as KeyboardEvent;
+    const f = this.field();
+    const subfields = f.subfields ?? [];
+
+    if (!(index === subfields.length - 1)) {
+      return;
+    }
+
+    e.preventDefault();
+    this.onAddSubfield();
   }
 }

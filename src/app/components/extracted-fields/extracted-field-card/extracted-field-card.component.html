@@ -15,7 +15,9 @@
           <input
             class="w-full bg-transparent text-center text-sm font-bold outline-none placeholder:text-gray-300"
             [(ngModel)]="field().tag"
+            [attr.data-editable]="'true'"
             (ngModelChange)="field().tag = $event; notifyChange()"
+            (input)="onInputAutoAdvance($event)"
             maxlength="3"
             placeholder="000"
           />
@@ -27,7 +29,9 @@
       <input
         class="border-tertiary-default h-10 w-10.5 rounded-lg border text-center text-sm font-medium outline-none placeholder:text-gray-300"
         [(ngModel)]="field().ind1"
+        [attr.data-editable]="'true'"
         (ngModelChange)="field().ind1 = $event; notifyChange()"
+        (input)="onInputAutoAdvance($event)"
         maxlength="1"
         placeholder=" "
       />
@@ -35,7 +39,9 @@
       <input
         class="border-tertiary-default h-10 w-10.5 rounded-lg border text-center text-sm font-medium outline-none placeholder:text-gray-300"
         [(ngModel)]="field().ind2"
+        [attr.data-editable]="'true'"
         (ngModelChange)="field().ind2 = $event; notifyChange()"
+        (input)="onInputAutoAdvance($event)"
         maxlength="1"
         placeholder=" "
       />
@@ -184,7 +190,10 @@
               <input
                 class="w-4 items-center justify-center bg-transparent text-center text-sm font-bold outline-none placeholder:text-gray-300"
                 [(ngModel)]="sf.code"
+                [attr.data-editable]="'true'"
+                [attr.data-role]="'subfield-code'"
                 (ngModelChange)="sf.code = $event; notifyChange()"
+                (input)="onInputAutoAdvance($event)"
                 maxlength="1"
                 placeholder="a"
               />
@@ -200,7 +209,9 @@
             class="disabled:text-disable flex-1 bg-transparent text-base text-sm outline-none placeholder:text-gray-300 disabled:cursor-not-allowed"
             [(ngModel)]="sf.value"
             [disabled]="isValueDisabled(sf, field())"
+            [attr.data-editable]="!isValueDisabled(sf, field()) ? 'true' : null"
             (ngModelChange)="sf.value = $event; notifyChange()"
+            (keydown.enter)="onEnterSubfieldValue($index, $event)"
             placeholder="Aa"
           />
         </div>
