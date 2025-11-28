@@ -57,6 +57,7 @@ export interface BookStatusResponse extends BookCommon {}
 export type ExtractedMarcRecord = Record<MarcTag, ExtractedMarcField[]>;
 export interface BookResultResponse extends BookCommon {
   extracted_marc_record?: Record<string, ExtractedMarcField[]> | null;
+  library_sigla: string | null;
   existing_marc_records?: ExistingMarcRecord[];
   last_edited_record: LastEditedRecord | null;
   provenance?: Record<UUID, Step[]>;
