@@ -41,7 +41,7 @@ export class ImagesViewComponent {
         return 'Poslední čísl. strana';
       case 'Unknown':
       default:
-        return 'Neznámý typ stránky';
+        return 'Neznámý typ strany';
     }
   }
 
