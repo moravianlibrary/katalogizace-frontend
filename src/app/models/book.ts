@@ -36,7 +36,7 @@ export interface BookCommon {
   created_at?: string;
   modified_at?: string;
   state?: TaskState;
-  images: ApiImageItem[] | null;
+  images: ApiImageItem[];
   hatchet_workflow_id?: string | null;
   batch_id?: string | null;
   error_message?: string | null;

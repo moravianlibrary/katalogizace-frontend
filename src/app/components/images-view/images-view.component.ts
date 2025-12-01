@@ -13,7 +13,7 @@ export class ImagesViewComponent {
   private bookService = inject(BooksService);
 
   bookId = input<string | null>(null);
-  images = input<ApiImageItem[] | null>(null);
+  images = input<ApiImageItem[]>([]);
 
   items = signal<ImgItem[]>([]);
   selectedId = signal<string | null>(null);
@@ -46,7 +46,7 @@ export class ImagesViewComponent {
   }
 
   ngOnInit() {
-    const apiImages = this.images() ?? [];
+    const apiImages = this.images();
 
     this.items.set(
       apiImages.map<ImgItem>((img) => ({
