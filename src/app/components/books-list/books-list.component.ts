@@ -131,6 +131,7 @@ export class BooksListComponent {
     this.books.uploadImages(files).subscribe({
       next: () => {
         this.toast.show('Obrázky byly úspěšně nahrány.', 'success');
+        this.load();
       },
       error: () => {
         this.toast.show('Nahrávání obrázků se nezdařilo.', 'error');
