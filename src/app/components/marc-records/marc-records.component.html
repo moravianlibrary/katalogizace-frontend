@@ -7,12 +7,13 @@
     } @else {
       <div class="text-secondary p-2 text-sm font-bold">
         <div
-          class="grid grid-cols-[1fr_2fr_1fr_1fr] items-center gap-3 text-left"
+          class="grid grid-cols-[1fr_2fr_2fr_1fr_auto] items-center gap-3 text-left"
         >
           <div>Zdroj</div>
-          <div>Autor (100|a)</div>
-          <div>Roky (100|d)</div>
-          <div></div>
+          <div>Název</div>
+          <div>Autor</div>
+          <div>Rok vydání</div>
+          <div class="h-6 w-6"></div>
         </div>
       </div>
 
@@ -30,10 +31,14 @@
             type="button"
           >
             <div
-              class="grid grid-cols-[1fr_2fr_1fr_1fr] items-center gap-3 text-left text-sm"
+              class="grid grid-cols-[1fr_2fr_2fr_1fr_auto] items-center gap-3 text-left text-sm"
             >
               <div class="truncate">
                 {{ rec.source || "Vyčtený" }}
+              </div>
+
+              <div class="truncate">
+                {{ getTitle(rec) || "" }}
               </div>
 
               <div class="truncate">
@@ -41,7 +46,7 @@
               </div>
 
               <div class="truncate">
-                {{ getAuthorYears(rec) || "" }}
+                {{ getPublicationYear(rec) || "" }}
               </div>
 
               <div class="flex items-center justify-end">

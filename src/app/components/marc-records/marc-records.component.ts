@@ -34,16 +34,36 @@ export class MarcRecordsComponent {
     this.expandedIndex.update((current) => (current === index ? null : index));
   }
 
+  getTitle(rec: ExistingMarcRecord): string | null {
+    const f245 = rec.normal_fields?.find((f) => f.tag === '245');
+    if (!f245) return '';
+    return f245.subfields?.find((sf) => sf.code === 'a')?.value ?? '';
+  }
+
   getAuthorName(rec: ExistingMarcRecord): string {
     const f100 = rec.normal_fields?.find((f) => f.tag === '100');
     if (!f100) return '';
     return f100.subfields?.find((sf) => sf.code === 'a')?.value ?? '';
   }
 
-  getAuthorYears(rec: ExistingMarcRecord): string {
-    const f100 = rec.normal_fields?.find((f) => f.tag === '100');
-    if (!f100) return '';
-    return f100.subfields?.find((sf) => sf.code === 'd')?.value ?? '';
+  getPublicationYear(rec: ExistingMarcRecord): string {
+    const f264 = rec.normal_fields?.find((f) => f.tag === '264');
+    if (f264) {
+      const sf264 = f264.subfields?.find((sf) => sf.code === 'c')?.value ?? '';
+      if (sf264 !== '') {
+        return sf264;
+      }
+    }
+
+    const f260 = rec.normal_fields?.find((f) => f.tag === '260');
+    if (f260) {
+      const sf260 = f260.subfields?.find((sf) => sf.code === 'c')?.value ?? '';
+      if (sf260 !== '') {
+        return sf260;
+      }
+    }
+
+    return '';
   }
 
   onTakeRecord() {
