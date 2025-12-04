@@ -2,6 +2,7 @@ export type UUID = string;
 
 export type TaskState =
   | 'new'
+  | 'created'
   | 'scheduled'
   | 'in_progress'
   | 'ready'
@@ -183,3 +184,8 @@ export type UiFieldWithMeta = {
   candidates: MarcCandidate[];
   isManual: boolean;
 };
+
+export interface BookImageUploadResponse {
+  book_id: UUID;
+  image_id: UUID;
+}

@@ -1,7 +1,7 @@
 import { DatePipe, NgClass } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { PaginatedBooksResponse, TaskState } from '../../models/book';
 import { BooksService } from '../../services/books.service';
 import { ToastService } from '../../services/toast.service';
@@ -10,7 +10,7 @@ import { WorkingPanelService } from '../../services/working-panel.service';
 @Component({
   standalone: true,
   selector: 'app-books-list',
-  imports: [NgClass, DatePipe],
+  imports: [NgClass, DatePipe, RouterModule],
   templateUrl: 'books-list.component.html',
 })
 export class BooksListComponent {

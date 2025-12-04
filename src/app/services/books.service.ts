@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import {
+  BookImageUploadResponse,
   BookResultResponse,
   BookStatusResponse,
   BookUploadResponse,
@@ -83,6 +84,35 @@ export class BooksService {
           'KATALOGIZACE-API-KEY': apiKey,
         },
       },
+    );
+  }
+
+  createBook(batchId?: string) {
+    let params = new HttpParams();
+    if (batchId) {
+      params = params.set('batch_id', batchId);
+    }
+
+    return this.http.post<BookUploadResponse>(
+      `${this.apiBaseUrl}/books/create`,
+      null,
+    );
+  }
+
+  uploadBookImage(bookId: string, file: Blob | File) {
+    const formData = new FormData();
+    formData.append('image_file', file);
+
+    return this.http.post<BookImageUploadResponse>(
+      `${this.apiBaseUrl}/books/${bookId}/upload-image`,
+      formData,
+    );
+  }
+
+  startBookWorkflow(bookId: string) {
+    return this.http.post<BookUploadResponse>(
+      `${this.apiBaseUrl}/books/${bookId}/start-workflow`,
+      null,
     );
   }
 }
