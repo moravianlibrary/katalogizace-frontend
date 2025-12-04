@@ -1,0 +1,51 @@
+<!-- src/app/books/book-capture-native/book-capture-native.component.html -->
+
+<div class="flex flex-col gap-4 p-4">
+  <h1 class="text-xl font-semibold">Naskenovať knihu (natívny foťák)</h1>
+
+  <!-- skrytý input -> otvorí natívnu kameru -->
+  <input
+    class="hidden"
+    #fileInput
+    (change)="onFileSelected($event)"
+    type="file"
+    accept="image/*"
+    capture="environment"
+  />
+
+  <div class="flex flex-col gap-3">
+    <p class="text-sm text-gray-600">
+      Po každom kliknutí na „Odfotiť stránku“ sa otvorí natívna kamera. Po
+      odfotení sa fotka automaticky odošle na server.
+    </p>
+
+    <div class="flex flex-wrap items-center gap-3">
+      <button
+        class="btn btn-primary"
+        [disabled]="isCreating() || isUploading() || isFinishing()"
+        (click)="captureClick()"
+      >
+        <ng-container *ngIf="isCreating(); else captureLabel">
+          Zakladám knihu…
+        </ng-container>
+        <ng-template #captureLabel>
+          {{ isUploading() ? "Nahrávam…" : "Odfotiť stránku" }}
+        </ng-template>
+      </button>
+
+      <button
+        class="btn btn-success"
+        [disabled]="isFinishing() || photoCount() === 0"
+        (click)="finish()"
+      >
+        {{ isFinishing() ? "Spúšťam workflow…" : "Hotovo" }}
+      </button>
+
+      <button class="btn btn-secondary" (click)="cancel()">Zrušiť</button>
+
+      <span class="ml-auto" *ngIf="photoCount() > 0">
+        Stránok odfotených: <strong>{{ photoCount() }}</strong>
+      </span>
+    </div>
+  </div>
+</div>
