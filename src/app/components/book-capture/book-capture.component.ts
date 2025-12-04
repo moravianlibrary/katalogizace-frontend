@@ -113,6 +113,7 @@ export class BookCaptureComponent implements AfterViewInit {
           .subscribe({
             next: () => {
               this.photoCount.update((c) => c + 1);
+              this.toast.show('Stránka úspešne odfotená', 'success');
               this.isUploading.set(false);
             },
             error: (err) => {
