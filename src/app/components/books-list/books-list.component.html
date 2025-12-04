@@ -3,26 +3,28 @@
     <div class="flex flex-row items-center justify-between gap-6">
       <h1>Knihy</h1>
 
-      <button
-        class="bg-main-primary-default text-on-color hover:bg-main-primary-hover active:bg-main-primary-pressed cursor-pointer rounded-xl px-4 py-3 font-medium"
-        type="button"
-        routerLink="/books/capture-native"
-      >
-        Naskenujte knihu
-      </button>
+      <div class="flex gap-4">
+        <button
+          class="bg-main-primary-default text-on-color hover:bg-main-primary-hover active:bg-main-primary-pressed cursor-pointer rounded-xl px-4 py-3 font-medium"
+          type="button"
+          routerLink="/books/capture-native"
+        >
+          Naskenujte knihu
+        </button>
 
-      <button
-        class="bg-main-primary-default text-on-color hover:bg-main-primary-hover active:bg-main-primary-pressed disabled:bg-main-primary-disable disabled:text-btn-primary-disable cursor-pointer rounded-xl px-4 py-3 font-medium disabled:cursor-not-allowed disabled:opacity-50"
-        [disabled]="isUploading"
-        (click)="!isUploading && fileInput.click()"
-        type="button"
-      >
-        @if (isUploading) {
-          Nahrávám…
-        } @else {
-          Nahrát obrázky
-        }
-      </button>
+        <button
+          class="bg-main-primary-default text-on-color hover:bg-main-primary-hover active:bg-main-primary-pressed disabled:bg-main-primary-disable disabled:text-btn-primary-disable cursor-pointer rounded-xl px-4 py-3 font-medium disabled:cursor-not-allowed disabled:opacity-50"
+          [disabled]="isUploading"
+          (click)="!isUploading && fileInput.click()"
+          type="button"
+        >
+          @if (isUploading) {
+            Nahrávám…
+          } @else {
+            Nahrát obrázky
+          }
+        </button>
+      </div>
     </div>
 
     <input
