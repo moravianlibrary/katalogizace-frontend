@@ -62,13 +62,22 @@ export class BookCaptureComponent implements AfterViewInit {
 
   private async openCamera() {
     try {
-      this.stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' },
-      });
+      const constraints: MediaStreamConstraints = {
+        video: {
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+        },
+        audio: false,
+      };
+
+      this.stream = await navigator.mediaDevices.getUserMedia(constraints);
 
       const video = this.videoRef.nativeElement;
       video.srcObject = this.stream;
       await video.play();
+
+      console.log('Stream size:', video.videoWidth, 'x', video.videoHeight);
     } catch (e) {
       console.error('Camera error', e);
       this.toast.show('Nepodarilo sa otvoriť kameru.', 'error');
