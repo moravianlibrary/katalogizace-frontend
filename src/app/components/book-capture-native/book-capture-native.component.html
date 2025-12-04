@@ -1,9 +1,5 @@
-<!-- src/app/books/book-capture-native/book-capture-native.component.html -->
-
-<div class="flex flex-col gap-4 p-4">
-  <h1 class="text-xl font-semibold">Naskenovať knihu (natívny foťák)</h1>
-
-  <!-- skrytý input -> otvorí natívnu kameru -->
+<div class="flex flex-col gap-2 p-4">
+  <h2>Naskenujte knihu</h2>
   <input
     class="hidden"
     #fileInput
@@ -13,39 +9,44 @@
     capture="environment"
   />
 
-  <div class="flex flex-col gap-3">
-    <p class="text-sm text-gray-600">
-      Po každom kliknutí na „Odfotiť stránku“ sa otvorí natívna kamera. Po
-      odfotení sa fotka automaticky odošle na server.
+  <div class="flex flex-col gap-5">
+    <p class="text-light text-sm">
+      Pokaždé, když kliknete na „Vyfotit stránku“, otevře se nativní fotoaparát.
+      Po vyfocení se fotografie automaticky odešle na server.
     </p>
 
-    <div class="flex flex-wrap items-center gap-3">
+    <div class="flex flex-wrap items-center gap-5">
       <button
-        class="btn btn-primary"
+        class="bg-main-primary-default text-on-color hover:bg-main-primary-hover active:bg-main-primary-pressed text-sm-tight cursor-pointer rounded-lg px-4 py-3 font-medium"
         [disabled]="isCreating() || isUploading() || isFinishing()"
         (click)="captureClick()"
       >
-        <ng-container *ngIf="isCreating(); else captureLabel">
-          Zakladám knihu…
-        </ng-container>
-        <ng-template #captureLabel>
-          {{ isUploading() ? "Nahrávam…" : "Odfotiť stránku" }}
-        </ng-template>
+        @if (isCreating()) {
+          Zakládám knihu…
+        } @else {
+          {{ isUploading() ? "Nahrávám…" : "Vyfotit stránku" }}
+        }
       </button>
 
       <button
-        class="btn btn-success"
-        [disabled]="isFinishing() || photoCount() === 0"
-        (click)="finish()"
+        class="bg-main-base text-error hover:bg-main-error hover:text-on-color border-error text-sm-tight cursor-pointer rounded-lg border px-4 py-3 font-medium"
+        (click)="cancel()"
       >
-        {{ isFinishing() ? "Spúšťam workflow…" : "Hotovo" }}
+        Zrušit
       </button>
 
-      <button class="btn btn-secondary" (click)="cancel()">Zrušiť</button>
+      <button
+        class="bg-main-base text-success hover:bg-main-success hover:text-on-color border-success text-sm-tight cursor-pointer rounded-lg border px-4 py-3 font-medium"
+        (click)="finish()"
+      >
+        {{ isFinishing() ? "Spouštím workflow…" : "Hotovo" }}
+      </button>
 
-      <span class="ml-auto" *ngIf="photoCount() > 0">
-        Stránok odfotených: <strong>{{ photoCount() }}</strong>
-      </span>
+      @if (photoCount() > 0) {
+        <span class="ml-auto">
+          Počet naskenovaných stránek: <strong>{{ photoCount() }}</strong>
+        </span>
+      }
     </div>
   </div>
 </div>
