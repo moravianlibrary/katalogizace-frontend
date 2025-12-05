@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import {
   Component,
-  DestroyRef,
   ElementRef,
   ViewChild,
   inject,
@@ -19,7 +18,6 @@ import { ToastService } from '../../services/toast.service';
   templateUrl: './book-capture-native.component.html',
 })
 export class BookCaptureNativeComponent {
-  private destroyRef = inject(DestroyRef);
   private books = inject(BooksService);
   private router = inject(Router);
   private toast = inject(ToastService);
