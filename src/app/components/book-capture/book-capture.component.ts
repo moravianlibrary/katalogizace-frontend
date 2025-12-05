@@ -2,11 +2,13 @@ import { CommonModule } from '@angular/common';
 import {
   AfterViewInit,
   Component,
+  DestroyRef,
   ElementRef,
   ViewChild,
   inject,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 
 import { BooksService } from '../../services/books.service';
@@ -19,6 +21,7 @@ import { ToastService } from '../../services/toast.service';
   templateUrl: './book-capture.component.html',
 })
 export class BookCaptureComponent implements AfterViewInit {
+  private destroyRef = inject(DestroyRef);
   private books = inject(BooksService);
   private router = inject(Router);
   private toast = inject(ToastService);
@@ -40,18 +43,21 @@ export class BookCaptureComponent implements AfterViewInit {
 
   startNewBook() {
     this.isCreating.set(true);
-    this.books.createBook().subscribe({
-      next: (res) => {
-        this.bookId.set(res.book_id);
-        this.isCreating.set(false);
-        this.openCamera();
-      },
-      error: (err) => {
-        console.error(err);
-        this.toast.show('Nepodařilo se založit knihu.', 'error');
-        this.isCreating.set(false);
-      },
-    });
+    this.books
+      .createBook()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.bookId.set(res.book_id);
+          this.isCreating.set(false);
+          this.openCamera();
+        },
+        error: (err) => {
+          console.error(err);
+          this.toast.show('Nepodařilo se založit knihu.', 'error');
+          this.isCreating.set(false);
+        },
+      });
   }
 
   private async openCamera() {
@@ -84,25 +90,13 @@ export class BookCaptureComponent implements AfterViewInit {
     const video = this.videoRef.nativeElement;
     const canvas = this.canvasRef.nativeElement;
 
-    const vw = video.videoWidth;
-    const vh = video.videoHeight;
-    if (!vw || !vh) return;
-
-    const targetLongSide = 2500;
-    const scale = targetLongSide / Math.max(vw, vh);
-    const w = Math.round(vw * Math.min(1, scale));
-    const h = Math.round(vh * Math.min(1, scale));
-
-    canvas.width = w;
-    canvas.height = h;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    (ctx as any).imageSmoothingEnabled = true;
-    (ctx as any).imageSmoothingQuality = 'high';
-
-    ctx.drawImage(video, 0, 0, w, h);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
     this.isUploading.set(true);
     canvas.toBlob(
@@ -113,21 +107,24 @@ export class BookCaptureComponent implements AfterViewInit {
           return;
         }
 
-        this.books.uploadBookImage(this.bookId()!, blob).subscribe({
-          next: () => {
-            this.photoCount.update((c) => c + 1);
-            this.toast.show('Stránka úspěšně odfocená', 'success');
-            this.isUploading.set(false);
-          },
-          error: (err) => {
-            console.error(err);
-            this.toast.show('Upload fotky zlyhal.', 'error');
-            this.isUploading.set(false);
-          },
-        });
+        this.books
+          .uploadBookImage(this.bookId()!, blob)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.photoCount.update((c) => c + 1);
+              this.toast.show('Stránka úspěšně odfocená', 'success');
+              this.isUploading.set(false);
+            },
+            error: (err) => {
+              console.error(err);
+              this.toast.show('Upload fotky zlyhal.', 'error');
+              this.isUploading.set(false);
+            },
+          });
       },
       'image/jpeg',
-      0.92,
+      0.9,
     );
   }
 
@@ -137,18 +134,21 @@ export class BookCaptureComponent implements AfterViewInit {
     this.isFinishing.set(true);
     this.stopCamera();
 
-    this.books.startBookWorkflow(this.bookId()!).subscribe({
-      next: () => {
-        this.isFinishing.set(false);
-        this.toast.show('Workflow spuštěn.', 'success');
-        this.router.navigate(['/books']);
-      },
-      error: (err) => {
-        console.error(err);
-        this.toast.show('Spuštění workflow zlyhalo.', 'error');
-        this.isFinishing.set(false);
-      },
-    });
+    this.books
+      .startBookWorkflow(this.bookId()!)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.isFinishing.set(false);
+          this.toast.show('Workflow spuštěn.', 'success');
+          this.router.navigate(['/books']);
+        },
+        error: (err) => {
+          console.error(err);
+          this.toast.show('Spuštění workflow zlyhalo.', 'error');
+          this.isFinishing.set(false);
+        },
+      });
   }
 
   cancel() {
