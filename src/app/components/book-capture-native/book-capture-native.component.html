@@ -18,7 +18,7 @@
     <div class="flex flex-wrap items-center gap-5">
       <button
         class="bg-main-primary-default text-on-color hover:bg-main-primary-hover active:bg-main-primary-pressed text-sm-tight disabled:bg-main-primary-disable disabled:text-btn-primary-disable cursor-pointer rounded-lg px-4 py-3 font-medium disabled:cursor-not-allowed"
-        [disabled]="true"
+        [disabled]="isCreating() || isUploading() || isFinishing()"
         (click)="captureClick()"
       >
         @if (isCreating()) {
