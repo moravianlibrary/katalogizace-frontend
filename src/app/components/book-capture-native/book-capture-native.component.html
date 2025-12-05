@@ -41,12 +41,9 @@
       >
         {{ isFinishing() ? "Spouštím workflow…" : "Hotovo" }}
       </button>
-
-      @if (photoCount() > 0) {
-        <span class="ml-auto">
-          Počet naskenovaných stránek: <strong>{{ photoCount() }}</strong>
-        </span>
-      }
     </div>
+    <span>
+      Počet naskenovaných stránek: <strong>{{ photoCount() }}</strong>
+    </span>
   </div>
 </div>

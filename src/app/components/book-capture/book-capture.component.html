@@ -1,47 +1,57 @@
 <div class="flex flex-col gap-4 p-4">
-  <h1 class="text-xl font-semibold">Naskenovať knihu foťákom</h1>
+  <h2>Naskenujte knihu</h2>
 
-  <div *ngIf="!bookId()">
-    <button
-      class="btn btn-primary"
-      [disabled]="isCreating()"
-      (click)="startNewBook()"
-    >
-      {{ isCreating() ? "Zakladám knihu…" : "Založiť knihu a otvoriť kameru" }}
-    </button>
-  </div>
-
-  <div class="flex flex-col gap-3" *ngIf="bookId()">
-    <video
-      class="max-h-[70vh] w-full rounded bg-black"
-      #video
-      autoplay
-      playsinline
-    ></video>
-    <canvas #canvas hidden></canvas>
-
-    <div class="flex flex-wrap items-center gap-3">
+  @if (!bookId()) {
+    <div>
       <button
-        class="btn btn-primary"
-        [disabled]="isUploading() || isFinishing()"
-        (click)="takePhoto()"
+        class="bg-main-primary-default text-on-color hover:bg-main-primary-hover active:bg-main-primary-pressed text-sm-tight cursor-pointer rounded-lg px-4 py-3 font-medium"
+        [disabled]="isCreating()"
+        (click)="startNewBook()"
       >
-        {{ isUploading() ? "Nahrávam…" : "Odfotiť stránku" }}
+        {{
+          isCreating() ? "Zakládám knihu…" : "Založit knihu a otvevřít kameru"
+        }}
       </button>
+    </div>
+  } @else {
+    <div class="flex flex-col gap-3">
+      <video
+        class="max-h-[70vh] w-full rounded bg-black"
+        #video
+        autoplay
+        playsinline
+      ></video>
 
-      <button
-        class="btn btn-success"
-        [disabled]="isFinishing() || photoCount() === 0"
-        (click)="finish()"
-      >
-        {{ isFinishing() ? "Spúšťam workflow…" : "Hotovo" }}
-      </button>
+      <canvas #canvas hidden></canvas>
 
-      <button class="btn btn-secondary" (click)="cancel()">Zrušiť</button>
+      <div class="flex flex-wrap items-center gap-3">
+        <button
+          class="bg-main-primary-default text-on-color hover:bg-main-primary-hover active:bg-main-primary-pressed text-sm-tight cursor-pointer rounded-lg px-4 py-3 font-medium"
+          [disabled]="isUploading() || isFinishing()"
+          (click)="takePhoto()"
+        >
+          {{ isUploading() ? "Nahrávám…" : "Odfotit stránku" }}
+        </button>
 
-      <span class="ml-auto" *ngIf="photoCount() > 0">
-        Stránok odfotených: <strong>{{ photoCount() }}</strong>
+        <button
+          class="bg-main-base text-error hover:bg-main-error hover:text-on-color border-error text-sm-tight cursor-pointer rounded-lg border px-4 py-3 font-medium"
+          (click)="cancel()"
+        >
+          Zrušit
+        </button>
+
+        <button
+          class="bg-main-base text-success hover:bg-main-success hover:text-on-color border-success text-sm-tight cursor-pointer rounded-lg border px-4 py-3 font-medium"
+          [disabled]="isFinishing()"
+          (click)="finish()"
+        >
+          {{ isFinishing() ? "Spouštím workflow…" : "Hotovo" }}
+        </button>
+      </div>
+
+      <span>
+        Počet naskenovaných stránek: <strong>{{ photoCount() }}</strong>
       </span>
     </div>
-  </div>
+  }
 </div>
