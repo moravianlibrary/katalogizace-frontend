@@ -54,7 +54,7 @@ export class BookCaptureComponent implements AfterViewInit {
         },
         error: (err) => {
           console.error(err);
-          this.toast.show('Nepodarilo sa založiť knihu.', 'error');
+          this.toast.show('Nepodařilo se založit knihu.', 'error');
           this.isCreating.set(false);
         },
       });
@@ -80,7 +80,7 @@ export class BookCaptureComponent implements AfterViewInit {
       console.log('Stream size:', video.videoWidth, 'x', video.videoHeight);
     } catch (e) {
       console.error('Camera error', e);
-      this.toast.show('Nepodarilo sa otvoriť kameru.', 'error');
+      this.toast.show('Nepodařilo se otevřít kameru.', 'error');
     }
   }
 
@@ -103,7 +103,7 @@ export class BookCaptureComponent implements AfterViewInit {
       (blob) => {
         if (!blob) {
           this.isUploading.set(false);
-          this.toast.show('Nepodarilo sa spracovať fotku.', 'error');
+          this.toast.show('Nepodařilo se spracovat fotku.', 'error');
           return;
         }
 
@@ -113,7 +113,7 @@ export class BookCaptureComponent implements AfterViewInit {
           .subscribe({
             next: () => {
               this.photoCount.update((c) => c + 1);
-              this.toast.show('Stránka úspešne odfotená', 'success');
+              this.toast.show('Stránka úspěšně odfocená', 'success');
               this.isUploading.set(false);
             },
             error: (err) => {
@@ -140,12 +140,12 @@ export class BookCaptureComponent implements AfterViewInit {
       .subscribe({
         next: () => {
           this.isFinishing.set(false);
-          this.toast.show('Workflow spustený.', 'success');
+          this.toast.show('Workflow spuštěn.', 'success');
           this.router.navigate(['/books']);
         },
         error: (err) => {
           console.error(err);
-          this.toast.show('Spustenie workflowu zlyhalo.', 'error');
+          this.toast.show('Spuštění workflow zlyhalo.', 'error');
           this.isFinishing.set(false);
         },
       });

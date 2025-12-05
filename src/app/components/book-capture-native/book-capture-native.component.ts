@@ -51,7 +51,7 @@ export class BookCaptureNativeComponent {
           },
           error: (err) => {
             console.error(err);
-            this.toast.show('Nepodarilo sa založiť knihu.', 'error');
+            this.toast.show('Nepodařilo se založit knihu.', 'error');
             this.isCreating.set(false);
           },
         });
@@ -81,7 +81,7 @@ export class BookCaptureNativeComponent {
       .subscribe({
         next: () => {
           this.photoCount.update((c) => c + 1);
-          this.toast.show('Stránka úspešne odfotená', 'success');
+          this.toast.show('Stránka úspěšně odfocená', 'success');
           this.isUploading.set(false);
         },
         error: (err) => {
@@ -94,7 +94,7 @@ export class BookCaptureNativeComponent {
 
   finish() {
     if (!this.bookId() || this.photoCount() === 0) {
-      this.toast.show('Najprv odfoť aspoň jednu stránku.', 'error');
+      this.toast.show('Nejprve vyfoťte alespoň jednu stránku.', 'error');
       return;
     }
 
@@ -105,12 +105,12 @@ export class BookCaptureNativeComponent {
       .subscribe({
         next: () => {
           this.isFinishing.set(false);
-          this.toast.show('Workflow spustený.', 'success');
+          this.toast.show('Workflow spuštěn.', 'success');
           this.router.navigate(['/books']);
         },
         error: (err) => {
           console.error(err);
-          this.toast.show('Spustenie workflowu zlyhalo.', 'error');
+          this.toast.show('Spuštění workflow zlyhalo.', 'error');
           this.isFinishing.set(false);
         },
       });
