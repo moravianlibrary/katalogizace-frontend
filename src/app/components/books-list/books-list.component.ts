@@ -135,6 +135,8 @@ export class BooksListComponent {
       },
       error: () => {
         this.toast.show('Nahrávání obrázků se nezdařilo.', 'error');
+        this.isUploading = false;
+        input.value = '';
       },
       complete: () => {
         this.isUploading = false;
