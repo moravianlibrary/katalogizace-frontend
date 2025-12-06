@@ -2,16 +2,30 @@
   <h2>Naskenujte knihu</h2>
 
   @if (!bookId()) {
-    <div>
-      <button
-        class="bg-main-primary-default text-on-color hover:bg-main-primary-hover active:bg-main-primary-pressed text-sm-tight disabled:bg-main-primary-disable disabled:text-btn-primary-disable cursor-pointer rounded-lg px-4 py-3 font-medium disabled:cursor-not-allowed"
-        [disabled]="isCreating()"
-        (click)="startNewBook()"
-      >
-        {{
-          isCreating() ? "Zakládám knihu…" : "Založit knihu a otvevřít kameru"
-        }}
-      </button>
+    <div class="flex flex-col gap-5">
+      <p class="text-light text-sm">
+        Nejprve založte knihu. Poté se automaticky otevře kamera pro pořízení
+        první stránky.
+      </p>
+
+      <div class="flex gap-4">
+        <button
+          class="bg-main-base border-tertiary-default hover:border-tertiary-hover active:border-tertiary-pressed text-sm-tight cursor-pointer rounded-lg border px-4 py-3 text-base font-medium"
+          (click)="cancel()"
+        >
+          Zpět
+        </button>
+
+        <button
+          class="bg-main-primary-default text-on-color hover:bg-main-primary-hover active:bg-main-primary-pressed text-sm-tight disabled:bg-main-primary-disable disabled:text-btn-primary-disable cursor-pointer rounded-lg px-4 py-3 font-medium disabled:cursor-not-allowed"
+          [disabled]="isCreating()"
+          (click)="startNewBook()"
+        >
+          {{
+            isCreating() ? "Zakládám knihu…" : "Založit knihu a otevřít kameru"
+          }}
+        </button>
+      </div>
     </div>
   } @else {
     <div class="flex flex-col gap-3">

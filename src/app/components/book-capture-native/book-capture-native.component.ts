@@ -30,24 +30,20 @@ export class BookCaptureNativeComponent {
   isFinishing = signal(false);
   photoCount = signal(0);
 
-  ngOnInit() {
-    this.ensureBookCreated();
-  }
-
-  private ensureBookCreated() {
-    if (this.bookId() || this.isCreating()) return;
+  startNewBook() {
+    if (this.isCreating()) return;
 
     this.isCreating.set(true);
     this.books.createBook().subscribe({
       next: (res) => {
         this.bookId.set(res.book_id);
         this.isCreating.set(false);
+        this.openNativeCamera();
       },
       error: (err) => {
         console.error(err);
         this.toast.show('Nepodařilo se založit knihu.', 'error');
         this.isCreating.set(false);
-        this.router.navigate(['/books']);
       },
     });
   }

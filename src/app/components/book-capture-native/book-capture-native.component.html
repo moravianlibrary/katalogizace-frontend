@@ -1,5 +1,6 @@
 <div class="flex flex-col gap-2 p-4">
   <h2>Naskenujte knihu</h2>
+
   <input
     class="hidden"
     #fileInput
@@ -9,41 +10,65 @@
     capture="environment"
   />
 
-  <div class="flex flex-col gap-5">
-    <p class="text-light text-sm">
-      Pokaždé, když kliknete na „Vyfotit stránku“, otevře se nativní fotoaparát.
-      Po vyfocení se fotografie automaticky odešle na server.
-    </p>
+  @if (!bookId()) {
+    <div class="flex flex-col gap-5">
+      <p class="text-light text-sm">
+        Nejprve založte knihu. Poté budete moci otevřít nativní fotoaparát pro
+        pořízení první stránky.
+      </p>
 
-    <div class="flex flex-wrap items-center gap-5">
-      <button
-        class="bg-main-primary-default text-on-color hover:bg-main-primary-hover active:bg-main-primary-pressed text-sm-tight disabled:bg-main-primary-disable disabled:text-btn-primary-disable cursor-pointer rounded-lg px-4 py-3 font-medium disabled:cursor-not-allowed"
-        [disabled]="isCreating() || isUploading() || isFinishing()"
-        (click)="captureClick()"
-      >
-        @if (isCreating()) {
-          Zakládám knihu…
-        } @else {
-          {{ isUploading() ? "Nahrávám…" : "Vyfotit stránku" }}
-        }
-      </button>
+      <div class="flex gap-4">
+        <button
+          class="bg-main-base border-tertiary-default hover:border-tertiary-hover active:border-tertiary-pressed text-sm-tight cursor-pointer rounded-lg border px-4 py-3 text-base font-medium"
+          (click)="cancel()"
+        >
+          Zpět
+        </button>
 
-      <button
-        class="bg-main-base text-error hover:bg-main-error hover:text-on-color border-error text-sm-tight cursor-pointer rounded-lg border px-4 py-3 font-medium"
-        (click)="cancel()"
-      >
-        Zrušit
-      </button>
-
-      <button
-        class="bg-main-base text-success hover:bg-main-success hover:text-on-color border-success text-sm-tight cursor-pointer rounded-lg border px-4 py-3 font-medium"
-        (click)="finish()"
-      >
-        {{ isFinishing() ? "Spouštím workflow…" : "Hotovo" }}
-      </button>
+        <button
+          class="bg-main-primary-default text-on-color hover:bg-main-primary-hover active:bg-main-primary-pressed text-sm-tight disabled:bg-main-primary-disable disabled:text-btn-primary-disable cursor-pointer rounded-lg px-4 py-3 font-medium disabled:cursor-not-allowed"
+          [disabled]="isCreating()"
+          (click)="startNewBook()"
+        >
+          {{ isCreating() ? "Zakládám knihu…" : "Založit knihu" }}
+        </button>
+      </div>
     </div>
-    <span>
-      Počet naskenovaných stránek: <strong>{{ photoCount() }}</strong>
-    </span>
-  </div>
+  } @else {
+    <div class="flex flex-col gap-5">
+      <p class="text-light text-sm">
+        Pokaždé, když kliknete na „Vyfotit stránku“, otevře se nativní
+        fotoaparát. Po vyfocení se fotografie automaticky odešle na server.
+      </p>
+
+      <div class="flex flex-wrap items-center gap-5">
+        <button
+          class="bg-main-primary-default text-on-color hover:bg-main-primary-hover active:bg-main-primary-pressed text-sm-tight disabled:bg-main-primary-disable disabled:text-btn-primary-disable cursor-pointer rounded-lg px-4 py-3 font-medium disabled:cursor-not-allowed"
+          [disabled]="isUploading() || isFinishing()"
+          (click)="captureClick()"
+        >
+          {{ isUploading() ? "Nahrávám…" : "Vyfotit stránku" }}
+        </button>
+
+        <button
+          class="bg-main-base text-error hover:bg-main-error hover:text-on-color border-error text-sm-tight cursor-pointer rounded-lg border px-4 py-3 font-medium"
+          (click)="cancel()"
+        >
+          Zrušit
+        </button>
+
+        <button
+          class="bg-main-base text-success hover:bg-main-success hover:text-on-color border-success text-sm-tight cursor-pointer rounded-lg border px-4 py-3 font-medium"
+          [disabled]="isFinishing()"
+          (click)="finish()"
+        >
+          {{ isFinishing() ? "Spouštím workflow…" : "Hotovo" }}
+        </button>
+      </div>
+
+      <span>
+        Počet naskenovaných stránek: <strong>{{ photoCount() }}</strong>
+      </span>
+    </div>
+  }
 </div>
