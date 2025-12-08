@@ -34,13 +34,13 @@ export interface ApiImageItem {
 
 export interface BookCommon {
   book_id: UUID;
-  created_at?: string;
-  modified_at?: string;
-  state?: TaskState;
+  created_at: string | null;
+  modified_at: string | null;
+  state: TaskState;
   images: ApiImageItem[];
-  hatchet_workflow_id?: string | null;
-  batch_id?: string | null;
-  error_message?: string | null;
+  hatchet_workflow_id: string | null;
+  batch_id: string | null;
+  error_message: string | null;
 }
 export interface BookRecordInfo extends BookCommon {}
 
@@ -57,11 +57,11 @@ export interface BookStatusResponse extends BookCommon {}
 
 export type ExtractedMarcRecord = Record<MarcTag, ExtractedMarcField[]>;
 export interface BookResultResponse extends BookCommon {
-  extracted_marc_record?: Record<string, ExtractedMarcField[]> | null;
+  extracted_marc_record: Record<string, ExtractedMarcField[]> | null;
   library_sigla: string | null;
-  existing_marc_records?: ExistingMarcRecord[];
+  existing_marc_records: ExistingMarcRecord[];
   last_edited_record: LastEditedRecord | null;
-  provenance?: Record<UUID, Step[]>;
+  provenance: Record<UUID, Step[]>;
 }
 
 export interface ExtractedMarcField {
@@ -79,7 +79,7 @@ export interface MarcCandidate {
 export interface CandidateMarcRepresentation {
   ind1: string | null;
   ind2: string | null;
-  subfields?: MarcSubfield[];
+  subfields: MarcSubfield[];
 }
 
 export interface ExistingMarcRecord {
@@ -87,8 +87,8 @@ export interface ExistingMarcRecord {
   leader: string;
   source: string;
   quality_assessment: QualityScore;
-  special_fields?: ExistingMarcRecordSpecialField[];
-  normal_fields?: ExistingMarcRecordNormalField[];
+  special_fields: ExistingMarcRecordSpecialField[];
+  normal_fields: ExistingMarcRecordNormalField[];
 }
 
 export interface LastEditedRecord extends ExistingMarcRecord {}
@@ -109,7 +109,7 @@ export interface ExistingMarcRecordNormalField {
   tag: string;
   ind1: string;
   ind2: string;
-  subfields?: MarcSubfield[];
+  subfields: MarcSubfield[];
 }
 
 export interface MarcSubfield {
@@ -120,9 +120,9 @@ export interface MarcSubfield {
 export interface BookUploadResponse {
   book_id: UUID;
   state: TaskState;
-  hatchet_workflow_id?: string | null;
-  batch_id?: string | null;
-  images?: ApiImageItem[];
+  hatchet_workflow_id: string | null;
+  batch_id: string | null;
+  images: ApiImageItem[];
   created_at: string;
 }
 
@@ -161,14 +161,14 @@ export interface Step {
 export interface CandidateProvenanceResponse {
   book_id: UUID;
   candidate_id: UUID;
-  provenance?: Step[];
+  provenance: Step[];
 }
 
 export interface BatchBooksResponse {
   batch_id: UUID;
   books: BookStatusResponse[];
   total_count: number;
-  state_counts?: Record<TaskState, number>;
+  state_counts: Record<TaskState, number>;
 }
 
 export type UiSubfield = { code: string; value: string; isManual?: boolean };
