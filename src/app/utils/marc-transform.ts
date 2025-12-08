@@ -4,8 +4,29 @@ import {
   ExistingMarcRecordSpecialField,
   ExtractedMarcField,
   ExtractedMarcRecord,
+  MarcCandidate,
   UiFieldWithMeta,
 } from '../models/book';
+
+export interface ExistingMarcRecordFieldMeta {
+  fieldId: string;
+  selectedCandidateId: string | null;
+  candidates: MarcCandidate[];
+  score: number;
+}
+
+export interface ExistingMarcRecordNormalFieldWithMeta
+  extends ExistingMarcRecordNormalField,
+    ExistingMarcRecordFieldMeta {}
+
+export interface ExistingMarcRecordSpecialFieldWithMeta
+  extends ExistingMarcRecordSpecialField,
+    ExistingMarcRecordFieldMeta {}
+
+export interface ExistingMarcRecordWithMeta extends ExistingMarcRecord {
+  special_fields: ExistingMarcRecordSpecialFieldWithMeta[];
+  normal_fields: ExistingMarcRecordNormalFieldWithMeta[];
+}
 
 function pickCandidate(f: ExtractedMarcField) {
   const cand = f.candidates.find((c) => c.id === f.selected_candidate_id);
@@ -132,4 +153,71 @@ export function extractedToUiFields(
 
   out.sort((a, b) => a.tag.localeCompare(b.tag));
   return out;
+}
+
+export function extractedToExistingWithMeta(
+  extracted: ExtractedMarcRecord | null,
+): ExistingMarcRecordWithMeta | null {
+  if (!extracted) return null;
+
+  const special: ExistingMarcRecordSpecialFieldWithMeta[] = [];
+  const normal: ExistingMarcRecordNormalFieldWithMeta[] = [];
+
+  for (const [tag, fields] of Object.entries(extracted)) {
+    if (!Array.isArray(fields) || fields.length === 0) continue;
+
+    for (const f of fields) {
+      if (!f?.candidates?.length) continue;
+
+      const cand = pickCandidate(f);
+      const rep = cand.marc_representation;
+
+      const meta: ExistingMarcRecordFieldMeta = {
+        fieldId: f.id,
+        selectedCandidateId: f.selected_candidate_id,
+        candidates: f.candidates,
+        score: cand.score,
+      };
+
+      if (isControlTag(tag)) {
+        const value =
+          (rep.subfields && rep.subfields.length
+            ? rep.subfields.map((sf) => sf.value).join(' ')
+            : '') || '';
+
+        special.push({
+          tag,
+          value,
+          ...meta,
+        });
+      } else {
+        normal.push({
+          tag,
+          ind1: rep.ind1 ?? '',
+          ind2: rep.ind2 ?? '',
+          subfields: rep.subfields,
+          ...meta,
+        });
+      }
+    }
+  }
+
+  special.sort((a, b) => a.tag.localeCompare(b.tag));
+  normal.sort((a, b) => a.tag.localeCompare(b.tag));
+
+  const existing: ExistingMarcRecordWithMeta = {
+    record_id: 'extracted-synthetic',
+    leader: '',
+    source: '',
+    quality_assessment: {
+      required_present: 0,
+      required_total: 0,
+      required_if_applicable_present: 0,
+      required_if_applicable_total: 0,
+    },
+    special_fields: special,
+    normal_fields: normal,
+  };
+
+  return existing;
 }
