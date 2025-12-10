@@ -1,10 +1,18 @@
-import { Component, computed, inject, input, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import { ApiImageItem, ImgItem, PageType } from '../../models/book';
 import { BooksService } from '../../services/books.service';
 import { ImageLargePreviewComponent } from '../image/preview/preview.component';
 import { ImageThumbnailsComponent } from '../image/thumbnails/thumbnails.component';
 
 @Component({
+  standalone: true,
   selector: 'app-images-view',
   imports: [ImageLargePreviewComponent, ImageThumbnailsComponent],
   templateUrl: './images-view.component.html',
@@ -45,51 +53,59 @@ export class ImagesViewComponent {
     }
   }
 
-  ngOnInit() {
-    const apiImages = this.images();
+  constructor() {
+    effect(() => {
+      const apiImages = this.images();
 
-    this.items.set(
-      apiImages.map<ImgItem>((img) => ({
-        id: img.image_id,
-        url: '',
-        loading: true,
-        error: null,
-        pageType: this.pageTypeLabel(img.page_type),
-      })),
-    );
+      this.items.set(
+        apiImages.map<ImgItem>((img) => ({
+          id: img.image_id,
+          url: '',
+          loading: true,
+          error: null,
+          pageType: this.pageTypeLabel(img.page_type),
+        })),
+      );
 
-    for (const img of apiImages) {
-      const id = img.image_id;
-      this.bookService.getBookImage(this.bookId()!, id, true).subscribe({
-        next: (blob) => {
-          const url = URL.createObjectURL(blob);
-          this.items.update((arr) =>
-            arr.map((x) =>
-              x.id === id ? { ...x, url, loading: false, error: null } : x,
-            ),
-          );
-        },
-        error: () => {
-          this.items.update((arr) =>
-            arr.map((x) =>
-              x.id === id
-                ? {
-                    ...x,
-                    loading: false,
-                    error: 'Nepodařilo se načíst náhled.',
-                  }
-                : x,
-            ),
-          );
-        },
-      });
-    }
+      this.fullLoaded.clear();
 
-    if (apiImages.length) {
       const firstId = apiImages[0].image_id;
       this.selectedId.set(firstId);
-      this.ensureFull(firstId);
-    }
+
+      for (const img of apiImages) {
+        const id = img.image_id;
+        this.bookService.getBookImage(this.bookId()!, id, true).subscribe({
+          next: (blob) => {
+            const url = URL.createObjectURL(blob);
+            this.items.update((arr) =>
+              arr.map((x) =>
+                x.id === id ? { ...x, url, loading: false, error: null } : x,
+              ),
+            );
+          },
+          error: () => {
+            this.items.update((arr) =>
+              arr.map((x) =>
+                x.id === id
+                  ? {
+                      ...x,
+                      loading: false,
+                      error: 'Nepodařilo se načíst náhled.',
+                    }
+                  : x,
+              ),
+            );
+          },
+        });
+      }
+
+      const firstIdCopy = firstId;
+      setTimeout(() => {
+        if (this.selectedId() === firstIdCopy) {
+          this.ensureFull(firstIdCopy);
+        }
+      });
+    });
   }
 
   ensureFull(id: string) {
