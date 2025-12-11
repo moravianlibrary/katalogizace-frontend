@@ -7,34 +7,34 @@
   </colgroup>
 
   <tbody>
-    @if (record().leader) {
+    @if (existingRecord().leader) {
       <tr
         class="border-tertiary-default border-y-[0.5px]"
-        [leader]="record().leader"
+        [leader]="existingRecord().leader"
         appMarcRowLeader
       ></tr>
     }
 
-    @for (sf of record().special_fields; track $index) {
+    @for (sf of existingRecord().special_fields; track $index) {
       <tr
         class="border-tertiary-default border-b-[0.5px]"
         [ngClass]="{
-          'border-t-[0.5px]': $index === 0 && !record().leader,
+          'border-t-[0.5px]': $index === 0 && !existingRecord().leader,
         }"
         [sf]="sf"
         appMarcRowSpecial
       ></tr>
     }
 
-    @for (nf of record().normal_fields; track $index) {
+    @for (nf of existingRecord().normal_fields; track $index) {
       @if (nf.tag != "910") {
         <tr
           class="border-tertiary-default border-b-[0.5px]"
           [ngClass]="{
             'border-t-[0.5px]':
               $index === 0 &&
-              record().special_fields?.length === 0 &&
-              !record().leader,
+              existingRecord().special_fields.length === 0 &&
+              !existingRecord().leader,
           }"
           [nf]="nf"
           appMarcRowNormal

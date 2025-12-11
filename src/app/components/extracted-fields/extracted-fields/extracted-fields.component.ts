@@ -1,5 +1,5 @@
-import { Component, input } from '@angular/core';
-import { Step, UiFieldWithMeta } from '../../../models/book';
+import { Component, inject } from '@angular/core';
+import { RecordStateService } from '../../../services/record-state.service';
 import { ExtractedFieldCardComponent } from '../extracted-field-card/extracted-field-card.component';
 
 @Component({
@@ -9,6 +9,5 @@ import { ExtractedFieldCardComponent } from '../extracted-field-card/extracted-f
   templateUrl: './extracted-fields.component.html',
 })
 export class ExtractedFieldsComponent {
-  provenance = input<Record<string, Step[]>>({});
-  fields = input.required<UiFieldWithMeta[]>();
+  recordState = inject(RecordStateService);
 }

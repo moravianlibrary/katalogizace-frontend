@@ -144,12 +144,16 @@
             @for (b of data()!.books; track b.book_id) {
               <tr
                 class="hover:bg-main-light border-tertiary-default border-t"
-                [class.cursor-pointer]="b.state === 'completed'"
-                [attr.tabindex]="b.state === 'completed' ? 0 : null"
-                [attr.role]="b.state === 'completed' ? 'button' : null"
-                (click)="b.state === 'completed' && open(b.book_id)"
-                (keyup.enter)="b.state === 'completed' && open(b.book_id)"
-                (keyup.space)="b.state === 'completed' && open(b.book_id)"
+                [class.cursor-pointer]="b.process_state === 'completed'"
+                [attr.tabindex]="b.process_state === 'completed' ? 0 : null"
+                [attr.role]="b.process_state === 'completed' ? 'button' : null"
+                (click)="b.process_state === 'completed' && open(b.book_id)"
+                (keyup.enter)="
+                  b.process_state === 'completed' && open(b.book_id)
+                "
+                (keyup.space)="
+                  b.process_state === 'completed' && open(b.book_id)
+                "
               >
                 <td class="px-3 py-2">{{ b.book_id }}</td>
                 <td class="px-3 py-2">{{ b.created_at | date: "medium" }}</td>
@@ -157,9 +161,9 @@
                 <td class="px-3 py-2">
                   <span
                     class="inline-flex items-center rounded px-2 py-0.5 text-sm font-medium"
-                    [ngClass]="stateBadgeClass(b.state)"
+                    [ngClass]="stateBadgeClass(b.process_state)"
                   >
-                    {{ b.state || "—" }}
+                    {{ b.process_state || "—" }}
                   </span>
                 </td>
               </tr>

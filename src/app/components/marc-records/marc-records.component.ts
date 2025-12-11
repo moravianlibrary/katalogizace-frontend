@@ -1,30 +1,55 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { ExistingMarcRecord, ExtractedMarcRecord } from '../../models/book';
 import { RecordStateService } from '../../services/record-state.service';
+import { RecordStore } from '../../stores/record.store';
 import { extractedToExisting } from '../../utils/marc-transform';
-import { MarcRecordTableComponent } from '../marc-record-table/marc-record-table.component';
+import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
+import { ExtractedMarcRecordTableComponent } from '../marc-record-table/extracted-marc-record-table/extracted-marc-record-table.component';
+interface RecordType {
+  extracted: ExtractedMarcRecord | null;
+  existing: ExistingMarcRecord | null;
+}
 
 @Component({
   standalone: true,
   selector: 'app-marc-records',
-  imports: [MarcRecordTableComponent, CommonModule],
+  imports: [
+    ExistingMarcRecordTableComponent,
+    CommonModule,
+    ExtractedMarcRecordTableComponent,
+  ],
   templateUrl: './marc-records.component.html',
 })
 export class MarcRecordsComponent {
-  existingRecords = input<ExistingMarcRecord[]>([]);
-  extractedRecord = input<ExtractedMarcRecord | null>(null);
-
+  private store = inject(RecordStore);
   private recordState = inject(RecordStateService);
 
-  records = computed<ExistingMarcRecord[]>(() => {
-    const list: ExistingMarcRecord[] = [];
-    const extracted = extractedToExisting(this.extractedRecord());
+  existingRecords = this.store.existingRecords;
+  extractedRecord = this.store.extracted;
+
+  transformed = computed(() => {
+    return extractedToExisting(this.extractedRecord());
+  });
+
+  records = computed<RecordType[]>(() => {
+    const list: RecordType[] = [];
+    const extracted = this.extractedRecord();
 
     if (extracted) {
-      list.push(extracted);
+      list.push({
+        extracted: extracted,
+        existing: null,
+      });
     }
-    list.push(...this.existingRecords());
+
+    for (const rec of this.existingRecords()) {
+      list.push({
+        extracted: null,
+        existing: rec,
+      });
+    }
+
     return list;
   });
 
@@ -34,19 +59,31 @@ export class MarcRecordsComponent {
     this.expandedIndex.update((current) => (current === index ? null : index));
   }
 
-  getTitle(rec: ExistingMarcRecord): string | null {
+  getTitle(rec: ExistingMarcRecord | null): string | null {
+    if (!rec) {
+      return null;
+    }
+
     const f245 = rec.normal_fields?.find((f) => f.tag === '245');
     if (!f245) return '';
     return f245.subfields?.find((sf) => sf.code === 'a')?.value ?? '';
   }
 
-  getAuthorName(rec: ExistingMarcRecord): string {
+  getAuthorName(rec: ExistingMarcRecord | null): string | null {
+    if (!rec) {
+      return null;
+    }
+
     const f100 = rec.normal_fields?.find((f) => f.tag === '100');
     if (!f100) return '';
     return f100.subfields?.find((sf) => sf.code === 'a')?.value ?? '';
   }
 
-  getPublicationYear(rec: ExistingMarcRecord): string {
+  getPublicationYear(rec: ExistingMarcRecord | null): string | null {
+    if (!rec) {
+      return null;
+    }
+
     const f264 = rec.normal_fields?.find((f) => f.tag === '264');
     if (f264) {
       const sf264 = f264.subfields?.find((sf) => sf.code === 'c')?.value ?? '';

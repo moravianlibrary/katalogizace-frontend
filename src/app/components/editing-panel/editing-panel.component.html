@@ -1,9 +1,7 @@
 <section class="flex h-screen flex-col gap-5 p-6">
-  <app-navigation-buttons
-    [bookId]="result()?.book_id ?? ''"
-  ></app-navigation-buttons>
+  <app-navigation-buttons [bookId]="book_id()"></app-navigation-buttons>
 
-  @if (hasLastEdited()) {
+  @if (this.store.hasLastEdited()) {
     <div
       class="bg-main-bright text-secondary flex items-start gap-2 rounded-lg px-3 py-2 text-xs"
     >
@@ -41,13 +39,10 @@
 
   <div class="min-h-0 flex-1 overflow-auto">
     @if (viewMode() === "cards") {
-      <app-extracted-fields
-        [fields]="uiFields()"
-        [provenance]="result()?.provenance ?? {}"
-      />
+      <app-extracted-fields />
     } @else {
       @if (recordPreview(); as rec) {
-        <app-marc-record-table [record]="rec" />
+        <app-existing-marc-record-table [existingRecord]="rec" />
       } @else {
         <p class="text-light text-sm">Žádná data k zobrazení.</p>
       }

@@ -1,9 +1,7 @@
 <div
   class="bg-main-base flex flex-col gap-4 rounded-2xl p-4"
   [ngClass]="{
-    'border-primary-default border-2 p-3.5!':
-      wps.state().mode !== 'records' &&
-      wps.state().fieldId === field().extractedFieldId,
+    'border-primary-default border-2 p-3.5!': isActive,
   }"
 >
   <div class="flex justify-between gap-4">
@@ -26,77 +24,30 @@
         }
       </div>
 
-      <input
-        class="border-tertiary-default h-10 w-10.5 rounded-lg border text-center text-sm font-medium outline-none placeholder:text-gray-300"
-        [(ngModel)]="field().ind1"
-        [attr.data-editable]="'true'"
-        (ngModelChange)="field().ind1 = $event; notifyChange()"
-        (input)="onInputAutoAdvance($event)"
-        maxlength="1"
-        placeholder=" "
-      />
+      @if (!field().special) {
+        <input
+          class="border-tertiary-default h-10 w-10.5 rounded-lg border text-center text-sm font-medium outline-none placeholder:text-gray-300"
+          [(ngModel)]="field().ind1"
+          [attr.data-editable]="'true'"
+          (ngModelChange)="field().ind1 = $event; notifyChange()"
+          (input)="onInputAutoAdvance($event)"
+          maxlength="1"
+          placeholder=" "
+        />
 
-      <input
-        class="border-tertiary-default h-10 w-10.5 rounded-lg border text-center text-sm font-medium outline-none placeholder:text-gray-300"
-        [(ngModel)]="field().ind2"
-        [attr.data-editable]="'true'"
-        (ngModelChange)="field().ind2 = $event; notifyChange()"
-        (input)="onInputAutoAdvance($event)"
-        maxlength="1"
-        placeholder=" "
-      />
+        <input
+          class="border-tertiary-default h-10 w-10.5 rounded-lg border text-center text-sm font-medium outline-none placeholder:text-gray-300"
+          [(ngModel)]="field().ind2"
+          [attr.data-editable]="'true'"
+          (ngModelChange)="field().ind2 = $event; notifyChange()"
+          (input)="onInputAutoAdvance($event)"
+          maxlength="1"
+          placeholder=" "
+        />
+      }
     </div>
 
     <div class="flex items-center gap-2">
-      @if (!field().isManual) {
-        <button
-          class="inline-flex h-10 w-11 cursor-pointer items-center justify-center rounded-lg px-2 py-1.5"
-          (click)="onShowProvenance()"
-        >
-          <span
-            class="h-5 w-5 rounded-full"
-            [ngClass]="scoreClass(field().score)"
-            title="score {{ field().score | number: '1.2-2' }}"
-          ></span>
-        </button>
-      }
-
-      <button
-        class="inline-flex h-10 w-11 cursor-pointer items-center justify-center rounded-lg px-2 py-1.5"
-        (click)="onShowCandidates()"
-        type="button"
-        title="Kandidáti"
-      >
-        <svg
-          class="icon-secondary-default"
-          xmlns="http://www.w3.org/2000/svg"
-          width="22"
-          height="22"
-          viewBox="0 0 20 20"
-        >
-          <path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
-            d="M7.53252 2.88281C7.77684 3.12665 7.77723 3.52238 7.5334 3.7667L3.3584 7.95003C3.11456 8.19435 2.71884 8.19474 2.47451 7.95091C2.23019 7.70708 2.2298 7.31135 2.47363 7.06703L6.64863 2.88369C6.89247 2.63937 7.2882 2.63898 7.53252 2.88281Z"
-          />
-          <path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
-            d="M17.7079 7.50814C17.7079 7.85332 17.4281 8.13314 17.0829 8.13314L2.91621 8.13314C2.57103 8.13314 2.29121 7.85332 2.29121 7.50814C2.29121 7.16296 2.57103 6.88314 2.91621 6.88314L17.0829 6.88314C17.4281 6.88314 17.7079 7.16296 17.7079 7.50814Z"
-          />
-          <path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
-            d="M17.5244 12.0495C17.7687 12.2933 17.7691 12.689 17.5253 12.9334L13.3503 17.1167C13.1064 17.361 12.7107 17.3614 12.4664 17.1176C12.2221 16.8737 12.2217 16.478 12.4655 16.2337L16.6405 12.0504C16.8843 11.806 17.2801 11.8056 17.5244 12.0495Z"
-          />
-          <path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
-            d="M17.7079 12.4919C17.7079 12.837 17.4281 13.1169 17.0829 13.1169L2.91621 13.1169C2.57103 13.1169 2.29121 12.837 2.29121 12.4919C2.29121 12.1467 2.57103 11.8669 2.91621 11.8669L17.0829 11.8669C17.4281 11.8669 17.7079 12.1467 17.7079 12.4919Z"
-          />
-        </svg>
-      </button>
-
       <button
         class="inline-flex h-10 w-11 cursor-pointer items-center justify-center rounded-lg px-2 py-1.5"
         (click)="onAddSubfield()"
@@ -172,57 +123,75 @@
   </div>
 
   <div class="flex flex-col gap-3">
-    @for (sf of field().subfields; track $index) {
+    @if (field().special) {
       <div class="flex flex-col gap-1">
         <div
-          class="flex items-center gap-2 rounded-lg border px-4 py-2.5"
-          [class.border-error]="hasCodeCollision(sf, field())"
-          [class.border-tertiary-disable]="isValueDisabled(sf, field())"
-          [class.border-tertiary-default]="
-            !hasCodeCollision(sf, field()) && !isValueDisabled(sf, field())
-          "
+          class="border-tertiary-default flex items-center gap-2 rounded-lg border px-4 py-2.5"
         >
-          <span
-            class="text-secondary inline-flex items-center text-sm font-bold"
-          >
-            |
-            @if (isCodeEditable(sf)) {
-              <input
-                class="w-4 items-center justify-center bg-transparent text-center text-sm font-bold outline-none placeholder:text-gray-300"
-                [(ngModel)]="sf.code"
-                [attr.data-editable]="'true'"
-                [attr.data-role]="'subfield-code'"
-                (ngModelChange)="sf.code = $event; notifyChange()"
-                (input)="onInputAutoAdvance($event)"
-                maxlength="1"
-                placeholder="a"
-              />
-            } @else {
-              <span
-                class="w-4 items-center justify-center text-center text-sm font-bold"
-                >{{ sf.code }}</span
-              >
-            }
-          </span>
-
           <input
             class="disabled:text-disable flex-1 bg-transparent text-base text-sm outline-none placeholder:text-gray-300 disabled:cursor-not-allowed"
-            [(ngModel)]="sf.value"
-            [disabled]="isValueDisabled(sf, field())"
-            [attr.data-editable]="!isValueDisabled(sf, field()) ? 'true' : null"
-            (ngModelChange)="sf.value = $event; notifyChange()"
-            (keydown.enter)="onEnterSubfieldValue($index, $event)"
+            [(ngModel)]="field().value"
+            [attr.data-editable]="true"
+            (ngModelChange)="field().value = $event; notifyChange()"
             placeholder="Aa"
           />
         </div>
-
-        @if (hasCodeCollision(sf, field())) {
-          <p class="text-error text-xs">
-            Kód podpole <strong>{{ sf.code }}</strong> se již v tomto poli
-            vyskytuje.
-          </p>
-        }
       </div>
+    } @else {
+      @for (sf of field().subfields; track $index) {
+        <div class="flex flex-col gap-1">
+          <div
+            class="flex items-center gap-2 rounded-lg border px-4 py-2.5"
+            [class.border-error]="hasCodeCollision(sf, field())"
+            [class.border-tertiary-disable]="isValueDisabled(sf, field())"
+            [class.border-tertiary-default]="
+              !hasCodeCollision(sf, field()) && !isValueDisabled(sf, field())
+            "
+          >
+            <span
+              class="text-secondary inline-flex items-center text-sm font-bold"
+            >
+              |
+              @if (isCodeEditable(sf)) {
+                <input
+                  class="w-4 items-center justify-center bg-transparent text-center text-sm font-bold outline-none placeholder:text-gray-300"
+                  [(ngModel)]="sf.code"
+                  [attr.data-editable]="'true'"
+                  [attr.data-role]="'subfield-code'"
+                  (ngModelChange)="sf.code = $event; notifyChange()"
+                  (input)="onInputAutoAdvance($event)"
+                  maxlength="1"
+                  placeholder="a"
+                />
+              } @else {
+                <span
+                  class="w-4 items-center justify-center text-center text-sm font-bold"
+                  >{{ sf.code }}</span
+                >
+              }
+            </span>
+
+            <input
+              class="disabled:text-disable flex-1 bg-transparent text-base text-sm outline-none placeholder:text-gray-300 disabled:cursor-not-allowed"
+              [(ngModel)]="sf.value"
+              [disabled]="isValueDisabled(sf, field())"
+              [attr.data-editable]="
+                !isValueDisabled(sf, field()) ? 'true' : null
+              "
+              (ngModelChange)="sf.value = $event; notifyChange()"
+              (keydown.enter)="onEnterSubfieldValue($index, $event)"
+              placeholder="Aa"
+            />
+          </div>
+
+          @if (hasCodeCollision(sf, field())) {
+            <p class="text-error text-xs">
+              Kód podpole <strong>{{ sf.code }}</strong> se již v tomto poli
+              vyskytuje.
+            </p>
+          }
+        </div>
+      }
     }
   </div>
 </div>

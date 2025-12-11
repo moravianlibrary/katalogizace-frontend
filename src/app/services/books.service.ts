@@ -7,7 +7,8 @@ import {
   BookUploadResponse,
   LastEditedRecord,
   PaginatedBooksResponse,
-  TaskState,
+  ProcessState,
+  RecordState,
 } from '../models/book';
 import { EnvironmentService } from './environment.service';
 
@@ -21,16 +22,22 @@ export class BooksService {
     opts: {
       page?: number;
       page_size?: number;
-      state?: TaskState | null;
+      process_state?: ProcessState | null;
+      record_state?: RecordState | null;
       batch_id?: string | null;
     } = {},
   ) {
-    const { page = 1, page_size = 20, state, batch_id } = opts;
+    const {
+      page = 1,
+      page_size = 20,
+      process_state,
+      record_state,
+      batch_id,
+    } = opts;
     let params = new HttpParams()
       .set('page', String(page))
       .set('page_size', String(page_size));
 
-    if (state) params = params.set('state', state);
     if (batch_id) params = params.set('batch_id', batch_id);
 
     return this.http.get<PaginatedBooksResponse>(`${this.apiBaseUrl}/books/`, {

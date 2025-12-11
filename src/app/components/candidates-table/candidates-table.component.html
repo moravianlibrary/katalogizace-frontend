@@ -27,18 +27,18 @@
             (click)="onRowClick(candidate.id)"
           >
             <td class="text-secondary p-2 text-center align-text-top font-bold">
-              {{ candidate.marc_representation.ind1 ?? "" }}
+              {{ candidate.MARC_representation.ind1 ?? "" }}
             </td>
 
             <td class="text-secondary p-2 text-center align-text-top font-bold">
-              {{ candidate.marc_representation.ind2 ?? "" }}
+              {{ candidate.MARC_representation.ind2 ?? "" }}
             </td>
 
             <td class="p-2 align-text-top">
-              @if (candidate.marc_representation.subfields?.length) {
+              @if (candidate.MARC_representation.subfields.length) {
                 <div class="flex flex-wrap gap-x-2 gap-y-1">
                   @for (
-                    sf of candidate.marc_representation.subfields;
+                    sf of candidate.MARC_representation.subfields;
                     track $index
                   ) {
                     <span>

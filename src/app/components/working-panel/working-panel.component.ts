@@ -1,5 +1,4 @@
-import { Component, computed, inject, input } from '@angular/core';
-import { ExistingMarcRecord, ExtractedMarcRecord } from '../../models/book';
+import { Component, computed, inject } from '@angular/core';
 import { WorkingPanelService } from '../../services/working-panel.service';
 import { CandidatesTableComponent } from '../candidates-table/candidates-table.component';
 import { MarcRecordsComponent } from '../marc-records/marc-records.component';
@@ -17,9 +16,6 @@ import { ProvenanceTimelineComponent } from '../provenance-timeline/provenance-t
 })
 export class WorkingPanelComponent {
   private wps = inject(WorkingPanelService);
-
-  existingRecords = input<ExistingMarcRecord[]>([]);
-  extractedRecord = input<ExtractedMarcRecord | null>(null);
 
   state = computed(() => this.wps.state());
 }

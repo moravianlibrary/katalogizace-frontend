@@ -1,0 +1,53 @@
+<table class="w-full border-collapse text-sm">
+  <colgroup>
+    <col class="w-16" />
+    <col class="w-10" />
+    <col class="w-10" />
+    <col />
+    <col class="w-10" />
+    <col class="w-10" />
+  </colgroup>
+
+  <tbody>
+    @if (transformed(); as rec) {
+      @if (rec.leader) {
+        <tr
+          class="border-tertiary-default border-y-[0.5px]"
+          [leader]="rec.leader"
+          appMarcRowLeader
+        ></tr>
+      }
+
+      @for (sf of rec.special_fields; track $index) {
+        <tr
+          class="border-tertiary-default border-b-[0.5px]"
+          [ngClass]="{
+            'border-t-[0.5px]': $index === 0 && !rec.leader,
+          }"
+          [sf]="sf"
+          appMarcRowSpecial
+        ></tr>
+      }
+
+      @for (nf of rec.normal_fields; track $index) {
+        @if (nf.tag != "910") {
+          <tr
+            class="border-tertiary-default border-b-[0.5px]"
+            [ngClass]="{
+              'border-t-[0.5px]':
+                $index === 0 && rec.special_fields.length === 0 && !rec.leader,
+            }"
+            [nf]="nf"
+            appMarcRowNormal
+          ></tr>
+        }
+      }
+    } @else {
+      <tr>
+        <td class="text-light p-2 text-sm" colspan="6">
+          Žádná data k zobrazení.
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>

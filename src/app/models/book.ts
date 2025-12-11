@@ -1,13 +1,14 @@
 export type UUID = string;
 
-export type TaskState =
-  | 'new'
+export type ProcessState =
   | 'created'
   | 'scheduled'
   | 'in_progress'
   | 'ready'
   | 'failed'
   | 'completed';
+
+export type RecordState = 'new' | 'edited' | 'reviewed' | 'completed';
 
 export type MarcTag = `${number}${number}${number}` | string;
 
@@ -36,7 +37,8 @@ export interface BookCommon {
   book_id: UUID;
   created_at: string | null;
   modified_at: string | null;
-  state: TaskState;
+  process_state: ProcessState;
+  record_state: RecordState;
   images: ApiImageItem[];
   hatchet_workflow_id: string | null;
   batch_id: string | null;
@@ -55,16 +57,23 @@ export interface PaginatedBooksResponse {
 
 export interface BookStatusResponse extends BookCommon {}
 
-export type ExtractedMarcRecord = Record<MarcTag, ExtractedMarcField[]>;
+export type ExtractedMarcRecord = Record<
+  MarcTag,
+  ExtractedMarcSpecialField[] | ExtractedMarcNormalField[]
+>;
 export interface BookResultResponse extends BookCommon {
-  extracted_marc_record: Record<string, ExtractedMarcField[]> | null;
+  extracted_MARC_record: ExtractedMarcRecord | null;
   library_sigla: string | null;
-  existing_marc_records: ExistingMarcRecord[];
+  existing_MARC_records: ExistingMarcRecord[];
   last_edited_record: LastEditedRecord | null;
   provenance: Record<UUID, Step[]>;
 }
 
-export interface ExtractedMarcField {
+export interface ExtractedMarcSpecialField {
+  value: string;
+}
+
+export interface ExtractedMarcNormalField {
   id: UUID;
   candidates: MarcCandidate[];
   selected_candidate_id: UUID | null;
@@ -73,7 +82,7 @@ export interface ExtractedMarcField {
 export interface MarcCandidate {
   id: UUID;
   score: number;
-  marc_representation: CandidateMarcRepresentation;
+  MARC_representation: CandidateMarcRepresentation;
 }
 
 export interface CandidateMarcRepresentation {
@@ -119,7 +128,7 @@ export interface MarcSubfield {
 
 export interface BookUploadResponse {
   book_id: UUID;
-  state: TaskState;
+  state: ProcessState;
   hatchet_workflow_id: string | null;
   batch_id: string | null;
   images: ApiImageItem[];
@@ -168,21 +177,20 @@ export interface BatchBooksResponse {
   batch_id: UUID;
   books: BookStatusResponse[];
   total_count: number;
-  state_counts: Record<TaskState, number>;
+  state_counts: Record<ProcessState, number>;
 }
 
 export type UiSubfield = { code: string; value: string; isManual?: boolean };
 
 export type UiFieldWithMeta = {
-  extractedFieldId: UUID;
+  fieldId: UUID;
   tag: string;
   ind1: string | null;
   ind2: string | null;
   subfields: UiSubfield[];
-  candidateId: UUID;
-  score: number;
-  candidates: MarcCandidate[];
   isManual: boolean;
+  special: boolean;
+  value: string;
 };
 
 export interface BookImageUploadResponse {

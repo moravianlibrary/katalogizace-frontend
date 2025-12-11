@@ -1,9 +1,9 @@
 <section class="flex h-full flex-col">
-  <h2 class="mb-5">Záznamy</h2>
+  <h2 class="mb-4">Záznamy</h2>
 
   <div class="overflow-auto">
     @if (!records().length) {
-      <p class="text-light p-4 text-sm">Žádné existující záznamy.</p>
+      <p class="text-light text-sm">Žádné záznamy.</p>
     } @else {
       <div class="text-secondary p-2 text-sm font-bold">
         <div
@@ -34,48 +34,93 @@
               class="grid grid-cols-[1fr_2fr_2fr_1fr_auto] items-center gap-3 text-left text-sm"
             >
               <div class="truncate">
-                {{ rec.source || "Vyčtený" }}
+                {{ rec.extracted ? "Vyčtený" : rec.existing!.source }}
               </div>
 
-              <div class="truncate">
-                {{ getTitle(rec) || "" }}
-              </div>
+              @if ($index === 0) {
+                <div class="truncate">
+                  {{ getTitle(transformed()) || "" }}
+                </div>
 
-              <div class="truncate">
-                {{ getAuthorName(rec) || "" }}
-              </div>
+                <div class="truncate">
+                  {{ getAuthorName(transformed()) || "" }}
+                </div>
 
-              <div class="truncate">
-                {{ getPublicationYear(rec) || "" }}
-              </div>
+                <div class="truncate">
+                  {{ getPublicationYear(transformed()) || "" }}
+                </div>
 
-              <div class="flex items-center justify-end">
-                <svg
-                  class="icon-secondary-default transition-transform duration-150"
-                  [ngClass]="{ 'rotate-180': expandedIndex() === $index }"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 16 16"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M3.5286 5.5286C3.78895 5.26825
+                <div class="flex items-center justify-end">
+                  <svg
+                    class="icon-secondary-default transition-transform duration-150"
+                    [ngClass]="{ 'rotate-180': expandedIndex() === $index }"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 16 16"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M3.5286 5.5286C3.78895 5.26825
                  4.21106 5.26825 4.47141 5.5286L8 9.05719
                  L11.5286 5.5286C11.7889 5.26825 12.2111 5.26825
                  12.4714 5.5286C12.7318 5.78895 12.7318 6.21106
                  12.4714 6.47141L8.47141 10.4714C8.21106 10.7318
                  7.78895 10.7318 7.5286 10.4714L3.5286 6.47141
                  C3.26825 6.21106 3.26825 5.78895 3.5286 5.5286Z"
-                  />
-                </svg>
-              </div>
+                    />
+                  </svg>
+                </div>
+              } @else {
+                <div class="truncate">
+                  {{ getTitle(rec.existing) || "" }}
+                </div>
+
+                <div class="truncate">
+                  {{ getAuthorName(rec.existing) || "" }}
+                </div>
+
+                <div class="truncate">
+                  {{ getPublicationYear(rec.existing) || "" }}
+                </div>
+
+                <div class="flex items-center justify-end">
+                  <svg
+                    class="icon-secondary-default transition-transform duration-150"
+                    [ngClass]="{ 'rotate-180': expandedIndex() === $index }"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 16 16"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M3.5286 5.5286C3.78895 5.26825
+                 4.21106 5.26825 4.47141 5.5286L8 9.05719
+                 L11.5286 5.5286C11.7889 5.26825 12.2111 5.26825
+                 12.4714 5.5286C12.7318 5.78895 12.7318 6.21106
+                 12.4714 6.47141L8.47141 10.4714C8.21106 10.7318
+                 7.78895 10.7318 7.5286 10.4714L3.5286 6.47141
+                 C3.26825 6.21106 3.26825 5.78895 3.5286 5.5286Z"
+                    />
+                  </svg>
+                </div>
+              }
             </div>
           </button>
 
           @if (expandedIndex() === $index) {
-            <app-marc-record-table [record]="rec" />
+            @if ($index === 0) {
+              <app-extracted-marc-record-table
+                [extractedRecord]="rec.extracted!"
+              />
+            } @else {
+              <app-existing-marc-record-table
+                [existingRecord]="rec.existing!"
+              />
+            }
           }
         </div>
       }

@@ -2,8 +2,9 @@ import {
   ExistingMarcRecord,
   ExistingMarcRecordNormalField,
   ExistingMarcRecordSpecialField,
-  ExtractedMarcField,
+  ExtractedMarcNormalField,
   ExtractedMarcRecord,
+  ExtractedMarcSpecialField,
   MarcCandidate,
   UiFieldWithMeta,
 } from '../models/book';
@@ -28,7 +29,7 @@ export interface ExistingMarcRecordWithMeta extends ExistingMarcRecord {
   normal_fields: ExistingMarcRecordNormalFieldWithMeta[];
 }
 
-function pickCandidate(f: ExtractedMarcField) {
+function pickCandidate(f: ExtractedMarcNormalField) {
   const cand = f.candidates.find((c) => c.id === f.selected_candidate_id);
   if (!cand) {
     console.warn(
@@ -55,17 +56,17 @@ export function extractedToExisting(
     if (!Array.isArray(fields) || fields.length === 0) continue;
 
     for (const f of fields) {
-      if (!f?.candidates?.length) continue;
-      const cand = pickCandidate(f);
-      const rep = cand.marc_representation;
-
       if (isControlTag(tag)) {
-        const value =
-          (rep.subfields && rep.subfields.length
-            ? rep.subfields.map((sf) => sf.value).join(' ')
-            : '') || '';
+        const field = f as ExtractedMarcSpecialField;
+        const value = field.value;
         special.push({ tag, value });
       } else {
+        const field = f as ExtractedMarcNormalField;
+        if (!field.candidates.length) continue;
+
+        const cand = pickCandidate(field);
+        const rep = cand.MARC_representation;
+
         normal.push({
           tag,
           ind1: rep.ind1 ?? '',
@@ -98,7 +99,6 @@ export function extractedToExisting(
 
 export function extractedToUiFields(
   extracted: ExtractedMarcRecord | null,
-  includeControl: boolean,
 ): UiFieldWithMeta[] {
   if (!extracted) return [];
 
@@ -107,33 +107,28 @@ export function extractedToUiFields(
   for (const [tag, fields] of Object.entries(extracted)) {
     if (!Array.isArray(fields) || fields.length === 0) continue;
 
-    const isControl = isControlTag(tag);
-    if (isControl && !includeControl) continue;
-
     for (const f of fields) {
-      if (!f?.candidates?.length) continue;
-      const cand = pickCandidate(f);
-      const rep = cand.marc_representation;
-
-      if (isControl) {
-        const value =
-          (rep.subfields && rep.subfields.length
-            ? rep.subfields.map((sf) => sf.value).join(' ')
-            : '') || '';
+      if (isControlTag(tag)) {
+        const field = f as ExtractedMarcSpecialField;
 
         out.push({
+          fieldId: `special-${crypto.randomUUID()}`,
           tag,
           ind1: null,
           ind2: null,
-          subfields: [{ code: '', value }],
-          candidateId: cand.id,
-          score: cand.score,
-          candidates: f.candidates,
-          extractedFieldId: f.id,
+          subfields: [],
           isManual: false,
+          special: true,
+          value: field.value,
         });
       } else {
+        const field = f as ExtractedMarcNormalField;
+        if (!field.candidates.length) continue;
+        const cand = pickCandidate(field);
+        const rep = cand.MARC_representation;
+
         out.push({
+          fieldId: field.id,
           tag,
           ind1: rep.ind1 ?? null,
           ind2: rep.ind2 ?? null,
@@ -141,11 +136,9 @@ export function extractedToUiFields(
             code: sf.code,
             value: sf.value,
           })),
-          candidateId: cand.id,
-          score: cand.score,
-          candidates: f.candidates,
-          extractedFieldId: f.id,
           isManual: false,
+          special: false,
+          value: '',
         });
       }
     }
@@ -167,30 +160,33 @@ export function extractedToExistingWithMeta(
     if (!Array.isArray(fields) || fields.length === 0) continue;
 
     for (const f of fields) {
-      if (!f?.candidates?.length) continue;
-
-      const cand = pickCandidate(f);
-      const rep = cand.marc_representation;
-
-      const meta: ExistingMarcRecordFieldMeta = {
-        fieldId: f.id,
-        selectedCandidateId: f.selected_candidate_id,
-        candidates: f.candidates,
-        score: cand.score,
-      };
-
       if (isControlTag(tag)) {
-        const value =
-          (rep.subfields && rep.subfields.length
-            ? rep.subfields.map((sf) => sf.value).join(' ')
-            : '') || '';
+        const field = f as ExtractedMarcSpecialField;
+        const meta: ExistingMarcRecordFieldMeta = {
+          fieldId: '',
+          selectedCandidateId: '',
+          candidates: [],
+          score: 0,
+        };
 
         special.push({
           tag,
-          value,
+          value: field.value,
           ...meta,
         });
       } else {
+        const field = f as ExtractedMarcNormalField;
+        if (!field.candidates.length) continue;
+        const cand = pickCandidate(field);
+        const rep = cand.MARC_representation;
+
+        const meta: ExistingMarcRecordFieldMeta = {
+          fieldId: field.id,
+          selectedCandidateId: field.selected_candidate_id,
+          candidates: field.candidates,
+          score: cand.score,
+        };
+
         normal.push({
           tag,
           ind1: rep.ind1 ?? '',

@@ -1,18 +1,15 @@
 <section class="h-screen">
   <div class="grid h-screen grid-cols-1 md:grid-cols-3">
     <div class="shadow-s z-2 h-screen">
-      <app-images-view [bookId]="bookId" [images]="result()!.images" />
+      <app-images-view [bookId]="bookId" [images]="images()" />
     </div>
 
     <div class="bg-main-light z-1 h-screen overflow-hidden">
-      <app-editing-panel [result]="result()" />
+      <app-editing-panel [book_id]="bookId" />
     </div>
 
     <div class="shadow-s z-2 h-screen overflow-auto">
-      <app-working-panel
-        [existingRecords]="result()?.existing_marc_records ?? []"
-        [extractedRecord]="result()?.extracted_marc_record ?? null"
-      />
+      <app-working-panel />
     </div>
   </div>
 </section>

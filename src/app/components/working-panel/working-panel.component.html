@@ -1,9 +1,6 @@
 <section class="h-screen overflow-auto p-6">
   @if (state().mode === "records") {
-    <app-marc-records
-      [existingRecords]="existingRecords()"
-      [extractedRecord]="extractedRecord()"
-    />
+    <app-marc-records />
   } @else if (state().mode === "candidates") {
     <app-candidates-table
       [title]="'Výběr kandidátů pole ' + state().tag"
