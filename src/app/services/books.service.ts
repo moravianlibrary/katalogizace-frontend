@@ -122,4 +122,8 @@ export class BooksService {
       null,
     );
   }
+
+  deleteBookRecord(bookId: string) {
+    return this.http.delete<string>(`${this.apiBaseUrl}/books/${bookId}`);
+  }
 }
