@@ -170,4 +170,23 @@ export class BooksListComponent {
       },
     });
   }
+
+  onDelete(id: string, event: MouseEvent) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    const confirmed = confirm('Opravdu chcete smazat tuto knihu?');
+    if (!confirmed) return;
+
+    this.books.deleteBookRecord(id).subscribe({
+      next: () => {
+        this.toast.show('Kniha byla úspěšně smazána.', 'success');
+        this.load();
+      },
+      error: (err) => {
+        console.error(err);
+        this.toast.show('Smazání knihy se nezdařilo.', 'error');
+      },
+    });
+  }
 }
