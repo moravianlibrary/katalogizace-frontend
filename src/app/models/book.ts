@@ -10,6 +10,22 @@ export type ProcessState =
 
 export type RecordState = 'new' | 'edited' | 'reviewed' | 'completed';
 
+export const PROCESS_STATE_LABELS: Record<ProcessState, string> = {
+  created: 'Vytvořeno',
+  scheduled: 'Naplánováno',
+  in_progress: 'Probíhá zpracování',
+  ready: 'Připraveno',
+  failed: 'Chyba',
+  completed: 'Dokončeno',
+};
+
+export const RECORD_STATE_LABELS: Record<RecordState, string> = {
+  new: 'Nový záznam',
+  edited: 'Upraveno',
+  reviewed: 'Zkontrolováno',
+  completed: 'Schváleno',
+};
+
 export type MarcTag = `${number}${number}${number}` | string;
 
 export interface ImgItem {

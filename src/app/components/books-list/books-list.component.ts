@@ -2,7 +2,13 @@ import { DatePipe, NgClass } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { PaginatedBooksResponse, ProcessState } from '../../models/book';
+import {
+  PaginatedBooksResponse,
+  ProcessState,
+  RecordState,
+} from '../../models/book';
+import { ProcessStateLabelPipe } from '../../pipes/process-state-label.pipe';
+import { RecordStateLabelPipe } from '../../pipes/record-state-label.pipe';
 import { BooksService } from '../../services/books.service';
 import { ToastService } from '../../services/toast.service';
 import { WorkingPanelService } from '../../services/working-panel.service';
@@ -10,7 +16,13 @@ import { WorkingPanelService } from '../../services/working-panel.service';
 @Component({
   standalone: true,
   selector: 'app-books-list',
-  imports: [NgClass, DatePipe, RouterModule],
+  imports: [
+    NgClass,
+    DatePipe,
+    RouterModule,
+    RecordStateLabelPipe,
+    ProcessStateLabelPipe,
+  ],
   templateUrl: 'books-list.component.html',
 })
 export class BooksListComponent {
@@ -95,7 +107,7 @@ export class BooksListComponent {
     });
   }
 
-  stateBadgeClass(state?: ProcessState | null) {
+  processStateBadgeClass(state?: ProcessState | null) {
     switch (state) {
       case 'created':
         return 'bg-slate-100 text-slate-700';
@@ -107,6 +119,21 @@ export class BooksListComponent {
         return 'bg-amber-100 text-amber-800';
       case 'failed':
         return 'bg-red-100 text-red-700';
+      case 'completed':
+        return 'bg-green-100 text-green-700';
+      default:
+        return 'bg-slate-100 text-slate-600';
+    }
+  }
+
+  recordStateBadgeClass(state?: RecordState | null) {
+    switch (state) {
+      case 'new':
+        return 'bg-slate-100 text-slate-700';
+      case 'edited':
+        return 'bg-blue-100 text-blue-700';
+      case 'reviewed':
+        return 'bg-amber-100 text-amber-800';
       case 'completed':
         return 'bg-green-100 text-green-700';
       default:

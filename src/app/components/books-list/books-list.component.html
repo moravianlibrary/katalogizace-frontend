@@ -137,7 +137,9 @@
               <th class="px-3 py-2 text-left">ID</th>
               <th class="px-3 py-2 text-left">Vytvořeno</th>
               <th class="px-3 py-2 text-left">Upraveno</th>
-              <th class="px-3 py-2 text-left">Stav</th>
+              <th class="px-3 py-2 text-left">Stav zpracování</th>
+              <th class="px-3 py-2 text-left">Stav záznamu</th>
+              <!-- 👈 nový stĺpec -->
             </tr>
           </thead>
           <tbody>
@@ -161,15 +163,23 @@
                 <td class="px-3 py-2">
                   <span
                     class="inline-flex items-center rounded px-2 py-0.5 text-sm font-medium"
-                    [ngClass]="stateBadgeClass(b.process_state)"
+                    [ngClass]="processStateBadgeClass(b.process_state)"
                   >
-                    {{ b.process_state || "—" }}
+                    {{ b.process_state | processStateLabel }}
+                  </span>
+                </td>
+                <td class="px-3 py-2">
+                  <span
+                    class="inline-flex items-center rounded px-2 py-0.5 text-sm font-medium"
+                    [ngClass]="recordStateBadgeClass(b.record_state)"
+                  >
+                    {{ b.record_state | recordStateLabel }}
                   </span>
                 </td>
               </tr>
             } @empty {
               <tr>
-                <td class="px-3 py-4 text-center" colspan="4">
+                <td class="px-3 py-4 text-center" colspan="5">
                   Zatím žádné záznamy.
                 </td>
               </tr>
