@@ -105,6 +105,22 @@ export class BookCaptureNativeComponent {
   }
 
   cancel() {
-    this.router.navigate(['/books']);
+    const id = this.bookId();
+    if (!id) {
+      this.router.navigate(['/books']);
+      return;
+    }
+
+    this.books.deleteBookRecord(id).subscribe({
+      next: () => {
+        this.toast.show('Naskenování knihy bylo zrušeno.', 'success');
+        this.router.navigate(['/books']);
+      },
+      error: (err) => {
+        console.error(err);
+        this.toast.show('Nepodařilo se zrušit knihu.', 'error');
+        this.router.navigate(['/books']);
+      },
+    });
   }
 }
