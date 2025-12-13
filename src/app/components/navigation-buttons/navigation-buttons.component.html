@@ -78,38 +78,64 @@
       }
     </button>
 
-    <button
-      class="bg-main-base text-secondary border-primary-default text-sm-tight disabled:text-disable disabled:border-primary-disable inline-flex gap-3 rounded-lg border px-3.75 py-2.75 font-medium text-nowrap hover:cursor-pointer disabled:cursor-not-allowed"
-      [disabled]="recordState.viewMode() === 'table'"
-      (click)="addField()"
-      type="button"
-    >
-      Přidat pole
-      <svg
-        [class.icon-primary-disable]="recordState.viewMode() === 'table'"
-        [class.icon-primary-default]="recordState.viewMode() === 'cards'"
-        width="16"
-        height="16"
-        viewBox="0 0 16 16"
-        xmlns="http://www.w3.org/2000/svg"
+    <div class="relative">
+      <button
+        class="bg-main-base text-secondary border-primary-default text-sm-tight disabled:text-disable disabled:border-primary-disable inline-flex gap-3 rounded-lg border px-3.75 py-2.75 font-medium text-nowrap hover:cursor-pointer disabled:cursor-not-allowed"
+        [disabled]="recordState.viewMode() === 'table'"
+        (click)="toggleAddMenu($event)"
+        type="button"
       >
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M4.83301 7.99992C4.83301 7.72378 5.05687 7.49992 5.33301 7.49992H10.6663C10.9425 7.49992 11.1663 7.72378 11.1663 7.99992C11.1663 8.27606 10.9425 8.49992 10.6663 8.49992H5.33301C5.05687 8.49992 4.83301 8.27606 4.83301 7.99992Z"
-        />
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M7.99967 4.83325C8.27582 4.83325 8.49967 5.05711 8.49967 5.33325V10.6666C8.49967 10.9427 8.27582 11.1666 7.99967 11.1666C7.72353 11.1666 7.49967 10.9427 7.49967 10.6666V5.33325C7.49967 5.05711 7.72353 4.83325 7.99967 4.83325Z"
-        />
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M2.06279 2.06303C2.95243 1.17339 4.28369 0.833252 5.99967 0.833252H9.99967C11.7157 0.833252 13.0469 1.17339 13.9366 2.06303C14.8262 2.95268 15.1663 4.28394 15.1663 5.99992V9.99992C15.1663 11.7159 14.8262 13.0472 13.9366 13.9368C13.0469 14.8265 11.7157 15.1666 9.99967 15.1666H5.99967C4.28369 15.1666 2.95243 14.8265 2.06279 13.9368C1.17314 13.0472 0.833008 11.7159 0.833008 9.99992V5.99992C0.833008 4.28394 1.17314 2.95268 2.06279 2.06303ZM2.76989 2.77014C2.15954 3.38049 1.83301 4.38257 1.83301 5.99992V9.99992C1.83301 11.6173 2.15954 12.6193 2.76989 13.2297C3.38025 13.8401 4.38232 14.1666 5.99967 14.1666H9.99967C11.617 14.1666 12.6191 13.8401 13.2295 13.2297C13.8398 12.6193 14.1663 11.6173 14.1663 9.99992V5.99992C14.1663 4.38257 13.8398 3.38049 13.2295 2.77014C12.6191 2.15978 11.617 1.83325 9.99967 1.83325H5.99967C4.38232 1.83325 3.38025 2.15978 2.76989 2.77014Z"
-        />
-      </svg>
-    </button>
+        Přidat pole
+        <svg
+          [class.icon-primary-disable]="recordState.viewMode() === 'table'"
+          [class.icon-primary-default]="recordState.viewMode() === 'cards'"
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M4.83301 7.99992C4.83301 7.72378 5.05687 7.49992 5.33301 7.49992H10.6663C10.9425 7.49992 11.1663 7.72378 11.1663 7.99992C11.1663 8.27606 10.9425 8.49992 10.6663 8.49992H5.33301C5.05687 8.49992 4.83301 8.27606 4.83301 7.99992Z"
+          />
+          <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M7.99967 4.83325C8.27582 4.83325 8.49967 5.05711 8.49967 5.33325V10.6666C8.49967 10.9427 8.27582 11.1666 7.99967 11.1666C7.72353 11.1666 7.49967 10.9427 7.49967 10.6666V5.33325C7.49967 5.05711 7.72353 4.83325 7.99967 4.83325Z"
+          />
+          <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M2.06279 2.06303C2.95243 1.17339 4.28369 0.833252 5.99967 0.833252H9.99967C11.7157 0.833252 13.0469 1.17339 13.9366 2.06303C14.8262 2.95268 15.1663 4.28394 15.1663 5.99992V9.99992C15.1663 11.7159 14.8262 13.0472 13.9366 13.9368C13.0469 14.8265 11.7157 15.1666 9.99967 15.1666H5.99967C4.28369 15.1666 2.95243 14.8265 2.06279 13.9368C1.17314 13.0472 0.833008 11.7159 0.833008 9.99992V5.99992C0.833008 4.28394 1.17314 2.95268 2.06279 2.06303ZM2.76989 2.77014C2.15954 3.38049 1.83301 4.38257 1.83301 5.99992V9.99992C1.83301 11.6173 2.15954 12.6193 2.76989 13.2297C3.38025 13.8401 4.38232 14.1666 5.99967 14.1666H9.99967C11.617 14.1666 12.6191 13.8401 13.2295 13.2297C13.8398 12.6193 14.1663 11.6173 14.1663 9.99992V5.99992C14.1663 4.38257 13.8398 3.38049 13.2295 2.77014C12.6191 2.15978 11.617 1.83325 9.99967 1.83325H5.99967C4.38232 1.83325 3.38025 2.15978 2.76989 2.77014Z"
+          />
+        </svg>
+      </button>
+
+      @if (showAddMenu()) {
+        <div
+          class="border-primary-default text-secondary absolute right-0 z-50 mt-2 overflow-hidden rounded-lg border bg-white shadow-md"
+          (click)="$event.stopPropagation()"
+        >
+          <button
+            class="hover:bg-main-light text-cemter w-full cursor-pointer px-4 py-2 text-sm"
+            (click)="addSpecialField()"
+            type="button"
+          >
+            Speciální pole
+          </button>
+
+          <button
+            class="hover:bg-main-light w-full cursor-pointer px-4 py-2 text-center text-sm"
+            (click)="addNormalField()"
+            type="button"
+          >
+            Normální pole
+          </button>
+        </div>
+      }
+    </div>
+
     <button
       class="bg-main-primary-default text-on-color disabled:bg-main-primary-disable text-sm-tight inline-flex gap-3 rounded-lg px-4 py-3 font-medium hover:cursor-pointer disabled:cursor-not-allowed"
       [disabled]="isSaving()"

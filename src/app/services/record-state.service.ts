@@ -8,6 +8,7 @@ import {
 import { extractedToUiFields } from '../utils/marc-transform';
 
 export type RecordViewMode = 'cards' | 'table';
+export type FieldType = 'special' | 'normal';
 
 @Injectable({ providedIn: 'root' })
 export class RecordStateService {
@@ -84,23 +85,26 @@ export class RecordStateService {
     this.uiFields.set(fields);
   }
 
-  addField() {
+  addField(fieldType: FieldType) {
     const current = this.uiFields();
+    const isSpecial = fieldType === 'special';
 
     const newField: UiFieldWithMeta = {
       fieldId: `manual-${crypto.randomUUID()}`,
       tag: '',
       ind1: '',
       ind2: '',
-      subfields: [
-        {
-          code: '',
-          value: '',
-          isManual: true,
-        },
-      ],
+      subfields: isSpecial
+        ? []
+        : [
+            {
+              code: '',
+              value: '',
+              isManual: true,
+            },
+          ],
       isManual: true,
-      special: false,
+      special: isSpecial,
       value: '',
     };
 
