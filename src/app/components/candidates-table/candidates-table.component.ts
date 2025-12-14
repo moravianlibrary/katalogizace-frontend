@@ -53,7 +53,6 @@ export class CandidatesTableComponent {
     }
   });
 
-  catalogueUrl = ''; // !!!TODO
   showAutPreview = computed(() => this.tag() === '100' || this.tag() === '700');
 
   selectedAutRecordId = computed<string | null>(() => {
@@ -72,6 +71,29 @@ export class CandidatesTableComponent {
   autLoading = signal(false);
   autError = signal<string | null>(null);
   autRecord = signal<ExistingMarcRecord | null>(null);
+
+  private getDocNumberFromRecord(
+    rec: ExistingMarcRecord | null,
+  ): string | null {
+    if (!rec) return null;
+
+    const f998 = rec.normal_fields.find((f) => f.tag === '998');
+    const sfA = f998?.subfields?.find((sf) => sf.code === 'a');
+    const value = sfA?.value?.trim();
+
+    return value ?? null;
+  }
+
+  catalogueUrl = computed<string | null>(() => {
+    const rec = this.autRecord();
+    const docNumber = this.getDocNumberFromRecord(rec);
+
+    if (!docNumber) return null;
+
+    return `https://aleph.nkp.cz/F/?func=direct&doc_number=${encodeURIComponent(
+      docNumber,
+    )}&local_base=AUT`;
+  });
 
   private autCache = new Map<string, ExistingMarcRecord>();
 

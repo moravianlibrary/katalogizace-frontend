@@ -83,16 +83,16 @@
         <div class="mb-2 flex shrink-0 items-center justify-between">
           <div class="text-secondary flex gap-2 text-sm font-semibold">
             Autoritní záznam
-            @if (selectedAutRecordId()) {
+            @if (selectedAutRecordId() && catalogueUrl()) {
               <a
                 class="text-link underline hover:no-underline"
-                [href]="catalogueUrl + '/' + selectedAutRecordId()"
+                [href]="catalogueUrl()"
                 target="_blank"
                 rel="noopener noreferrer"
                 title="Otevřít v souborném katalogu"
               >
                 <span class="flex gap-0.5">
-                  {{ selectedAutRecordId() }}
+                  Zobrazit v NKP (AUT)
                   <svg
                     class="icon-link"
                     xmlns="http://www.w3.org/2000/svg"
