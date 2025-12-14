@@ -1,79 +1,142 @@
 <div class="flex h-full flex-col gap-4">
-  <h2>{{ title() }}</h2>
+  <h2 class="shrink-0">{{ title() }}</h2>
 
-  <div class="min-h-0 flex-1 overflow-auto">
-    <table class="w-full border-collapse text-sm">
-      <colgroup>
-        <col class="w-12" />
-        <col class="w-12" />
-        <col />
-        <col class="w-12" />
-      </colgroup>
+  <div class="flex min-h-0 flex-1 flex-col gap-8">
+    <div class="max-h-[50%] min-h-0 overflow-auto">
+      <table class="w-full border-collapse text-sm">
+        <colgroup>
+          <col class="w-12" />
+          <col class="w-12" />
+          <col />
+          <col class="w-12" />
+        </colgroup>
 
-      <thead class="bg-main-base sticky top-0">
-        <tr class="border-tertiary-default border-b-[0.5px]">
-          <th class="text-secondary p-2 text-left font-bold">Ind1</th>
-          <th class="text-secondary p-2 text-left font-bold">Ind2</th>
-          <th class="text-secondary p-2 text-left font-bold">Podpole</th>
-          <th class="text-secondary p-2 text-left font-bold">Skóre</th>
-        </tr>
-      </thead>
+        <thead class="bg-main-base sticky top-0">
+          <tr class="border-tertiary-default border-b-[0.5px]">
+            <th class="text-secondary p-2 text-left font-bold">Ind1</th>
+            <th class="text-secondary p-2 text-left font-bold">Ind2</th>
+            <th class="text-secondary p-2 text-left font-bold">Podpole</th>
+            <th class="text-secondary p-2 text-left font-bold">Skóre</th>
+          </tr>
+        </thead>
 
-      <tbody>
-        @for (candidate of sortedCandidates(); track candidate.id) {
-          <tr
-            class="border-tertiary-default cursor-pointer border-b-[0.5px]"
-            [class.bg-main-light]="selectedId() === candidate.id"
-            (click)="onRowClick(candidate.id)"
-          >
-            <td class="text-secondary p-2 text-center align-text-top font-bold">
-              {{ candidate.MARC_representation.ind1 ?? "" }}
-            </td>
+        <tbody>
+          @for (candidate of sortedCandidates(); track candidate.id) {
+            <tr
+              class="border-tertiary-default cursor-pointer border-b-[0.5px]"
+              [class.bg-main-light]="selectedId() === candidate.id"
+              (click)="onRowClick(candidate.id)"
+            >
+              <td
+                class="text-secondary p-2 text-center align-text-top font-bold"
+              >
+                {{ candidate.MARC_representation.ind1 ?? "" }}
+              </td>
 
-            <td class="text-secondary p-2 text-center align-text-top font-bold">
-              {{ candidate.MARC_representation.ind2 ?? "" }}
-            </td>
+              <td
+                class="text-secondary p-2 text-center align-text-top font-bold"
+              >
+                {{ candidate.MARC_representation.ind2 ?? "" }}
+              </td>
 
-            <td class="p-2 align-text-top">
-              @if (candidate.MARC_representation.subfields.length) {
-                <div class="flex flex-wrap gap-x-2 gap-y-1">
-                  @for (
-                    sf of candidate.MARC_representation.subfields;
-                    track $index
-                  ) {
-                    <span>
-                      <span class="text-secondary font-bold"
-                        >|{{ sf.code }}</span
-                      >
-                      <span class="ml-1">{{ sf.value }}</span>
-                    </span>
-                  }
+              <td class="p-2 align-text-top">
+                @if (candidate.MARC_representation.subfields.length) {
+                  <div class="flex flex-wrap gap-x-2 gap-y-1">
+                    @for (
+                      sf of candidate.MARC_representation.subfields;
+                      track $index
+                    ) {
+                      <span>
+                        <span class="text-secondary font-bold"
+                          >|{{ sf.code }}</span
+                        >
+                        <span class="ml-1">{{ sf.value }}</span>
+                      </span>
+                    }
+                  </div>
+                }
+              </td>
+
+              <td class="p-2">
+                <div class="flex h-full items-center justify-center">
+                  <span
+                    class="h-4 w-4 rounded-full"
+                    [ngClass]="scoreClass(candidate.score)"
+                    title="score {{ candidate.score | number: '1.2-2' }}"
+                  ></span>
                 </div>
-              }
-            </td>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td class="p-4 text-center text-slate-500" colspan="4">
+                Žádní kandidáti.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
 
-            <td class="p-2">
-              <div class="flex h-full items-center justify-center">
-                <span
-                  class="h-4 w-4 rounded-full"
-                  [ngClass]="scoreClass(candidate.score)"
-                  title="score {{ candidate.score | number: '1.2-2' }}"
-                ></span>
-              </div>
-            </td>
-          </tr>
-        } @empty {
-          <tr>
-            <td class="p-4 text-center text-slate-500" colspan="4">
-              Žádní kandidáti.
-            </td>
-          </tr>
+    @if (showAutPreview()) {
+      <div class="flex min-h-0 flex-1 flex-col">
+        <div class="mb-2 flex shrink-0 items-center justify-between">
+          <div class="text-secondary flex gap-2 text-sm font-semibold">
+            Autoritní záznam
+            @if (selectedAutRecordId()) {
+              <a
+                class="text-link underline hover:no-underline"
+                [href]="catalogueUrl + '/' + selectedAutRecordId()"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Otevřít v souborném katalogu"
+              >
+                <span class="flex gap-0.5">
+                  {{ selectedAutRecordId() }}
+                  <svg
+                    class="icon-link"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M5.46136 10.4113C5.7536 10.7048 5.75254 11.1797 5.45899 11.4719C3.50562 13.4166 3.51052 16.5817 5.46136 18.5413C7.40605 20.4947 10.5712 20.4898 12.5307 18.5389C14.4856 16.5927 14.4873 13.4285 12.5295 11.4708C12.2366 11.1779 12.2366 10.703 12.5295 10.4101C12.8224 10.1172 13.2973 10.1172 13.5902 10.4101C16.1324 12.9523 16.1341 17.0681 13.589 19.6019C11.0485 22.1311 6.93364 22.1462 4.39834 19.5996C1.86917 17.0591 1.85408 12.9442 4.4007 10.4089C4.69424 10.1167 5.16912 10.1177 5.46136 10.4113Z"
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M18.5508 5.45134C16.4913 3.40067 13.1662 3.39555 11.1214 5.44908C9.07218 7.50708 9.07381 10.8331 11.1203 12.8796C11.4132 13.1724 11.4132 13.6473 11.1203 13.9402C10.8274 14.2331 10.3525 14.2331 10.0596 13.9402C7.42612 11.3067 7.42774 7.03269 10.0585 4.39069C12.6937 1.74422 16.9686 1.7591 19.6092 4.38843C22.2556 7.02363 22.2407 11.2985 19.6114 13.9391C19.3192 14.2326 18.8443 14.2336 18.5508 13.9413C18.2572 13.6491 18.2562 13.1742 18.5485 12.8807C20.5992 10.8212 20.6043 7.49614 18.5508 5.45134Z"
+                    />
+                  </svg>
+                </span>
+              </a>
+            }
+          </div>
+        </div>
+
+        @if (!selectedAutRecordId()) {
+          <div class="text-light text-sm">
+            Vybraný kandidát nemá podpole <strong>|7</strong>
+          </div>
+        } @else if (autLoading()) {
+          <div class="text-sm">Načítám autoritní záznam…</div>
+        } @else if (autError()) {
+          <div class="text-error text-sm">{{ autError() }}</div>
+        } @else if (autRecord()) {
+          <div class="min-h-0 flex-1 overflow-auto">
+            <app-existing-marc-record-table [existingRecord]="autRecord()!" />
+          </div>
+        } @else {
+          <div class="text-light text-sm">—</div>
         }
-      </tbody>
-    </table>
+      </div>
+    }
   </div>
 
-  <div class="mt-2 flex items-center justify-between">
+  <div class="mt-2 flex shrink-0 items-center justify-between">
     <button
       class="border-tertiary-default text-sm-tight text-secondary cursor-pointer rounded-lg border px-4 py-3 font-medium"
       (click)="onClose()"

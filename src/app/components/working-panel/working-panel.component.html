@@ -6,6 +6,7 @@
       [title]="'Výběr kandidátů pole ' + state().tag"
       [candidates]="state().candidates ?? []"
       [selectedCandidateId]="state().selectedCandidateId ?? null"
+      [tag]="state().tag"
     />
   } @else if (state().mode === "provenance") {
     <app-provenance-timeline

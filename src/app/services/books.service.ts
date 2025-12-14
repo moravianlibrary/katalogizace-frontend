@@ -1,10 +1,12 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { map } from 'rxjs/operators';
 import {
   BookImageUploadResponse,
   BookResultResponse,
   BookStatusResponse,
   BookUploadResponse,
+  ExistingMarcRecord,
   LastEditedRecord,
   PaginatedBooksResponse,
   ProcessState,
@@ -125,5 +127,13 @@ export class BooksService {
 
   deleteBookRecord(bookId: string) {
     return this.http.delete<string>(`${this.apiBaseUrl}/books/${bookId}`);
+  }
+
+  getAutRecord(recordId: string) {
+    return this.http
+      .get<{
+        record: ExistingMarcRecord;
+      }>(`${this.apiBaseUrl}/catalogue/AUT/record/${recordId}`)
+      .pipe(map((resp) => resp.record));
   }
 }
