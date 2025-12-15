@@ -89,9 +89,6 @@ export class BooksService {
       formData,
       {
         params,
-        headers: {
-          'KATALOGIZACE-API-KEY': apiKey,
-        },
       },
     );
   }

@@ -10,7 +10,7 @@ export const apiKeyInterceptor: HttpInterceptorFn = (req, next) => {
   const augmented = isApi
     ? req.clone({
         setHeaders: {
-          'KATALOGIZACE-API-KEY': envService.get('apiServiceKey'),
+          Authorization: `Bearer ${envService.get('apiServiceKey')}`,
         },
       })
     : req;
