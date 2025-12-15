@@ -4,6 +4,7 @@ import { ExistingMarcRecord, ExtractedMarcRecord } from '../../models/book';
 import { MarcDiffService } from '../../services/marc-diff.service';
 import { RecordStateService } from '../../services/record-state.service';
 import { RecordStore } from '../../stores/record.store';
+import { filterExistingRecord015to830 } from '../../utils/marc-filter';
 import { extractedToExisting } from '../../utils/marc-transform';
 import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
 import { ExtractedMarcRecordTableComponent } from '../marc-record-table/extracted-marc-record-table/extracted-marc-record-table.component';
@@ -143,7 +144,8 @@ export class MarcRecordsComponent {
     if (idx === 0) {
       this.recordState.loadFromExtracted(rec.extracted);
     } else {
-      this.recordState.loadFromExistingOrLastEdited(rec.existing);
+      const filtered = filterExistingRecord015to830(rec.existing!);
+      this.recordState.loadFromExistingOrLastEdited(filtered);
     }
   }
 }
