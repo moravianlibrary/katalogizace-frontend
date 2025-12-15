@@ -1,4 +1,4 @@
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, HostListener, inject, input, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BooksService } from '../../services/books.service';
 import { RecordStateService } from '../../services/record-state.service';
@@ -23,8 +23,31 @@ export class NavigationButtonsComponent {
 
   isSaving = signal(false);
 
+  showAddMenu = signal(false);
+
+  toggleAddMenu(event: MouseEvent) {
+    event.stopPropagation();
+    this.showAddMenu.update((v) => !v);
+  }
+
+  @HostListener('document:click')
+  closeAddMenu() {
+    this.showAddMenu.set(false);
+  }
+
+  addNormalField() {
+    this.showAddMenu.set(false);
+    this.recordState.addField('normal');
+  }
+
+  addSpecialField() {
+    this.showAddMenu.set(false);
+    this.recordState.addField('special');
+  }
+
   goBack() {
     this.wps.showRecords();
+    this.recordState.resetViewMode();
 
     this.router
       .navigate(['..'], {
@@ -34,10 +57,6 @@ export class NavigationButtonsComponent {
       .catch(() => {
         this.router.navigate(['/books']);
       });
-  }
-
-  addField() {
-    this.recordState.addField();
   }
 
   onSave() {

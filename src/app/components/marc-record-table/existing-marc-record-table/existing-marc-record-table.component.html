@@ -1,0 +1,73 @@
+<table class="w-full border-collapse text-sm">
+  <colgroup>
+    <col class="w-16" />
+    <col class="w-10" />
+    <col class="w-10" />
+    <col />
+  </colgroup>
+
+  <tbody>
+    @if (existingRecord().leader) {
+      <tr
+        class="border-tertiary-default border-y-[0.5px]"
+        [ngClass]="
+          this.ds.enabledByUser() && this.recordState.viewMode() === 'table'
+            ? 'opacity-60'
+            : ''
+        "
+        [leader]="existingRecord().leader"
+        appMarcRowLeader
+      ></tr>
+    }
+
+    @for (sf of existingRecord().special_fields; track $index) {
+      <tr
+        class="border-tertiary-default border-b-[0.5px]"
+        [ngClass]="[
+          $index === 0 && !existingRecord().leader ? 'border-t-[0.5px]' : '',
+          diff().rowClass(
+            diff().diffKindForSpecial(sf.tag, sf.value, diffSide())
+          ),
+          this.ds.enabledByUser() &&
+          !isDiffableTag015to830(sf.tag) &&
+          this.recordState.viewMode() === 'table'
+            ? 'opacity-60'
+            : '',
+        ]"
+        [sf]="sf"
+        appMarcRowSpecial
+      ></tr>
+    }
+
+    @for (nf of existingRecord().normal_fields; track $index) {
+      @if (nf.tag != "910") {
+        <tr
+          class="border-tertiary-default border-b-[0.5px]"
+          [ngClass]="[
+            $index === 0 &&
+            existingRecord().special_fields.length === 0 &&
+            !existingRecord().leader
+              ? 'border-t-[0.5px]'
+              : '',
+            diff().rowClass(
+              diff().diffKindForNormal(
+                nf.tag,
+                nf.ind1,
+                nf.ind2,
+                nf.subfields,
+                diffSide()
+              )
+            ),
+            this.ds.enabledByUser() &&
+            !isDiffableTag015to830(nf.tag) &&
+            this.recordState.viewMode() === 'table'
+              ? 'opacity-60'
+              : '',
+          ]"
+          [nf]="nf"
+          appMarcRowNormal
+        ></tr>
+      }
+    }
+  </tbody>
+</table>

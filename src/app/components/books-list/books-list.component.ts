@@ -1,14 +1,28 @@
 import { DatePipe, NgClass } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router } from '@angular/router';
-import { PaginatedBooksResponse, TaskState } from '../../models/book';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import {
+  PaginatedBooksResponse,
+  ProcessState,
+  RecordState,
+} from '../../models/book';
+import { ProcessStateLabelPipe } from '../../pipes/process-state-label.pipe';
+import { RecordStateLabelPipe } from '../../pipes/record-state-label.pipe';
 import { BooksService } from '../../services/books.service';
+import { ToastService } from '../../services/toast.service';
+import { WorkingPanelService } from '../../services/working-panel.service';
 
 @Component({
   standalone: true,
   selector: 'app-books-list',
-  imports: [NgClass, DatePipe],
+  imports: [
+    NgClass,
+    DatePipe,
+    RouterModule,
+    RecordStateLabelPipe,
+    ProcessStateLabelPipe,
+  ],
   templateUrl: 'books-list.component.html',
 })
 export class BooksListComponent {
@@ -16,6 +30,10 @@ export class BooksListComponent {
   private router = inject(Router);
   private books = inject(BooksService);
   private destroyRef = inject(DestroyRef);
+  private toast = inject(ToastService);
+  private wps = inject(WorkingPanelService);
+
+  isUploading = false;
 
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
@@ -48,7 +66,6 @@ export class BooksListComponent {
       .listBooks({
         page: this.page(),
         page_size: this.pageSize(),
-        // state: undefined, batch_id: undefined // ľahko doplniteľné
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -90,9 +107,9 @@ export class BooksListComponent {
     });
   }
 
-  stateBadgeClass(state?: TaskState | null) {
+  processStateBadgeClass(state?: ProcessState | null) {
     switch (state) {
-      case 'new':
+      case 'created':
         return 'bg-slate-100 text-slate-700';
       case 'scheduled':
         return 'bg-indigo-100 text-indigo-700';
@@ -109,7 +126,67 @@ export class BooksListComponent {
     }
   }
 
+  recordStateBadgeClass(state?: RecordState | null) {
+    switch (state) {
+      case 'new':
+        return 'bg-slate-100 text-slate-700';
+      case 'edited':
+        return 'bg-blue-100 text-blue-700';
+      case 'reviewed':
+        return 'bg-amber-100 text-amber-800';
+      case 'completed':
+        return 'bg-green-100 text-green-700';
+      default:
+        return 'bg-slate-100 text-slate-600';
+    }
+  }
+
   open(id: string) {
     this.router.navigate(['/books', id]);
+    this.wps.setMode('records');
+  }
+
+  onUploadImages(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    const files = Array.from(input.files);
+
+    this.isUploading = true;
+
+    this.books.uploadImages(files).subscribe({
+      next: () => {
+        this.toast.show('Obrázky byly úspěšně nahrány.', 'success');
+        this.load();
+      },
+      error: () => {
+        this.toast.show('Nahrávání obrázků se nezdařilo.', 'error');
+        this.isUploading = false;
+        input.value = '';
+      },
+      complete: () => {
+        this.isUploading = false;
+        input.value = '';
+      },
+    });
+  }
+
+  onDelete(id: string, event: MouseEvent) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    const confirmed = confirm('Opravdu chcete smazat tuto knihu?');
+    if (!confirmed) return;
+
+    this.books.deleteBookRecord(id).subscribe({
+      next: () => {
+        this.toast.show('Kniha byla úspěšně smazána.', 'success');
+        this.load();
+      },
+      error: (err) => {
+        console.error(err);
+        this.toast.show('Smazání knihy se nezdařilo.', 'error');
+      },
+    });
   }
 }

@@ -14,13 +14,23 @@
             {{ it.error }}
           </span>
         } @else {
-          <img
-            class="pointer-events-none block h-full w-auto object-contain select-none"
+          <div
+            class="relative h-full"
             [class.border-4]="selectedId() === it.id"
             [class.border-tertiary-default]="selectedId() === it.id"
-            [src]="it.url"
-            alt="thumb"
-          />
+          >
+            <img
+              class="pointer-events-none block h-full w-auto object-contain select-none"
+              [src]="it.url"
+              alt="thumb"
+            />
+
+            <div
+              class="text-on-color pointer-events-none absolute inset-x-0 bottom-0 bg-black/65 px-2 py-1 text-center text-xs font-medium"
+            >
+              {{ it.pageType }}
+            </div>
+          </div>
         }
       </button>
     }

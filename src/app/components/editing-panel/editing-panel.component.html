@@ -1,16 +1,80 @@
 <section class="flex h-screen flex-col gap-5 p-6">
-  <app-navigation-buttons
-    [bookId]="result()?.book_id ?? ''"
-  ></app-navigation-buttons>
+  <app-navigation-buttons [bookId]="book_id()"></app-navigation-buttons>
+
+  @if (this.store.hasLastEdited()) {
+    <div
+      class="bg-main-bright text-secondary flex items-start gap-2 rounded-lg px-3 py-2 text-xs"
+    >
+      <svg
+        class="icon-secondary-default"
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+      >
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M1.25 12C1.25 6.08579 6.08579 1.25 12 1.25C17.9142 1.25 22.75 6.08579 22.75 12C22.75 17.9142 17.9142 22.75 12 22.75C6.08579 22.75 1.25 17.9142 1.25 12ZM12 2.75C6.91421 2.75 2.75 6.91421 2.75 12C2.75 17.0858 6.91421 21.25 12 21.25C17.0858 21.25 21.25 17.0858 21.25 12C21.25 6.91421 17.0858 2.75 12 2.75Z"
+        />
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M12 7.25C12.4142 7.25 12.75 7.58579 12.75 8V13C12.75 13.4142 12.4142 13.75 12 13.75C11.5858 13.75 11.25 13.4142 11.25 13V8C11.25 7.58579 11.5858 7.25 12 7.25Z"
+        />
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M10.9941 16C10.9941 15.4477 11.4419 15 11.9941 15H12.0031C12.5554 15 13.0031 15.4477 13.0031 16C13.0031 16.5523 12.5554 17 12.0031 17H11.9941C11.4419 17 10.9941 16.5523 10.9941 16Z"
+        />
+      </svg>
+
+      <div>
+        <p class="text-sm font-medium">
+          Zobrazuje se poslední uložená verze záznamu.
+        </p>
+      </div>
+    </div>
+  }
+
   <div class="min-h-0 flex-1 overflow-auto">
     @if (viewMode() === "cards") {
-      <app-extracted-fields
-        [fields]="uiFields()"
-        [provenance]="result()?.provenance ?? {}"
-      />
+      <app-extracted-fields />
     } @else {
       @if (recordPreview(); as rec) {
-        <app-marc-record-table [record]="rec" />
+        <div class="flex flex-col gap-5">
+          <div class="auto ml-auto flex gap-5">
+            <div class="flex items-center gap-3">
+              <span class="text-secondary text-sm-tight font-medium">
+                Porovnání
+              </span>
+              <button
+                class="inline-flex h-8 w-14 shrink-0 cursor-pointer items-center rounded-full transition"
+                [class.bg-main-primary-default]="diffEnabled()"
+                [class.hover:bg-main-primary-hover]="diffEnabled()"
+                [class.bg-main-bright]="!diffEnabled()"
+                [class.hover:bg-main-contrast]="!diffEnabled()"
+                [attr.aria-checked]="diffEnabled()"
+                (click)="diff.toggle()"
+                type="button"
+                role="switch"
+                aria-label="Porovnání záznamů"
+              >
+                <span
+                  class="inline-block h-6 w-6 transform rounded-full bg-white shadow transition"
+                  [class.translate-x-7]="diffEnabled()"
+                  [class.translate-x-1]="!diffEnabled()"
+                ></span>
+              </button>
+            </div>
+          </div>
+
+          <app-existing-marc-record-table
+            [existingRecord]="rec"
+            [diffIndex]="diffIndex()"
+            diffSide="preview"
+          />
+        </div>
       } @else {
         <p class="text-light text-sm">Žádná data k zobrazení.</p>
       }

@@ -1,8 +1,10 @@
 import { Component, effect, inject, input } from '@angular/core';
-import { BookResultResponse } from '../../models/book';
+import { UUID } from '../../models/book';
+import { MarcDiffService } from '../../services/marc-diff.service';
 import { RecordStateService } from '../../services/record-state.service';
+import { RecordStore } from '../../stores/record.store';
 import { ExtractedFieldsComponent } from '../extracted-fields/extracted-fields/extracted-fields.component';
-import { MarcRecordTableComponent } from '../marc-record-table/marc-record-table.component';
+import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
 import { NavigationButtonsComponent } from '../navigation-buttons/navigation-buttons.component';
 
 @Component({
@@ -11,34 +13,41 @@ import { NavigationButtonsComponent } from '../navigation-buttons/navigation-but
   imports: [
     NavigationButtonsComponent,
     ExtractedFieldsComponent,
-    MarcRecordTableComponent,
+    ExistingMarcRecordTableComponent,
   ],
   templateUrl: './editing-panel.component.html',
 })
 export class EditingPanelComponent {
-  result = input<BookResultResponse | null>(null);
+  book_id = input<UUID>('');
 
   recordState = inject(RecordStateService);
+  store = inject(RecordStore);
+  diff = inject(MarcDiffService);
 
   viewMode = this.recordState.viewMode;
   recordPreview = this.recordState.recordPreview;
   uiFields = this.recordState.uiFields;
 
-  constructor() {
-    effect(
-      () => {
-        const r = this.result();
-        if (!r) {
-          this.recordState.uiFields.set([]);
-          return;
-        }
+  diffIndex = this.diff.diffIndex;
+  diffEnabled = this.diff.enabledByUser;
 
-        this.recordState.loadFromExtractedAndLast(
-          r.extracted_marc_record ?? null,
-          r.last_edited_record ?? null,
-        );
-      },
-      { allowSignalWrites: true },
-    );
+  constructor() {
+    effect(() => {
+      const e = this.store.extracted();
+      const l = this.store.lastEdited();
+
+      if (l) {
+        this.recordState.loadFromExistingOrLastEdited(l);
+      } else {
+        this.recordState.loadFromExtracted(e);
+      }
+    });
+
+    // auto turn off diff when leaving table view mode
+    // effect(() => {
+    //   if (this.recordState.viewMode() !== 'table') {
+    //     this.diff.setEnabled(false);
+    //   }
+    // });
   }
 }

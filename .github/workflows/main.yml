@@ -17,13 +17,13 @@ name: Main workflow
 # https://github.com/marketplace/actions/create-json
 # https://github.com/trineracz/deploy-docker-with-terraform
 
-on:  # yamllint disable-line rule:truthy
+on: # yamllint disable-line rule:truthy
   push:
     branches:
       - dev
       - main
     tags:
-      - 'v*'
+      - "v*"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -71,81 +71,75 @@ jobs:
       # where they should be deployed in `deploy` job
       docker_names: ${{ steps.set_docker_names.outputs.docker_names }}
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Dump VARS context
-      env:
-        VARS_CONTEXT: ${{ toJson(vars) }}
-      run: |
-        echo "$VARS_CONTEXT"
-        echo "environment: ${{ needs.set_environment.outputs.environment }}"
-    # variable GITHUB_REF=refs/tags/v1.3 is set if
-    # git tag v1.3 commmand was run before
+      - name: Dump VARS context
+        env:
+          VARS_CONTEXT: ${{ toJson(vars) }}
+        run: |
+          echo "$VARS_CONTEXT"
+          echo "environment: ${{ needs.set_environment.outputs.environment }}"
+      # variable GITHUB_REF=refs/tags/v1.3 is set if
+      # git tag v1.3 commmand was run before
 
-    # GITHUB_REF=refs/heads/main
-    # if it's just commit in `main` branch
-    - name: Set vars
-      id: set_vars
-      run: |
-        REF_NAME=$(echo $GITHUB_REF_NAME | grep -oE '([a-z0-9\-\.]*?)$')
-        (
-          echo "ref_name=$REF_NAME"
-          echo "docker_container_suffix=${REF_NAME//\./_}"
-          echo "docker_image=ghcr.io/${GITHUB_REPOSITORY,,}-$REF_NAME"
-        ) | tee --append "$GITHUB_OUTPUT" > "GITHUB_ENV"
+      # GITHUB_REF=refs/heads/main
+      # if it's just commit in `main` branch
+      - name: Set vars
+        id: set_vars
+        run: |
+          REF_NAME=$(echo $GITHUB_REF_NAME | grep -oE '([a-z0-9\-\.]*?)$')
+          (
+            echo "ref_name=$REF_NAME"
+            echo "docker_container_suffix=${REF_NAME//\./_}"
+            echo "docker_image=ghcr.io/${GITHUB_REPOSITORY,,}-$REF_NAME"
+          ) | tee --append "$GITHUB_OUTPUT" > "GITHUB_ENV"
 
-    - name: Set docker names for dev branch
-      uses: jsdaniell/create-json@v1.2.3
-      with:
-        name: 'docker_names.json'
-        # https://ai-katalogizace.test.trinera.cloud/
-        json:
-          '{"include": [
+      - name: Set docker names for dev branch
+        uses: jsdaniell/create-json@v1.2.3
+        with:
+          name: "docker_names.json"
+          # https://ai-katalogizace.test.trinera.cloud/
+          json: '{"include": [
             {
-              "name": "ai_katalogizace_${{ steps.set_vars.outputs.ref_name }}",
-              "domain": "ai-katalogizace.test.trinera.cloud"
+            "name": "ai_katalogizace_${{ steps.set_vars.outputs.ref_name }}",
+            "domain": "ai-katalogizace.test.trinera.cloud"
             }
-          ]}'
-      if:
-        github.ref == 'refs/heads/dev'
+            ]}'
+        if: github.ref == 'refs/heads/dev'
 
-    - name: Set docker names for main branch
-      uses: jsdaniell/create-json@v1.2.3
-      with:
-        name: 'docker_names.json'
-        json:
-          '{"include": [
+      - name: Set docker names for main branch
+        uses: jsdaniell/create-json@v1.2.3
+        with:
+          name: "docker_names.json"
+          json: '{"include": [
             {
-              "name": "ai_katalogizace_${{ steps.set_vars.outputs.ref_name }}",
-              "domain": "ai-katalogizace.app.trinera.cloud"
+            "name": "ai_katalogizace_${{ steps.set_vars.outputs.ref_name }}",
+            "domain": "ai-katalogizace.app.trinera.cloud"
             }
-          ]}'
-      if:
-        github.ref == 'refs/heads/main'
+            ]}'
+        if: github.ref == 'refs/heads/main'
 
-    - name: "Set docker names for tag v*"
-      uses: jsdaniell/create-json@v1.2.3
-      with:
-        name: 'docker_names.json'
-        json:
-          '{"include": [
+      - name: "Set docker names for tag v*"
+        uses: jsdaniell/create-json@v1.2.3
+        with:
+          name: "docker_names.json"
+          json: '{"include": [
             {
-              name: "ai_katalogizace_${{ steps.set_vars.outputs.docker_container_suffix }}",
-              domain: "${{ steps.set_vars.outputs.ref_name }}.ai-katalogizace.app.trinera.cloud"
+            name: "ai_katalogizace_${{ steps.set_vars.outputs.docker_container_suffix }}",
+            domain: "${{ steps.set_vars.outputs.ref_name }}.ai-katalogizace.app.trinera.cloud"
             }
-          ]}'
-      if:
-        startsWith(github.ref, 'refs/tags/v')
+            ]}'
+        if: startsWith(github.ref, 'refs/tags/v')
 
-    - name: Upload docker_names artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: docker-names-artifact
-        path: docker_names.json
+      - name: Upload docker_names artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-names-artifact
+          path: docker_names.json
 
-    - name: Set docker_names output
-      id: set_docker_names
-      run: |
+      - name: Set docker_names output
+        id: set_docker_names
+        run: |
           echo "docker_names=$(cat docker_names.json)" > "$GITHUB_OUTPUT"
 
     # - name: Debug
@@ -155,29 +149,28 @@ jobs:
     #     echo "REF_NAME: ${REF_NAME}"
 
   build:
-    if:
-      github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
     needs: set_variables
     runs-on: ubuntu-latest
     environment: ${{ needs.set_environment.outputs.environment }}
     env:
       DOCKER_IMAGE: ${{ needs.set_variables.outputs.docker_image }}
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Log in to ghcr.io
-      run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Log in to ghcr.io
+        run: echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-    - name: Build the Docker image
-      run: |
-        docker build \
-          --tag "${DOCKER_IMAGE}:latest" \
-          --tag "${DOCKER_IMAGE}:$(date +%Y%m%d%H%M)" \
-          --file Dockerfile .
+      - name: Build the Docker image
+        run: |
+          docker build \
+            --tag "${DOCKER_IMAGE}:latest" \
+            --tag "${DOCKER_IMAGE}:$(date +%Y%m%d%H%M)" \
+            --file Dockerfile .
 
-    - name: Push image to GHCR
-      run: >
-        docker push --all-tags "${DOCKER_IMAGE}"
+      - name: Push image to GHCR
+        run: >
+          docker push --all-tags "${DOCKER_IMAGE}"
 
   deploy:
     name: deploy
@@ -216,7 +209,7 @@ jobs:
           echo "$VARS_CONTEXT"
           echo "environment: ${{ needs.set_environment.outputs.environment }}"
 
-      - name: 'Deploy with Terraform'
+      - name: "Deploy with Terraform"
         id: deploy_with_terraform
         uses: trineracz/deploy-docker-with-terraform@v1.0.0
         env:

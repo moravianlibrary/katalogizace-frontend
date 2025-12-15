@@ -7,13 +7,19 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { MarcCandidate } from '../../models/book';
+import {
+  ExistingMarcRecord,
+  MarcCandidate,
+  MarcSubfield,
+} from '../../models/book';
+import { BooksService } from '../../services/books.service';
 import { WorkingPanelService } from '../../services/working-panel.service';
+import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
 
 @Component({
   standalone: true,
   selector: 'app-candidates-table',
-  imports: [CommonModule],
+  imports: [CommonModule, ExistingMarcRecordTableComponent],
   templateUrl: './candidates-table.component.html',
 })
 export class CandidatesTableComponent {
@@ -22,7 +28,10 @@ export class CandidatesTableComponent {
 
   selectedCandidateId = input<string | null>(null);
 
+  tag = input<string>();
+
   private wps = inject(WorkingPanelService);
+  private books = inject(BooksService);
 
   sortedCandidates = computed<MarcCandidate[]>(() => {
     const list = [...this.candidates()];
@@ -42,6 +51,80 @@ export class CandidatesTableComponent {
     } else {
       this.selectedId.set(list[0]?.id ?? null);
     }
+  });
+
+  showAutPreview = computed(() => this.tag() === '100' || this.tag() === '700');
+
+  selectedAutRecordId = computed<string | null>(() => {
+    if (!this.showAutPreview()) return null;
+
+    const id = this.selectedId();
+    if (!id) return null;
+
+    const cand = this.sortedCandidates().find((c) => c.id === id);
+    const sfs = cand?.MARC_representation?.subfields ?? [];
+    const sf7 = sfs.find((sf: MarcSubfield) => sf.code === '7')?.value?.trim();
+
+    return sf7 && sf7.length > 0 ? sf7 : null;
+  });
+
+  autLoading = signal(false);
+  autError = signal<string | null>(null);
+  autRecord = signal<ExistingMarcRecord | null>(null);
+
+  private getDocNumberFromRecord(
+    rec: ExistingMarcRecord | null,
+  ): string | null {
+    if (!rec) return null;
+
+    const f998 = rec.normal_fields.find((f) => f.tag === '998');
+    const sfA = f998?.subfields?.find((sf) => sf.code === 'a');
+    const value = sfA?.value?.trim();
+
+    return value ?? null;
+  }
+
+  catalogueUrl = computed<string | null>(() => {
+    const rec = this.autRecord();
+    const docNumber = this.getDocNumberFromRecord(rec);
+
+    if (!docNumber) return null;
+
+    return `https://aleph.nkp.cz/F/?func=direct&doc_number=${encodeURIComponent(
+      docNumber,
+    )}&local_base=AUT`;
+  });
+
+  private autCache = new Map<string, ExistingMarcRecord>();
+
+  private autFetchEffect = effect(() => {
+    const recordId = this.selectedAutRecordId();
+
+    this.autError.set(null);
+    this.autRecord.set(null);
+    this.autLoading.set(false);
+
+    if (!recordId) return;
+
+    const cached = this.autCache.get(recordId);
+    if (cached) {
+      this.autRecord.set(cached);
+      return;
+    }
+
+    this.autLoading.set(true);
+    this.books.getAutRecord(recordId).subscribe({
+      next: (rec) => {
+        this.autCache.set(recordId, rec);
+        this.autRecord.set(rec);
+        this.autLoading.set(false);
+      },
+      error: (err) => {
+        console.error(err);
+        this.autError.set('Nepodařilo se načíst autoritní záznam.');
+        this.autLoading.set(false);
+      },
+    });
   });
 
   private readonly SCORE_CLASS: Record<number, string> = {

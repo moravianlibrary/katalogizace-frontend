@@ -1,12 +1,30 @@
 export type UUID = string;
 
-export type TaskState =
-  | 'new'
+export type ProcessState =
+  | 'created'
   | 'scheduled'
   | 'in_progress'
   | 'ready'
   | 'failed'
   | 'completed';
+
+export type RecordState = 'new' | 'edited' | 'reviewed' | 'completed';
+
+export const PROCESS_STATE_LABELS: Record<ProcessState, string> = {
+  created: 'Vytvořeno',
+  scheduled: 'Naplánováno',
+  in_progress: 'Probíhá zpracování',
+  ready: 'Připraveno',
+  failed: 'Chyba',
+  completed: 'Dokončeno',
+};
+
+export const RECORD_STATE_LABELS: Record<RecordState, string> = {
+  new: 'Nový záznam',
+  edited: 'Upraveno',
+  reviewed: 'Zkontrolováno',
+  completed: 'Schváleno',
+};
 
 export type MarcTag = `${number}${number}${number}` | string;
 
@@ -14,18 +32,33 @@ export interface ImgItem {
   id: string;
   url: string;
   loading: boolean;
-  error?: string | null;
+  error: string | null;
+  pageType: string;
+}
+
+export type PageType =
+  | 'TitlePage'
+  | 'TableOfContents'
+  | 'FrontCover'
+  | 'BackCover'
+  | 'Impressum'
+  | 'EndPage'
+  | 'Unknown';
+export interface ApiImageItem {
+  image_id: UUID;
+  page_type: PageType | null;
 }
 
 export interface BookCommon {
   book_id: UUID;
-  created_at?: string;
-  modified_at?: string;
-  state?: TaskState;
-  image_ids: UUID[] | null;
-  hatchet_workflow_id?: string | null;
-  batch_id?: string | null;
-  error_message?: string | null;
+  created_at: string | null;
+  modified_at: string | null;
+  process_state: ProcessState;
+  record_state: RecordState;
+  images: ApiImageItem[];
+  hatchet_workflow_id: string | null;
+  batch_id: string | null;
+  error_message: string | null;
 }
 export interface BookRecordInfo extends BookCommon {}
 
@@ -40,15 +73,23 @@ export interface PaginatedBooksResponse {
 
 export interface BookStatusResponse extends BookCommon {}
 
-export type ExtractedMarcRecord = Record<MarcTag, ExtractedMarcField[]>;
+export type ExtractedMarcRecord = Record<
+  MarcTag,
+  ExtractedMarcSpecialField[] | ExtractedMarcNormalField[]
+>;
 export interface BookResultResponse extends BookCommon {
-  extracted_marc_record?: Record<string, ExtractedMarcField[]> | null;
-  existing_marc_records?: ExistingMarcRecord[];
+  extracted_MARC_record: ExtractedMarcRecord | null;
+  library_sigla: string | null;
+  existing_MARC_records: ExistingMarcRecord[];
   last_edited_record: LastEditedRecord | null;
-  provenance?: Record<UUID, Step[]>;
+  provenance: Record<UUID, Step[]>;
 }
 
-export interface ExtractedMarcField {
+export interface ExtractedMarcSpecialField {
+  value: string;
+}
+
+export interface ExtractedMarcNormalField {
   id: UUID;
   candidates: MarcCandidate[];
   selected_candidate_id: UUID | null;
@@ -57,27 +98,25 @@ export interface ExtractedMarcField {
 export interface MarcCandidate {
   id: UUID;
   score: number;
-  marc_representation: CandidateMarcRepresentation;
+  MARC_representation: CandidateMarcRepresentation;
 }
 
 export interface CandidateMarcRepresentation {
   ind1: string | null;
   ind2: string | null;
-  subfields?: MarcSubfield[];
+  subfields: MarcSubfield[];
 }
 
 export interface ExistingMarcRecord {
   record_id: string;
   leader: string;
   source: string;
-  quality_assessment: QualityScore;
-  special_fields?: ExistingMarcRecordSpecialField[];
-  normal_fields?: ExistingMarcRecordNormalField[];
+  quality_assessment: QualityScore | null;
+  special_fields: ExistingMarcRecordSpecialField[];
+  normal_fields: ExistingMarcRecordNormalField[];
 }
 
-export interface LastEditedRecord extends ExistingMarcRecord {
-  source: string;
-}
+export interface LastEditedRecord extends ExistingMarcRecord {}
 
 export interface QualityScore {
   required_present: number;
@@ -95,7 +134,7 @@ export interface ExistingMarcRecordNormalField {
   tag: string;
   ind1: string;
   ind2: string;
-  subfields?: MarcSubfield[];
+  subfields: MarcSubfield[];
 }
 
 export interface MarcSubfield {
@@ -105,10 +144,10 @@ export interface MarcSubfield {
 
 export interface BookUploadResponse {
   book_id: UUID;
-  state: TaskState;
-  hatchet_workflow_id?: string | null;
-  batch_id?: string | null;
-  image_ids?: UUID[];
+  state: ProcessState;
+  hatchet_workflow_id: string | null;
+  batch_id: string | null;
+  images: ApiImageItem[];
   created_at: string;
 }
 
@@ -147,26 +186,30 @@ export interface Step {
 export interface CandidateProvenanceResponse {
   book_id: UUID;
   candidate_id: UUID;
-  provenance?: Step[];
+  provenance: Step[];
 }
 
 export interface BatchBooksResponse {
   batch_id: UUID;
   books: BookStatusResponse[];
   total_count: number;
-  state_counts?: Record<TaskState, number>;
+  state_counts: Record<ProcessState, number>;
 }
 
 export type UiSubfield = { code: string; value: string; isManual?: boolean };
 
 export type UiFieldWithMeta = {
-  extractedFieldId: UUID;
+  fieldId: UUID;
   tag: string;
   ind1: string | null;
   ind2: string | null;
   subfields: UiSubfield[];
-  candidateId: UUID;
-  score: number;
-  candidates: MarcCandidate[];
   isManual: boolean;
+  special: boolean;
+  value: string;
 };
+
+export interface BookImageUploadResponse {
+  book_id: UUID;
+  image_id: UUID;
+}

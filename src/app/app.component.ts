@@ -30,8 +30,10 @@ export class AppComponent {
     };
     console.log('Dev Info:', devInfo);
     if (devInfo.gitCommitHash) {
-      console.log('https://github.com/trineracz/katalogizace-frontend/commit/' + devInfo.gitCommitHash);
+      console.log(
+        'https://github.com/trineracz/katalogizace-frontend/commit/' +
+          devInfo.gitCommitHash,
+      );
     }
   }
-
 }

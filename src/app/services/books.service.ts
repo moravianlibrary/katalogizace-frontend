@@ -1,12 +1,16 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { map } from 'rxjs/operators';
 import {
+  BookImageUploadResponse,
   BookResultResponse,
   BookStatusResponse,
   BookUploadResponse,
+  ExistingMarcRecord,
   LastEditedRecord,
   PaginatedBooksResponse,
-  TaskState,
+  ProcessState,
+  RecordState,
 } from '../models/book';
 import { EnvironmentService } from './environment.service';
 
@@ -20,16 +24,22 @@ export class BooksService {
     opts: {
       page?: number;
       page_size?: number;
-      state?: TaskState | null;
+      process_state?: ProcessState | null;
+      record_state?: RecordState | null;
       batch_id?: string | null;
     } = {},
   ) {
-    const { page = 1, page_size = 20, state, batch_id } = opts;
+    const {
+      page = 1,
+      page_size = 20,
+      process_state,
+      record_state,
+      batch_id,
+    } = opts;
     let params = new HttpParams()
       .set('page', String(page))
       .set('page_size', String(page_size));
 
-    if (state) params = params.set('state', state);
     if (batch_id) params = params.set('batch_id', batch_id);
 
     return this.http.get<PaginatedBooksResponse>(`${this.apiBaseUrl}/books/`, {
@@ -44,7 +54,7 @@ export class BooksService {
   }
 
   submitRevision(bookId: string, record: LastEditedRecord) {
-    return this.http.post<BookUploadResponse>(
+    return this.http.post<LastEditedRecord>(
       `${this.apiBaseUrl}/books/${bookId}/revision`,
       record,
     );
@@ -61,5 +71,66 @@ export class BooksService {
     let params = new HttpParams();
     params = params.set('thumbnail', String(thumbnail));
     return this.http.get(url, { params, responseType: 'blob' });
+  }
+
+  uploadImages(files: File[], batchId?: string) {
+    const formData = new FormData();
+    files.forEach((file) => formData.append('image_files', file));
+
+    let params = new HttpParams();
+    if (batchId) {
+      params = params.set('batch_id', batchId);
+    }
+
+    const apiKey = this.envService.get('apiServiceKey');
+
+    return this.http.post<BookUploadResponse>(
+      `${this.apiBaseUrl}/books/upload-images`,
+      formData,
+      {
+        params,
+      },
+    );
+  }
+
+  createBook(batchId?: string) {
+    let params = new HttpParams();
+    if (batchId) {
+      params = params.set('batch_id', batchId);
+    }
+
+    return this.http.post<BookUploadResponse>(
+      `${this.apiBaseUrl}/books/create`,
+      null,
+    );
+  }
+
+  uploadBookImage(bookId: string, file: Blob | File) {
+    const formData = new FormData();
+    formData.append('image_file', file);
+
+    return this.http.post<BookImageUploadResponse>(
+      `${this.apiBaseUrl}/books/${bookId}/upload-image`,
+      formData,
+    );
+  }
+
+  startBookWorkflow(bookId: string) {
+    return this.http.post<BookUploadResponse>(
+      `${this.apiBaseUrl}/books/${bookId}/start-workflow`,
+      null,
+    );
+  }
+
+  deleteBookRecord(bookId: string) {
+    return this.http.delete<string>(`${this.apiBaseUrl}/books/${bookId}`);
+  }
+
+  getAutRecord(recordId: string) {
+    return this.http
+      .get<{
+        record: ExistingMarcRecord;
+      }>(`${this.apiBaseUrl}/catalogue/AUT/record/${recordId}`)
+      .pipe(map((resp) => resp.record));
   }
 }
