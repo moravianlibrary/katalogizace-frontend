@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { ExistingMarcRecord, ExtractedMarcRecord } from '../../models/book';
+import { MarcDiffService } from '../../services/marc-diff.service';
 import { RecordStateService } from '../../services/record-state.service';
 import { RecordStore } from '../../stores/record.store';
 import { extractedToExisting } from '../../utils/marc-transform';
@@ -32,6 +33,9 @@ export class MarcRecordsComponent {
     return extractedToExisting(this.extractedRecord());
   });
 
+  private diff = inject(MarcDiffService);
+  diffIndex = this.diff.diffIndex;
+
   records = computed<RecordType[]>(() => {
     const list: RecordType[] = [];
     const extracted = this.extractedRecord();
@@ -54,6 +58,28 @@ export class MarcRecordsComponent {
   });
 
   expandedIndex = signal<number | null>(0);
+
+  constructor() {
+    // nastav default otvorený record (keď sa načítajú records)
+    effect(() => {
+      const idx = this.expandedIndex();
+      const list = this.records();
+
+      if (idx == null || !list[idx]) {
+        this.store.setOpenedRecord(null);
+        return;
+      }
+
+      const item = list[idx];
+      if (item.existing) {
+        this.store.setOpenedRecord(item.existing);
+      } else if (item.extracted) {
+        this.store.setOpenedRecord(extractedToExisting(item.extracted));
+      } else {
+        this.store.setOpenedRecord(null);
+      }
+    });
+  }
 
   toggleRow(index: number) {
     this.expandedIndex.update((current) => (current === index ? null : index));

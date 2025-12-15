@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ApiImageItem } from '../../models/book';
 import { BooksService } from '../../services/books.service';
+import { MarcDiffService } from '../../services/marc-diff.service';
 import { ToastService } from '../../services/toast.service';
 import { RecordStore } from '../../stores/record.store';
 import { EditingPanelComponent } from '../editing-panel/editing-panel.component';
@@ -11,7 +12,7 @@ import { WorkingPanelComponent } from '../working-panel/working-panel.component'
 @Component({
   standalone: true,
   selector: 'app-book-detail',
-  providers: [RecordStore],
+  providers: [RecordStore, MarcDiffService],
   imports: [ImagesViewComponent, EditingPanelComponent, WorkingPanelComponent],
   templateUrl: 'book-detail.component.html',
 })

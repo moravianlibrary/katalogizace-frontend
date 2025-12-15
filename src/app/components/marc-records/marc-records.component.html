@@ -115,10 +115,14 @@
             @if ($index === 0) {
               <app-extracted-marc-record-table
                 [extractedRecord]="rec.extracted!"
+                [diffIndex]="diffIndex()"
+                diffSide="opened"
               />
             } @else {
               <app-existing-marc-record-table
                 [existingRecord]="rec.existing!"
+                [diffIndex]="diffIndex()"
+                diffSide="opened"
               />
             }
           }

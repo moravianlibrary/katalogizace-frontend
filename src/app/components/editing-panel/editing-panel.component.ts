@@ -1,5 +1,6 @@
 import { Component, effect, inject, input } from '@angular/core';
 import { UUID } from '../../models/book';
+import { MarcDiffService } from '../../services/marc-diff.service';
 import { RecordStateService } from '../../services/record-state.service';
 import { RecordStore } from '../../stores/record.store';
 import { ExtractedFieldsComponent } from '../extracted-fields/extracted-fields/extracted-fields.component';
@@ -21,10 +22,14 @@ export class EditingPanelComponent {
 
   recordState = inject(RecordStateService);
   store = inject(RecordStore);
+  diff = inject(MarcDiffService);
 
   viewMode = this.recordState.viewMode;
   recordPreview = this.recordState.recordPreview;
   uiFields = this.recordState.uiFields;
+
+  diffIndex = this.diff.diffIndex;
+  diffEnabled = this.diff.enabledByUser;
 
   constructor() {
     effect(() => {
@@ -37,5 +42,12 @@ export class EditingPanelComponent {
         this.recordState.loadFromExtracted(e);
       }
     });
+
+    // auto turn off diff when leaving table view mode
+    // effect(() => {
+    //   if (this.recordState.viewMode() !== 'table') {
+    //     this.diff.setEnabled(false);
+    //   }
+    // });
   }
 }

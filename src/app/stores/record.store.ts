@@ -16,6 +16,12 @@ export class RecordStore {
 
   readonly hasLastEdited = computed(() => !!this.lastEdited());
 
+  readonly openedRecord = signal<ExistingMarcRecord | null>(null);
+
+  setOpenedRecord(rec: ExistingMarcRecord | null) {
+    this.openedRecord.set(rec);
+  }
+
   extractedWithMeta = computed(() =>
     extractedToExistingWithMeta(this.extracted()),
   );
