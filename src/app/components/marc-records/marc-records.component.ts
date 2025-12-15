@@ -130,6 +130,20 @@ export class MarcRecordsComponent {
   }
 
   onTakeRecord() {
-    this.recordState.loadFromExtracted(this.extractedRecord());
+    const idx = this.expandedIndex();
+    if (idx === null) {
+      return;
+    }
+
+    const rec = this.records()[idx];
+    if (!rec) {
+      return;
+    }
+
+    if (idx === 0) {
+      this.recordState.loadFromExtracted(rec.extracted);
+    } else {
+      this.recordState.loadFromExistingOrLastEdited(rec.existing);
+    }
   }
 }

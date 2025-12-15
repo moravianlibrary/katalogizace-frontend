@@ -131,16 +131,14 @@
     }
   </div>
 
-  @if (
-    records().length > 0 && expandedIndex() !== null && expandedIndex() === 0
-  ) {
+  @if (records().length > 0 && expandedIndex() !== null) {
     <div class="mt-4 flex justify-end">
       <button
         class="bg-main-primary-default text-on-color text-sm-tight cursor-pointer rounded-lg px-4 py-3 font-medium"
         (click)="onTakeRecord()"
         type="button"
       >
-        Převzít vyčtený záznam
+        Převzít záznam
       </button>
     </div>
   }
