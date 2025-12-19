@@ -8,13 +8,21 @@ import {
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { apiKeyInterceptor } from './interceptors/api-key.interceptor';
+import { authErrorInterceptor } from './interceptors/auth-error.interceptor';
+import { authInterceptor } from './interceptors/auth.interceptor';
 import { EnvironmentService } from './services/environment.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([apiKeyInterceptor])),
+    provideHttpClient(
+      withInterceptors([
+        apiKeyInterceptor,
+        authInterceptor,
+        authErrorInterceptor,
+      ]),
+    ),
     provideAppInitializer(() => {
       // Inject services
       const envService = inject(EnvironmentService);
