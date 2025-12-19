@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 
@@ -13,6 +13,7 @@ export class LoginComponent {
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);
   private router = inject(Router);
+  route = inject(ActivatedRoute);
   private toast = inject(ToastService);
 
   loading = signal(false);
@@ -54,7 +55,9 @@ export class LoginComponent {
       next: () => {
         this.loading.set(false);
         this.toast.show('Úspěšné přihlášení', 'success');
-        this.router.navigateByUrl('/books');
+
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+        this.router.navigateByUrl(returnUrl || '/books');
       },
       error: (e) => {
         this.loading.set(false);
