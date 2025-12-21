@@ -1,6 +1,6 @@
 @if (toast.message()) {
   <div
-    class="fixed right-5 bottom-5 z-9999 mt-5 ml-5 rounded-lg px-4 py-3 text-sm shadow-md"
+    class="fixed top-2 left-1/2 z-9999 -translate-x-1/2 rounded-lg px-4 py-3 text-sm shadow-md"
     [class.bg-main-success]="toast.kind() === 'success'"
     [class.bg-main-error]="toast.kind() === 'error'"
   >
