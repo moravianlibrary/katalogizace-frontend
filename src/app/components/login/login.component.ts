@@ -57,7 +57,7 @@ export class LoginComponent {
         this.toast.show('Úspěšné přihlášení', 'success');
 
         const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-        this.router.navigateByUrl(returnUrl || '/books');
+        this.router.navigateByUrl(returnUrl || '/batches');
       },
       error: (e) => {
         this.loading.set(false);

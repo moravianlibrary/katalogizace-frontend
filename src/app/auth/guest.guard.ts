@@ -11,5 +11,5 @@ export const guestGuard: CanActivateFn = (route) => {
   }
 
   const returnUrl = route.queryParamMap.get('returnUrl');
-  return router.parseUrl(returnUrl || '/books');
+  return router.parseUrl(returnUrl || '/batches');
 };
