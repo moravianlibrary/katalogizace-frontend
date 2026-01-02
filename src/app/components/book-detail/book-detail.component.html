@@ -1,14 +1,14 @@
-<section class="h-screen">
-  <div class="grid h-screen grid-cols-1 md:grid-cols-3">
-    <div class="shadow-s z-2 h-screen">
+<section class="h-full min-h-0">
+  <div class="grid h-full min-h-0 grid-cols-1 md:grid-cols-3">
+    <div class="shadow-s z-2 h-full min-h-0 overflow-hidden">
       <app-images-view [bookId]="bookId" [images]="images()" />
     </div>
 
-    <div class="bg-main-light z-1 h-screen overflow-hidden">
+    <div class="bg-main-light z-1 h-full min-h-0 overflow-hidden">
       <app-editing-panel [book_id]="bookId" />
     </div>
 
-    <div class="shadow-s z-2 h-screen overflow-auto">
+    <div class="shadow-s z-2 h-full min-h-0 overflow-hidden">
       <app-working-panel />
     </div>
   </div>
