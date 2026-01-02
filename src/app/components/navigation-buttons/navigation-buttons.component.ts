@@ -45,20 +45,6 @@ export class NavigationButtonsComponent {
     this.recordState.addField('special');
   }
 
-  goBack() {
-    this.wps.showRecords();
-    this.recordState.resetViewMode();
-
-    this.router
-      .navigate(['..'], {
-        relativeTo: this.route,
-        queryParamsHandling: 'preserve',
-      })
-      .catch(() => {
-        this.router.navigate(['/books']);
-      });
-  }
-
   onSave() {
     const bookId = this.bookId();
     const record = this.recordState.buildExistingRecord(bookId);
