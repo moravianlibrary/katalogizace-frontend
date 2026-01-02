@@ -1,0 +1,58 @@
+<div class="bg-main-base flex h-screen flex-col">
+  <header
+    class="border-tertiary-default bg-main-base sticky top-0 z-10 border-b"
+  >
+    <div class="mx-auto flex items-center justify-between px-4 py-3">
+      <div class="flex items-center gap-3">
+        @if (showBack()) {
+          <button
+            class="hover:bg-main-light rounded-xl p-2"
+            (click)="back()"
+            type="button"
+            aria-label="Zpět"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M15 18l-6-6 6-6"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        }
+
+        <div class="min-w-0">
+          <div class="text-lg font-bold">AI Katalogizace</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        @if (auth.user()) {
+          <div class="text-secondary hidden text-sm font-semibold sm:block">
+            {{ auth.user()!.full_name }} · {{ auth.user()!.email }}
+          </div>
+        }
+
+        <button
+          class="border-tertiary-default hover:bg-main-light cursor-pointer rounded-lg border px-3 py-2 text-sm font-medium"
+          (click)="logout()"
+          type="button"
+        >
+          Odhlásit
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="min-h-0 flex-1">
+    <router-outlet></router-outlet>
+  </main>
+</div>
