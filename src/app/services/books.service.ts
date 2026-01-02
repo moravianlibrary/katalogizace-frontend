@@ -18,7 +18,10 @@ import { EnvironmentService } from './environment.service';
 export class BooksService {
   private http = inject(HttpClient);
   private envService = inject(EnvironmentService);
-  private apiBaseUrl = this.envService.get('apiServiceBaseUrl');
+
+  private get apiBaseUrl(): string {
+    return this.envService.get('apiServiceBaseUrl') as string;
+  }
 
   listBooks(
     opts: {
@@ -26,7 +29,7 @@ export class BooksService {
       page_size?: number;
       process_state?: ProcessState | null;
       record_state?: RecordState | null;
-      batch_id?: string | null;
+      batch_id?: string;
     } = {},
   ) {
     const {
@@ -73,16 +76,11 @@ export class BooksService {
     return this.http.get(url, { params, responseType: 'blob' });
   }
 
-  uploadImages(files: File[], batchId?: string) {
+  uploadImages(files: File[], batchId: string) {
     const formData = new FormData();
     files.forEach((file) => formData.append('image_files', file));
 
-    let params = new HttpParams();
-    if (batchId) {
-      params = params.set('batch_id', batchId);
-    }
-
-    const apiKey = this.envService.get('apiServiceKey');
+    const params = new HttpParams().set('batch_id', batchId);
 
     return this.http.post<BookUploadResponse>(
       `${this.apiBaseUrl}/books/upload-images`,
@@ -93,15 +91,13 @@ export class BooksService {
     );
   }
 
-  createBook(batchId?: string) {
-    let params = new HttpParams();
-    if (batchId) {
-      params = params.set('batch_id', batchId);
-    }
+  createBook(batchId: string) {
+    const params = new HttpParams().set('batch_id', batchId);
 
     return this.http.post<BookUploadResponse>(
       `${this.apiBaseUrl}/books/create`,
       null,
+      { params },
     );
   }
 

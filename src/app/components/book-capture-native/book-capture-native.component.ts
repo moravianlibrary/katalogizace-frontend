@@ -6,7 +6,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { BooksService } from '../../services/books.service';
 import { ToastService } from '../../services/toast.service';
@@ -21,10 +21,12 @@ export class BookCaptureNativeComponent {
   private books = inject(BooksService);
   private router = inject(Router);
   private toast = inject(ToastService);
+  private route = inject(ActivatedRoute);
 
   @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
 
   bookId = signal<string | null>(null);
+  batchId = this.route.snapshot.paramMap.get('batchId') ?? '';
   isCreating = signal(false);
   isUploading = signal(false);
   isFinishing = signal(false);
@@ -34,7 +36,7 @@ export class BookCaptureNativeComponent {
     if (this.isCreating()) return;
 
     this.isCreating.set(true);
-    this.books.createBook().subscribe({
+    this.books.createBook(this.batchId).subscribe({
       next: (res) => {
         this.bookId.set(res.book_id);
         this.isCreating.set(false);
@@ -94,7 +96,7 @@ export class BookCaptureNativeComponent {
       next: () => {
         this.isFinishing.set(false);
         this.toast.show('Workflow spuštěn.', 'success');
-        this.router.navigate(['/books']);
+        this.router.navigate(['/batches', this.batchId, 'books']);
       },
       error: (err) => {
         console.error(err);
@@ -107,19 +109,19 @@ export class BookCaptureNativeComponent {
   cancel() {
     const id = this.bookId();
     if (!id) {
-      this.router.navigate(['/books']);
+      this.router.navigate(['/batches', this.batchId, 'books']);
       return;
     }
 
     this.books.deleteBookRecord(id).subscribe({
       next: () => {
         this.toast.show('Naskenování knihy bylo zrušeno.', 'success');
-        this.router.navigate(['/books']);
+        this.router.navigate(['/batches', this.batchId, 'books']);
       },
       error: (err) => {
         console.error(err);
         this.toast.show('Nepodařilo se zrušit knihu.', 'error');
-        this.router.navigate(['/books']);
+        this.router.navigate(['/batches', this.batchId, 'books']);
       },
     });
   }

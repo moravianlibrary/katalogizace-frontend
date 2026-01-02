@@ -10,6 +10,7 @@ import { routes } from './app.routes';
 import { apiKeyInterceptor } from './interceptors/api-key.interceptor';
 import { authErrorInterceptor } from './interceptors/auth-error.interceptor';
 import { authInterceptor } from './interceptors/auth.interceptor';
+import { AuthService } from './services/auth.service';
 import { EnvironmentService } from './services/environment.service';
 
 export const appConfig: ApplicationConfig = {
@@ -26,11 +27,19 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(() => {
       // Inject services
       const envService = inject(EnvironmentService);
+      const auth = inject(AuthService);
+
       return (async () => {
         // Wait for environment to load
         await envService.load();
         const apiServiceBaseUrl = envService.get('apiServiceBaseUrl') as string;
         //console.log('Using apiServiceBaseUrl:', apiServiceBaseUrl);
+
+        if (auth.isLoggedIn()) {
+          auth.loadCurrentUser().subscribe({
+            error: () => auth.logout(),
+          });
+        }
       })();
     }),
   ],

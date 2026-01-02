@@ -1,38 +1,54 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './auth/auth.guard';
 import { guestGuard } from './auth/guest.guard';
+
+import { LoginComponent } from './components/login/login.component';
+import { RegisterComponent } from './components/register/register.component';
+
 import { BookCaptureNativeComponent } from './components/book-capture-native/book-capture-native.component';
 import { BookCaptureComponent } from './components/book-capture/book-capture.component';
 import { BookDetailComponent } from './components/book-detail/book-detail.component';
 import { BooksListComponent } from './components/books-list/books-list.component';
-import { LoginComponent } from './components/login/login.component';
-import { RegisterComponent } from './components/register/register.component';
+
+import { BatchesListComponent } from './components/batches-list/batches-list.component';
+import { ProtectedLayoutComponent } from './components/layout/protected-layout/protected-layout.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'books', pathMatch: 'full' },
+  { path: '', redirectTo: 'batches', pathMatch: 'full' },
 
   // public
   { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
   { path: 'register', component: RegisterComponent, canActivate: [guestGuard] },
 
   // protected
-  { path: 'books', component: BooksListComponent, canActivate: [authGuard] },
   {
-    path: 'books/capture',
-    component: BookCaptureComponent,
+    path: '',
+    component: ProtectedLayoutComponent,
     canActivate: [authGuard],
-  },
-  {
-    path: 'books/capture-native',
-    component: BookCaptureNativeComponent,
-    canActivate: [authGuard],
-  },
-  {
-    path: 'books/:bookId',
-    component: BookDetailComponent,
-    canActivate: [authGuard],
+    children: [
+      { path: 'batches', component: BatchesListComponent },
+
+      { path: 'batches/:batchId/books', component: BooksListComponent },
+      {
+        path: 'batches/:batchId/books/capture',
+        component: BookCaptureComponent,
+      },
+      {
+        path: 'batches/:batchId/books/capture-native',
+        component: BookCaptureNativeComponent,
+      },
+      {
+        path: 'batches/:batchId/books/:bookId',
+        component: BookDetailComponent,
+      },
+
+      // { path: 'books', component: BooksListComponent },
+      // { path: 'books/capture', component: BookCaptureComponent },
+      // { path: 'books/capture-native', component: BookCaptureNativeComponent },
+      // { path: 'books/:bookId', component: BookDetailComponent },
+    ],
   },
 
   // fallback
-  { path: '**', redirectTo: 'books' },
+  { path: '**', redirectTo: 'batches' },
 ];

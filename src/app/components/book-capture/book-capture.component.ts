@@ -2,13 +2,12 @@ import { CommonModule } from '@angular/common';
 import {
   AfterViewInit,
   Component,
-  DestroyRef,
   ElementRef,
   ViewChild,
   inject,
   signal,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { BooksService } from '../../services/books.service';
 import { ToastService } from '../../services/toast.service';
@@ -20,10 +19,10 @@ import { ToastService } from '../../services/toast.service';
   templateUrl: './book-capture.component.html',
 })
 export class BookCaptureComponent implements AfterViewInit {
-  private destroyRef = inject(DestroyRef);
   private books = inject(BooksService);
   private router = inject(Router);
   private toast = inject(ToastService);
+  private route = inject(ActivatedRoute);
 
   @ViewChild('video') videoRef!: ElementRef<HTMLVideoElement>;
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
@@ -31,6 +30,7 @@ export class BookCaptureComponent implements AfterViewInit {
   private stream: MediaStream | null = null;
 
   bookId = signal<string | null>(null);
+  batchId = this.route.snapshot.paramMap.get('batchId') ?? '';
   isCreating = signal(false);
   isUploading = signal(false);
   isFinishing = signal(false);
@@ -42,7 +42,7 @@ export class BookCaptureComponent implements AfterViewInit {
 
   startNewBook() {
     this.isCreating.set(true);
-    this.books.createBook().subscribe({
+    this.books.createBook(this.batchId).subscribe({
       next: (res) => {
         this.bookId.set(res.book_id);
         this.isCreating.set(false);
@@ -131,7 +131,7 @@ export class BookCaptureComponent implements AfterViewInit {
       next: () => {
         this.isFinishing.set(false);
         this.toast.show('Workflow spuštěn.', 'success');
-        this.router.navigate(['/books']);
+        this.router.navigate(['/batches', this.batchId, 'books']);
       },
       error: (err) => {
         console.error(err);
@@ -146,19 +146,19 @@ export class BookCaptureComponent implements AfterViewInit {
 
     const id = this.bookId();
     if (!id) {
-      this.router.navigate(['/books']);
+      this.router.navigate(['/batches', this.batchId, 'books']);
       return;
     }
 
     this.books.deleteBookRecord(id).subscribe({
       next: () => {
         this.toast.show('Naskenování knihy bylo zrušeno.', 'success');
-        this.router.navigate(['/books']);
+        this.router.navigate(['/batches', this.batchId, 'books']);
       },
       error: (err) => {
         console.error(err);
         this.toast.show('Nepodařilo se zrušit knihu.', 'error');
-        this.router.navigate(['/books']);
+        this.router.navigate(['/batches', this.batchId, 'books']);
       },
     });
   }
