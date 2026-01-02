@@ -5,6 +5,13 @@ import { EnvironmentService } from '../services/environment.service';
 
 type TokenResponse = { access_token: string; token_type: string };
 
+export type CurrentUser = {
+  email: string;
+  full_name: string;
+  roles: string[];
+  permissions: string[];
+};
+
 export type RegisterDto = {
   email: string;
   password: string;
@@ -21,10 +28,16 @@ export class AuthService {
   private http = inject(HttpClient);
   private env = inject(EnvironmentService);
 
-  private apiBaseUrl = this.env.get('apiServiceBaseUrl');
+  private get apiBaseUrl(): string {
+    return this.env.get('apiServiceBaseUrl') as string;
+  }
 
   readonly token = signal<string | null>(localStorage.getItem('access_token'));
   readonly isLoggedIn = computed(() => !!this.token());
+
+  readonly user = signal<CurrentUser | null>(null);
+  readonly userEmail = computed(() => this.user()?.email ?? null);
+  readonly userName = computed(() => this.user()?.full_name ?? null);
 
   setToken(token: string | null) {
     this.token.set(token);
@@ -51,10 +64,26 @@ export class AuthService {
       .post<TokenResponse>(`${this.apiBaseUrl}/users/login`, body.toString(), {
         headers,
       })
-      .pipe(tap((r) => this.setToken(r.access_token)));
+      .pipe(
+        tap((r) => this.setToken(r.access_token)),
+        tap(() => {
+          this.loadCurrentUser().subscribe({
+            error: () => {
+              this.user.set(null);
+            },
+          });
+        }),
+      );
+  }
+
+  loadCurrentUser() {
+    return this.http
+      .get<CurrentUser>(`${this.apiBaseUrl}/users/current-user`)
+      .pipe(tap((u) => this.user.set(u)));
   }
 
   logout() {
     this.setToken(null);
+    this.user.set(null);
   }
 }
