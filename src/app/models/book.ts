@@ -213,3 +213,17 @@ export interface BookImageUploadResponse {
   book_id: UUID;
   image_id: UUID;
 }
+
+export type Batch = {
+  batch_id: UUID;
+  name: string;
+  description: string | null;
+  book_ids: UUID[];
+  created_by: string;
+  created_at: string;
+};
+
+export type BatchesResponse = {
+  batches?: Batch[];
+  total_count: number;
+};
