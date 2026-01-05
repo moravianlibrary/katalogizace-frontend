@@ -8,6 +8,8 @@ export type ProcessState =
   | 'failed'
   | 'completed';
 
+export type BatchState = 'created' | 'in_progress' | 'completed';
+
 export type RecordState = 'new' | 'edited' | 'reviewed' | 'completed';
 
 export const PROCESS_STATE_LABELS: Record<ProcessState, string> = {
@@ -24,6 +26,12 @@ export const RECORD_STATE_LABELS: Record<RecordState, string> = {
   edited: 'Upraveno',
   reviewed: 'Zkontrolováno',
   completed: 'Schváleno',
+};
+
+export const BATCH_STATE_LABELS: Record<BatchState, string> = {
+  created: 'Vytvořeno',
+  in_progress: 'Probíhá zpracování',
+  completed: 'Dokončeno',
 };
 
 export type MarcTag = `${number}${number}${number}` | string;
@@ -218,6 +226,7 @@ export type Batch = {
   batch_id: UUID;
   name: string;
   description: string | null;
+  state: BatchState;
   book_ids: UUID[];
   created_by: string;
   created_at: string;

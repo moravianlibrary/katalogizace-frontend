@@ -1,16 +1,17 @@
-import { DatePipe } from '@angular/common';
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { DatePipe, NgClass } from '@angular/common';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterModule } from '@angular/router';
 
-import { Batch, BatchesResponse } from '../../models/book';
+import { Batch, BatchesResponse, BatchState } from '../../models/book';
+import { BatchStateLabelPipe } from '../../pipes/batch-state-label.pipe';
 import { BatchesService } from '../../services/batches.service';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
   standalone: true,
   selector: 'app-batches-list',
-  imports: [DatePipe, RouterModule],
+  imports: [DatePipe, RouterModule, NgClass, BatchStateLabelPipe],
   templateUrl: './batches-list.component.html',
 })
 export class BatchesListComponent {
@@ -126,5 +127,18 @@ export class BatchesListComponent {
         this.creating.set(false);
       },
     });
+  }
+
+  batchStateBadgeClass(state?: BatchState | null) {
+    switch (state) {
+      case 'created':
+        return 'bg-slate-100 text-slate-700';
+      case 'in_progress':
+        return 'bg-blue-100 text-blue-700';
+      case 'completed':
+        return 'bg-green-100 text-green-700';
+      default:
+        return 'bg-slate-100 text-slate-600';
+    }
   }
 }

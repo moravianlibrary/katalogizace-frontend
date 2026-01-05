@@ -69,6 +69,7 @@
             <th class="px-3 py-2 text-left">Vytvořil</th>
             <th class="px-3 py-2 text-left">Vytvořeno</th>
             <th class="px-3 py-2 text-left">Upraveno</th>
+            <th class="px-3 py-2 text-left">Stav</th>
             <th class="px-3 py-2 text-left">Akce</th>
           </tr>
         </thead>
@@ -111,6 +112,14 @@
                 } @else {
                   —
                 }
+              </td>
+              <td class="px-3 py-2">
+                <span
+                  class="inline-flex items-center rounded px-2 py-0.5 text-sm font-medium"
+                  [ngClass]="batchStateBadgeClass(b.state)"
+                >
+                  {{ b.state | batchStateLabel }}
+                </span>
               </td>
               <td class="px-3 py-2">
                 <button
