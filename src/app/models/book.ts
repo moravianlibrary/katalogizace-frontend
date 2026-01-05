@@ -221,6 +221,7 @@ export type Batch = {
   book_ids: UUID[];
   created_by: string;
   created_at: string;
+  modified_at: string;
 };
 
 export type BatchesResponse = {

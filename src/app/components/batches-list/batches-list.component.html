@@ -68,6 +68,7 @@
             <th class="px-3 py-2 text-left">Počet knih</th>
             <th class="px-3 py-2 text-left">Vytvořil</th>
             <th class="px-3 py-2 text-left">Vytvořeno</th>
+            <th class="px-3 py-2 text-left">Upraveno</th>
             <th class="px-3 py-2 text-left">Akce</th>
           </tr>
         </thead>
@@ -100,6 +101,13 @@
               <td class="px-3 py-2">
                 @if (b.created_at) {
                   {{ b.created_at | date: "medium" }}
+                } @else {
+                  —
+                }
+              </td>
+              <td class="px-3 py-2">
+                @if (b.modified_at) {
+                  {{ b.modified_at | date: "medium" }}
                 } @else {
                   —
                 }
