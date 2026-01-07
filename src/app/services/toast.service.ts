@@ -8,6 +8,7 @@ export class ToastService {
   readonly kind = signal<ToastKind>('success');
 
   show(message: string, kind: ToastKind) {
+    console.log(message);
     this.kind.set(kind);
     this.message.set(message);
 

@@ -12,6 +12,7 @@ import { BooksListComponent } from './components/books-list/books-list.component
 
 import { BatchesListComponent } from './components/batches-list/batches-list.component';
 import { ProtectedLayoutComponent } from './components/layout/protected-layout/protected-layout.component';
+import { captureExitGuard } from './guards/capture-exit.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'batches', pathMatch: 'full' },
@@ -40,11 +41,13 @@ export const routes: Routes = [
         path: 'batches/:batchId/books/capture',
         component: BookCaptureComponent,
         data: { backTo: '../' },
+        canDeactivate: [captureExitGuard],
       },
       {
         path: 'batches/:batchId/books/capture-native',
         component: BookCaptureNativeComponent,
         data: { backTo: '../' },
+        canDeactivate: [captureExitGuard],
       },
       {
         path: 'batches/:batchId/books/:bookId',

@@ -11,6 +11,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BooksService } from '../../services/api/books.service';
 import { ToastService } from '../../services/toast.service';
 
+import { of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+
 @Component({
   standalone: true,
   selector: 'app-book-capture-native',
@@ -31,6 +34,9 @@ export class BookCaptureNativeComponent {
   isUploading = signal(false);
   isFinishing = signal(false);
   photoCount = signal(0);
+
+  private didFinish = signal(false);
+  private cleanupDone = signal(false);
 
   startNewBook() {
     if (this.isCreating()) return;
@@ -94,6 +100,7 @@ export class BookCaptureNativeComponent {
     this.isFinishing.set(true);
     this.books.startBookWorkflow(this.bookId()!).subscribe({
       next: () => {
+        this.didFinish.set(true);
         this.isFinishing.set(false);
         this.toast.show('Workflow spuštěn.', 'success');
         this.router.navigate(['/batches', this.batchId, 'books']);
@@ -106,23 +113,29 @@ export class BookCaptureNativeComponent {
     });
   }
 
-  cancel() {
-    const id = this.bookId();
-    if (!id) {
-      this.router.navigate(['/batches', this.batchId, 'books']);
-      return;
-    }
+  cleanupOnExit() {
+    if (this.cleanupDone()) return true;
+    this.cleanupDone.set(true);
 
-    this.books.deleteBookRecord(id).subscribe({
-      next: () => {
+    if (this.isFinishing() || this.didFinish()) return true;
+
+    const id = this.bookId();
+    if (!id) return true;
+
+    return this.books.deleteBookRecord(id).pipe(
+      map(() => {
         this.toast.show('Naskenování knihy bylo zrušeno.', 'success');
-        this.router.navigate(['/batches', this.batchId, 'books']);
-      },
-      error: (err) => {
+        return true;
+      }),
+      catchError((err) => {
         console.error(err);
-        this.toast.show('Nepodařilo se zrušit knihu.', 'error');
-        this.router.navigate(['/batches', this.batchId, 'books']);
-      },
-    });
+        this.toast.show('Nepodařilo se zrušit naskenování knihy.', 'error');
+        return of(true);
+      }),
+    );
+  }
+
+  cancel() {
+    this.router.navigate(['/batches', this.batchId, 'books']);
   }
 }

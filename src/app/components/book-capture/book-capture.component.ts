@@ -12,6 +12,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BooksService } from '../../services/api/books.service';
 import { ToastService } from '../../services/toast.service';
 
+import { of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+
 @Component({
   standalone: true,
   selector: 'app-book-capture',
@@ -35,6 +38,9 @@ export class BookCaptureComponent implements AfterViewInit {
   isUploading = signal(false);
   isFinishing = signal(false);
   photoCount = signal(0);
+
+  private didFinish = signal(false);
+  private cleanupDone = signal(false);
 
   ngAfterViewInit() {
     // kameru spúšťame až po createBook()
@@ -132,6 +138,7 @@ export class BookCaptureComponent implements AfterViewInit {
 
     this.books.startBookWorkflow(this.bookId()!).subscribe({
       next: () => {
+        this.didFinish.set(true);
         this.isFinishing.set(false);
         this.toast.show('Workflow spuštěn.', 'success');
         this.router.navigate(['/batches', this.batchId, 'books']);
@@ -144,26 +151,34 @@ export class BookCaptureComponent implements AfterViewInit {
     });
   }
 
-  cancel() {
+  cleanupOnExit() {
+    if (this.cleanupDone()) return true;
+    this.cleanupDone.set(true);
+
+    if (this.isFinishing() || this.didFinish()) {
+      return true;
+    }
+
     this.stopCamera();
 
     const id = this.bookId();
-    if (!id) {
-      this.router.navigate(['/batches', this.batchId, 'books']);
-      return;
-    }
+    if (!id) return true;
 
-    this.books.deleteBookRecord(id).subscribe({
-      next: () => {
+    return this.books.deleteBookRecord(id).pipe(
+      map(() => {
         this.toast.show('Naskenování knihy bylo zrušeno.', 'success');
-        this.router.navigate(['/batches', this.batchId, 'books']);
-      },
-      error: (err) => {
+        return true;
+      }),
+      catchError((err) => {
         console.error(err);
-        this.toast.show('Nepodařilo se zrušit knihu.', 'error');
-        this.router.navigate(['/batches', this.batchId, 'books']);
-      },
-    });
+        this.toast.show('Nepodařilo se zrušit naskenování knihy.', 'error');
+        return of(true);
+      }),
+    );
+  }
+
+  cancel() {
+    this.router.navigate(['/batches', this.batchId, 'books']);
   }
 
   private stopCamera() {
