@@ -122,7 +122,10 @@ export class BookCaptureComponent implements AfterViewInit {
   }
 
   finish() {
-    if (!this.bookId()) return;
+    if (!this.bookId() || this.photoCount() === 0) {
+      this.toast.show('Nejprve vyfoťte alespoň jednu stránku.', 'error');
+      return;
+    }
 
     this.isFinishing.set(true);
     this.stopCamera();
