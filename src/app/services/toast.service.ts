@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
-export type ToastKind = 'success' | 'error';
+export type ToastKind = 'success' | 'error' | 'warning';
 
 @Injectable({ providedIn: 'root' })
 export class ToastService {
