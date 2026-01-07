@@ -11,8 +11,8 @@ import {
   PaginatedBooksResponse,
   ProcessState,
   RecordState,
-} from '../models/book';
-import { EnvironmentService } from './environment.service';
+} from '../../models/book';
+import { EnvironmentService } from '../environment.service';
 
 @Injectable({ providedIn: 'root' })
 export class BooksService {

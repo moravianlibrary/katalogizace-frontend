@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { tap } from 'rxjs/operators';
-import { EnvironmentService } from '../services/environment.service';
+import { EnvironmentService } from '../../services/environment.service';
 
 type TokenResponse = { access_token: string; token_type: string };
 

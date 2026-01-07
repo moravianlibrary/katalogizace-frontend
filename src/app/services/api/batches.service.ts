@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Batch, BatchesResponse } from '../models/book';
-import { EnvironmentService } from './environment.service';
+import { Batch, BatchesResponse } from '../../models/book';
+import { EnvironmentService } from '../environment.service';
 
 @Injectable({ providedIn: 'root' })
 export class BatchesService {
