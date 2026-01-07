@@ -26,20 +26,30 @@ export const routes: Routes = [
     component: ProtectedLayoutComponent,
     canActivate: [authGuard],
     children: [
-      { path: 'batches', component: BatchesListComponent },
-
-      { path: 'batches/:batchId/books', component: BooksListComponent },
+      {
+        path: 'batches',
+        component: BatchesListComponent,
+        data: { backTo: null },
+      },
+      {
+        path: 'batches/:batchId/books',
+        component: BooksListComponent,
+        data: { backTo: '/batches' },
+      },
       {
         path: 'batches/:batchId/books/capture',
         component: BookCaptureComponent,
+        data: { backTo: '../' },
       },
       {
         path: 'batches/:batchId/books/capture-native',
         component: BookCaptureNativeComponent,
+        data: { backTo: '../' },
       },
       {
         path: 'batches/:batchId/books/:bookId',
         component: BookDetailComponent,
+        data: { backTo: '../' },
       },
 
       // { path: 'books', component: BooksListComponent },
