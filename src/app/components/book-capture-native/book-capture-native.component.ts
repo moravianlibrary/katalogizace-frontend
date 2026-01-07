@@ -46,7 +46,6 @@ export class BookCaptureNativeComponent {
       next: (res) => {
         this.bookId.set(res.book_id);
         this.isCreating.set(false);
-        this.openNativeCamera();
       },
       error: (err) => {
         console.error(err);
