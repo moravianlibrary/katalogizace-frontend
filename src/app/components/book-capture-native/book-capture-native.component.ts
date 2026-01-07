@@ -11,6 +11,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BooksService } from '../../services/api/books.service';
 import { ToastService } from '../../services/toast.service';
 
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
@@ -29,7 +30,7 @@ export class BookCaptureNativeComponent {
   @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
 
   bookId = signal<string | null>(null);
-  batchId = this.route.snapshot.paramMap.get('batchId') ?? '';
+  batchId = signal<string>('');
   isCreating = signal(false);
   isUploading = signal(false);
   isFinishing = signal(false);
@@ -38,14 +39,33 @@ export class BookCaptureNativeComponent {
   private didFinish = signal(false);
   private cleanupDone = signal(false);
 
+  constructor() {
+    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((pm) => {
+      this.batchId.set(pm.get('batchId') ?? '');
+      this.bookId.set(pm.get('bookId'));
+    });
+  }
+
   startNewBook() {
     if (this.isCreating()) return;
 
     this.isCreating.set(true);
-    this.books.createBook(this.batchId).subscribe({
+    this.books.createBook(this.batchId()).subscribe({
       next: (res) => {
-        this.bookId.set(res.book_id);
         this.isCreating.set(false);
+
+        this.router.navigate([
+          '/batches',
+          this.batchId(),
+          'books',
+          'capture-native',
+          res.book_id,
+        ]);
+
+        this.toast.show(
+          'Kniha založena. Klikněte na „Vyfotit stránku“.',
+          'success',
+        );
       },
       error: (err) => {
         console.error(err);
@@ -56,7 +76,7 @@ export class BookCaptureNativeComponent {
   }
 
   captureClick() {
-    if (this.isUploading() || this.isFinishing()) return;
+    if (!this.bookId() || this.isUploading() || this.isFinishing()) return;
 
     this.openNativeCamera();
   }
@@ -102,7 +122,7 @@ export class BookCaptureNativeComponent {
         this.didFinish.set(true);
         this.isFinishing.set(false);
         this.toast.show('Workflow spuštěn.', 'success');
-        this.router.navigate(['/batches', this.batchId, 'books']);
+        this.router.navigate(['/batches', this.batchId(), 'books']);
       },
       error: (err) => {
         console.error(err);
@@ -135,6 +155,6 @@ export class BookCaptureNativeComponent {
   }
 
   cancel() {
-    this.router.navigate(['/batches', this.batchId, 'books']);
+    this.router.navigate(['/batches', this.batchId(), 'books']);
   }
 }
