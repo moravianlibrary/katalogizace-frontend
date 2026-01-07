@@ -286,6 +286,9 @@
 @utility bg-main-success {
   background-color: var(--color-green-500);
 }
+@utility bg-main-warning {
+  background-color: var(--color-orange-500);
+}
 
 /* Success rate */
 @utility bg-main-success-rate-0-10 {
