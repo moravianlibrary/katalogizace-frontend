@@ -56,7 +56,7 @@
     <div class="text-md">Načítám…</div>
   } @else if (error()) {
     <div class="text-md text-error">{{ error() }}</div>
-  } @else if (rows().length === 0) {
+  } @else if (!data() || rows().length === 0) {
     <div class="text-md">Zatím žádné dávky.</div>
   } @else {
     <div class="border-tertiary-default overflow-x-auto rounded-lg border">
@@ -99,20 +99,9 @@
                 </span>
               </td>
               <td class="px-3 py-2">{{ b.created_by }}</td>
-              <td class="px-3 py-2">
-                @if (b.created_at) {
-                  {{ b.created_at | date: "medium" }}
-                } @else {
-                  —
-                }
-              </td>
-              <td class="px-3 py-2">
-                @if (b.modified_at) {
-                  {{ b.modified_at | date: "medium" }}
-                } @else {
-                  —
-                }
-              </td>
+              <td class="px-3 py-2">{{ b.created_at | date: "medium" }}</td>
+              <td class="px-3 py-2">{{ b.modified_at | date: "medium" }}</td>
+
               <td class="px-3 py-2">
                 <span
                   class="inline-flex items-center rounded px-2 py-0.5 text-sm font-medium"
@@ -166,7 +155,7 @@
             </tr>
           } @empty {
             <tr>
-              <td class="px-3 py-4 text-center" colspan="5">
+              <td class="px-3 py-4 text-center" colspan="8">
                 Zatím žádné dávky.
               </td>
             </tr>
@@ -176,7 +165,27 @@
     </div>
 
     <div class="flex items-center justify-between text-sm">
-      <div class="text-light">Celkem: {{ totalCount() }}</div>
+      <div class="text-light">
+        Celkem: {{ data()!.total }} • Strana {{ page() }} / {{ totalPages() }}
+      </div>
+
+      <div class="flex gap-2">
+        <button
+          class="cursor-pointer rounded border px-3 py-1 disabled:cursor-not-allowed disabled:opacity-40"
+          [disabled]="!data()!.has_prev"
+          (click)="goPrev()"
+        >
+          Předchozí
+        </button>
+
+        <button
+          class="cursor-pointer rounded border px-3 py-1 disabled:cursor-not-allowed disabled:opacity-40"
+          [disabled]="!data()!.has_next"
+          (click)="goNext()"
+        >
+          Další
+        </button>
+      </div>
     </div>
   }
 </section>

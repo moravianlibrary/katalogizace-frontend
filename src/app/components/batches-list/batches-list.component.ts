@@ -1,9 +1,10 @@
 import { DatePipe, NgClass } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { combineLatest } from 'rxjs';
 
-import { Batch, BatchesResponse, BatchState } from '../../models/book';
+import { Batch, BatchState, PaginatedBatchesResponse } from '../../models/book';
 import { BatchStateLabelPipe } from '../../pipes/batch-state-label.pipe';
 import { BatchesService } from '../../services/api/batches.service';
 import { ToastService } from '../../services/toast.service';
@@ -15,6 +16,7 @@ import { ToastService } from '../../services/toast.service';
   templateUrl: './batches-list.component.html',
 })
 export class BatchesListComponent {
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
   private batches = inject(BatchesService);
   private destroyRef = inject(DestroyRef);
@@ -22,23 +24,53 @@ export class BatchesListComponent {
 
   loading = signal(false);
   error = signal<string | null>(null);
-  data = signal<BatchesResponse | null>(null);
+  data = signal<PaginatedBatchesResponse | null>(null);
 
   filterMine = signal(false);
 
+  page = signal<number>(1);
+  pageSize = signal<number>(20);
+
+  totalPages = computed(() =>
+    this.data()
+      ? Math.max(1, Math.ceil(this.data()!.total / this.data()!.page_size))
+      : 1,
+  );
+
   rows = computed<Batch[]>(() => this.data()?.batches ?? []);
-  totalCount = computed(() => this.data()?.total_count ?? 0);
 
   newName = signal('');
   newDescription = signal('');
   creating = signal(false);
+
+  constructor() {
+    combineLatest([this.route.paramMap, this.route.queryParamMap])
+      .pipe(takeUntilDestroyed())
+      .subscribe(([_, qp]) => {
+        const p = Number(qp.get('page') ?? '1');
+        const ps = Number(qp.get('page_size') ?? '20');
+
+        this.page.set(isNaN(p) || p < 1 ? 1 : p);
+        this.pageSize.set(isNaN(ps) || ps < 1 ? 20 : ps);
+
+        const mine = qp.get('mine');
+        if (mine === '1' || mine === 'true') this.filterMine.set(true);
+        if (mine === '0' || mine === 'false') this.filterMine.set(false);
+
+        this.load();
+      });
+  }
 
   load() {
     this.loading.set(true);
     this.error.set(null);
 
     this.batches
-      .listBatches({ filter_owned_by_user: this.filterMine() })
+      .listBatches({
+        filter_owned_by_user: this.filterMine(),
+        page: this.page(),
+        page_size: this.pageSize(),
+      })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (resp) => {
@@ -54,13 +86,41 @@ export class BatchesListComponent {
       });
   }
 
-  ngOnInit() {
-    this.load();
+  goPrev() {
+    if (!this.data() || !this.data()!.has_prev) return;
+    const prevPage = Math.max(1, this.page() - 1);
+    this.page.set(prevPage);
+    this.navigateWithQuery({ page: prevPage });
+  }
+
+  goNext() {
+    if (!this.data() || !this.data()!.has_next) return;
+    const nextPage = this.page() + 1;
+    this.page.set(nextPage);
+    this.navigateWithQuery({ page: nextPage });
+  }
+
+  navigateWithQuery(partial: {
+    page?: number;
+    page_size?: number;
+    mine?: string;
+  }) {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        page: this.page(),
+        page_size: this.pageSize(),
+        mine: this.filterMine() ? '1' : '0',
+        ...partial,
+      },
+      queryParamsHandling: 'merge',
+    });
   }
 
   toggleMine() {
     this.filterMine.update((v) => !v);
-    this.load();
+    this.page.set(1);
+    this.navigateWithQuery({ page: 1, mine: this.filterMine() ? '1' : '0' });
   }
 
   open(batchId: string) {
@@ -91,13 +151,11 @@ export class BatchesListComponent {
   }
 
   onNameInput(event: Event) {
-    const value = (event.target as HTMLInputElement).value;
-    this.newName.set(value);
+    this.newName.set((event.target as HTMLInputElement).value);
   }
 
   onDescriptionInput(event: Event) {
-    const value = (event.target as HTMLInputElement).value;
-    this.newDescription.set(value);
+    this.newDescription.set((event.target as HTMLInputElement).value);
   }
 
   createBatch() {
@@ -116,7 +174,6 @@ export class BatchesListComponent {
         this.toast.show('Dávka byla vytvořena.', 'success');
         this.newName.set('');
         this.newDescription.set('');
-        this.load();
         this.creating.set(false);
 
         this.router.navigate(['/batches', batch.batch_id, 'books']);

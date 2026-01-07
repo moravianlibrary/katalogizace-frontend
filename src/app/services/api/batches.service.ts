@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Batch, BatchesResponse } from '../../models/book';
+import { Batch, PaginatedBatchesResponse } from '../../models/book';
 import { EnvironmentService } from '../environment.service';
 
 @Injectable({ providedIn: 'root' })
@@ -12,17 +12,29 @@ export class BatchesService {
     return this.env.get('apiServiceBaseUrl') as string;
   }
 
-  listBatches(opts: { filter_owned_by_user?: boolean } = {}) {
-    const { filter_owned_by_user = false } = opts;
+  listBatches(
+    opts: {
+      filter_owned_by_user?: boolean;
+      page?: number;
+      page_size?: number;
+    } = {},
+  ) {
+    const { filter_owned_by_user = false, page = 1, page_size = 20 } = opts;
 
-    let params = new HttpParams();
+    let params = new HttpParams()
+      .set('page', String(page))
+      .set('page_size', String(page_size));
+
     if (filter_owned_by_user) {
       params = params.set('filter_owned_by_user', 'true');
     }
 
-    return this.http.get<BatchesResponse>(`${this.apiBaseUrl}/batches/`, {
-      params,
-    });
+    return this.http.get<PaginatedBatchesResponse>(
+      `${this.apiBaseUrl}/batches/`,
+      {
+        params,
+      },
+    );
   }
 
   getBatch(batch_id: string) {

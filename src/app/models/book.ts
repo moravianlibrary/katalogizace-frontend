@@ -233,7 +233,11 @@ export type Batch = {
   modified_at: string;
 };
 
-export type BatchesResponse = {
-  batches?: Batch[];
-  total_count: number;
+export type PaginatedBatchesResponse = {
+  batches: Batch[];
+  total: number;
+  page: number;
+  page_size: number;
+  has_next: boolean;
+  has_prev: boolean;
 };
