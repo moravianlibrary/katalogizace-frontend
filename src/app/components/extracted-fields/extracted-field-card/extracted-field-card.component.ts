@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, ElementRef, inject, input } from '@angular/core';
+import { Component, ElementRef, inject, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   MarcSubfield,
@@ -21,28 +21,7 @@ export class ExtractedFieldCardComponent {
 
   field = input.required<UiFieldWithMeta>();
 
-  private lastAppliedCandidateId: string | null = null;
-
   constructor(private host: ElementRef<HTMLElement>) {}
-
-  private applyFx = effect(() => {
-    const evt = this.wps.applyCandidate();
-    if (!evt) return;
-
-    const f = this.field();
-    if (evt.fieldId !== f.fieldId) return;
-
-    if (this.lastAppliedCandidateId === evt.candidate.id) return;
-
-    const rep = evt.candidate.MARC_representation;
-    f.ind1 = rep.ind1 ?? '';
-    f.ind2 = rep.ind2 ?? '';
-    f.subfields = rep.subfields ?? [];
-
-    this.lastAppliedCandidateId = evt.candidate.id;
-
-    this.notifyChange();
-  });
 
   notifyChange() {
     this.recordState.touch();

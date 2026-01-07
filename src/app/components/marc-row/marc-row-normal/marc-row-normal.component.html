@@ -11,12 +11,15 @@
 </td>
 
 <td class="p-2">
-  @if (nf().subfields?.length) {
+  @if (subfieldsEnumerated().length) {
     <div class="flex flex-wrap gap-x-2 gap-y-1 align-text-top">
-      @for (sf of nf().subfields; track $index) {
-        <span>
-          <span class="text-secondary font-bold">|{{ sf.code }}</span>
-          <span class="ml-1">{{ sf.value }}</span>
+      @for (e of subfieldsEnumerated(); track $index) {
+        <span
+          class="rounded px-1 py-0.5"
+          [ngClass]="subDiffClass(subDiffKindAt($index))"
+        >
+          <span class="text-secondary font-bold">|{{ e.sf.code }}</span>
+          <span class="ml-1">{{ e.sf.value }}</span>
         </span>
       }
     </div>

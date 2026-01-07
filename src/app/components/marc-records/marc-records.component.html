@@ -120,7 +120,7 @@
               />
             } @else {
               <app-existing-marc-record-table
-                [existingRecord]="rec.existing!"
+                [existingRecord]="store.openedForDiff()!"
                 [diffIndex]="diffIndex()"
                 diffSide="opened"
               />

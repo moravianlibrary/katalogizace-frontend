@@ -3,6 +3,7 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { ExistingMarcRecord, ExtractedMarcRecord } from '../../models/book';
 import { MarcDiffService } from '../../services/marc-diff.service';
 import { RecordStateService } from '../../services/record-state.service';
+import { WorkingPanelService } from '../../services/working-panel.service';
 import { RecordStore } from '../../stores/record.store';
 import { filterExistingRecord015to830 } from '../../utils/marc-filter';
 import { extractedToExisting } from '../../utils/marc-transform';
@@ -24,8 +25,10 @@ interface RecordType {
   templateUrl: './marc-records.component.html',
 })
 export class MarcRecordsComponent {
-  private store = inject(RecordStore);
+  store = inject(RecordStore);
   private recordState = inject(RecordStateService);
+
+  private wps = inject(WorkingPanelService);
 
   existingRecords = this.store.existingRecords;
   extractedRecord = this.store.extracted;
@@ -60,6 +63,8 @@ export class MarcRecordsComponent {
 
   expandedIndex = signal<number | null>(0);
 
+  private lastAppliedKey: string | null = null;
+
   constructor() {
     // nastav default otvorený record (keď sa načítajú records)
     effect(() => {
@@ -67,18 +72,44 @@ export class MarcRecordsComponent {
       const list = this.records();
 
       if (idx == null || !list[idx]) {
-        this.store.setOpenedRecord(null);
+        this.store.setOpenedExisting(null);
+        this.store.setOpenedExtracted(null);
         return;
       }
 
       const item = list[idx];
       if (item.existing) {
-        this.store.setOpenedRecord(item.existing);
-      } else if (item.extracted) {
-        this.store.setOpenedRecord(extractedToExisting(item.extracted));
-      } else {
-        this.store.setOpenedRecord(null);
+        this.store.setOpenedExisting(item.existing);
+        return;
       }
+
+      if (item.extracted) {
+        this.store.setOpenedExtracted(item.extracted);
+        return;
+      }
+
+      this.store.setOpenedExisting(null);
+      this.store.setOpenedExtracted(null);
+    });
+
+    effect(() => {
+      const evt = this.wps.applyCandidate();
+      if (!evt) return;
+
+      const key = `${evt.fieldId}:${evt.candidate.id}`;
+      if (this.lastAppliedKey === key) return;
+      this.lastAppliedKey = key;
+
+      this.recordState.applyCandidateToUiField({
+        fieldId: evt.fieldId,
+        candidate: evt.candidate,
+      });
+
+      // ✅ 2) update opened record v working paneli (ak je extracted)
+      // sem si dopoj svoju metódu ktorá upraví openedExtractedWithMeta
+      this.store.applyCandidateToOpenedExtracted(evt.fieldId, evt.candidate);
+
+      this.wps.applyCandidate.set(null);
     });
   }
 

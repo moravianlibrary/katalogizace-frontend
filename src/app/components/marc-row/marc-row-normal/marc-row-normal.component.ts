@@ -1,9 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject, input } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { MarcCandidate, UUID } from '../../../models/book';
 import { RecordStateService } from '../../../services/record-state.service';
 import { WorkingPanelService } from '../../../services/working-panel.service';
 import { RecordStore } from '../../../stores/record.store';
+
+import {
+  SubDiffIndex,
+  SubDiffKind,
+  enumerateSubfields,
+  isDiffableTag015to830,
+  normalSignature,
+} from '../../../utils/marc-diff';
 
 @Component({
   standalone: true,
@@ -23,31 +31,12 @@ export class MarcRowNormalComponent {
     score?: number;
   }>();
 
+  diffIndex = input<SubDiffIndex | null>(null);
+  diffSide = input<'opened' | 'preview'>('opened');
+
   private wps = inject(WorkingPanelService);
   private store = inject(RecordStore);
-
-  private lastAppliedCandidateId: string | null = null;
-
-  private applyFx = effect(() => {
-    const evt = this.wps.applyCandidate();
-    if (!evt) return;
-
-    const f = this.nf();
-    if (evt.fieldId !== f.fieldId) return;
-
-    if (this.lastAppliedCandidateId === evt.candidate.id) return;
-
-    const rep = evt.candidate.MARC_representation;
-    f.ind1 = rep.ind1 ?? '';
-    f.ind2 = rep.ind2 ?? '';
-    f.subfields = rep.subfields ?? [];
-    f.selectedCandidateId = evt.candidate.id;
-    f.score = evt.candidate.score;
-
-    this.lastAppliedCandidateId = evt.candidate.id;
-
-    this.notifyChange();
-  });
+  private recordState = inject(RecordStateService);
 
   notifyChange() {
     this.recordState.touch();
@@ -61,8 +50,6 @@ export class MarcRowNormalComponent {
       this.nf().selectedCandidateId ?? '',
     );
   }
-
-  recordState = inject(RecordStateService);
 
   private readonly SCORE_CLASS: Record<number, string> = {
     0: 'bg-main-success-rate-0-10',
@@ -94,5 +81,55 @@ export class MarcRowNormalComponent {
     const steps = this.store.provenance()[nf.selectedCandidateId] ?? [];
     const title = `Jak jsme získali pole ${nf.tag}?`;
     this.wps.showProvenance(title, steps, nf.fieldId);
+  }
+
+  private fieldKey = computed(() => {
+    const f = this.nf();
+    return normalSignature({
+      tag: f.tag,
+      ind1: f.ind1 ?? '',
+      ind2: f.ind2 ?? '',
+      subfields: (f.subfields ?? []).map((sf) => ({
+        code: sf.code,
+        value: sf.value,
+      })),
+    });
+  });
+
+  subfieldsEnumerated = computed(() => {
+    const f = this.nf();
+    return enumerateSubfields(
+      (f.subfields ?? []).map((sf) => ({ code: sf.code, value: sf.value })),
+    );
+  });
+
+  subDiffKindAt(i: number): SubDiffKind | null {
+    const f = this.nf();
+    if (!isDiffableTag015to830(f.tag)) return null;
+
+    const idx = this.diffIndex();
+    if (!idx) return null;
+
+    const side = this.diffSide();
+    const perField = idx[side].get(this.fieldKey());
+    if (!perField) return null;
+
+    const entry = this.subfieldsEnumerated()[i];
+    if (!entry) return null;
+
+    return perField.get(entry.key) ?? null;
+  }
+
+  subDiffClass(kind: SubDiffKind | null): string {
+    switch (kind) {
+      case 'same':
+        return 'bg-green-100 text-green-900';
+      case 'changed':
+        return 'bg-red-100 text-red-900';
+      case 'missing_or_extra':
+        return 'bg-orange-100 text-orange-900';
+      default:
+        return '';
+    }
   }
 }

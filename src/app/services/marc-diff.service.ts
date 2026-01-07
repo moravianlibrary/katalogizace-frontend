@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { RecordStore } from '../stores/record.store';
-import { DiffIndex, diffMarcRecords } from '../utils/marc-diff';
+import { SubDiffIndex, diffMarcRecordsSubfields } from '../utils/marc-diff';
 import { RecordStateService } from './record-state.service';
 import { WorkingPanelService } from './working-panel.service';
 
@@ -29,14 +29,14 @@ export class MarcDiffService {
     return editingIsTable && workingIsRecords;
   });
 
-  readonly diffIndex = computed<DiffIndex | null>(() => {
+  readonly diffIndex = computed<SubDiffIndex | null>(() => {
     if (!this.diffEnabled()) return null;
 
-    const opened = this.store.openedRecord();
+    const opened = this.store.openedForDiff();
     const preview = this.recordState.recordPreview();
 
     if (!opened || !preview) return null;
 
-    return diffMarcRecords(opened, preview);
+    return diffMarcRecordsSubfields(opened, preview);
   });
 }

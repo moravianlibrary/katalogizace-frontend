@@ -3,6 +3,7 @@ import {
   ExistingMarcRecord,
   ExtractedMarcRecord,
   LastEditedRecord,
+  MarcCandidate,
   UiFieldWithMeta,
 } from '../models/book';
 import { extractedToUiFields } from '../utils/marc-transform';
@@ -24,6 +25,33 @@ export class RecordStateService {
   touch() {
     const current = this.uiFields();
     this.uiFields.set([...current]);
+  }
+
+  applyCandidateToUiField(evt: { fieldId: string; candidate: MarcCandidate }) {
+    const current = this.uiFields();
+    const idx = current.findIndex((f) => f.fieldId === evt.fieldId);
+    if (idx < 0) return;
+
+    const cand = evt.candidate;
+    const rep = cand.MARC_representation;
+
+    const updated = {
+      ...current[idx],
+      ind1: rep.ind1 ?? '',
+      ind2: rep.ind2 ?? '',
+      subfields: (rep.subfields ?? []).map((sf: any) => ({
+        code: sf.code,
+        value: sf.value,
+        isManual: true,
+      })),
+      selectedCandidateId: cand.id,
+      score: cand.score,
+    };
+
+    const next = [...current];
+    next[idx] = updated;
+
+    this.uiFields.set(next);
   }
 
   toggleViewMode() {
