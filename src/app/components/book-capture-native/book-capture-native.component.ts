@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   ViewChild,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -39,10 +40,42 @@ export class BookCaptureNativeComponent {
   private didFinish = signal(false);
   private cleanupDone = signal(false);
 
+  private pendingFile = signal<File | null>(null);
+
   constructor() {
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((pm) => {
       this.batchId.set(pm.get('batchId') ?? '');
       this.bookId.set(pm.get('bookId'));
+    });
+
+    effect(() => {
+      this.bookId();
+      this.pendingFile();
+      this.tryUploadPending();
+    });
+  }
+
+  private tryUploadPending() {
+    const file = this.pendingFile();
+    const id = this.bookId();
+
+    if (!file || !id) return;
+    if (this.isUploading() || this.isFinishing()) return;
+
+    this.isUploading.set(true);
+
+    this.books.uploadBookImage(id, file).subscribe({
+      next: () => {
+        this.pendingFile.set(null);
+        this.photoCount.update((c) => c + 1);
+        this.toast.show('Stránka úspěšně odfocená', 'success');
+        this.isUploading.set(false);
+      },
+      error: (err) => {
+        console.error(err);
+        this.toast.show('Upload fotky zlyhal.', 'error');
+        this.isUploading.set(false);
+      },
     });
   }
 
@@ -91,7 +124,7 @@ export class BookCaptureNativeComponent {
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files && input.files[0];
-    if (!file || !this.bookId()) {
+    if (!file) {
       return;
     }
 
