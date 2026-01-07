@@ -128,19 +128,7 @@ export class BookCaptureNativeComponent {
       return;
     }
 
-    this.isUploading.set(true);
-    this.books.uploadBookImage(this.bookId()!, file).subscribe({
-      next: () => {
-        this.photoCount.update((c) => c + 1);
-        this.toast.show('Stránka úspěšně odfocená', 'success');
-        this.isUploading.set(false);
-      },
-      error: (err) => {
-        console.error(err);
-        this.toast.show('Upload fotky zlyhal.', 'error');
-        this.isUploading.set(false);
-      },
-    });
+    this.pendingFile.set(file);
   }
 
   finish() {

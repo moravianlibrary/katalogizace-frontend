@@ -7,6 +7,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { BooksService } from '../../services/api/books.service';
@@ -31,9 +32,11 @@ export class BookCaptureComponent implements AfterViewInit {
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
 
   private stream: MediaStream | null = null;
+  private viewReady = signal(false);
 
   bookId = signal<string | null>(null);
-  batchId = this.route.snapshot.paramMap.get('batchId') ?? '';
+  batchId = signal<string>('');
+
   isCreating = signal(false);
   isUploading = signal(false);
   isFinishing = signal(false);
@@ -42,17 +45,42 @@ export class BookCaptureComponent implements AfterViewInit {
   private didFinish = signal(false);
   private cleanupDone = signal(false);
 
+  constructor() {
+    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((pm) => {
+      this.batchId.set(pm.get('batchId') ?? '');
+      this.bookId.set(pm.get('bookId'));
+
+      if (this.bookId() && this.viewReady() && !this.stream) {
+        this.openCamera();
+      }
+    });
+  }
+
   ngAfterViewInit() {
-    // kameru spúšťame až po createBook()
+    this.viewReady.set(true);
+
+    if (this.bookId() && !this.stream) {
+      this.openCamera();
+    }
   }
 
   startNewBook() {
+    if (this.isCreating()) return;
+
     this.isCreating.set(true);
-    this.books.createBook(this.batchId).subscribe({
+    this.books.createBook(this.batchId()).subscribe({
       next: (res) => {
-        this.bookId.set(res.book_id);
         this.isCreating.set(false);
-        this.openCamera();
+
+        this.router.navigate([
+          '/batches',
+          this.batchId(),
+          'books',
+          'capture',
+          res.book_id,
+        ]);
+
+        this.toast.show('Kniha založena.', 'success');
       },
       error: (err) => {
         console.error(err);
@@ -78,8 +106,6 @@ export class BookCaptureComponent implements AfterViewInit {
       const video = this.videoRef.nativeElement;
       video.srcObject = this.stream;
       await video.play();
-
-      console.log('Stream size:', video.videoWidth, 'x', video.videoHeight);
     } catch (e) {
       console.error('Camera error', e);
       this.toast.show('Nepodařilo se otevřít kameru.', 'error');
@@ -141,7 +167,7 @@ export class BookCaptureComponent implements AfterViewInit {
         this.didFinish.set(true);
         this.isFinishing.set(false);
         this.toast.show('Workflow spuštěn.', 'success');
-        this.router.navigate(['/batches', this.batchId, 'books']);
+        this.router.navigate(['/batches', this.batchId(), 'books']);
       },
       error: (err) => {
         console.error(err);
@@ -155,9 +181,7 @@ export class BookCaptureComponent implements AfterViewInit {
     if (this.cleanupDone()) return true;
     this.cleanupDone.set(true);
 
-    if (this.isFinishing() || this.didFinish()) {
-      return true;
-    }
+    if (this.isFinishing() || this.didFinish()) return true;
 
     this.stopCamera();
 
@@ -178,7 +202,7 @@ export class BookCaptureComponent implements AfterViewInit {
   }
 
   cancel() {
-    this.router.navigate(['/batches', this.batchId, 'books']);
+    this.router.navigate(['/batches', this.batchId(), 'books']);
   }
 
   private stopCamera() {

@@ -44,6 +44,12 @@ export const routes: Routes = [
         canDeactivate: [captureExitGuard],
       },
       {
+        path: 'batches/:batchId/books/capture/:bookId',
+        component: BookCaptureComponent,
+        data: { backTo: '../' },
+        canDeactivate: [captureExitGuard],
+      },
+      {
         path: 'batches/:batchId/books/capture-native',
         component: BookCaptureNativeComponent,
         data: { backTo: '../' },
