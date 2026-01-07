@@ -10,7 +10,7 @@ import { routes } from './app.routes';
 import { apiKeyInterceptor } from './interceptors/api-key.interceptor';
 import { authErrorInterceptor } from './interceptors/auth-error.interceptor';
 import { authInterceptor } from './interceptors/auth.interceptor';
-import { AuthService } from './services/auth.service';
+import { AuthService } from './services/api/auth.service';
 import { EnvironmentService } from './services/environment.service';
 
 export const appConfig: ApplicationConfig = {

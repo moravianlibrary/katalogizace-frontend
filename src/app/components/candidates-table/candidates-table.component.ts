@@ -12,7 +12,7 @@ import {
   MarcCandidate,
   MarcSubfield,
 } from '../../models/book';
-import { BooksService } from '../../services/books.service';
+import { BooksService } from '../../services/api/books.service';
 import { WorkingPanelService } from '../../services/working-panel.service';
 import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
 

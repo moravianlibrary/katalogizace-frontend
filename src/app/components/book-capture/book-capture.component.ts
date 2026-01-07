@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { BooksService } from '../../services/books.service';
+import { BooksService } from '../../services/api/books.service';
 import { ToastService } from '../../services/toast.service';
 
 @Component({

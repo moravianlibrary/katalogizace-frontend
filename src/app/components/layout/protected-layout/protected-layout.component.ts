@@ -2,7 +2,7 @@ import { CommonModule, Location } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { AuthService } from '../../../services/auth.service';
+import { AuthService } from '../../../services/api/auth.service';
 
 @Component({
   standalone: true,

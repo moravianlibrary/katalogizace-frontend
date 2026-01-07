@@ -5,7 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 
 import { Batch, BatchesResponse, BatchState } from '../../models/book';
 import { BatchStateLabelPipe } from '../../pipes/batch-state-label.pipe';
-import { BatchesService } from '../../services/batches.service';
+import { BatchesService } from '../../services/api/batches.service';
 import { ToastService } from '../../services/toast.service';
 
 @Component({

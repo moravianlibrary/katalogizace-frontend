@@ -1,5 +1,5 @@
 import { Component, HostListener, inject, input, signal } from '@angular/core';
-import { BooksService } from '../../services/books.service';
+import { BooksService } from '../../services/api/books.service';
 import { RecordStateService } from '../../services/record-state.service';
 import { ToastService } from '../../services/toast.service';
 

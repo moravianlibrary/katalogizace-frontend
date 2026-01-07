@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ApiImageItem } from '../../models/book';
-import { BooksService } from '../../services/books.service';
+import { BooksService } from '../../services/api/books.service';
 import { MarcDiffService } from '../../services/marc-diff.service';
 import { ToastService } from '../../services/toast.service';
 import { RecordStore } from '../../stores/record.store';

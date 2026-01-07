@@ -105,8 +105,6 @@ export class MarcRecordsComponent {
         candidate: evt.candidate,
       });
 
-      // ✅ 2) update opened record v working paneli (ak je extracted)
-      // sem si dopoj svoju metódu ktorá upraví openedExtractedWithMeta
       this.store.applyCandidateToOpenedExtracted(evt.fieldId, evt.candidate);
 
       this.wps.applyCandidate.set(null);

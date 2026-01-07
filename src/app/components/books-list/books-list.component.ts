@@ -11,8 +11,8 @@ import {
 } from '../../models/book';
 import { ProcessStateLabelPipe } from '../../pipes/process-state-label.pipe';
 import { RecordStateLabelPipe } from '../../pipes/record-state-label.pipe';
-import { BatchesService } from '../../services/batches.service';
-import { BooksService } from '../../services/books.service';
+import { BatchesService } from '../../services/api/batches.service';
+import { BooksService } from '../../services/api/books.service';
 import { ToastService } from '../../services/toast.service';
 import { WorkingPanelService } from '../../services/working-panel.service';
 

@@ -3,7 +3,7 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../services/api/auth.service';
 
 export const authErrorInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);

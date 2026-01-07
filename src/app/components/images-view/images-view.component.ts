@@ -7,7 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { ApiImageItem, ImgItem, PageType } from '../../models/book';
-import { BooksService } from '../../services/books.service';
+import { BooksService } from '../../services/api/books.service';
 import { ImageLargePreviewComponent } from '../image/preview/preview.component';
 import { ImageThumbnailsComponent } from '../image/thumbnails/thumbnails.component';
 
