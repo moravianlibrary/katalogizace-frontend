@@ -42,7 +42,8 @@ export interface BookResultResponseDto extends BookCommonDto {
 
 export interface BookUploadResponseDto {
   book_id: UUID;
-  state: ProcessState; // pozor: v OpenAPI je to `process_state` – drž sa API a zjednoť názov ak treba
+  process_state: ProcessState;
+  record_state: RecordState;
   hatchet_workflow_id: string | null;
   batch_id: string | null;
   images: ApiImageItem[];
