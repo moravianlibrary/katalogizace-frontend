@@ -222,4 +222,40 @@ export class BooksListComponent {
       },
     });
   }
+
+  onRerun(id: string, event: MouseEvent) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    const confirmed = confirm(
+      'Opravdu chcete znovu spustit zpracování této knihy?',
+    );
+    if (!confirmed) return;
+
+    this.books.rerunBookWorkflow(id).subscribe({
+      next: (resp) => {
+        this.patchBookRow(id, resp);
+        this.toast.show('Zpracování knihy bylo znovu spuštěno.', 'success');
+      },
+      error: (err) => {
+        console.error(err);
+        this.toast.show('Znovuspuštění zpracování se nezdařilo.', 'error');
+      },
+    });
+  }
+
+  private patchBookRow(
+    bookId: string,
+    patch: Partial<PaginatedBooksResponseDto['books'][number]>,
+  ) {
+    const d = this.data();
+    if (!d) return;
+
+    this.data.set({
+      ...d,
+      books: d.books.map((b) =>
+        b.book_id === bookId ? { ...b, ...patch } : b,
+      ),
+    });
+  }
 }

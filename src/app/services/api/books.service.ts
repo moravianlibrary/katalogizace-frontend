@@ -122,4 +122,10 @@ export class BooksService {
   deleteBookRecord(bookId: string) {
     return this.http.delete<string>(`${this.apiBaseUrl}/books/${bookId}`);
   }
+
+  rerunBookWorkflow(bookId: string) {
+    return this.http.get<BookUploadResponseDto>(
+      `${this.apiBaseUrl}/books/${bookId}/rerun`,
+    );
+  }
 }
