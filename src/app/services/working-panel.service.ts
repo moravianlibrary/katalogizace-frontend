@@ -1,24 +1,11 @@
-import { MarcCandidate, Step } from '@/app/models';
+import {
+  ApplyCandidateEvent,
+  MarcCandidate,
+  PanelMode,
+  PanelState,
+  Step,
+} from '@/app/models';
 import { Injectable, signal } from '@angular/core';
-
-export type PanelMode = 'records' | 'candidates' | 'provenance' | 'delete';
-
-export interface PanelState {
-  mode: PanelMode;
-  tag?: string;
-  title?: string;
-  candidates?: MarcCandidate[];
-  steps?: Step[];
-  fieldId?: string;
-  subfields?: { code: string; value: string }[];
-  selectedCandidateId?: string;
-}
-
-export type ApplyCandidateEvent = {
-  fieldId: string;
-  tag: string;
-  candidate: MarcCandidate;
-};
 
 @Injectable({ providedIn: 'root' })
 export class WorkingPanelService {
