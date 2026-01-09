@@ -1,14 +1,14 @@
+import {
+  BatchDto,
+  PaginatedBooksResponseDto,
+  ProcessState,
+  RecordState,
+} from '@/app/models';
 import { DatePipe, NgClass } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { combineLatest } from 'rxjs';
-import {
-  Batch,
-  PaginatedBooksResponse,
-  ProcessState,
-  RecordState,
-} from '../../models/book';
 import { ProcessStateLabelPipe } from '../../pipes/process-state-label.pipe';
 import { RecordStateLabelPipe } from '../../pipes/record-state-label.pipe';
 import { BatchesService } from '../../services/api/batches.service';
@@ -41,10 +41,10 @@ export class BooksListComponent {
 
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
-  data = signal<PaginatedBooksResponse | null>(null);
+  data = signal<PaginatedBooksResponseDto | null>(null);
 
   batchId = signal<string | null>(null);
-  batch = signal<Batch | null>(null);
+  batch = signal<BatchDto | null>(null);
 
   page = signal<number>(1);
   pageSize = signal<number>(20);

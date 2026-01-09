@@ -2,14 +2,9 @@ import {
   ExistingMarcRecord,
   ExistingMarcRecordNormalField,
   MarcSubfield,
-} from '../models/book';
-
-export type SubDiffKind = 'same' | 'changed' | 'missing_or_extra';
-
-export type SubDiffIndex = {
-  opened: Map<string, Map<string, SubDiffKind>>;
-  preview: Map<string, Map<string, SubDiffKind>>;
-};
+  SubDiffIndex,
+  SubDiffKind,
+} from '@/app/models';
 
 const SEP = '\u001F';
 const KV = '\u001E';

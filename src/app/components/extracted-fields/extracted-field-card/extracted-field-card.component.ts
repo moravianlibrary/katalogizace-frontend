@@ -1,11 +1,7 @@
+import { MarcSubfield, UiFieldWithMeta, UiSubfield } from '@/app/models';
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, inject, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import {
-  MarcSubfield,
-  UiFieldWithMeta,
-  UiSubfield,
-} from '../../../models/book';
 import { RecordStateService } from '../../../services/record-state.service';
 import { WorkingPanelService } from '../../../services/working-panel.service';
 

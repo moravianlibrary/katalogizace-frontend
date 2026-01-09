@@ -1,5 +1,5 @@
+import { PROCESS_STATE_LABELS, ProcessState } from '@/app/models';
 import { Pipe, PipeTransform } from '@angular/core';
-import { PROCESS_STATE_LABELS, ProcessState } from '../models/book';
 
 @Pipe({
   name: 'processStateLabel',

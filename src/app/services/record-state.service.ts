@@ -1,15 +1,14 @@
-import { computed, Injectable, signal } from '@angular/core';
 import {
   ExistingMarcRecord,
   ExtractedMarcRecord,
+  FieldType,
   LastEditedRecord,
   MarcCandidate,
+  RecordViewMode,
   UiFieldWithMeta,
-} from '../models/book';
+} from '@/app/models';
+import { computed, Injectable, signal } from '@angular/core';
 import { extractedToUiFields } from '../utils/marc-transform';
-
-export type RecordViewMode = 'cards' | 'table';
-export type FieldType = 'special' | 'normal';
 
 @Injectable({ providedIn: 'root' })
 export class RecordStateService {

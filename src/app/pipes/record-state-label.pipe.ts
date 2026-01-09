@@ -1,5 +1,5 @@
+import { RECORD_STATE_LABELS, RecordState } from '@/app/models';
 import { Pipe, PipeTransform } from '@angular/core';
-import { RECORD_STATE_LABELS, RecordState } from '../models/book';
 
 @Pipe({
   name: 'recordStateLabel',

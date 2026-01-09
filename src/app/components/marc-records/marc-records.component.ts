@@ -1,6 +1,6 @@
+import { ExistingMarcRecord, MarcRecordsItem } from '@/app/models';
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { ExistingMarcRecord, ExtractedMarcRecord } from '../../models/book';
 import { MarcDiffService } from '../../services/marc-diff.service';
 import { RecordStateService } from '../../services/record-state.service';
 import { WorkingPanelService } from '../../services/working-panel.service';
@@ -9,10 +9,6 @@ import { filterExistingRecord015to830 } from '../../utils/marc-filter';
 import { extractedToExisting } from '../../utils/marc-transform';
 import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
 import { ExtractedMarcRecordTableComponent } from '../marc-record-table/extracted-marc-record-table/extracted-marc-record-table.component';
-interface RecordType {
-  extracted: ExtractedMarcRecord | null;
-  existing: ExistingMarcRecord | null;
-}
 
 @Component({
   standalone: true,
@@ -40,8 +36,8 @@ export class MarcRecordsComponent {
   private diff = inject(MarcDiffService);
   diffIndex = this.diff.diffIndex;
 
-  records = computed<RecordType[]>(() => {
-    const list: RecordType[] = [];
+  records = computed<MarcRecordsItem[]>(() => {
+    const list: MarcRecordsItem[] = [];
     const extracted = this.extractedRecord();
 
     if (extracted) {
@@ -66,7 +62,6 @@ export class MarcRecordsComponent {
   private lastAppliedKey: string | null = null;
 
   constructor() {
-    // nastav default otvorený record (keď sa načítajú records)
     effect(() => {
       const idx = this.expandedIndex();
       const list = this.records();

@@ -1,7 +1,7 @@
+import { ExistingMarcRecord } from '@/app/models/';
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
-import { ExistingMarcRecord } from 'src/app/models/book';
 import { EnvironmentService } from '../environment.service';
 
 @Injectable({ providedIn: 'root' })

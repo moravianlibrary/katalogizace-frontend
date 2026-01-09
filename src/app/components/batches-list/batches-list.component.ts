@@ -4,7 +4,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { combineLatest } from 'rxjs';
 
-import { Batch, BatchState, PaginatedBatchesResponse } from '../../models/book';
+import {
+  BatchDto,
+  BatchState,
+  PaginatedBatchesResponseDto,
+} from '@/app/models';
 import { BatchStateLabelPipe } from '../../pipes/batch-state-label.pipe';
 import { BatchesService } from '../../services/api/batches.service';
 import { ToastService } from '../../services/toast.service';
@@ -24,7 +28,7 @@ export class BatchesListComponent {
 
   loading = signal(false);
   error = signal<string | null>(null);
-  data = signal<PaginatedBatchesResponse | null>(null);
+  data = signal<PaginatedBatchesResponseDto | null>(null);
 
   filterMine = signal(false);
 
@@ -37,7 +41,7 @@ export class BatchesListComponent {
       : 1,
   );
 
-  rows = computed<Batch[]>(() => this.data()?.batches ?? []);
+  rows = computed<BatchDto[]>(() => this.data()?.batches ?? []);
 
   newName = signal('');
   newDescription = signal('');
@@ -127,7 +131,7 @@ export class BatchesListComponent {
     this.router.navigate(['/batches', batchId, 'books']);
   }
 
-  countBooks(b: Batch) {
+  countBooks(b: BatchDto) {
     return b.book_ids?.length ?? 0;
   }
 

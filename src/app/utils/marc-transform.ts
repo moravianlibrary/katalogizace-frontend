@@ -1,33 +1,16 @@
 import {
   ExistingMarcRecord,
+  ExistingMarcRecordFieldMeta,
   ExistingMarcRecordNormalField,
+  ExistingMarcRecordNormalFieldWithMeta,
   ExistingMarcRecordSpecialField,
+  ExistingMarcRecordSpecialFieldWithMeta,
+  ExistingMarcRecordWithMeta,
   ExtractedMarcNormalField,
   ExtractedMarcRecord,
   ExtractedMarcSpecialField,
-  MarcCandidate,
   UiFieldWithMeta,
-} from '../models/book';
-
-export interface ExistingMarcRecordFieldMeta {
-  fieldId: string;
-  selectedCandidateId: string | null;
-  candidates: MarcCandidate[];
-  score: number;
-}
-
-export interface ExistingMarcRecordNormalFieldWithMeta
-  extends ExistingMarcRecordNormalField,
-    ExistingMarcRecordFieldMeta {}
-
-export interface ExistingMarcRecordSpecialFieldWithMeta
-  extends ExistingMarcRecordSpecialField,
-    ExistingMarcRecordFieldMeta {}
-
-export interface ExistingMarcRecordWithMeta extends ExistingMarcRecord {
-  special_fields: ExistingMarcRecordSpecialFieldWithMeta[];
-  normal_fields: ExistingMarcRecordNormalFieldWithMeta[];
-}
+} from '@/app/models';
 
 function pickCandidate(f: ExtractedMarcNormalField) {
   const cand = f.candidates.find((c) => c.id === f.selected_candidate_id);

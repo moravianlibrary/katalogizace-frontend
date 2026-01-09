@@ -1,15 +1,13 @@
-import { computed, Injectable, signal } from '@angular/core';
 import {
   ExistingMarcRecord,
+  ExistingMarcRecordWithMeta,
   ExtractedMarcRecord,
   LastEditedRecord,
   MarcCandidate,
   Step,
-} from '../models/book';
-import {
-  ExistingMarcRecordWithMeta,
-  extractedToExistingWithMeta,
-} from '../utils/marc-transform';
+} from '@/app/models';
+import { computed, Injectable, signal } from '@angular/core';
+import { extractedToExistingWithMeta } from '../utils/marc-transform';
 
 @Injectable()
 export class RecordStore {

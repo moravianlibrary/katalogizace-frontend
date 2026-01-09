@@ -1,6 +1,6 @@
+import { ApiImageItem } from '@/app/models';
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ApiImageItem } from '../../models/book';
 import { BooksService } from '../../services/api/books.service';
 import { MarcDiffService } from '../../services/marc-diff.service';
 import { ToastService } from '../../services/toast.service';

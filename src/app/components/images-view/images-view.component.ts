@@ -1,3 +1,4 @@
+import { ApiImageItem, ImgItem, PageType } from '@/app/models';
 import {
   Component,
   computed,
@@ -6,7 +7,6 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { ApiImageItem, ImgItem, PageType } from '../../models/book';
 import { BooksService } from '../../services/api/books.service';
 import { ImageLargePreviewComponent } from '../image/preview/preview.component';
 import { ImageThumbnailsComponent } from '../image/thumbnails/thumbnails.component';

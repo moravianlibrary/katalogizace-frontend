@@ -1,5 +1,5 @@
+import { STEP_KIND_LABELS, StepKind } from '@/app/models';
 import { Pipe, PipeTransform } from '@angular/core';
-import { STEP_KIND_LABELS, StepKind } from '../models/book';
 
 @Pipe({
   name: 'stepKindLabel',

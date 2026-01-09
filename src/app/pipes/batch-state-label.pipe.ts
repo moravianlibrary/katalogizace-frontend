@@ -1,5 +1,5 @@
+import { BATCH_STATE_LABELS, BatchState } from '@/app/models';
 import { Pipe, PipeTransform } from '@angular/core';
-import { BATCH_STATE_LABELS, BatchState } from '../models/book';
 
 @Pipe({
   name: 'batchStateLabel',

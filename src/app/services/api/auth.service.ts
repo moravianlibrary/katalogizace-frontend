@@ -3,25 +3,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { tap } from 'rxjs/operators';
 import { EnvironmentService } from '../../services/environment.service';
 
-type TokenResponse = { access_token: string; token_type: string };
-
-export type CurrentUser = {
-  email: string;
-  full_name: string;
-  roles: string[];
-  permissions: string[];
-};
-
-export type RegisterDto = {
-  email: string;
-  password: string;
-  full_name: string;
-};
-
-export type LoginDto = {
-  email: string;
-  password: string;
-};
+import { CurrentUserDto, LoginDto, RegisterDto, TokenDto } from '@/app/models';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -35,7 +17,7 @@ export class AuthService {
   readonly token = signal<string | null>(localStorage.getItem('access_token'));
   readonly isLoggedIn = computed(() => !!this.token());
 
-  readonly user = signal<CurrentUser | null>(null);
+  readonly user = signal<CurrentUserDto | null>(null);
   readonly userEmail = computed(() => this.user()?.email ?? null);
   readonly userName = computed(() => this.user()?.full_name ?? null);
 
@@ -61,7 +43,7 @@ export class AuthService {
     });
 
     return this.http
-      .post<TokenResponse>(`${this.apiBaseUrl}/users/login`, body.toString(), {
+      .post<TokenDto>(`${this.apiBaseUrl}/users/login`, body.toString(), {
         headers,
       })
       .pipe(
@@ -78,7 +60,7 @@ export class AuthService {
 
   loadCurrentUser() {
     return this.http
-      .get<CurrentUser>(`${this.apiBaseUrl}/users/current-user`)
+      .get<CurrentUserDto>(`${this.apiBaseUrl}/users/current-user`)
       .pipe(tap((u) => this.user.set(u)));
   }
 

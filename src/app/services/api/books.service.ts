@@ -1,17 +1,15 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { map } from 'rxjs/operators';
 import {
-  BookImageUploadResponse,
-  BookResultResponse,
-  BookStatusResponse,
-  BookUploadResponse,
-  ExistingMarcRecord,
+  BookImageUploadResponseDto,
+  BookResultResponseDto,
+  BookStatusResponseDto,
+  BookUploadResponseDto,
   LastEditedRecord,
-  PaginatedBooksResponse,
+  PaginatedBooksResponseDto,
   ProcessState,
   RecordState,
-} from '../../models/book';
+} from '@/app/models/';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
 import { EnvironmentService } from '../environment.service';
 
 @Injectable({ providedIn: 'root' })
@@ -45,13 +43,16 @@ export class BooksService {
 
     if (batch_id) params = params.set('batch_id', batch_id);
 
-    return this.http.get<PaginatedBooksResponse>(`${this.apiBaseUrl}/books/`, {
-      params,
-    });
+    return this.http.get<PaginatedBooksResponseDto>(
+      `${this.apiBaseUrl}/books/`,
+      {
+        params,
+      },
+    );
   }
 
   getBookStatus(bookId: string) {
-    return this.http.get<BookStatusResponse>(
+    return this.http.get<BookStatusResponseDto>(
       `${this.apiBaseUrl}/books/${bookId}/status`,
     );
   }
@@ -64,7 +65,7 @@ export class BooksService {
   }
 
   getBookResult(bookId: string) {
-    return this.http.get<BookResultResponse>(
+    return this.http.get<BookResultResponseDto>(
       `${this.apiBaseUrl}/books/${bookId}/result`,
     );
   }
@@ -82,7 +83,7 @@ export class BooksService {
 
     const params = new HttpParams().set('batch_id', batchId);
 
-    return this.http.post<BookUploadResponse>(
+    return this.http.post<BookUploadResponseDto>(
       `${this.apiBaseUrl}/books/upload-images`,
       formData,
       {
@@ -94,7 +95,7 @@ export class BooksService {
   createBook(batchId: string) {
     const params = new HttpParams().set('batch_id', batchId);
 
-    return this.http.post<BookUploadResponse>(
+    return this.http.post<BookUploadResponseDto>(
       `${this.apiBaseUrl}/books/create`,
       null,
       { params },
@@ -105,14 +106,14 @@ export class BooksService {
     const formData = new FormData();
     formData.append('image_file', file);
 
-    return this.http.post<BookImageUploadResponse>(
+    return this.http.post<BookImageUploadResponseDto>(
       `${this.apiBaseUrl}/books/${bookId}/upload-image`,
       formData,
     );
   }
 
   startBookWorkflow(bookId: string) {
-    return this.http.post<BookUploadResponse>(
+    return this.http.post<BookUploadResponseDto>(
       `${this.apiBaseUrl}/books/${bookId}/start-workflow`,
       null,
     );
@@ -120,13 +121,5 @@ export class BooksService {
 
   deleteBookRecord(bookId: string) {
     return this.http.delete<string>(`${this.apiBaseUrl}/books/${bookId}`);
-  }
-
-  getAutRecord(recordId: string) {
-    return this.http
-      .get<{
-        record: ExistingMarcRecord;
-      }>(`${this.apiBaseUrl}/catalogue/AUT/record/${recordId}`)
-      .pipe(map((resp) => resp.record));
   }
 }

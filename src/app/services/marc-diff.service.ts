@@ -1,6 +1,7 @@
+import { SubDiffIndex } from '@/app/models';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { RecordStore } from '../stores/record.store';
-import { SubDiffIndex, diffMarcRecordsSubfields } from '../utils/marc-diff';
+import { diffMarcRecordsSubfields } from '../utils/marc-diff';
 import { RecordStateService } from './record-state.service';
 import { WorkingPanelService } from './working-panel.service';
 

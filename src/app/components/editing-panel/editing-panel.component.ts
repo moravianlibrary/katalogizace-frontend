@@ -1,5 +1,5 @@
+import { UUID } from '@/app/models';
 import { Component, effect, inject, input } from '@angular/core';
-import { UUID } from '../../models/book';
 import { MarcDiffService } from '../../services/marc-diff.service';
 import { RecordStateService } from '../../services/record-state.service';
 import { RecordStore } from '../../stores/record.store';

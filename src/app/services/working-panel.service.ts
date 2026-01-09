@@ -1,5 +1,5 @@
+import { MarcCandidate, Step } from '@/app/models';
 import { Injectable, signal } from '@angular/core';
-import { MarcCandidate, Step } from '../models/book';
 
 export type PanelMode = 'records' | 'candidates' | 'provenance' | 'delete';
 

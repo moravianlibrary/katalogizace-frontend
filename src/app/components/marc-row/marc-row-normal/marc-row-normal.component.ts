@@ -1,13 +1,11 @@
+import { MarcCandidate, SubDiffIndex, SubDiffKind, UUID } from '@/app/models';
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
-import { MarcCandidate, UUID } from '../../../models/book';
 import { RecordStateService } from '../../../services/record-state.service';
 import { WorkingPanelService } from '../../../services/working-panel.service';
 import { RecordStore } from '../../../stores/record.store';
 
 import {
-  SubDiffIndex,
-  SubDiffKind,
   enumerateSubfields,
   isDiffableTag015to830,
   normalSignature,

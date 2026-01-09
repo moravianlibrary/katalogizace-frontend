@@ -1,5 +1,5 @@
+import { ImgItem } from '@/app/models';
 import { Component, input } from '@angular/core';
-import { ImgItem } from '../../../models/book';
 
 @Component({
   standalone: true,

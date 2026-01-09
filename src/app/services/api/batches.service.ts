@@ -1,6 +1,6 @@
+import { BatchDto, PaginatedBatchesResponseDto } from '@/app/models';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Batch, PaginatedBatchesResponse } from '../../models/book';
 import { EnvironmentService } from '../environment.service';
 
 @Injectable({ providedIn: 'root' })
@@ -29,7 +29,7 @@ export class BatchesService {
       params = params.set('filter_owned_by_user', 'true');
     }
 
-    return this.http.get<PaginatedBatchesResponse>(
+    return this.http.get<PaginatedBatchesResponseDto>(
       `${this.apiBaseUrl}/batches/`,
       {
         params,
@@ -38,7 +38,7 @@ export class BatchesService {
   }
 
   getBatch(batch_id: string) {
-    return this.http.get<Batch>(`${this.apiBaseUrl}/batches/${batch_id}`);
+    return this.http.get<BatchDto>(`${this.apiBaseUrl}/batches/${batch_id}`);
   }
 
   createBatch(name: string, description: string | null) {
@@ -48,7 +48,7 @@ export class BatchesService {
       params = params.set('description', description);
     }
 
-    return this.http.post<Batch>(`${this.apiBaseUrl}/batches/`, null, {
+    return this.http.post<BatchDto>(`${this.apiBaseUrl}/batches/`, null, {
       params,
     });
   }

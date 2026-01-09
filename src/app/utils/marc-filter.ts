@@ -1,4 +1,4 @@
-import { ExistingMarcRecord } from '../models/book';
+import { ExistingMarcRecord } from '@/app/models';
 
 export function filterExistingRecord015to830(
   rec: ExistingMarcRecord,
