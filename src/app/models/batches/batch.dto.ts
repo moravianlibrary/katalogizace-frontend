@@ -28,3 +28,9 @@ export interface BatchBooksResponseDto {
   total_count: number;
   state_counts: Record<ProcessState, number>;
 }
+
+export type UpdateBatchRequest = {
+  name: string;
+  description: string | null;
+  state?: BatchState;
+};

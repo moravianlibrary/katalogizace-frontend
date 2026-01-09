@@ -1,4 +1,8 @@
-import { BatchDto, PaginatedBatchesResponseDto } from '@/app/models';
+import {
+  BatchDto,
+  PaginatedBatchesResponseDto,
+  UpdateBatchRequest,
+} from '@/app/models';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { EnvironmentService } from '../environment.service';
@@ -51,6 +55,13 @@ export class BatchesService {
     return this.http.post<BatchDto>(`${this.apiBaseUrl}/batches/`, null, {
       params,
     });
+  }
+
+  updateBatch(batch_id: string, patch: UpdateBatchRequest) {
+    return this.http.put<BatchDto>(
+      `${this.apiBaseUrl}/batches/${batch_id}`,
+      patch,
+    );
   }
 
   deleteBatch(batch_id: string) {

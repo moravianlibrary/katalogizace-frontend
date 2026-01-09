@@ -1,5 +1,13 @@
 import { DatePipe, NgClass } from '@angular/common';
-import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  ElementRef,
+  inject,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { combineLatest } from 'rxjs';
@@ -46,6 +54,14 @@ export class BatchesListComponent {
   newName = signal('');
   newDescription = signal('');
   creating = signal(false);
+
+  editingBatch = signal<BatchDto | null>(null);
+  editName = signal('');
+  editDescription = signal('');
+  savingEdit = signal(false);
+
+  @ViewChild('editDialog', { static: true })
+  editDialog!: ElementRef<HTMLDialogElement>;
 
   constructor() {
     combineLatest([this.route.paramMap, this.route.queryParamMap])
@@ -201,5 +217,69 @@ export class BatchesListComponent {
       default:
         return 'bg-slate-100 text-slate-600';
     }
+  }
+
+  onEditNameInput(event: Event) {
+    this.editName.set((event.target as HTMLInputElement).value);
+  }
+
+  onEditDescriptionInput(event: Event) {
+    this.editDescription.set((event.target as HTMLInputElement).value);
+  }
+
+  openEdit(b: BatchDto, event: MouseEvent) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    this.editingBatch.set(b);
+    this.editName.set((b.name ?? '').trim());
+    this.editDescription.set((b.description ?? '').trim());
+
+    this.editDialog.nativeElement.showModal();
+  }
+
+  closeEdit() {
+    if (this.editDialog?.nativeElement.open) {
+      this.editDialog.nativeElement.close();
+    }
+
+    this.editingBatch.set(null);
+    this.editName.set('');
+    this.editDescription.set('');
+    this.savingEdit.set(false);
+  }
+
+  saveEdit() {
+    const b = this.editingBatch();
+    if (!b || this.savingEdit()) return;
+
+    const name = this.editName().trim();
+    const descRaw = this.editDescription().trim();
+    const description: string | null = descRaw ? descRaw : null;
+
+    if (!name) {
+      this.toast.show('Název dávky je povinný', 'warning');
+      return;
+    }
+
+    this.savingEdit.set(true);
+
+    this.batches
+      .updateBatch(b.batch_id, {
+        name,
+        description,
+      })
+      .subscribe({
+        next: () => {
+          this.toast.show('Dávka byla upravena.', 'success');
+          this.closeEdit();
+          this.load();
+        },
+        error: (err) => {
+          console.error(err);
+          this.toast.show('Uložení změn se nezdařilo.', 'error');
+          this.savingEdit.set(false);
+        },
+      });
   }
 }
