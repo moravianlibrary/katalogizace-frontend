@@ -1,4 +1,5 @@
 import { ApiImageItem } from '@/app/models';
+import { RecordStateService } from '@/app/services/record-state.service';
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BooksService } from '../../services/api/books.service';
@@ -21,6 +22,7 @@ export class BookDetailComponent {
   private bookService = inject(BooksService);
   private store = inject(RecordStore);
   private toast = inject(ToastService);
+  private recordState = inject(RecordStateService);
 
   bookId = this.route.snapshot.paramMap.get('bookId') ?? '';
 
@@ -44,5 +46,7 @@ export class BookDetailComponent {
         console.error('Error:', err);
       },
     });
+
+    this.recordState.resetViewMode();
   }
 }
