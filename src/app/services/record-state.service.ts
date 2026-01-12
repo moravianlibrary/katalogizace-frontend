@@ -16,6 +16,16 @@ export class RecordStateService {
 
   readonly viewMode = signal<RecordViewMode>('cards');
 
+  readonly focusTagFieldId = signal<string | null>(null);
+
+  requestFocusTag(fieldId: string) {
+    this.focusTagFieldId.set(fieldId);
+  }
+
+  clearFocusTag() {
+    this.focusTagFieldId.set(null);
+  }
+
   SPECIAL_TAGS = new Set(['001', '003', '005', '006', '007', '008']);
   isControlTag(tag: string): boolean {
     return this.SPECIAL_TAGS.has(tag);
@@ -54,6 +64,8 @@ export class RecordStateService {
   }
 
   toggleViewMode() {
+    this.clearFocusTag();
+
     this.viewMode.update((m) => (m === 'cards' ? 'table' : 'cards'));
   }
 
@@ -64,6 +76,8 @@ export class RecordStateService {
   loadFromExistingOrLastEdited(
     rec: ExistingMarcRecord | LastEditedRecord | null,
   ) {
+    this.clearFocusTag();
+
     if (!rec) {
       this.uiFields.set([]);
       return;
@@ -103,6 +117,8 @@ export class RecordStateService {
   }
 
   loadFromExtracted(extracted: ExtractedMarcRecord | null) {
+    this.clearFocusTag();
+
     if (!extracted) {
       this.uiFields.set([]);
       return;
@@ -136,6 +152,8 @@ export class RecordStateService {
     };
 
     this.uiFields.set([newField, ...current]);
+
+    this.requestFocusTag(newField.fieldId);
   }
 
   removeField(fieldId: string) {

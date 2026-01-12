@@ -1,6 +1,6 @@
 import { MarcSubfield, UiFieldWithMeta, UiSubfield } from '@/app/models';
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, inject, input } from '@angular/core';
+import { Component, effect, ElementRef, inject, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RecordStateService } from '../../../services/record-state.service';
 import { WorkingPanelService } from '../../../services/working-panel.service';
@@ -17,7 +17,23 @@ export class ExtractedFieldCardComponent {
 
   field = input.required<UiFieldWithMeta>();
 
-  constructor(private host: ElementRef<HTMLElement>) {}
+  constructor(private host: ElementRef<HTMLElement>) {
+    effect(() => {
+      const targetId = this.recordState.focusTagFieldId();
+      if (!targetId || targetId !== this.field().fieldId) return;
+
+      setTimeout(() => {
+        const el = this.host.nativeElement.querySelector<HTMLInputElement>(
+          'input[data-role="field-tag"]',
+        );
+        if (el) {
+          el.focus();
+          el.select();
+        }
+        this.recordState.clearFocusTag();
+      }, 0);
+    });
+  }
 
   notifyChange() {
     this.recordState.touch();

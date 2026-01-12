@@ -16,6 +16,7 @@
             [attr.data-editable]="'true'"
             (ngModelChange)="field().tag = $event; notifyChange()"
             (input)="onInputAutoAdvance($event)"
+            data-role="field-tag"
             maxlength="3"
             placeholder="000"
           />
