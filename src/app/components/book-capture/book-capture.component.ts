@@ -2,16 +2,19 @@ import { CommonModule } from '@angular/common';
 import {
   AfterViewInit,
   Component,
-  DestroyRef,
   ElementRef,
   ViewChild,
   inject,
   signal,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
 
-import { BooksService } from '../../services/books.service';
+import { BooksService } from '../../services/api/books.service';
 import { ToastService } from '../../services/toast.service';
+
+import { of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 @Component({
   standalone: true,
@@ -20,33 +23,64 @@ import { ToastService } from '../../services/toast.service';
   templateUrl: './book-capture.component.html',
 })
 export class BookCaptureComponent implements AfterViewInit {
-  private destroyRef = inject(DestroyRef);
   private books = inject(BooksService);
   private router = inject(Router);
   private toast = inject(ToastService);
+  private route = inject(ActivatedRoute);
 
   @ViewChild('video') videoRef!: ElementRef<HTMLVideoElement>;
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
 
   private stream: MediaStream | null = null;
+  private viewReady = signal(false);
 
   bookId = signal<string | null>(null);
+  batchId = signal<string>('');
+
   isCreating = signal(false);
   isUploading = signal(false);
   isFinishing = signal(false);
   photoCount = signal(0);
 
+  private didFinish = signal(false);
+  private cleanupDone = signal(false);
+
+  constructor() {
+    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((pm) => {
+      this.batchId.set(pm.get('batchId') ?? '');
+      this.bookId.set(pm.get('bookId'));
+
+      if (this.bookId() && this.viewReady() && !this.stream) {
+        this.openCamera();
+      }
+    });
+  }
+
   ngAfterViewInit() {
-    // kameru spúšťame až po createBook()
+    this.viewReady.set(true);
+
+    if (this.bookId() && !this.stream) {
+      this.openCamera();
+    }
   }
 
   startNewBook() {
+    if (this.isCreating()) return;
+
     this.isCreating.set(true);
-    this.books.createBook().subscribe({
+    this.books.createBook(this.batchId()).subscribe({
       next: (res) => {
-        this.bookId.set(res.book_id);
         this.isCreating.set(false);
-        this.openCamera();
+
+        this.router.navigate([
+          '/batches',
+          this.batchId(),
+          'books',
+          'capture',
+          res.book_id,
+        ]);
+
+        this.toast.show('Kniha založena.', 'success');
       },
       error: (err) => {
         console.error(err);
@@ -72,8 +106,6 @@ export class BookCaptureComponent implements AfterViewInit {
       const video = this.videoRef.nativeElement;
       video.srcObject = this.stream;
       await video.play();
-
-      console.log('Stream size:', video.videoWidth, 'x', video.videoHeight);
     } catch (e) {
       console.error('Camera error', e);
       this.toast.show('Nepodařilo se otevřít kameru.', 'error');
@@ -122,16 +154,20 @@ export class BookCaptureComponent implements AfterViewInit {
   }
 
   finish() {
-    if (!this.bookId()) return;
+    if (!this.bookId() || this.photoCount() === 0) {
+      this.toast.show('Nejprve vyfoťte alespoň jednu stránku.', 'warning');
+      return;
+    }
 
     this.isFinishing.set(true);
     this.stopCamera();
 
     this.books.startBookWorkflow(this.bookId()!).subscribe({
       next: () => {
+        this.didFinish.set(true);
         this.isFinishing.set(false);
         this.toast.show('Workflow spuštěn.', 'success');
-        this.router.navigate(['/books']);
+        this.router.navigate(['/batches', this.batchId(), 'books']);
       },
       error: (err) => {
         console.error(err);
@@ -141,26 +177,32 @@ export class BookCaptureComponent implements AfterViewInit {
     });
   }
 
-  cancel() {
+  cleanupOnExit() {
+    if (this.cleanupDone()) return true;
+    this.cleanupDone.set(true);
+
+    if (this.isFinishing() || this.didFinish()) return true;
+
     this.stopCamera();
 
     const id = this.bookId();
-    if (!id) {
-      this.router.navigate(['/books']);
-      return;
-    }
+    if (!id) return true;
 
-    this.books.deleteBookRecord(id).subscribe({
-      next: () => {
+    return this.books.deleteBookRecord(id).pipe(
+      map(() => {
         this.toast.show('Naskenování knihy bylo zrušeno.', 'success');
-        this.router.navigate(['/books']);
-      },
-      error: (err) => {
+        return true;
+      }),
+      catchError((err) => {
         console.error(err);
-        this.toast.show('Nepodařilo se zrušit knihu.', 'error');
-        this.router.navigate(['/books']);
-      },
-    });
+        this.toast.show('Nepodařilo se zrušit naskenování knihy.', 'error');
+        return of(true);
+      }),
+    );
+  }
+
+  cancel() {
+    this.router.navigate(['/batches', this.batchId(), 'books']);
   }
 
   private stopCamera() {

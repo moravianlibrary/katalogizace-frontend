@@ -1,9 +1,7 @@
+import { ExtractedMarcRecord, SubDiffIndex } from '@/app/models';
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
-import { ExtractedMarcRecord } from '../../../models/book';
 import { RecordStore } from '../../../stores/record.store';
-import { DiffIndex } from '../../../utils/marc-diff';
-import { MarcDiffHelper } from '../../../utils/marc-diff-helper';
 import { MarcRowLeaderComponent } from '../../marc-row/marc-row-leader/marc-row-leader.component';
 import { MarcRowNormalComponent } from '../../marc-row/marc-row-normal/marc-row-normal.component';
 import { MarcRowSpecialComponent } from '../../marc-row/marc-row-special/marc-row-special.component';
@@ -31,10 +29,8 @@ export class ExtractedMarcRecordTableComponent {
   ds = inject(MarcDiffService);
   recordState = inject(RecordStateService);
 
-  transformed = computed(() => this.store.extractedWithMeta());
+  transformed = computed(() => this.store.openedExtractedWithMeta());
 
-  diffIndex = input<DiffIndex | null>(null);
+  diffIndex = input<SubDiffIndex | null>(null);
   diffSide = input<'opened' | 'preview'>('opened');
-
-  diff = computed(() => new MarcDiffHelper(this.diffIndex()));
 }

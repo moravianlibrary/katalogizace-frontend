@@ -1,20 +1,30 @@
-import { computed, Injectable, signal } from '@angular/core';
 import {
   ExistingMarcRecord,
   ExtractedMarcRecord,
+  FieldType,
   LastEditedRecord,
+  MarcCandidate,
+  RecordViewMode,
   UiFieldWithMeta,
-} from '../models/book';
+} from '@/app/models';
+import { computed, Injectable, signal } from '@angular/core';
 import { extractedToUiFields } from '../utils/marc-transform';
-
-export type RecordViewMode = 'cards' | 'table';
-export type FieldType = 'special' | 'normal';
 
 @Injectable({ providedIn: 'root' })
 export class RecordStateService {
   readonly uiFields = signal<UiFieldWithMeta[]>([]);
 
   readonly viewMode = signal<RecordViewMode>('cards');
+
+  readonly focusTagFieldId = signal<string | null>(null);
+
+  requestFocusTag(fieldId: string) {
+    this.focusTagFieldId.set(fieldId);
+  }
+
+  clearFocusTag() {
+    this.focusTagFieldId.set(null);
+  }
 
   SPECIAL_TAGS = new Set(['001', '003', '005', '006', '007', '008']);
   isControlTag(tag: string): boolean {
@@ -26,7 +36,36 @@ export class RecordStateService {
     this.uiFields.set([...current]);
   }
 
+  applyCandidateToUiField(evt: { fieldId: string; candidate: MarcCandidate }) {
+    const current = this.uiFields();
+    const idx = current.findIndex((f) => f.fieldId === evt.fieldId);
+    if (idx < 0) return;
+
+    const cand = evt.candidate;
+    const rep = cand.MARC_representation;
+
+    const updated = {
+      ...current[idx],
+      ind1: rep.ind1 ?? '',
+      ind2: rep.ind2 ?? '',
+      subfields: (rep.subfields ?? []).map((sf: any) => ({
+        code: sf.code,
+        value: sf.value,
+        isManual: true,
+      })),
+      selectedCandidateId: cand.id,
+      score: cand.score,
+    };
+
+    const next = [...current];
+    next[idx] = updated;
+
+    this.uiFields.set(next);
+  }
+
   toggleViewMode() {
+    this.clearFocusTag();
+
     this.viewMode.update((m) => (m === 'cards' ? 'table' : 'cards'));
   }
 
@@ -37,6 +76,8 @@ export class RecordStateService {
   loadFromExistingOrLastEdited(
     rec: ExistingMarcRecord | LastEditedRecord | null,
   ) {
+    this.clearFocusTag();
+
     if (!rec) {
       this.uiFields.set([]);
       return;
@@ -76,6 +117,8 @@ export class RecordStateService {
   }
 
   loadFromExtracted(extracted: ExtractedMarcRecord | null) {
+    this.clearFocusTag();
+
     if (!extracted) {
       this.uiFields.set([]);
       return;
@@ -109,6 +152,8 @@ export class RecordStateService {
     };
 
     this.uiFields.set([newField, ...current]);
+
+    this.requestFocusTag(newField.fieldId);
   }
 
   removeField(fieldId: string) {

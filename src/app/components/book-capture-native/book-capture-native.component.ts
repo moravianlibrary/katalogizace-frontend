@@ -3,13 +3,18 @@ import {
   Component,
   ElementRef,
   ViewChild,
+  effect,
   inject,
   signal,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
-import { BooksService } from '../../services/books.service';
+import { BooksService } from '../../services/api/books.service';
 import { ToastService } from '../../services/toast.service';
+
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 
 @Component({
   standalone: true,
@@ -21,24 +26,79 @@ export class BookCaptureNativeComponent {
   private books = inject(BooksService);
   private router = inject(Router);
   private toast = inject(ToastService);
+  private route = inject(ActivatedRoute);
 
   @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
 
   bookId = signal<string | null>(null);
+  batchId = signal<string>('');
   isCreating = signal(false);
   isUploading = signal(false);
   isFinishing = signal(false);
   photoCount = signal(0);
 
+  private didFinish = signal(false);
+  private cleanupDone = signal(false);
+
+  private pendingFile = signal<File | null>(null);
+
+  constructor() {
+    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((pm) => {
+      this.batchId.set(pm.get('batchId') ?? '');
+      this.bookId.set(pm.get('bookId'));
+    });
+
+    effect(() => {
+      this.bookId();
+      this.pendingFile();
+      this.tryUploadPending();
+    });
+  }
+
+  private tryUploadPending() {
+    const file = this.pendingFile();
+    const id = this.bookId();
+
+    if (!file || !id) return;
+    if (this.isUploading() || this.isFinishing()) return;
+
+    this.isUploading.set(true);
+
+    this.books.uploadBookImage(id, file).subscribe({
+      next: () => {
+        this.pendingFile.set(null);
+        this.photoCount.update((c) => c + 1);
+        this.toast.show('Stránka úspěšně odfocená', 'success');
+        this.isUploading.set(false);
+      },
+      error: (err) => {
+        console.error(err);
+        this.toast.show('Upload fotky zlyhal.', 'error');
+        this.isUploading.set(false);
+      },
+    });
+  }
+
   startNewBook() {
     if (this.isCreating()) return;
 
     this.isCreating.set(true);
-    this.books.createBook().subscribe({
+    this.books.createBook(this.batchId()).subscribe({
       next: (res) => {
-        this.bookId.set(res.book_id);
         this.isCreating.set(false);
-        this.openNativeCamera();
+
+        this.router.navigate([
+          '/batches',
+          this.batchId(),
+          'books',
+          'capture-native',
+          res.book_id,
+        ]);
+
+        this.toast.show(
+          'Kniha založena. Klikněte na „Vyfotit stránku“.',
+          'success',
+        );
       },
       error: (err) => {
         console.error(err);
@@ -49,7 +109,7 @@ export class BookCaptureNativeComponent {
   }
 
   captureClick() {
-    if (this.isUploading() || this.isFinishing()) return;
+    if (!this.bookId() || this.isUploading() || this.isFinishing()) return;
 
     this.openNativeCamera();
   }
@@ -64,37 +124,26 @@ export class BookCaptureNativeComponent {
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files && input.files[0];
-    if (!file || !this.bookId()) {
+    if (!file) {
       return;
     }
 
-    this.isUploading.set(true);
-    this.books.uploadBookImage(this.bookId()!, file).subscribe({
-      next: () => {
-        this.photoCount.update((c) => c + 1);
-        this.toast.show('Stránka úspěšně odfocená', 'success');
-        this.isUploading.set(false);
-      },
-      error: (err) => {
-        console.error(err);
-        this.toast.show('Upload fotky zlyhal.', 'error');
-        this.isUploading.set(false);
-      },
-    });
+    this.pendingFile.set(file);
   }
 
   finish() {
     if (!this.bookId() || this.photoCount() === 0) {
-      this.toast.show('Nejprve vyfoťte alespoň jednu stránku.', 'error');
+      this.toast.show('Nejprve vyfoťte alespoň jednu stránku.', 'warning');
       return;
     }
 
     this.isFinishing.set(true);
     this.books.startBookWorkflow(this.bookId()!).subscribe({
       next: () => {
+        this.didFinish.set(true);
         this.isFinishing.set(false);
         this.toast.show('Workflow spuštěn.', 'success');
-        this.router.navigate(['/books']);
+        this.router.navigate(['/batches', this.batchId(), 'books']);
       },
       error: (err) => {
         console.error(err);
@@ -104,23 +153,29 @@ export class BookCaptureNativeComponent {
     });
   }
 
-  cancel() {
-    const id = this.bookId();
-    if (!id) {
-      this.router.navigate(['/books']);
-      return;
-    }
+  cleanupOnExit() {
+    if (this.cleanupDone()) return true;
+    this.cleanupDone.set(true);
 
-    this.books.deleteBookRecord(id).subscribe({
-      next: () => {
+    if (this.isFinishing() || this.didFinish()) return true;
+
+    const id = this.bookId();
+    if (!id) return true;
+
+    return this.books.deleteBookRecord(id).pipe(
+      map(() => {
         this.toast.show('Naskenování knihy bylo zrušeno.', 'success');
-        this.router.navigate(['/books']);
-      },
-      error: (err) => {
+        return true;
+      }),
+      catchError((err) => {
         console.error(err);
-        this.toast.show('Nepodařilo se zrušit knihu.', 'error');
-        this.router.navigate(['/books']);
-      },
-    });
+        this.toast.show('Nepodařilo se zrušit naskenování knihy.', 'error');
+        return of(true);
+      }),
+    );
+  }
+
+  cancel() {
+    this.router.navigate(['/batches', this.batchId(), 'books']);
   }
 }

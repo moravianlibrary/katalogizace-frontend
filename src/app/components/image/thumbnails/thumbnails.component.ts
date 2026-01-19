@@ -1,6 +1,6 @@
+import { ImgItem } from '@/app/models';
 import { CommonModule } from '@angular/common';
 import { Component, input, output } from '@angular/core';
-import { ImgItem } from './../../../models/book';
 
 @Component({
   standalone: true,

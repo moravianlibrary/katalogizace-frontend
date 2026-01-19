@@ -1,6 +1,6 @@
+import { Step } from '@/app/models';
 import { CommonModule } from '@angular/common';
 import { Component, inject, input } from '@angular/core';
-import { Step } from '../../models/book';
 import { StepKindLabelPipe } from '../../pipes/step-kind-label.pipe';
 import { WorkingPanelService } from '../../services/working-panel.service';
 

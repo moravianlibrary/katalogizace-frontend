@@ -1,10 +1,9 @@
+import { ExistingMarcRecord, SubDiffIndex } from '@/app/models';
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, input } from '@angular/core';
-import { ExistingMarcRecord } from '../../../models/book';
+import { Component, inject, input } from '@angular/core';
 import { MarcDiffService } from '../../../services/marc-diff.service';
 import { RecordStateService } from '../../../services/record-state.service';
-import { DiffIndex, isDiffableTag015to830 } from '../../../utils/marc-diff';
-import { MarcDiffHelper } from '../../../utils/marc-diff-helper';
+import { isDiffableTag015to830 } from '../../../utils/marc-diff';
 import { MarcRowLeaderComponent } from '../../marc-row/marc-row-leader/marc-row-leader.component';
 import { MarcRowNormalComponent } from '../../marc-row/marc-row-normal/marc-row-normal.component';
 import { MarcRowSpecialComponent } from '../../marc-row/marc-row-special/marc-row-special.component';
@@ -28,8 +27,6 @@ export class ExistingMarcRecordTableComponent {
 
   isDiffableTag015to830 = isDiffableTag015to830;
 
-  diffIndex = input<DiffIndex | null>(null);
+  diffIndex = input<SubDiffIndex | null>(null);
   diffSide = input<'opened' | 'preview'>('opened');
-
-  diff = computed(() => new MarcDiffHelper(this.diffIndex()));
 }

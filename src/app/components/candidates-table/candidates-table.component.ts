@@ -1,3 +1,4 @@
+import { ExistingMarcRecord, MarcCandidate, MarcSubfield } from '@/app/models';
 import { CommonModule } from '@angular/common';
 import {
   Component,
@@ -7,12 +8,7 @@ import {
   input,
   signal,
 } from '@angular/core';
-import {
-  ExistingMarcRecord,
-  MarcCandidate,
-  MarcSubfield,
-} from '../../models/book';
-import { BooksService } from '../../services/books.service';
+import { CatalogueService } from '../../services/api/catalogue.service';
 import { WorkingPanelService } from '../../services/working-panel.service';
 import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
 
@@ -31,7 +27,7 @@ export class CandidatesTableComponent {
   tag = input<string>();
 
   private wps = inject(WorkingPanelService);
-  private books = inject(BooksService);
+  private catalogue = inject(CatalogueService);
 
   sortedCandidates = computed<MarcCandidate[]>(() => {
     const list = [...this.candidates()];
@@ -113,7 +109,7 @@ export class CandidatesTableComponent {
     }
 
     this.autLoading.set(true);
-    this.books.getAutRecord(recordId).subscribe({
+    this.catalogue.getAutRecord(recordId).subscribe({
       next: (rec) => {
         this.autCache.set(recordId, rec);
         this.autRecord.set(rec);

@@ -1,15 +1,18 @@
+import {
+  BatchDto,
+  PaginatedBooksResponseDto,
+  ProcessState,
+  RecordState,
+} from '@/app/models';
 import { DatePipe, NgClass } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import {
-  PaginatedBooksResponse,
-  ProcessState,
-  RecordState,
-} from '../../models/book';
+import { combineLatest } from 'rxjs';
 import { ProcessStateLabelPipe } from '../../pipes/process-state-label.pipe';
 import { RecordStateLabelPipe } from '../../pipes/record-state-label.pipe';
-import { BooksService } from '../../services/books.service';
+import { BatchesService } from '../../services/api/batches.service';
+import { BooksService } from '../../services/api/books.service';
 import { ToastService } from '../../services/toast.service';
 import { WorkingPanelService } from '../../services/working-panel.service';
 
@@ -32,12 +35,16 @@ export class BooksListComponent {
   private destroyRef = inject(DestroyRef);
   private toast = inject(ToastService);
   private wps = inject(WorkingPanelService);
+  private batchesService = inject(BatchesService);
 
   isUploading = false;
 
   loading = signal<boolean>(false);
   error = signal<string | null>(null);
-  data = signal<PaginatedBooksResponse | null>(null);
+  data = signal<PaginatedBooksResponseDto | null>(null);
+
+  batchId = signal<string | null>(null);
+  batch = signal<BatchDto | null>(null);
 
   page = signal<number>(1);
   pageSize = signal<number>(20);
@@ -49,13 +56,31 @@ export class BooksListComponent {
   );
 
   constructor() {
-    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((qp) => {
-      const p = Number(qp.get('page') ?? '1');
-      const ps = Number(qp.get('page_size') ?? '20');
-      this.page.set(isNaN(p) || p < 1 ? 1 : p);
-      this.pageSize.set(isNaN(ps) || ps < 1 ? 20 : ps);
-      this.load();
-    });
+    combineLatest([this.route.paramMap, this.route.queryParamMap])
+      .pipe(takeUntilDestroyed())
+      .subscribe(([pm, qp]) => {
+        const bid = pm.get('batchId');
+        this.batchId.set(bid);
+
+        const p = Number(qp.get('page') ?? '1');
+        const ps = Number(qp.get('page_size') ?? '20');
+        this.page.set(isNaN(p) || p < 1 ? 1 : p);
+        this.pageSize.set(isNaN(ps) || ps < 1 ? 20 : ps);
+
+        if (bid) {
+          this.batchesService.getBatch(bid).subscribe({
+            next: (resp) => this.batch.set(resp),
+            error: (err) => {
+              this.error.set('Nepodařilo se načíst informace o dávce');
+              console.error(err);
+            },
+          });
+        } else {
+          this.batch.set(null);
+        }
+
+        this.load();
+      });
   }
 
   load() {
@@ -66,6 +91,7 @@ export class BooksListComponent {
       .listBooks({
         page: this.page(),
         page_size: this.pageSize(),
+        batch_id: this.batchId()!,
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -142,7 +168,14 @@ export class BooksListComponent {
   }
 
   open(id: string) {
-    this.router.navigate(['/books', id]);
+    const bid = this.batchId();
+
+    if (bid) {
+      this.router.navigate(['/batches', bid, 'books', id]);
+    } else {
+      this.router.navigate(['/batches']);
+    }
+
     this.wps.setMode('records');
   }
 
@@ -154,7 +187,7 @@ export class BooksListComponent {
 
     this.isUploading = true;
 
-    this.books.uploadImages(files).subscribe({
+    this.books.uploadImages(files, this.batchId()!).subscribe({
       next: () => {
         this.toast.show('Obrázky byly úspěšně nahrány.', 'success');
         this.load();
@@ -187,6 +220,42 @@ export class BooksListComponent {
         console.error(err);
         this.toast.show('Smazání knihy se nezdařilo.', 'error');
       },
+    });
+  }
+
+  onRerun(id: string, event: MouseEvent) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    const confirmed = confirm(
+      'Opravdu chcete znovu spustit zpracování této knihy?',
+    );
+    if (!confirmed) return;
+
+    this.books.rerunBookWorkflow(id).subscribe({
+      next: (resp) => {
+        this.patchBookRow(id, resp);
+        this.toast.show('Zpracování knihy bylo znovu spuštěno.', 'success');
+      },
+      error: (err) => {
+        console.error(err);
+        this.toast.show('Znovuspuštění zpracování se nezdařilo.', 'error');
+      },
+    });
+  }
+
+  private patchBookRow(
+    bookId: string,
+    patch: Partial<PaginatedBooksResponseDto['books'][number]>,
+  ) {
+    const d = this.data();
+    if (!d) return;
+
+    this.data.set({
+      ...d,
+      books: d.books.map((b) =>
+        b.book_id === bookId ? { ...b, ...patch } : b,
+      ),
     });
   }
 }

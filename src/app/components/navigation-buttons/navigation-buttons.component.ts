@@ -1,9 +1,7 @@
 import { Component, HostListener, inject, input, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { BooksService } from '../../services/books.service';
+import { BooksService } from '../../services/api/books.service';
 import { RecordStateService } from '../../services/record-state.service';
 import { ToastService } from '../../services/toast.service';
-import { WorkingPanelService } from '../../services/working-panel.service';
 
 @Component({
   selector: 'app-navigation-buttons',
@@ -11,10 +9,6 @@ import { WorkingPanelService } from '../../services/working-panel.service';
   templateUrl: './navigation-buttons.component.html',
 })
 export class NavigationButtonsComponent {
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
-  private wps = inject(WorkingPanelService);
-
   bookId = input.required<string>();
 
   private books = inject(BooksService);
@@ -43,20 +37,6 @@ export class NavigationButtonsComponent {
   addSpecialField() {
     this.showAddMenu.set(false);
     this.recordState.addField('special');
-  }
-
-  goBack() {
-    this.wps.showRecords();
-    this.recordState.resetViewMode();
-
-    this.router
-      .navigate(['..'], {
-        relativeTo: this.route,
-        queryParamsHandling: 'preserve',
-      })
-      .catch(() => {
-        this.router.navigate(['/books']);
-      });
   }
 
   onSave() {

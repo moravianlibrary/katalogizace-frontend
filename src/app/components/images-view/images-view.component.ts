@@ -1,3 +1,4 @@
+import { ApiImageItem, ImgItem, PageType } from '@/app/models';
 import {
   Component,
   computed,
@@ -6,8 +7,7 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { ApiImageItem, ImgItem, PageType } from '../../models/book';
-import { BooksService } from '../../services/books.service';
+import { BooksService } from '../../services/api/books.service';
 import { ImageLargePreviewComponent } from '../image/preview/preview.component';
 import { ImageThumbnailsComponent } from '../image/thumbnails/thumbnails.component';
 
@@ -56,9 +56,17 @@ export class ImagesViewComponent {
   constructor() {
     effect(() => {
       const apiImages = this.images();
+      const bookId = this.bookId();
+
+      if (!bookId || apiImages.length === 0) {
+        this.items.set([]);
+        this.selectedId.set(null);
+        this.fullLoaded.clear();
+        return;
+      }
 
       this.items.set(
-        apiImages.map<ImgItem>((img) => ({
+        apiImages.map((img) => ({
           id: img.image_id,
           url: '',
           loading: true,
@@ -74,7 +82,7 @@ export class ImagesViewComponent {
 
       for (const img of apiImages) {
         const id = img.image_id;
-        this.bookService.getBookImage(this.bookId()!, id, true).subscribe({
+        this.bookService.getBookImage(bookId, id, true).subscribe({
           next: (blob) => {
             const url = URL.createObjectURL(blob);
             this.items.update((arr) =>
@@ -99,11 +107,8 @@ export class ImagesViewComponent {
         });
       }
 
-      const firstIdCopy = firstId;
       setTimeout(() => {
-        if (this.selectedId() === firstIdCopy) {
-          this.ensureFull(firstIdCopy);
-        }
+        if (this.selectedId() === firstId) this.ensureFull(firstId);
       });
     });
   }

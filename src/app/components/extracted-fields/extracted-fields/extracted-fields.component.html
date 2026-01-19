@@ -2,7 +2,7 @@
   @if (this.recordState.uiFields().length === 0) {
     <div class="text-light text-sm">Žádná pole.</div>
   } @else {
-    @for (f of this.recordState.uiFields(); track $index) {
+    @for (f of this.recordState.uiFields(); track f.fieldId) {
       <app-extracted-field-card [field]="f" />
     }
   }

@@ -1,16 +1,14 @@
+import { ExistingMarcRecord, MarcRecordsItem } from '@/app/models';
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { ExistingMarcRecord, ExtractedMarcRecord } from '../../models/book';
 import { MarcDiffService } from '../../services/marc-diff.service';
 import { RecordStateService } from '../../services/record-state.service';
+import { WorkingPanelService } from '../../services/working-panel.service';
 import { RecordStore } from '../../stores/record.store';
+import { filterExistingRecord015to830 } from '../../utils/marc-filter';
 import { extractedToExisting } from '../../utils/marc-transform';
 import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
 import { ExtractedMarcRecordTableComponent } from '../marc-record-table/extracted-marc-record-table/extracted-marc-record-table.component';
-interface RecordType {
-  extracted: ExtractedMarcRecord | null;
-  existing: ExistingMarcRecord | null;
-}
 
 @Component({
   standalone: true,
@@ -23,8 +21,10 @@ interface RecordType {
   templateUrl: './marc-records.component.html',
 })
 export class MarcRecordsComponent {
-  private store = inject(RecordStore);
+  store = inject(RecordStore);
   private recordState = inject(RecordStateService);
+
+  private wps = inject(WorkingPanelService);
 
   existingRecords = this.store.existingRecords;
   extractedRecord = this.store.extracted;
@@ -36,8 +36,8 @@ export class MarcRecordsComponent {
   private diff = inject(MarcDiffService);
   diffIndex = this.diff.diffIndex;
 
-  records = computed<RecordType[]>(() => {
-    const list: RecordType[] = [];
+  records = computed<MarcRecordsItem[]>(() => {
+    const list: MarcRecordsItem[] = [];
     const extracted = this.extractedRecord();
 
     if (extracted) {
@@ -59,25 +59,50 @@ export class MarcRecordsComponent {
 
   expandedIndex = signal<number | null>(0);
 
+  private lastAppliedKey: string | null = null;
+
   constructor() {
-    // nastav default otvorený record (keď sa načítajú records)
     effect(() => {
       const idx = this.expandedIndex();
       const list = this.records();
 
       if (idx == null || !list[idx]) {
-        this.store.setOpenedRecord(null);
+        this.store.setOpenedExisting(null);
+        this.store.setOpenedExtracted(null);
         return;
       }
 
       const item = list[idx];
       if (item.existing) {
-        this.store.setOpenedRecord(item.existing);
-      } else if (item.extracted) {
-        this.store.setOpenedRecord(extractedToExisting(item.extracted));
-      } else {
-        this.store.setOpenedRecord(null);
+        this.store.setOpenedExisting(item.existing);
+        return;
       }
+
+      if (item.extracted) {
+        this.store.setOpenedExtracted(item.extracted);
+        return;
+      }
+
+      this.store.setOpenedExisting(null);
+      this.store.setOpenedExtracted(null);
+    });
+
+    effect(() => {
+      const evt = this.wps.applyCandidate();
+      if (!evt) return;
+
+      const key = `${evt.fieldId}:${evt.candidate.id}`;
+      if (this.lastAppliedKey === key) return;
+      this.lastAppliedKey = key;
+
+      this.recordState.applyCandidateToUiField({
+        fieldId: evt.fieldId,
+        candidate: evt.candidate,
+      });
+
+      this.store.applyCandidateToOpenedExtracted(evt.fieldId, evt.candidate);
+
+      this.wps.applyCandidate.set(null);
     });
   }
 
@@ -130,6 +155,21 @@ export class MarcRecordsComponent {
   }
 
   onTakeRecord() {
-    this.recordState.loadFromExtracted(this.extractedRecord());
+    const idx = this.expandedIndex();
+    if (idx === null) {
+      return;
+    }
+
+    const rec = this.records()[idx];
+    if (!rec) {
+      return;
+    }
+
+    if (idx === 0) {
+      this.recordState.loadFromExtracted(rec.extracted);
+    } else {
+      const filtered = filterExistingRecord015to830(rec.existing!);
+      this.recordState.loadFromExistingOrLastEdited(filtered);
+    }
   }
 }
