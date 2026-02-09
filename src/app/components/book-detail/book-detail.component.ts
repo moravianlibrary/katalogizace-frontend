@@ -1,4 +1,4 @@
-import { ApiImageItem } from '@/app/models';
+import { ApiImageItem, ID } from '@/app/models';
 import { RecordStateService } from '@/app/services/record-state.service';
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -24,12 +24,21 @@ export class BookDetailComponent {
   private toast = inject(ToastService);
   private recordState = inject(RecordStateService);
 
-  bookId = this.route.snapshot.paramMap.get('bookId') ?? '';
+  bookId: ID | null = (() => {
+    const id = this.route.snapshot.paramMap.get('bookId');
+    const n = Number(id);
+    return Number.isFinite(n) ? n : null;
+  })();
 
   images = signal<ApiImageItem[]>([]);
 
   ngOnInit() {
-    this.bookService.getBookResult(this.bookId).subscribe({
+    if (this.bookId === null) {
+      this.toast.show('Neplatné ID knihy', 'error');
+      return;
+    }
+
+    this.bookService.getBookResult(this.bookId.toString()).subscribe({
       next: (data) => {
         this.images.set(data.images);
 

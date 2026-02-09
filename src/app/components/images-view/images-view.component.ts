@@ -1,4 +1,4 @@
-import { ApiImageItem, ImgItem, PageType } from '@/app/models';
+import { ApiImageItem, ID, ImgItem, PageType } from '@/app/models';
 import {
   Component,
   computed,
@@ -20,13 +20,13 @@ import { ImageThumbnailsComponent } from '../image/thumbnails/thumbnails.compone
 export class ImagesViewComponent {
   private bookService = inject(BooksService);
 
-  bookId = input<string | null>(null);
+  bookId = input<ID | null>(null);
   images = input<ApiImageItem[]>([]);
 
   items = signal<ImgItem[]>([]);
-  selectedId = signal<string | null>(null);
+  selectedId = signal<ID | null>(null);
 
-  private fullLoaded = new Set<string>();
+  private fullLoaded = new Set<ID>();
 
   selectedItem = computed(() => {
     const id = this.selectedId();
@@ -82,29 +82,31 @@ export class ImagesViewComponent {
 
       for (const img of apiImages) {
         const id = img.image_id;
-        this.bookService.getBookImage(bookId, id, true).subscribe({
-          next: (blob) => {
-            const url = URL.createObjectURL(blob);
-            this.items.update((arr) =>
-              arr.map((x) =>
-                x.id === id ? { ...x, url, loading: false, error: null } : x,
-              ),
-            );
-          },
-          error: () => {
-            this.items.update((arr) =>
-              arr.map((x) =>
-                x.id === id
-                  ? {
-                      ...x,
-                      loading: false,
-                      error: 'Nepodařilo se načíst náhled.',
-                    }
-                  : x,
-              ),
-            );
-          },
-        });
+        this.bookService
+          .getBookImage(bookId.toString(), id.toString(), true)
+          .subscribe({
+            next: (blob) => {
+              const url = URL.createObjectURL(blob);
+              this.items.update((arr) =>
+                arr.map((x) =>
+                  x.id === id ? { ...x, url, loading: false, error: null } : x,
+                ),
+              );
+            },
+            error: () => {
+              this.items.update((arr) =>
+                arr.map((x) =>
+                  x.id === id
+                    ? {
+                        ...x,
+                        loading: false,
+                        error: 'Nepodařilo se načíst náhled.',
+                      }
+                    : x,
+                ),
+              );
+            },
+          });
       }
 
       setTimeout(() => {
@@ -113,35 +115,39 @@ export class ImagesViewComponent {
     });
   }
 
-  ensureFull(id: string) {
+  ensureFull(id: ID) {
     if (this.fullLoaded.has(id)) return;
 
     const it = this.items().find((x) => x.id === id);
     if (!it) return;
 
-    this.bookService.getBookImage(this.bookId()!, id, false).subscribe({
-      next: (blob) => {
-        const fullUrl = URL.createObjectURL(blob);
-        if (it.url) URL.revokeObjectURL(it.url);
+    this.bookService
+      .getBookImage(this.bookId()!.toString(), id.toString(), false)
+      .subscribe({
+        next: (blob) => {
+          const fullUrl = URL.createObjectURL(blob);
+          if (it.url) URL.revokeObjectURL(it.url);
 
-        this.items.update((arr) =>
-          arr.map((x) =>
-            x.id === id ? { ...x, url: fullUrl, error: null } : x,
-          ),
-        );
-        this.fullLoaded.add(id);
-      },
-      error: () => {
-        this.items.update((arr) =>
-          arr.map((x) =>
-            x.id === id ? { ...x, error: 'Nepodařilo se načíst obrázek.' } : x,
-          ),
-        );
-      },
-    });
+          this.items.update((arr) =>
+            arr.map((x) =>
+              x.id === id ? { ...x, url: fullUrl, error: null } : x,
+            ),
+          );
+          this.fullLoaded.add(id);
+        },
+        error: () => {
+          this.items.update((arr) =>
+            arr.map((x) =>
+              x.id === id
+                ? { ...x, error: 'Nepodařilo se načíst obrázek.' }
+                : x,
+            ),
+          );
+        },
+      });
   }
 
-  onSelect(id: string) {
+  onSelect(id: ID) {
     this.selectedId.set(id);
     this.ensureFull(id);
   }

@@ -1,13 +1,13 @@
 import { BookStatusResponseDto } from '../books/book.dto';
-import { UUID } from '../shared/id.model';
+import { ID } from '../shared/id.model';
 import { BatchState, ProcessState } from '../shared/states.model';
 
 export type BatchDto = {
-  batch_id: UUID;
+  batch_id: ID;
   name: string;
   description: string | null;
   state: BatchState;
-  book_ids: UUID[];
+  book_ids: ID[];
   created_by: string;
   created_at: string;
   modified_at: string;
@@ -23,7 +23,7 @@ export type PaginatedBatchesResponseDto = {
 };
 
 export interface BatchBooksResponseDto {
-  batch_id: UUID;
+  batch_id: ID;
   books: BookStatusResponseDto[];
   total_count: number;
   state_counts: Record<ProcessState, number>;

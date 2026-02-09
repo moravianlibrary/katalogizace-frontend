@@ -5,6 +5,7 @@ import {
   LastEditedRecord,
   MarcCandidate,
   Step,
+  UUID,
 } from '@/app/models';
 import { computed, Injectable, signal } from '@angular/core';
 import { extractedToExistingWithMeta } from '../utils/marc-transform';
@@ -95,7 +96,7 @@ export class RecordStore {
     });
   }
 
-  applyCandidateToOpenedExtracted(fieldId: string, candidate: MarcCandidate) {
+  applyCandidateToOpenedExtracted(fieldId: UUID, candidate: MarcCandidate) {
     const ex = this.openedExtractedWithMeta();
     if (!ex) return;
 

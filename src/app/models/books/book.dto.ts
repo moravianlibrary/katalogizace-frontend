@@ -1,4 +1,4 @@
-import { UUID } from '../shared/id.model';
+import { ID, UUID } from '../shared/id.model';
 import { ProcessState, RecordState } from '../shared/states.model';
 import { ApiImageItem } from './images.model';
 import {
@@ -9,14 +9,14 @@ import {
 import { Step } from './provenance.dto';
 
 export interface BookCommonDto {
-  book_id: UUID;
+  book_id: ID;
   created_at: string | null;
   modified_at: string | null;
   process_state: ProcessState;
   record_state: RecordState;
   images: ApiImageItem[];
-  hatchet_workflow_id: string | null;
-  batch_id: string | null;
+  hatchet_workflow_id: UUID | null;
+  batch_id: ID | null;
   error_message: string | null;
 }
 
@@ -41,16 +41,16 @@ export interface BookResultResponseDto extends BookCommonDto {
 }
 
 export interface BookUploadResponseDto {
-  book_id: UUID;
+  book_id: ID;
   process_state: ProcessState;
   record_state: RecordState;
-  hatchet_workflow_id: string | null;
-  batch_id: string | null;
+  hatchet_workflow_id: UUID | null;
+  batch_id: ID;
   images: ApiImageItem[];
   created_at: string;
 }
 
 export interface BookImageUploadResponseDto {
-  book_id: UUID;
-  image_id: UUID;
+  book_id: ID;
+  image_id: ID;
 }

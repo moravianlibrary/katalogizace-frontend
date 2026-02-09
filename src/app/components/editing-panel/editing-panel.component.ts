@@ -1,4 +1,4 @@
-import { UUID } from '@/app/models';
+import { ID } from '@/app/models';
 import { Component, effect, inject, input } from '@angular/core';
 import { MarcDiffService } from '../../services/marc-diff.service';
 import { RecordStateService } from '../../services/record-state.service';
@@ -18,7 +18,7 @@ import { NavigationButtonsComponent } from '../navigation-buttons/navigation-but
   templateUrl: './editing-panel.component.html',
 })
 export class EditingPanelComponent {
-  book_id = input<UUID>('');
+  book_id = input<ID | null>(null);
 
   recordState = inject(RecordStateService);
   store = inject(RecordStore);

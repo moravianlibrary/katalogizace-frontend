@@ -15,6 +15,7 @@ import { combineLatest } from 'rxjs';
 import {
   BatchDto,
   BatchState,
+  ID,
   PaginatedBatchesResponseDto,
 } from '@/app/models';
 import { BatchStateLabelPipe } from '../../pipes/batch-state-label.pipe';
@@ -143,22 +144,22 @@ export class BatchesListComponent {
     this.navigateWithQuery({ page: 1, mine: this.filterMine() ? '1' : '0' });
   }
 
-  open(batchId: string) {
-    this.router.navigate(['/batches', batchId, 'books']);
+  open(batchId: ID) {
+    this.router.navigate(['/batches', batchId.toString(), 'books']);
   }
 
   countBooks(b: BatchDto) {
     return b.book_ids?.length ?? 0;
   }
 
-  onDelete(batchId: string, event: MouseEvent) {
+  onDelete(batchId: ID, event: MouseEvent) {
     event.stopPropagation();
     event.preventDefault();
 
     const confirmed = confirm('Opravdu chcete smazat tuto dávku?');
     if (!confirmed) return;
 
-    this.batches.deleteBatch(batchId).subscribe({
+    this.batches.deleteBatch(batchId.toString()).subscribe({
       next: () => {
         this.toast.show('Dávka byla úspěšně smazána.', 'success');
         this.load();
@@ -196,7 +197,7 @@ export class BatchesListComponent {
         this.newDescription.set('');
         this.creating.set(false);
 
-        this.router.navigate(['/batches', batch.batch_id, 'books']);
+        this.router.navigate(['/batches', batch.batch_id.toString(), 'books']);
       },
       error: (err) => {
         console.error(err);
@@ -265,7 +266,7 @@ export class BatchesListComponent {
     this.savingEdit.set(true);
 
     this.batches
-      .updateBatch(b.batch_id, {
+      .updateBatch(b.batch_id.toString(), {
         name,
         description,
       })

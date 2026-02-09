@@ -1,5 +1,6 @@
 import { MarcCandidate } from '../books/marc.dto';
 import { Step } from '../books/provenance.dto';
+import { UUID } from './id.model';
 
 export type PanelMode = 'records' | 'candidates' | 'provenance' | 'delete';
 
@@ -9,13 +10,13 @@ export interface PanelState {
   title?: string;
   candidates?: MarcCandidate[];
   steps?: Step[];
-  fieldId?: string;
+  fieldId?: UUID;
   subfields?: { code: string; value: string }[];
-  selectedCandidateId?: string;
+  selectedCandidateId?: UUID;
 }
 
 export type ApplyCandidateEvent = {
-  fieldId: string;
+  fieldId: UUID;
   tag: string;
   candidate: MarcCandidate;
 };

@@ -1,4 +1,4 @@
-import { UUID } from '../shared/id.model';
+import { ID } from '../shared/id.model';
 
 export type PageType =
   | 'TitlePage'
@@ -10,12 +10,12 @@ export type PageType =
   | 'Unknown';
 
 export interface ApiImageItem {
-  image_id: UUID;
+  image_id: ID;
   page_type: PageType | null;
 }
 
 export interface ImgItem {
-  id: string;
+  id: ID;
   url: string;
   loading: boolean;
   error: string | null;

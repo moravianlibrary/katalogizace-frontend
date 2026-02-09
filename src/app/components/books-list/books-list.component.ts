@@ -1,5 +1,6 @@
 import {
   BatchDto,
+  ID,
   PaginatedBooksResponseDto,
   ProcessState,
   RecordState,
@@ -43,7 +44,7 @@ export class BooksListComponent {
   error = signal<string | null>(null);
   data = signal<PaginatedBooksResponseDto | null>(null);
 
-  batchId = signal<string | null>(null);
+  batchId = signal<ID | null>(null);
   batch = signal<BatchDto | null>(null);
 
   page = signal<number>(1);
@@ -59,7 +60,8 @@ export class BooksListComponent {
     combineLatest([this.route.paramMap, this.route.queryParamMap])
       .pipe(takeUntilDestroyed())
       .subscribe(([pm, qp]) => {
-        const bid = pm.get('batchId');
+        const bidParam = pm.get('batchId');
+        const bid = bidParam !== null ? Number(bidParam) : null;
         this.batchId.set(bid);
 
         const p = Number(qp.get('page') ?? '1');
@@ -68,7 +70,7 @@ export class BooksListComponent {
         this.pageSize.set(isNaN(ps) || ps < 1 ? 20 : ps);
 
         if (bid) {
-          this.batchesService.getBatch(bid).subscribe({
+          this.batchesService.getBatch(bid.toString()).subscribe({
             next: (resp) => this.batch.set(resp),
             error: (err) => {
               this.error.set('Nepodařilo se načíst informace o dávce');
@@ -91,7 +93,7 @@ export class BooksListComponent {
       .listBooks({
         page: this.page(),
         page_size: this.pageSize(),
-        batch_id: this.batchId()!,
+        batch_id: this.batchId()!.toString(),
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -167,11 +169,16 @@ export class BooksListComponent {
     }
   }
 
-  open(id: string) {
+  open(id: ID) {
     const bid = this.batchId();
 
     if (bid) {
-      this.router.navigate(['/batches', bid, 'books', id]);
+      this.router.navigate([
+        '/batches',
+        bid.toString(),
+        'books',
+        id.toString(),
+      ]);
     } else {
       this.router.navigate(['/batches']);
     }
@@ -187,7 +194,7 @@ export class BooksListComponent {
 
     this.isUploading = true;
 
-    this.books.uploadImages(files, this.batchId()!).subscribe({
+    this.books.uploadImages(files, this.batchId()?.toString()!).subscribe({
       next: () => {
         this.toast.show('Obrázky byly úspěšně nahrány.', 'success');
         this.load();
@@ -204,14 +211,14 @@ export class BooksListComponent {
     });
   }
 
-  onDelete(id: string, event: MouseEvent) {
+  onDelete(id: ID, event: MouseEvent) {
     event.stopPropagation();
     event.preventDefault();
 
     const confirmed = confirm('Opravdu chcete smazat tuto knihu?');
     if (!confirmed) return;
 
-    this.books.deleteBookRecord(id).subscribe({
+    this.books.deleteBookRecord(id.toString()).subscribe({
       next: () => {
         this.toast.show('Kniha byla úspěšně smazána.', 'success');
         this.load();
@@ -223,7 +230,7 @@ export class BooksListComponent {
     });
   }
 
-  onRerun(id: string, event: MouseEvent) {
+  onRerun(id: ID, event: MouseEvent) {
     event.stopPropagation();
     event.preventDefault();
 
@@ -232,7 +239,7 @@ export class BooksListComponent {
     );
     if (!confirmed) return;
 
-    this.books.rerunBookWorkflow(id).subscribe({
+    this.books.rerunBookWorkflow(id.toString()).subscribe({
       next: (resp) => {
         this.patchBookRow(id, resp);
         this.toast.show('Zpracování knihy bylo znovu spuštěno.', 'success');
@@ -245,7 +252,7 @@ export class BooksListComponent {
   }
 
   private patchBookRow(
-    bookId: string,
+    bookId: ID,
     patch: Partial<PaginatedBooksResponseDto['books'][number]>,
   ) {
     const d = this.data();

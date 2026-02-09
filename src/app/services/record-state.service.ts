@@ -2,10 +2,12 @@ import {
   ExistingMarcRecord,
   ExtractedMarcRecord,
   FieldType,
+  ID,
   LastEditedRecord,
   MarcCandidate,
   RecordViewMode,
   UiFieldWithMeta,
+  UUID,
 } from '@/app/models';
 import { computed, Injectable, signal } from '@angular/core';
 import { extractedToUiFields } from '../utils/marc-transform';
@@ -16,9 +18,9 @@ export class RecordStateService {
 
   readonly viewMode = signal<RecordViewMode>('cards');
 
-  readonly focusTagFieldId = signal<string | null>(null);
+  readonly focusTagFieldId = signal<UUID | null>(null);
 
-  requestFocusTag(fieldId: string) {
+  requestFocusTag(fieldId: UUID) {
     this.focusTagFieldId.set(fieldId);
   }
 
@@ -36,7 +38,7 @@ export class RecordStateService {
     this.uiFields.set([...current]);
   }
 
-  applyCandidateToUiField(evt: { fieldId: string; candidate: MarcCandidate }) {
+  applyCandidateToUiField(evt: { fieldId: UUID; candidate: MarcCandidate }) {
     const current = this.uiFields();
     const idx = current.findIndex((f) => f.fieldId === evt.fieldId);
     if (idx < 0) return;
@@ -156,12 +158,12 @@ export class RecordStateService {
     this.requestFocusTag(newField.fieldId);
   }
 
-  removeField(fieldId: string) {
+  removeField(fieldId: UUID) {
     const current = this.uiFields();
     this.uiFields.set(current.filter((f) => f.fieldId !== fieldId));
   }
 
-  buildExistingRecord(bookId: string): LastEditedRecord | null {
+  buildExistingRecord(bookId: ID): LastEditedRecord | null {
     const preview = this.recordPreview();
 
     if (!preview) {

@@ -1,4 +1,4 @@
-import { ImgItem } from '@/app/models';
+import { ID, ImgItem } from '@/app/models';
 import { CommonModule } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 
@@ -10,11 +10,11 @@ import { Component, input, output } from '@angular/core';
 })
 export class ImageThumbnailsComponent {
   items = input.required<ImgItem[]>();
-  selectedId = input<string | null>(null);
+  selectedId = input<ID | null>(null);
 
-  select = output<string>();
+  select = output<ID>();
 
-  onPick(id: string) {
+  onPick(id: ID) {
     this.select.emit(id);
   }
 }

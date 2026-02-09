@@ -1,4 +1,9 @@
-import { ExistingMarcRecord, MarcCandidate, MarcSubfield } from '@/app/models';
+import {
+  ExistingMarcRecord,
+  MarcCandidate,
+  MarcSubfield,
+  UUID,
+} from '@/app/models';
 import { CommonModule } from '@angular/common';
 import {
   Component,
@@ -22,7 +27,7 @@ export class CandidatesTableComponent {
   title = input.required<string>();
   candidates = input.required<MarcCandidate[]>();
 
-  selectedCandidateId = input<string | null>(null);
+  selectedCandidateId = input<UUID | null>(null);
 
   tag = input<string>();
 
@@ -36,7 +41,7 @@ export class CandidatesTableComponent {
     return list.sort((a, b) => norm(b.score) - norm(a.score));
   });
 
-  selectedId = signal<string | null>(null);
+  selectedId = signal<UUID | null>(null);
 
   private autoSelectOnChange = effect(() => {
     const list = this.sortedCandidates();
@@ -144,7 +149,7 @@ export class CandidatesTableComponent {
     ];
   }
 
-  onRowClick(id: string) {
+  onRowClick(id: UUID) {
     this.selectedId.set(id);
   }
 

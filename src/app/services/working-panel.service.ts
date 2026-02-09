@@ -4,6 +4,7 @@ import {
   PanelMode,
   PanelState,
   Step,
+  UUID,
 } from '@/app/models';
 import { Injectable, signal } from '@angular/core';
 
@@ -33,9 +34,9 @@ export class WorkingPanelService {
 
   showCandidates(
     tag: string,
-    fieldId: string,
+    fieldId: UUID,
     candidates: MarcCandidate[],
-    selectedCandidateId: string,
+    selectedCandidateId: UUID,
   ) {
     this.setMode('candidates', {
       tag,
@@ -45,7 +46,7 @@ export class WorkingPanelService {
     });
   }
 
-  confirmCandidate(candidateId: string) {
+  confirmCandidate(candidateId: UUID) {
     const s = this.state();
     if (
       s.mode !== 'candidates' ||
@@ -70,7 +71,7 @@ export class WorkingPanelService {
     this.showRecords();
   }
 
-  showProvenance(title: string, steps: Step[], fieldId: string) {
+  showProvenance(title: string, steps: Step[], fieldId: UUID) {
     this.setMode('provenance', { title, steps, fieldId });
   }
 }

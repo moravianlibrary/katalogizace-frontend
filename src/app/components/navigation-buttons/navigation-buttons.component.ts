@@ -1,3 +1,4 @@
+import { ID } from '@/app/models';
 import { Component, HostListener, inject, input, signal } from '@angular/core';
 import { BooksService } from '../../services/api/books.service';
 import { RecordStateService } from '../../services/record-state.service';
@@ -9,7 +10,7 @@ import { ToastService } from '../../services/toast.service';
   templateUrl: './navigation-buttons.component.html',
 })
 export class NavigationButtonsComponent {
-  bookId = input.required<string>();
+  bookId = input.required<ID>();
 
   private books = inject(BooksService);
   private toast = inject(ToastService);
@@ -50,7 +51,7 @@ export class NavigationButtonsComponent {
 
     this.isSaving.set(true);
 
-    this.books.submitRevision(bookId, record).subscribe({
+    this.books.submitRevision(bookId.toString(), record).subscribe({
       next: () => {
         this.isSaving.set(false);
         this.toast.show('Záznam byl úspěšně uložen.', 'success');

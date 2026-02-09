@@ -1,5 +1,5 @@
 <section class="flex h-full flex-col gap-5 p-6">
-  <app-navigation-buttons [bookId]="book_id()"></app-navigation-buttons>
+  <app-navigation-buttons [bookId]="book_id()!"></app-navigation-buttons>
 
   @if (this.store.hasLastEdited()) {
     <div

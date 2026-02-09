@@ -1,3 +1,4 @@
+import { UUID } from '../shared/id.model';
 import {
   ExistingMarcRecord,
   ExistingMarcRecordNormalField,
@@ -6,8 +7,8 @@ import {
 } from './marc.dto';
 
 export interface ExistingMarcRecordFieldMeta {
-  fieldId: string;
-  selectedCandidateId: string | null;
+  fieldId: UUID;
+  selectedCandidateId: UUID | null;
   candidates: MarcCandidate[];
   score: number;
 }

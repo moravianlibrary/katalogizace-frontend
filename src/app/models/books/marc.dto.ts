@@ -33,7 +33,7 @@ export interface MarcSubfield {
 }
 
 export interface ExistingMarcRecord {
-  record_id: string;
+  record_id: UUID;
   leader: string;
   source: string;
   quality_assessment: QualityScore | null;
