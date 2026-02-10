@@ -283,7 +283,7 @@
   background-color: var(--color-red-500);
 }
 @utility bg-main-success {
-  background-color: var(--color-green-500);
+  background-color: var(--color-green-600);
 }
 @utility bg-main-warning {
   background-color: var(--color-orange-500);
@@ -320,6 +320,9 @@
 @utility bg-main-success-rate-90-100 {
   background-color: var(--color-green-600);
 }
+@utility bg-main-success-unknown {
+  background-color: var(--color-gray-400);
+}
 
 /* ========== TEXT ========== */
 
@@ -341,6 +344,15 @@
 }
 
 /* Button texty */
+@utility text-btn-primary-default {
+  color: var(--color-white);
+}
+@utility text-btn-primary-hover {
+  color: var(--color-gray-50);
+}
+@utility text-btn-primary-pressed {
+  color: var(--color-gray-50);
+}
 @utility text-btn-primary-disable {
   color: var(--color-teal-200);
 }
@@ -355,7 +367,7 @@
   color: var(--color-teal-700);
 }
 @utility text-btn-secondary-disable {
-  color: var(--color-teal-200);
+  color: var(--color-teal-300);
 }
 
 @utility text-btn-tertiary-default {
@@ -382,7 +394,7 @@
   color: var(--color-orange-500);
 }
 @utility text-success {
-  color: var(--color-green-500);
+  color: var(--color-green-600);
 }
 
 /* Success rate */
@@ -466,7 +478,7 @@
 
 /* Tertiary */
 @utility border-tertiary-default {
-  border-color: var(--color-gray-500);
+  border-color: var(--color-gray-400);
 }
 @utility border-tertiary-hover {
   border-color: var(--color-gray-600);
@@ -527,13 +539,13 @@
 
 /* Primary */
 @utility icon-primary-default {
-  fill: var(--color-teal-500);
+  fill: var(--color-white);
 }
 @utility icon-primary-hover {
-  fill: var(--color-teal-600);
+  fill: var(--color-gray-50);
 }
 @utility icon-primary-pressed {
-  fill: var(--color-teal-700);
+  fill: var(--color-gray-50);
 }
 @utility icon-primary-disable {
   fill: var(--color-teal-200);
@@ -578,7 +590,7 @@
   fill: var(--color-orange-500);
 }
 @utility icon-success {
-  fill: var(--color-green-500);
+  fill: var(--color-green-600);
 }
 
 /* Black */
@@ -626,6 +638,14 @@
   box-sizing: border-box;
 }
 
+body,
+button,
+input,
+textarea,
+select {
+  color: var(--color-gray-1000);
+}
+
 h1,
 h2,
 h3,
@@ -633,7 +653,6 @@ h4,
 h5,
 h6 {
   font-weight: var(--font-weight-regular);
-  color: var(--color-gray-1000);
 }
 
 h1 {
