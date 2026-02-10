@@ -1,0 +1,95 @@
+/* ========== BUTTONS ========== */
+
+/* prettier-ignore */
+@utility btn {
+  @apply
+    inline-flex
+    rounded-lg
+    font-medium
+
+    cursor-pointer
+    disabled:cursor-not-allowed
+
+    transition-colors
+    duration-150
+    ease-in-out;
+}
+
+/* prettier-ignore */
+@utility btn-s {
+  @apply
+    px-3
+    py-2
+    text-sm;
+  line-height: var(--text-sm-tight--line-height);
+}
+
+/* prettier-ignore */
+@utility btn-m {
+  @apply
+    px-4
+    py-3
+    text-sm;
+  line-height: var(--text-sm-tight--line-height);
+}
+
+/* prettier-ignore */
+@utility btn-l {
+  @apply
+    px-4
+    py-3
+    text-md;
+}
+
+/* prettier-ignore */
+@utility btn-primary {
+  @apply
+    bg-main-primary-default
+    text-btn-primary-default
+
+    hover:bg-main-primary-hover
+    hover:text-btn-primary-hover
+
+    active:bg-main-primary-pressed
+    active:text-btn-primary-pressed
+
+    disabled:bg-main-primary-disable
+    disabled:text-btn-primary-disable;
+}
+
+/* prettier-ignore */
+@utility btn-secondary {
+  @apply
+    bg-main-secondary-default
+    text-btn-secondary-default
+
+    hover:bg-main-secondary-hover
+    hover:text-btn-secondary-hover
+
+    active:bg-main-secondary-pressed
+    active:text-btn-secondary-pressed
+
+    disabled:bg-main-secondary-disable
+    disabled:text-btn-secondary-disable;
+}
+
+/* prettier-ignore */
+@utility btn-tertiary {
+  @apply
+    bg-white
+    text-secondary
+    border
+    border-tertiary-default
+
+    hover:bg-white
+    hover:text-base-color
+    hover:border-tertiary-hover
+
+    active:bg-white
+    active:text-base-color
+    active:border-tertiary-pressed
+
+    disabled:bg-white
+    disabled:text-btn-tertiary-disable
+    disabled:border-tertiary-disable;
+}

@@ -1,0 +1,415 @@
+/* ========== BG - Main ========== */
+
+/* neutral */
+@utility bg-main-base {
+  background-color: var(--color-gray-25);
+}
+@utility bg-main-light {
+  background-color: var(--color-gray-100);
+}
+@utility bg-main-bright {
+  background-color: var(--color-gray-200);
+}
+@utility bg-main-contrast {
+  background-color: var(--color-gray-300);
+}
+@utility bg-main-additionally-1 {
+  background-color: var(--color-gray-400);
+}
+
+/* Primary */
+@utility bg-main-primary-default {
+  background-color: var(--color-teal-500);
+}
+@utility bg-main-primary-hover {
+  background-color: var(--color-teal-600);
+}
+@utility bg-main-primary-pressed {
+  background-color: var(--color-teal-700);
+}
+@utility bg-main-primary-disable {
+  background-color: var(--color-teal-50);
+}
+
+/* Secondary */
+@utility bg-main-secondary-default {
+  background-color: var(--color-teal-50);
+}
+@utility bg-main-secondary-hover {
+  background-color: var(--color-teal-100);
+}
+@utility bg-main-secondary-pressed {
+  background-color: var(--color-teal-200);
+}
+@utility bg-main-secondary-disable {
+  background-color: var(--color-teal-50);
+}
+
+/* Tertiary */
+@utility bg-main-tertiary-default {
+  background-color: var(--color-gray-500);
+}
+@utility bg-main-tertiary-hover {
+  background-color: var(--color-gray-600);
+}
+@utility bg-main-tertiary-pressed {
+  background-color: var(--color-gray-700);
+}
+@utility bg-main-tertiary-disable {
+  background-color: var(--color-gray-300);
+}
+
+/* Stavové farby */
+@utility bg-main-error {
+  background-color: var(--color-red-500);
+}
+@utility bg-main-success {
+  background-color: var(--color-green-600);
+}
+@utility bg-main-warning {
+  background-color: var(--color-orange-500);
+}
+
+/* Success rate */
+@utility bg-main-success-rate-0-10 {
+  background-color: var(--color-red-600);
+}
+@utility bg-main-success-rate-10-20 {
+  background-color: var(--color-red-500);
+}
+@utility bg-main-success-rate-20-30 {
+  background-color: var(--color-orange-600);
+}
+@utility bg-main-success-rate-30-40 {
+  background-color: var(--color-orange-500);
+}
+@utility bg-main-success-rate-40-50 {
+  background-color: var(--color-orange-400);
+}
+@utility bg-main-success-rate-50-60 {
+  background-color: var(--color-yellow-500);
+}
+@utility bg-main-success-rate-60-70 {
+  background-color: var(--color-yellow-400);
+}
+@utility bg-main-success-rate-70-80 {
+  background-color: var(--color-yellow-300);
+}
+@utility bg-main-success-rate-80-90 {
+  background-color: var(--color-green-400);
+}
+@utility bg-main-success-rate-90-100 {
+  background-color: var(--color-green-600);
+}
+@utility bg-main-success-unknown {
+  background-color: var(--color-gray-400);
+}
+
+/* ========== TEXT ========== */
+
+/* Základné texty */
+@utility text-base-color {
+  color: var(--color-gray-1000);
+}
+@utility text-secondary {
+  color: var(--color-gray-800);
+}
+@utility text-light {
+  color: var(--color-gray-600);
+}
+@utility text-disable {
+  color: var(--color-gray-400);
+}
+@utility text-on-color {
+  color: var(--color-white);
+}
+
+/* Button texty */
+@utility text-btn-primary-default {
+  color: var(--color-white);
+}
+@utility text-btn-primary-hover {
+  color: var(--color-gray-50);
+}
+@utility text-btn-primary-pressed {
+  color: var(--color-gray-50);
+}
+@utility text-btn-primary-disable {
+  color: var(--color-teal-200);
+}
+
+@utility text-btn-secondary-default {
+  color: var(--color-teal-500);
+}
+@utility text-btn-secondary-hover {
+  color: var(--color-teal-600);
+}
+@utility text-btn-secondary-pressed {
+  color: var(--color-teal-700);
+}
+@utility text-btn-secondary-disable {
+  color: var(--color-teal-300);
+}
+
+@utility text-btn-tertiary-default {
+  color: var(--color-gray-500);
+}
+@utility text-btn-tertiary-hover {
+  color: var(--color-gray-600);
+}
+@utility text-btn-tertiary-pressed {
+  color: var(--color-gray-700);
+}
+@utility text-btn-tertiary-disable {
+  color: var(--color-gray-300);
+}
+
+/* Stavové farby */
+@utility text-link {
+  color: var(--color-cyan-500);
+}
+@utility text-error {
+  color: var(--color-red-500);
+}
+@utility text-warning {
+  color: var(--color-orange-500);
+}
+@utility text-success {
+  color: var(--color-green-600);
+}
+
+/* Success rate */
+@utility text-success-rate-0-10 {
+  color: var(--color-red-600);
+}
+@utility text-success-rate-10-20 {
+  color: var(--color-red-500);
+}
+@utility text-success-rate-20-30 {
+  color: var(--color-orange-600);
+}
+@utility text-success-rate-30-40 {
+  color: var(--color-orange-500);
+}
+@utility text-success-rate-40-50 {
+  color: var(--color-orange-400);
+}
+@utility text-success-rate-50-60 {
+  color: var(--color-yellow-500);
+}
+@utility text-success-rate-60-70 {
+  color: var(--color-yellow-400);
+}
+@utility text-success-rate-70-80 {
+  color: var(--color-yellow-300);
+}
+@utility text-success-rate-80-90 {
+  color: var(--color-green-400);
+}
+@utility text-success-rate-90-100 {
+  color: var(--color-green-600);
+}
+
+/* ========== BORDER ========== */
+
+/* neutrálne */
+@utility border-base {
+  border-color: var(--color-gray-25);
+}
+@utility border-light {
+  border-color: var(--color-gray-100);
+}
+@utility border-bright {
+  border-color: var(--color-gray-200);
+}
+@utility border-contrast {
+  border-color: var(--color-gray-300);
+}
+@utility border-additionally-1 {
+  border-color: var(--color-gray-400);
+}
+
+/* Primary */
+@utility border-primary-default {
+  border-color: var(--color-teal-500);
+}
+@utility border-primary-hover {
+  border-color: var(--color-teal-600);
+}
+@utility border-primary-pressed {
+  border-color: var(--color-teal-700);
+}
+@utility border-primary-disable {
+  border-color: var(--color-teal-50);
+}
+
+/* Secondary */
+@utility border-secondary-default {
+  border-color: var(--color-teal-50);
+}
+@utility border-secondary-hover {
+  border-color: var(--color-teal-100);
+}
+@utility border-secondary-pressed {
+  border-color: var(--color-teal-200);
+}
+@utility border-secondary-disable {
+  border-color: var(--color-teal-50);
+}
+
+/* Tertiary */
+@utility border-tertiary-default {
+  border-color: var(--color-gray-400);
+}
+@utility border-tertiary-hover {
+  border-color: var(--color-gray-600);
+}
+@utility border-tertiary-pressed {
+  border-color: var(--color-gray-700);
+}
+@utility border-tertiary-disable {
+  border-color: var(--color-gray-300);
+}
+
+/* Stavové farby */
+@utility border-error {
+  border-color: var(--color-red-500);
+}
+@utility border-success {
+  border-color: var(--color-green-500);
+}
+
+/* Success rate */
+@utility border-success-rate-0-10 {
+  border-color: var(--color-red-600);
+}
+@utility border-success-rate-10-20 {
+  border-color: var(--color-red-500);
+}
+@utility border-success-rate-20-30 {
+  border-color: var(--color-orange-600);
+}
+@utility border-success-rate-30-40 {
+  border-color: var(--color-orange-500);
+}
+@utility border-success-rate-40-50 {
+  border-color: var(--color-orange-400);
+}
+@utility border-success-rate-50-60 {
+  border-color: var(--color-yellow-500);
+}
+@utility border-success-rate-60-70 {
+  border-color: var(--color-yellow-400);
+}
+@utility border-success-rate-70-80 {
+  border-color: var(--color-yellow-300);
+}
+@utility border-success-rate-80-90 {
+  border-color: var(--color-green-400);
+}
+@utility border-success-rate-90-100 {
+  border-color: var(--color-green-600);
+}
+
+/* ========== ICON ========== */
+
+/* On Color */
+@utility icon-on-color {
+  fill: var(--color-gray-25);
+}
+
+/* Primary */
+@utility icon-primary-default {
+  fill: var(--color-white);
+}
+@utility icon-primary-hover {
+  fill: var(--color-gray-50);
+}
+@utility icon-primary-pressed {
+  fill: var(--color-gray-50);
+}
+@utility icon-primary-disable {
+  fill: var(--color-teal-200);
+}
+
+/* Secondary */
+@utility icon-secondary-default {
+  fill: var(--color-teal-500);
+}
+@utility icon-secondary-hover {
+  fill: var(--color-teal-600);
+}
+@utility icon-secondary-pressed {
+  fill: var(--color-teal-700);
+}
+@utility icon-secondary-disable {
+  fill: var(--color-teal-200);
+}
+
+/* Tertiary */
+@utility icon-tertiary-default {
+  fill: var(--color-gray-500);
+}
+@utility icon-tertiary-hover {
+  fill: var(--color-gray-600);
+}
+@utility icon-tertiary-pressed {
+  fill: var(--color-gray-700);
+}
+@utility icon-tertiary-disable {
+  fill: var(--color-gray-200);
+}
+
+/* Stavové ikony */
+@utility icon-link {
+  fill: var(--color-cyan-500);
+}
+@utility icon-error {
+  fill: var(--color-red-500);
+}
+@utility icon-warning {
+  fill: var(--color-orange-500);
+}
+@utility icon-success {
+  fill: var(--color-green-600);
+}
+
+/* Black */
+@utility icon-black {
+  fill: var(--color-gray-1000);
+}
+@utility icon-black-only {
+  fill: var(--color-black);
+}
+
+/* Success rate */
+@utility icon-success-rate-0-10 {
+  fill: var(--color-red-600);
+}
+@utility icon-success-rate-10-20 {
+  fill: var(--color-red-500);
+}
+@utility icon-success-rate-20-30 {
+  fill: var(--color-orange-600);
+}
+@utility icon-success-rate-30-40 {
+  fill: var(--color-orange-500);
+}
+@utility icon-success-rate-40-50 {
+  fill: var(--color-orange-400);
+}
+@utility icon-success-rate-50-60 {
+  fill: var(--color-yellow-500);
+}
+@utility icon-success-rate-60-70 {
+  fill: var(--color-yellow-400);
+}
+@utility icon-success-rate-70-80 {
+  fill: var(--color-yellow-300);
+}
+@utility icon-success-rate-80-90 {
+  fill: var(--color-green-400);
+}
+@utility icon-success-rate-90-100 {
+  fill: var(--color-green-600);
+}

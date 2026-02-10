@@ -1,0 +1,44 @@
+@layer base {
+  * {
+    font-family: var(--font-plex);
+    box-sizing: border-box;
+  }
+
+  body {
+    color: var(--color-gray-1000);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: var(--font-weight-regular);
+  }
+
+  h1 {
+    font-size: var(--text-h1);
+    line-height: var(--leading-h1);
+  }
+
+  h2 {
+    font-size: var(--text-h2);
+    line-height: var(--leading-h2);
+  }
+
+  h3 {
+    font-size: var(--text-h3);
+    line-height: var(--leading-h3);
+  }
+
+  h4 {
+    font-size: var(--text-h4);
+    line-height: var(--leading-h4);
+  }
+
+  h5 {
+    font-size: var(--text-h5);
+    line-height: var(--leading-h5);
+  }
+}
