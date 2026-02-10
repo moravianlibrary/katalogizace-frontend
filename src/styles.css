@@ -638,11 +638,7 @@
   box-sizing: border-box;
 }
 
-body,
-button,
-input,
-textarea,
-select {
+body {
   color: var(--color-gray-1000);
 }
 
