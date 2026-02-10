@@ -10,13 +10,16 @@ import { Step } from './provenance.dto';
 
 export interface BookCommonDto {
   book_id: ID;
+  batch_id: ID | null;
   created_at: string | null;
   modified_at: string | null;
+  title: string;
+  author: string;
+  year_of_publishing: number;
   process_state: ProcessState;
   record_state: RecordState;
   images: ApiImageItem[];
   hatchet_workflow_id: UUID | null;
-  batch_id: ID | null;
   error_message: string | null;
 }
 
@@ -34,10 +37,10 @@ export interface PaginatedBooksResponseDto {
 
 export interface BookResultResponseDto extends BookCommonDto {
   extracted_MARC_record: ExtractedMarcRecord | null;
-  library_sigla: string | null;
   existing_MARC_records: ExistingMarcRecord[];
   last_edited_record: LastEditedRecord | null;
   provenance: Record<UUID, Step[]>;
+  warnings: string[];
 }
 
 export interface BookUploadResponseDto {
