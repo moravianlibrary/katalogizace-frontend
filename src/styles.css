@@ -1,10 +1,9 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&family=Karla:wght@400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;700&display=swap");
 
 @import "tailwindcss";
 
 @theme {
   --font-plex: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-karla: "Karla", ui-sans-serif, system-ui, sans-serif;
 
   /* Weights */
   --font-weight-regular: 400;
@@ -623,7 +622,7 @@
 }
 
 * {
-  font-family: var(--font-karla);
+  font-family: var(--font-plex);
   box-sizing: border-box;
 }
 
@@ -633,7 +632,6 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-plex);
   font-weight: var(--font-weight-regular);
   color: var(--color-gray-1000);
 }
