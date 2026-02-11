@@ -1,15 +1,14 @@
-<section class="h-full min-h-0">
-  <div class="grid h-full min-h-0 grid-cols-1 md:grid-cols-3">
-    <div class="shadow-s z-2 h-full min-h-0 overflow-hidden">
-      <app-images-view [bookId]="bookId" [images]="images()" />
-    </div>
+<section class="grid h-full min-h-0 grid-cols-1 gap-4 p-4 md:grid-cols-3">
+  <app-images-view
+    class="h-full min-h-0 overflow-hidden"
+    [bookId]="bookId"
+    [images]="images()"
+  />
 
-    <div class="bg-main-light z-1 h-full min-h-0 overflow-hidden">
-      <app-editing-panel [book_id]="bookId" />
-    </div>
+  <app-editing-panel
+    class="h-full min-h-0 overflow-hidden"
+    [book_id]="bookId"
+  />
 
-    <div class="shadow-s z-2 h-full min-h-0 overflow-hidden">
-      <app-working-panel />
-    </div>
-  </div>
+  <app-working-panel class="h-full min-h-0 overflow-hidden" />
 </section>
