@@ -1,13 +1,16 @@
-import { STEP_KIND_LABELS, StepKind } from '@/app/models';
-import { Pipe, PipeTransform } from '@angular/core';
+import { StepKind } from '@/app/models';
+import { inject, Pipe, PipeTransform } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 
 @Pipe({
   name: 'stepKindLabel',
   standalone: true,
 })
 export class StepKindLabelPipe implements PipeTransform {
+  private translate = inject(TranslateService);
+
   transform(value: StepKind): string {
     if (!value) return '';
-    return STEP_KIND_LABELS[value] ?? value;
+    return this.translate.instant(`labels.stepKind.${value}`);
   }
 }

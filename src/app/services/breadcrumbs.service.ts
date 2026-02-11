@@ -1,4 +1,5 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { ID } from '../models';
 
 export type BreadcrumbItem = {
@@ -8,6 +9,7 @@ export type BreadcrumbItem = {
 
 @Injectable({ providedIn: 'root' })
 export class BreadcrumbsService {
+  private translate = inject(TranslateService);
   readonly batchId = signal<ID | null>(null);
   readonly batchName = signal<string | null>(null);
 
@@ -37,7 +39,10 @@ export class BreadcrumbsService {
 
   readonly crumbs = computed<BreadcrumbItem[]>(() => {
     const items: BreadcrumbItem[] = [
-      { label: 'Seznam skupin', url: '/batches' },
+      {
+        label: this.translate.instant('services.breadcrumbs.list_of_groups'),
+        url: '/batches',
+      },
     ];
 
     const batch_id = this.batchId();

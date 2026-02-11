@@ -1,0 +1,41 @@
+{
+  "services": {
+    "breadcrumbs": {
+      "list_of_groups": "Seznam skupin"
+    }
+  },
+  "labels": {
+    "processState": {
+      "created": "Vytvořeno",
+      "scheduled": "Naplánováno",
+      "in_progress": "Probíhá zpracování",
+      "ready": "Připraveno",
+      "failed": "Chyba",
+      "completed": "Dokončeno"
+    },
+    "recordState": {
+      "new": "Nový záznam",
+      "edited": "Upraveno",
+      "reviewed": "Zkontrolováno",
+      "completed": "Schváleno"
+    },
+    "batchState": {
+      "created": "Vytvořeno",
+      "in_progress": "Probíhá zpracování",
+      "completed": "Dokončeno"
+    },
+    "stepKind": {
+      "extraction": "Extrakce",
+      "assignment": "Přiřazení",
+      "ocr": "OCR",
+      "disambiguation": "Disambiguace",
+      "normalization": "Normalizace",
+      "authority_search": "Hledání autorit",
+      "authority_match": "Spárování autorit",
+      "dedup_search": "Hledání duplicit",
+      "dedup_match": "Spárování duplicit",
+      "transliteration": "Transliterace",
+      "human_edit": "Ruční úprava"
+    }
+  }
+}

@@ -1,14 +1,17 @@
-import { PROCESS_STATE_LABELS, ProcessState } from '@/app/models';
-import { Pipe, PipeTransform } from '@angular/core';
+import { ProcessState } from '@/app/models';
+import { inject, Pipe, PipeTransform } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 
 @Pipe({
   name: 'processStateLabel',
   standalone: true,
 })
 export class ProcessStateLabelPipe implements PipeTransform {
+  private translate = inject(TranslateService);
+
   transform(value: ProcessState | null): string {
     if (!value) return '—';
 
-    return PROCESS_STATE_LABELS[value] ?? value;
+    return this.translate.instant(`labels.processState.${value}`);
   }
 }

@@ -1,6 +1,5 @@
 // shared
 export * from './shared/id.model';
-export * from './shared/labels.model';
 export * from './shared/states.model';
 export * from './shared/toast.model';
 export * from './shared/working-panel.model';
