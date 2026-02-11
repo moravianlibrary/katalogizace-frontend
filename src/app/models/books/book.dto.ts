@@ -41,6 +41,7 @@ export interface BookResultResponseDto extends BookCommonDto {
   last_edited_record: LastEditedRecord | null;
   provenance: Record<UUID, Step[]>;
   warnings: string[];
+  batch_name: string;
 }
 
 export interface BookUploadResponseDto {
