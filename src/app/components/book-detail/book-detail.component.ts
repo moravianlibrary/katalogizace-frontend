@@ -3,6 +3,7 @@ import { BreadcrumbsService } from '@/app/services/breadcrumbs.service';
 import { RecordStateService } from '@/app/services/record-state.service';
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { BooksService } from '../../services/api/books.service';
 import { MarcDiffService } from '../../services/marc-diff.service';
 import { ToastService } from '../../services/toast.service';
@@ -25,6 +26,7 @@ export class BookDetailComponent {
   private toast = inject(ToastService);
   private recordState = inject(RecordStateService);
   private breadcrumbs = inject(BreadcrumbsService);
+  private translate = inject(TranslateService);
 
   bookId: ID | null = (() => {
     const id = this.route.snapshot.paramMap.get('bookId');
@@ -36,7 +38,10 @@ export class BookDetailComponent {
 
   ngOnInit() {
     if (this.bookId === null) {
-      this.toast.show('Neplatné ID knihy', 'error');
+      this.toast.show(
+        this.translate.instant('messages.error.books.incorrect_id'),
+        'error',
+      );
       return;
     }
 
@@ -60,7 +65,7 @@ export class BookDetailComponent {
       },
       error: (err) => {
         this.toast.show(
-          'Nepodařilo se načíst detaily knihy. Zkuste to prosím později.',
+          this.translate.instant('messages.error.books.detail_load'),
           'error',
         );
         console.error('Error:', err);

@@ -13,6 +13,7 @@ import { BooksService } from '../../services/api/books.service';
 import { ToastService } from '../../services/toast.service';
 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
@@ -27,6 +28,7 @@ export class BookCaptureNativeComponent {
   private router = inject(Router);
   private toast = inject(ToastService);
   private route = inject(ActivatedRoute);
+  private translate = inject(TranslateService);
 
   @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
 
@@ -68,12 +70,18 @@ export class BookCaptureNativeComponent {
       next: () => {
         this.pendingFile.set(null);
         this.photoCount.update((c) => c + 1);
-        this.toast.show('Stránka úspěšně odfocená', 'success');
+        this.toast.show(
+          this.translate.instant('messages.success.books.photo_upload'),
+          'success',
+        );
         this.isUploading.set(false);
       },
       error: (err) => {
         console.error(err);
-        this.toast.show('Upload fotky zlyhal.', 'error');
+        this.toast.show(
+          this.translate.instant('messages.error.books.photo_upload'),
+          'error',
+        );
         this.isUploading.set(false);
       },
     });
@@ -96,13 +104,16 @@ export class BookCaptureNativeComponent {
         ]);
 
         this.toast.show(
-          'Kniha založena. Klikněte na „Vyfotit stránku“.',
+          this.translate.instant('messages.success.books.create'),
           'success',
         );
       },
       error: (err) => {
         console.error(err);
-        this.toast.show('Nepodařilo se založit knihu.', 'error');
+        this.toast.show(
+          this.translate.instant('messages.error.books.create'),
+          'error',
+        );
         this.isCreating.set(false);
       },
     });
@@ -133,7 +144,10 @@ export class BookCaptureNativeComponent {
 
   finish() {
     if (!this.bookId() || this.photoCount() === 0) {
-      this.toast.show('Nejprve vyfoťte alespoň jednu stránku.', 'warning');
+      this.toast.show(
+        this.translate.instant('messages.warning.books.no_photo'),
+        'warning',
+      );
       return;
     }
 
@@ -142,12 +156,18 @@ export class BookCaptureNativeComponent {
       next: () => {
         this.didFinish.set(true);
         this.isFinishing.set(false);
-        this.toast.show('Workflow spuštěn.', 'success');
+        this.toast.show(
+          this.translate.instant('messages.success.books.workflow'),
+          'success',
+        );
         this.router.navigate(['/batches', this.batchId(), 'books']);
       },
       error: (err) => {
         console.error(err);
-        this.toast.show('Spuštění workflow zlyhalo.', 'error');
+        this.toast.show(
+          this.translate.instant('messages.error.books.workflow'),
+          'error',
+        );
         this.isFinishing.set(false);
       },
     });
@@ -164,12 +184,18 @@ export class BookCaptureNativeComponent {
 
     return this.books.deleteBookRecord(id).pipe(
       map(() => {
-        this.toast.show('Naskenování knihy bylo zrušeno.', 'success');
+        this.toast.show(
+          this.translate.instant('messages.success.books.cancel'),
+          'success',
+        );
         return true;
       }),
       catchError((err) => {
         console.error(err);
-        this.toast.show('Nepodařilo se zrušit naskenování knihy.', 'error');
+        this.toast.show(
+          this.translate.instant('messages.error.books.cancel'),
+          'error',
+        );
         return of(true);
       }),
     );

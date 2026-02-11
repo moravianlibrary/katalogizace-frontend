@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../services/api/auth.service';
 import { ToastService } from '../../services/toast.service';
 
@@ -17,6 +18,7 @@ export class RegisterComponent {
   private router = inject(Router);
   route = inject(ActivatedRoute);
   private toast = inject(ToastService);
+  private translate = inject(TranslateService);
 
   loading = signal(false);
 
@@ -56,7 +58,7 @@ export class RegisterComponent {
         next: () => {
           this.loading.set(false);
           this.toast.show(
-            'Účet byl úspěšně vytvořen. Nyní se můžete přihlásit.',
+            this.translate.instant('messages.success.auth.register'),
             'success',
           );
 
@@ -70,7 +72,7 @@ export class RegisterComponent {
           const msg =
             e?.error?.detail ||
             e?.error?.message ||
-            'Registrace se nezdařila. Zkuste jiný e-mail nebo zkontrolujte údaje.';
+            this.translate.instant('messages.error.auth.register');
           this.toast.show(msg, 'error');
         },
       });

@@ -10,6 +10,7 @@ import { DatePipe, NgClass } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { combineLatest } from 'rxjs';
 import { ProcessStateLabelPipe } from '../../pipes/process-state-label.pipe';
 import { RecordStateLabelPipe } from '../../pipes/record-state-label.pipe';
@@ -39,6 +40,7 @@ export class BooksListComponent {
   private wps = inject(WorkingPanelService);
   private batchesService = inject(BatchesService);
   private breadcrumbs = inject(BreadcrumbsService);
+  private translate = inject(TranslateService);
 
   isUploading = false;
 
@@ -80,7 +82,11 @@ export class BooksListComponent {
               this.breadcrumbs.clearBook();
             },
             error: (err) => {
-              this.error.set('Nepodařilo se načíst informace o dávce');
+              this.error.set(
+                this.translate.instant(
+                  'messages.error.batches.batch_detail_load',
+                ),
+              );
               console.error(err);
 
               this.breadcrumbs.setBatch(bid, null);
@@ -117,7 +123,9 @@ export class BooksListComponent {
           this.loading.set(false);
         },
         error: (err) => {
-          this.error.set('Nepodařilo se načíst seznam knih.');
+          this.error.set(
+            this.translate.instant('messages.error.books.list_load'),
+          );
           console.error(err);
           this.loading.set(false);
         },
@@ -215,11 +223,17 @@ export class BooksListComponent {
 
     this.books.uploadImages(files, this.batchId()?.toString()!).subscribe({
       next: () => {
-        this.toast.show('Obrázky byly úspěšně nahrány.', 'success');
+        this.toast.show(
+          this.translate.instant('messages.success.books.images_upload'),
+          'success',
+        );
         this.load();
       },
       error: () => {
-        this.toast.show('Nahrávání obrázků se nezdařilo.', 'error');
+        this.toast.show(
+          this.translate.instant('messages.error.books.images_upload'),
+          'error',
+        );
         this.isUploading = false;
         input.value = '';
       },
@@ -234,17 +248,25 @@ export class BooksListComponent {
     event.stopPropagation();
     event.preventDefault();
 
-    const confirmed = confirm('Opravdu chcete smazat tuto knihu?');
+    const confirmed = confirm(
+      this.translate.instant('messages.confirm.books.delete'),
+    );
     if (!confirmed) return;
 
     this.books.deleteBookRecord(id.toString()).subscribe({
       next: () => {
-        this.toast.show('Kniha byla úspěšně smazána.', 'success');
+        this.toast.show(
+          this.translate.instant('messages.success.books.delete'),
+          'success',
+        );
         this.load();
       },
       error: (err) => {
         console.error(err);
-        this.toast.show('Smazání knihy se nezdařilo.', 'error');
+        this.toast.show(
+          this.translate.instant('messages.error.books.delete'),
+          'error',
+        );
       },
     });
   }
@@ -254,18 +276,24 @@ export class BooksListComponent {
     event.preventDefault();
 
     const confirmed = confirm(
-      'Opravdu chcete znovu spustit zpracování této knihy?',
+      this.translate.instant('messages.confirm.books.rerun'),
     );
     if (!confirmed) return;
 
     this.books.rerunBookWorkflow(id.toString()).subscribe({
       next: (resp) => {
         this.patchBookRow(id, resp);
-        this.toast.show('Zpracování knihy bylo znovu spuštěno.', 'success');
+        this.toast.show(
+          this.translate.instant('messages.success.books.rerun'),
+          'success',
+        );
       },
       error: (err) => {
         console.error(err);
-        this.toast.show('Znovuspuštění zpracování se nezdařilo.', 'error');
+        this.toast.show(
+          this.translate.instant('messages.error.books.rerun'),
+          'error',
+        );
       },
     });
   }

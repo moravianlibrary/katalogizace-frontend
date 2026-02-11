@@ -13,6 +13,7 @@ import {
   input,
   signal,
 } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { CatalogueService } from '../../services/api/catalogue.service';
 import { WorkingPanelService } from '../../services/working-panel.service';
 import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
@@ -24,6 +25,8 @@ import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-
   templateUrl: './candidates-table.component.html',
 })
 export class CandidatesTableComponent {
+  private translate = inject(TranslateService);
+
   title = input.required<string>();
   candidates = input.required<MarcCandidate[]>();
 
@@ -122,7 +125,10 @@ export class CandidatesTableComponent {
       },
       error: (err) => {
         console.error(err);
-        this.autError.set('Nepodařilo se načíst autoritní záznam.');
+
+        this.autError.set(
+          this.translate.instant('messages.error.aut_record_load'),
+        );
         this.autLoading.set(false);
       },
     });

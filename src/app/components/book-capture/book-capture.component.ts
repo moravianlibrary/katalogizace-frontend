@@ -13,6 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BooksService } from '../../services/api/books.service';
 import { ToastService } from '../../services/toast.service';
 
+import { TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
@@ -27,6 +28,7 @@ export class BookCaptureComponent implements AfterViewInit {
   private router = inject(Router);
   private toast = inject(ToastService);
   private route = inject(ActivatedRoute);
+  private translate = inject(TranslateService);
 
   @ViewChild('video') videoRef!: ElementRef<HTMLVideoElement>;
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
@@ -80,11 +82,17 @@ export class BookCaptureComponent implements AfterViewInit {
           res.book_id,
         ]);
 
-        this.toast.show('Kniha založena.', 'success');
+        this.toast.show(
+          this.translate.instant('messages.success.books.create'),
+          'success',
+        );
       },
       error: (err) => {
         console.error(err);
-        this.toast.show('Nepodařilo se založit knihu.', 'error');
+        this.toast.show(
+          this.translate.instant('messages.error.books.create'),
+          'error',
+        );
         this.isCreating.set(false);
       },
     });
@@ -108,7 +116,7 @@ export class BookCaptureComponent implements AfterViewInit {
       await video.play();
     } catch (e) {
       console.error('Camera error', e);
-      this.toast.show('Nepodařilo se otevřít kameru.', 'error');
+      this.toast.show(this.translate.instant('messages.error.camera'), 'error');
     }
   }
 
@@ -131,19 +139,28 @@ export class BookCaptureComponent implements AfterViewInit {
       (blob) => {
         if (!blob) {
           this.isUploading.set(false);
-          this.toast.show('Nepodařilo se spracovat fotku.', 'error');
+          this.toast.show(
+            this.translate.instant('messages.error.books.photo_capture'),
+            'error',
+          );
           return;
         }
 
         this.books.uploadBookImage(this.bookId()!, blob).subscribe({
           next: () => {
             this.photoCount.update((c) => c + 1);
-            this.toast.show('Stránka úspěšně odfocená', 'success');
+            this.toast.show(
+              this.translate.instant('messages.success.books.photo_upload'),
+              'success',
+            );
             this.isUploading.set(false);
           },
           error: (err) => {
             console.error(err);
-            this.toast.show('Upload fotky zlyhal.', 'error');
+            this.toast.show(
+              this.translate.instant('messages.error.books.photo_upload'),
+              'error',
+            );
             this.isUploading.set(false);
           },
         });
@@ -155,7 +172,10 @@ export class BookCaptureComponent implements AfterViewInit {
 
   finish() {
     if (!this.bookId() || this.photoCount() === 0) {
-      this.toast.show('Nejprve vyfoťte alespoň jednu stránku.', 'warning');
+      this.toast.show(
+        this.translate.instant('messages.warning.books.no_photo'),
+        'warning',
+      );
       return;
     }
 
@@ -166,12 +186,18 @@ export class BookCaptureComponent implements AfterViewInit {
       next: () => {
         this.didFinish.set(true);
         this.isFinishing.set(false);
-        this.toast.show('Workflow spuštěn.', 'success');
+        this.toast.show(
+          this.translate.instant('messages.success.books.workflow'),
+          'success',
+        );
         this.router.navigate(['/batches', this.batchId(), 'books']);
       },
       error: (err) => {
         console.error(err);
-        this.toast.show('Spuštění workflow zlyhalo.', 'error');
+        this.toast.show(
+          this.translate.instant('messages.error.books.workflow'),
+          'error',
+        );
         this.isFinishing.set(false);
       },
     });
@@ -190,12 +216,18 @@ export class BookCaptureComponent implements AfterViewInit {
 
     return this.books.deleteBookRecord(id).pipe(
       map(() => {
-        this.toast.show('Naskenování knihy bylo zrušeno.', 'success');
+        this.toast.show(
+          this.translate.instant('messages.success.books.cancel'),
+          'success',
+        );
         return true;
       }),
       catchError((err) => {
         console.error(err);
-        this.toast.show('Nepodařilo se zrušit naskenování knihy.', 'error');
+        this.toast.show(
+          this.translate.instant('messages.error.books.cancel'),
+          'error',
+        );
         return of(true);
       }),
     );

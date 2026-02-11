@@ -86,7 +86,9 @@ export class ImagesViewComponent {
                     ? {
                         ...x,
                         loading: false,
-                        error: 'Nepodařilo se načíst náhled.',
+                        error: this.translate.instant(
+                          'messages.error.books.thumbnail_load',
+                        ),
                       }
                     : x,
                 ),
@@ -125,7 +127,12 @@ export class ImagesViewComponent {
           this.items.update((arr) =>
             arr.map((x) =>
               x.id === id
-                ? { ...x, error: 'Nepodařilo se načíst obrázek.' }
+                ? {
+                    ...x,
+                    error: this.translate.instant(
+                      'messages.error.books.image_load',
+                    ),
+                  }
                 : x,
             ),
           );

@@ -1,5 +1,6 @@
 import { ID } from '@/app/models';
 import { Component, HostListener, inject, input, signal } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { BooksService } from '../../services/api/books.service';
 import { RecordStateService } from '../../services/record-state.service';
 import { ToastService } from '../../services/toast.service';
@@ -14,6 +15,7 @@ export class NavigationButtonsComponent {
 
   private books = inject(BooksService);
   private toast = inject(ToastService);
+  private translate = inject(TranslateService);
   recordState = inject(RecordStateService);
 
   isSaving = signal(false);
@@ -45,7 +47,10 @@ export class NavigationButtonsComponent {
     const record = this.recordState.buildExistingRecord(bookId);
 
     if (!record) {
-      this.toast.show('Není co uložit - chybí MARC záznam.', 'error');
+      this.toast.show(
+        this.translate.instant('messages.warning.record.empty'),
+        'warning',
+      );
       return;
     }
 
@@ -54,12 +59,18 @@ export class NavigationButtonsComponent {
     this.books.submitRevision(bookId.toString(), record).subscribe({
       next: () => {
         this.isSaving.set(false);
-        this.toast.show('Záznam byl úspěšně uložen.', 'success');
+        this.toast.show(
+          this.translate.instant('messages.success.record.save'),
+          'success',
+        );
       },
       error: (err) => {
         console.error(err);
         this.isSaving.set(false);
-        this.toast.show('Uložení záznamu selhalo.', 'error');
+        this.toast.show(
+          this.translate.instant('messages.error.record.save'),
+          'error',
+        );
       },
     });
   }

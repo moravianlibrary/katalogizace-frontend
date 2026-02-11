@@ -46,5 +46,89 @@
     "Impressum": "Tiráž",
     "EndPage": "Poslední čísl. strana",
     "Unknown": "Neznámý typ strany"
+  },
+  "buttons": {
+    "save": "Uložit",
+    "logout": "Odhlásit"
+  },
+  "messages": {
+    "success": {
+      "batches": {
+        "delete": "Dávka byla úspěšně smazána.",
+        "create": "Dávka byla vytvořena.",
+        "edit": "Dávka byla upravena."
+      },
+      "books": {
+        "create": "Kniha založena.",
+        "cancel": "Naskenování knihy bylo zrušeno.",
+        "workflow": "Workflow spuštěn.",
+        "photo_upload": "Stránka úspěšně odfocená",
+        "images_upload": "Obrázky byly úspěšně nahrány.",
+        "delete": "Kniha byla úspěšně smazána.",
+        "rerun": "Zpracování knihy bylo znovu spuštěno."
+      },
+      "auth": {
+        "login": "Úspěšné přihlášení",
+        "register": "Účet byl úspěšně vytvořen. Nyní se můžete přihlásit."
+      },
+      "record": {
+        "save": "Záznam byl úspěšně uložen."
+      }
+    },
+    "warning": {
+      "batches": {
+        "edit_empty_name": "Název dávky je povinný"
+      },
+      "books": {
+        "no_photo": "Nejprve vyfoťte alespoň jednu stránku."
+      },
+      "auth": {},
+      "record": {
+        "empty": "Není co uložit - chybí MARC záznam."
+      }
+    },
+    "error": {
+      "batches": {
+        "create": "Vytvoření dávky se nezdařilo.",
+        "load": "Nepodařilo se načíst seznam dávek.",
+        "delete": "Smazání dávky se nezdařilo.",
+        "empty_name": "Zadejte název dávky.",
+        "save": "Uložení změn se nezdařilo.",
+        "batch_detail_load": "Nepodařilo se načíst informace o dávce"
+      },
+      "books": {
+        "create": "Nepodařilo se založit knihu.",
+        "cancel": "Nepodařilo se zrušit naskenování knihy.",
+        "workflow": "Spuštění workflow zlyhalo.",
+        "photo_upload": "Upload fotky zlyhal.",
+        "photo_capture": "Nepodařilo se spracovat fotku.",
+        "incorrect_id": "Neplatné ID knihy",
+        "detail_load": "Nepodařilo se načíst detaily knihy. Zkuste to prosím později.",
+        "list_load": "Nepodařilo se načíst seznam knih.",
+        "images_upload": "Nahrávání obrázků se nezdařilo.",
+        "delete": "Smazání knihy se nezdařilo.",
+        "rerun": "Znovuspuštění zpracování se nezdařilo.",
+        "thumbnail_load": "Nepodařilo se načíst náhled.",
+        "image_load": "Nepodařilo se načíst obrázek."
+      },
+      "auth": {
+        "login": "Přihlášení se nezdařilo. Zkontrolujte prosím svůj e-mail a heslo.",
+        "register": "Registrace se nezdařila. Zkuste jiný e-mail nebo zkontrolujte údaje."
+      },
+      "camera": "Nepodařilo se otevřít kameru.",
+      "aut_record_load": "Nepodařilo se načíst autoritní záznam.",
+      "record": {
+        "save": "Uložení záznamu selhalo."
+      }
+    },
+    "confirm": {
+      "batches": {
+        "delete": "Opravdu chcete smazat tuto dávku?"
+      },
+      "books": {
+        "delete": "Opravdu chcete smazat tuto knihu?",
+        "rerun": "Opravdu chcete znovu spustit zpracování této knihy?"
+      }
+    }
   }
 }

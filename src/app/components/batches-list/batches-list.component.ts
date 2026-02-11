@@ -19,6 +19,7 @@ import {
   PaginatedBatchesResponseDto,
 } from '@/app/models';
 import { BreadcrumbsService } from '@/app/services/breadcrumbs.service';
+import { TranslateService } from '@ngx-translate/core';
 import { BatchStateLabelPipe } from '../../pipes/batch-state-label.pipe';
 import { BatchesService } from '../../services/api/batches.service';
 import { ToastService } from '../../services/toast.service';
@@ -36,6 +37,7 @@ export class BatchesListComponent {
   private destroyRef = inject(DestroyRef);
   private toast = inject(ToastService);
   private breadcrumbs = inject(BreadcrumbsService);
+  private translate = inject(TranslateService);
 
   loading = signal(false);
   error = signal<string | null>(null);
@@ -107,8 +109,11 @@ export class BatchesListComponent {
         error: (err) => {
           console.error(err);
           this.loading.set(false);
-          this.error.set('Nepodařilo se načíst seznam dávek.');
-          this.toast.show('Nepodařilo se načíst seznam dávek.', 'error');
+          this.error.set(this.translate.instant('messages.error.batches.load'));
+          this.toast.show(
+            this.translate.instant('messages.error.batches.load'),
+            'error',
+          );
         },
       });
   }
@@ -162,17 +167,25 @@ export class BatchesListComponent {
     event.stopPropagation();
     event.preventDefault();
 
-    const confirmed = confirm('Opravdu chcete smazat tuto dávku?');
+    const confirmed = confirm(
+      this.translate.instant('messages.confirm.batches.delete'),
+    );
     if (!confirmed) return;
 
     this.batches.deleteBatch(batchId.toString()).subscribe({
       next: () => {
-        this.toast.show('Dávka byla úspěšně smazána.', 'success');
+        this.toast.show(
+          this.translate.instant('messages.success.batches.delete'),
+          'success',
+        );
         this.load();
       },
       error: (err) => {
         console.error(err);
-        this.toast.show('Smazání dávky se nezdařilo.', 'error');
+        this.toast.show(
+          this.translate.instant('messages.error.batches.delete'),
+          'error',
+        );
       },
     });
   }
@@ -190,7 +203,10 @@ export class BatchesListComponent {
     const description = this.newDescription().trim();
 
     if (!name || this.creating()) {
-      this.toast.show('Zadejte název dávky.', 'error');
+      this.toast.show(
+        this.translate.instant('messages.error.batches.empty_name'),
+        'error',
+      );
       return;
     }
 
@@ -198,7 +214,10 @@ export class BatchesListComponent {
 
     this.batches.createBatch(name, description ? description : null).subscribe({
       next: (batch) => {
-        this.toast.show('Dávka byla vytvořena.', 'success');
+        this.toast.show(
+          this.translate.instant('messages.success.batches.create'),
+          'success',
+        );
         this.newName.set('');
         this.newDescription.set('');
         this.creating.set(false);
@@ -207,7 +226,10 @@ export class BatchesListComponent {
       },
       error: (err) => {
         console.error(err);
-        this.toast.show('Vytvoření dávky se nezdařilo.', 'error');
+        this.toast.show(
+          this.translate.instant('messages.error.batches.create'),
+          'error',
+        );
         this.creating.set(false);
       },
     });
@@ -265,7 +287,10 @@ export class BatchesListComponent {
     const description: string | null = descRaw ? descRaw : null;
 
     if (!name) {
-      this.toast.show('Název dávky je povinný', 'warning');
+      this.toast.show(
+        this.translate.instant('messages.warning.batches.edit_empty_name'),
+        'warning',
+      );
       return;
     }
 
@@ -279,13 +304,19 @@ export class BatchesListComponent {
       })
       .subscribe({
         next: () => {
-          this.toast.show('Dávka byla upravena.', 'success');
+          this.toast.show(
+            this.translate.instant('messages.success.batches.edit'),
+            'success',
+          );
           this.closeEdit();
           this.load();
         },
         error: (err) => {
           console.error(err);
-          this.toast.show('Uložení změn se nezdařilo.', 'error');
+          this.toast.show(
+            this.translate.instant('messages.error.batches.save'),
+            'error',
+          );
           this.savingEdit.set(false);
         },
       });

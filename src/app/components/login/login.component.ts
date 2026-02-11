@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../services/api/auth.service';
 import { ToastService } from '../../services/toast.service';
 
@@ -15,6 +16,7 @@ export class LoginComponent {
   private router = inject(Router);
   route = inject(ActivatedRoute);
   private toast = inject(ToastService);
+  private translate = inject(TranslateService);
 
   loading = signal(false);
 
@@ -54,7 +56,10 @@ export class LoginComponent {
     this.auth.login({ email: email!, password: password! }).subscribe({
       next: () => {
         this.loading.set(false);
-        this.toast.show('Úspěšné přihlášení', 'success');
+        this.toast.show(
+          this.translate.instant('messages.success.auth.login'),
+          'success',
+        );
 
         const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
         this.router.navigateByUrl(returnUrl || '/batches');
@@ -64,7 +69,7 @@ export class LoginComponent {
         const msg =
           e?.error?.detail ||
           e?.error?.message ||
-          'Přihlášení se nezdařilo. Zkontrolujte prosím svůj e-mail a heslo.';
+          this.translate.instant('messages.error.auth.login');
         this.toast.show(msg, 'error');
       },
     });
