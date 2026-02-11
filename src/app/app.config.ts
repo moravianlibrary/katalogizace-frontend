@@ -1,6 +1,7 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import {
   ApplicationConfig,
+  importProvidersFrom,
   inject,
   provideAppInitializer,
   provideZoneChangeDetection,
@@ -13,6 +14,10 @@ import { authInterceptor } from './interceptors/auth.interceptor';
 import { AuthService } from './services/api/auth.service';
 import { EnvironmentService } from './services/environment.service';
 
+import { TranslateModule } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
+import { I18nService } from './services/i18n.service';
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
@@ -24,16 +29,26 @@ export const appConfig: ApplicationConfig = {
         authErrorInterceptor,
       ]),
     ),
+    importProvidersFrom(
+      TranslateModule.forRoot({
+        defaultLanguage: 'cs',
+      }),
+    ),
+    provideTranslateHttpLoader({
+      prefix: './assets/i18n/',
+      suffix: '.json',
+    }),
+
     provideAppInitializer(() => {
       // Inject services
       const envService = inject(EnvironmentService);
       const auth = inject(AuthService);
+      const i18n = inject(I18nService);
 
       return (async () => {
+        i18n.init();
         // Wait for environment to load
         await envService.load();
-        const apiServiceBaseUrl = envService.get('apiServiceBaseUrl') as string;
-        //console.log('Using apiServiceBaseUrl:', apiServiceBaseUrl);
 
         if (auth.isLoggedIn()) {
           auth.loadCurrentUser().subscribe({
