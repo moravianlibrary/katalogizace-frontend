@@ -17,6 +17,10 @@ export class RecordStore {
   readonly existingRecords = signal<ExistingMarcRecord[]>([]);
   readonly provenance = signal<Record<string, Step[]>>({});
 
+  readonly title = signal<string | null>(null);
+  readonly author = signal<string | null>(null);
+  readonly yearOfPublication = signal<number | null>(null);
+
   readonly hasLastEdited = computed(() => !!this.lastEdited());
 
   readonly openedExisting = signal<ExistingMarcRecord | null>(null);
@@ -38,6 +42,18 @@ export class RecordStore {
 
   setProvenance(p: Record<string, Step[]>) {
     this.provenance.set(p);
+  }
+
+  setTitle(t: string) {
+    this.title.set(t);
+  }
+
+  setAuthor(a: string) {
+    this.author.set(a);
+  }
+
+  setYearOfPublication(year: number) {
+    this.yearOfPublication.set(year);
   }
 
   setOpenedExisting(rec: ExistingMarcRecord | null) {

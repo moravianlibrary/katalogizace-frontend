@@ -5,6 +5,7 @@ import {
   ProcessState,
   RecordState,
 } from '@/app/models';
+import { BreadcrumbsService } from '@/app/services/breadcrumbs.service';
 import { DatePipe, NgClass } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -37,6 +38,7 @@ export class BooksListComponent {
   private toast = inject(ToastService);
   private wps = inject(WorkingPanelService);
   private batchesService = inject(BatchesService);
+  private breadcrumbs = inject(BreadcrumbsService);
 
   isUploading = false;
 
@@ -71,18 +73,31 @@ export class BooksListComponent {
 
         if (bid) {
           this.batchesService.getBatch(bid.toString()).subscribe({
-            next: (resp) => this.batch.set(resp),
+            next: (resp) => {
+              this.batch.set(resp);
+
+              this.breadcrumbs.setBatch(resp.batch_id, resp.name);
+              this.breadcrumbs.clearBook();
+            },
             error: (err) => {
               this.error.set('Nepodařilo se načíst informace o dávce');
               console.error(err);
+
+              this.breadcrumbs.setBatch(bid, null);
+              this.breadcrumbs.clearBook();
             },
           });
         } else {
           this.batch.set(null);
+          this.breadcrumbs.clearBatch();
         }
 
         this.load();
       });
+  }
+
+  ngOnDestroy() {
+    this.breadcrumbs.clearBook();
   }
 
   load() {
@@ -169,20 +184,24 @@ export class BooksListComponent {
     }
   }
 
-  open(id: ID) {
+  open(book: PaginatedBooksResponseDto['books'][number]) {
     const bid = this.batchId();
 
-    if (bid) {
-      this.router.navigate([
-        '/batches',
-        bid.toString(),
-        'books',
-        id.toString(),
-      ]);
-    } else {
+    if (!bid) {
       this.router.navigate(['/batches']);
+      return;
     }
 
+    const batch = this.batch();
+    this.breadcrumbs.setBatch(bid, batch?.name ?? null);
+    this.breadcrumbs.setBook(book.book_id, book.title ?? String(book.book_id));
+
+    this.router.navigate([
+      '/batches',
+      bid.toString(),
+      'books',
+      book.book_id.toString(),
+    ]);
     this.wps.setMode('records');
   }
 

@@ -161,9 +161,9 @@
               [class.cursor-pointer]="b.process_state === 'completed'"
               [attr.tabindex]="b.process_state === 'completed' ? 0 : null"
               [attr.role]="b.process_state === 'completed' ? 'button' : null"
-              (click)="b.process_state === 'completed' && open(b.book_id)"
-              (keyup.enter)="b.process_state === 'completed' && open(b.book_id)"
-              (keyup.space)="b.process_state === 'completed' && open(b.book_id)"
+              (click)="b.process_state === 'completed' && open(b)"
+              (keyup.enter)="b.process_state === 'completed' && open(b)"
+              (keyup.space)="b.process_state === 'completed' && open(b)"
             >
               <td class="px-3 py-2">{{ b.book_id }}</td>
               <td class="px-3 py-2">{{ b.created_at | date: "medium" }}</td>

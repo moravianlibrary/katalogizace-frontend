@@ -1,58 +1,70 @@
-<div class="bg-main-base flex h-screen flex-col">
+<div class="flex h-screen flex-col">
   <header
-    class="border-tertiary-default bg-main-base sticky top-0 z-10 border-b"
+    class="bg-main-base sticky top-0 z-10 flex h-16 items-center justify-between px-4 py-3"
   >
-    <div class="mx-auto flex items-center justify-between px-4 py-3">
-      <div class="flex items-center gap-3">
-        @if (showBack()) {
-          <button
-            class="hover:bg-main-light active:bg-main-bright cursor-pointer rounded-xl p-2"
-            (click)="back()"
-            type="button"
-            aria-label="Zpět"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="22"
-              height="22"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M15 18l-6-6 6-6"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-          </button>
-        }
+    <div class="flex items-center gap-4">
+      <h5 class="text-light font-bold">AI Katalogizace</h5>
+      <nav class="min-w-0">
+        <ol class="text-md flex min-w-0 items-center gap-2">
+          @for (crumb of breadcrumbs.crumbs(); track $index) {
+            <li class="flex min-w-0 items-center gap-2">
+              <svg
+                class="icon-tertiary-default"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M9.26591 3.59957C9.46118 3.40431 9.77776 3.40431 9.97302 3.59957L14.0197 7.64624C14.1135 7.74001 14.1661 7.86718 14.1661 7.99979C14.1661 8.1324 14.1135 8.25958 14.0197 8.35335L9.97302 12.4C9.77776 12.5953 9.46118 12.5953 9.26591 12.4C9.07065 12.2047 9.07065 11.8882 9.26591 11.6929L12.959 7.99979L9.26591 4.30668C9.07065 4.11142 9.07065 3.79483 9.26591 3.59957Z"
+                />
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M1.83301 8C1.83301 7.72386 2.05687 7.5 2.33301 7.5H13.553C13.8292 7.5 14.053 7.72386 14.053 8C14.053 8.27614 13.8292 8.5 13.553 8.5H2.33301C2.05687 8.5 1.83301 8.27614 1.83301 8Z"
+                />
+              </svg>
 
-        <div class="min-w-0">
-          <div class="text-lg font-bold">AI Katalogizace</div>
+              @if (crumb.url) {
+                <a
+                  class="truncate"
+                  #rla="routerLinkActive"
+                  [routerLink]="crumb.url"
+                  [routerLinkActiveOptions]="{ exact: true }"
+                  [ngClass]="
+                    !rla.isActive ? 'text-light hover:text-secondary' : ''
+                  "
+                  routerLinkActive="text-secondary font-medium"
+                >
+                  {{ crumb.label }}
+                </a>
+              } @else {
+                <span class="text-secondary truncate font-medium">
+                  {{ crumb.label }}
+                </span>
+              }
+            </li>
+          }
+        </ol>
+      </nav>
+    </div>
+
+    <div class="flex items-center gap-4">
+      @if (auth.user()) {
+        <div class="text-base-color text-sm font-medium">
+          {{ auth.user()!.full_name }} · {{ auth.user()!.email }}
         </div>
-      </div>
+      }
 
-      <div class="flex items-center gap-3">
-        @if (auth.user()) {
-          <div class="text-secondary hidden text-sm font-semibold sm:block">
-            {{ auth.user()!.full_name }} · {{ auth.user()!.email }}
-          </div>
-        }
-
-        <button
-          class="border-tertiary-default hover:bg-main-light cursor-pointer rounded-lg border px-3 py-2 text-sm font-medium"
-          (click)="logout()"
-          type="button"
-        >
-          Odhlásit
-        </button>
-      </div>
+      <button class="btn btn-m btn-tertiary" (click)="logout()" type="button">
+        Odhlásit
+      </button>
     </div>
   </header>
 
-  <main class="min-h-0 flex-1">
+  <main class="bg-main-light min-h-0 flex-1">
     <router-outlet></router-outlet>
   </main>
 </div>

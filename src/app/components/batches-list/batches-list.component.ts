@@ -18,6 +18,7 @@ import {
   ID,
   PaginatedBatchesResponseDto,
 } from '@/app/models';
+import { BreadcrumbsService } from '@/app/services/breadcrumbs.service';
 import { BatchStateLabelPipe } from '../../pipes/batch-state-label.pipe';
 import { BatchesService } from '../../services/api/batches.service';
 import { ToastService } from '../../services/toast.service';
@@ -34,6 +35,7 @@ export class BatchesListComponent {
   private batches = inject(BatchesService);
   private destroyRef = inject(DestroyRef);
   private toast = inject(ToastService);
+  private breadcrumbs = inject(BreadcrumbsService);
 
   loading = signal(false);
   error = signal<string | null>(null);
@@ -63,6 +65,10 @@ export class BatchesListComponent {
 
   @ViewChild('editDialog', { static: true })
   editDialog!: ElementRef<HTMLDialogElement>;
+
+  ngOnInit() {
+    this.breadcrumbs.clearBatch();
+  }
 
   constructor() {
     combineLatest([this.route.paramMap, this.route.queryParamMap])

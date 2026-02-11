@@ -1,4 +1,5 @@
 import { ApiImageItem, ID } from '@/app/models';
+import { BreadcrumbsService } from '@/app/services/breadcrumbs.service';
 import { RecordStateService } from '@/app/services/record-state.service';
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -23,6 +24,7 @@ export class BookDetailComponent {
   private store = inject(RecordStore);
   private toast = inject(ToastService);
   private recordState = inject(RecordStateService);
+  private breadcrumbs = inject(BreadcrumbsService);
 
   bookId: ID | null = (() => {
     const id = this.route.snapshot.paramMap.get('bookId');
@@ -46,6 +48,15 @@ export class BookDetailComponent {
         this.store.setProvenance(data.provenance ?? {});
         this.store.setLastEdited(data.last_edited_record);
         this.store.setExistingRecords(data.existing_MARC_records);
+        this.store.setTitle(data.title);
+        this.store.setAuthor(data.author);
+        this.store.setYearOfPublication(data.year_of_publishing);
+
+        if (data.batch_id != null) {
+          this.breadcrumbs.setBatch(data.batch_id, data.batch_name ?? null);
+        }
+
+        this.breadcrumbs.setBook(this.bookId!, data.title);
       },
       error: (err) => {
         this.toast.show(
@@ -53,9 +64,15 @@ export class BookDetailComponent {
           'error',
         );
         console.error('Error:', err);
+
+        this.breadcrumbs.setBook(this.bookId!, String(this.bookId));
       },
     });
 
     this.recordState.resetViewMode();
+  }
+
+  ngOnDestroy() {
+    this.breadcrumbs.clearBook();
   }
 }
