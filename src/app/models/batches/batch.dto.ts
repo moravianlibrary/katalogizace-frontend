@@ -32,5 +32,5 @@ export interface BatchBooksResponseDto {
 export type UpdateBatchRequest = {
   name: string;
   description: string | null;
-  state?: BatchState;
+  state: BatchState;
 };

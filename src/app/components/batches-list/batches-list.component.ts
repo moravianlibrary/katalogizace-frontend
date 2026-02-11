@@ -269,6 +269,7 @@ export class BatchesListComponent {
       .updateBatch(b.batch_id.toString(), {
         name,
         description,
+        state: b.state,
       })
       .subscribe({
         next: () => {

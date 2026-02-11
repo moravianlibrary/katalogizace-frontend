@@ -46,14 +46,9 @@ export class BatchesService {
   }
 
   createBatch(name: string, description: string | null) {
-    let params = new HttpParams().set('name', name);
-
-    if (description !== null) {
-      params = params.set('description', description);
-    }
-
-    return this.http.post<BatchDto>(`${this.apiBaseUrl}/batches/`, null, {
-      params,
+    return this.http.post<BatchDto>(`${this.apiBaseUrl}/batches/`, {
+      name,
+      description,
     });
   }
 
