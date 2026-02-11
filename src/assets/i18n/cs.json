@@ -37,5 +37,14 @@
       "transliteration": "Transliterace",
       "human_edit": "Ruční úprava"
     }
+  },
+  "pageType": {
+    "TitlePage": "Titulní strana",
+    "TableOfContents": "Obsah",
+    "FrontCover": "Přední obálka",
+    "BackCover": "Zadní obálka",
+    "Impressum": "Tiráž",
+    "EndPage": "Poslední čísl. strana",
+    "Unknown": "Neznámý typ strany"
   }
 }

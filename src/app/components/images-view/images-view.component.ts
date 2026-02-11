@@ -7,6 +7,7 @@ import {
   input,
   signal,
 } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { BooksService } from '../../services/api/books.service';
 import { ImageLargePreviewComponent } from '../image/preview/preview.component';
 import { ImageThumbnailsComponent } from '../image/thumbnails/thumbnails.component';
@@ -19,6 +20,7 @@ import { ImageThumbnailsComponent } from '../image/thumbnails/thumbnails.compone
 })
 export class ImagesViewComponent {
   private bookService = inject(BooksService);
+  private translate = inject(TranslateService);
 
   bookId = input<ID | null>(null);
   images = input<ApiImageItem[]>([]);
@@ -34,23 +36,7 @@ export class ImagesViewComponent {
   });
 
   pageTypeLabel(pt: PageType | null): string {
-    switch (pt) {
-      case 'TitlePage':
-        return 'Titulní strana';
-      case 'TableOfContents':
-        return 'Obsah';
-      case 'FrontCover':
-        return 'Přední obálka';
-      case 'BackCover':
-        return 'Zadní obálka';
-      case 'Impressum':
-        return 'Tiráž';
-      case 'EndPage':
-        return 'Poslední čísl. strana';
-      case 'Unknown':
-      default:
-        return 'Neznámý typ strany';
-    }
+    return this.translate.instant(`pageType.${pt ?? 'Unknown'}`);
   }
 
   constructor() {
