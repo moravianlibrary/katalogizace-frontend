@@ -11,6 +11,6 @@ export class BatchStateLabelPipe implements PipeTransform {
   transform(value: BatchState | null): string {
     if (!value) return '—';
 
-    return this.translate.instant(`labels.batchStateState.${value}`);
+    return this.translate.instant(`labels.batchState.${value}`);
   }
 }
