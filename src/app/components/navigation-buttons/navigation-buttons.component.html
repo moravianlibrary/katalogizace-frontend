@@ -7,7 +7,7 @@
     {{ recordState.viewMode() === "cards" ? "Tabulka" : "Úprava" }}
     @if (recordState.viewMode() === "cards") {
       <svg
-        class="icon-primary-default"
+        class="icon-secondary-default"
         xmlns="http://www.w3.org/2000/svg"
         width="16"
         height="16"
@@ -26,7 +26,7 @@
       </svg>
     } @else {
       <svg
-        class="icon-primary-default"
+        class="icon-secondary-default"
         xmlns="http://www.w3.org/2000/svg"
         width="16"
         height="16"
@@ -60,7 +60,7 @@
     >
       Přidat pole
       <svg
-        class="icon-primary-default"
+        class="icon-secondary-default"
         [class.icon-primary-disable]="recordState.viewMode() === 'table'"
         width="16"
         height="16"
