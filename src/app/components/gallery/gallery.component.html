@@ -1,0 +1,41 @@
+<section
+  class="bg-main-base flex h-full min-h-0 flex-col rounded-2xl"
+  [class.w-full]="!collapsed()"
+  [class.w-40]="collapsed()"
+>
+  <app-gallery-header
+    [pageType]="selectedItem()?.pageType ?? null"
+    [pageIndex]="pageIndex()"
+    [pageCount]="pageCount()"
+    [collapsed]="collapsed()"
+    (toggleCollapse)="toggleCollapsed()"
+  ></app-gallery-header>
+
+  @if (!collapsed()) {
+    <div class="min-h-0 flex-1 px-4 pt-4 pb-3">
+      @if (selectedItem()) {
+        <app-image-large-preview
+          class="block h-full"
+          [item]="selectedItem()!"
+        />
+      }
+    </div>
+
+    <div class="px-4">
+      <app-image-thumbnails
+        [items]="items()"
+        [selectedId]="selectedId()"
+        (select)="onSelect($event)"
+      />
+    </div>
+  } @else {
+    <div class="min-h-0 flex-1 py-4 pl-4">
+      <app-image-thumbnails
+        [items]="items()"
+        [selectedId]="selectedId()"
+        (select)="onSelect($event)"
+        mode="vertical"
+      />
+    </div>
+  }
+</section>

@@ -7,18 +7,24 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BooksService } from '../../services/api/books.service';
-import { ImageLargePreviewComponent } from '../image/preview/preview.component';
-import { ImageThumbnailsComponent } from '../image/thumbnails/thumbnails.component';
+import { GalleryHeaderComponent } from './gallery-header/gallery-header.component';
+import { ImageLargePreviewComponent } from './preview/preview.component';
+import { ImageThumbnailsComponent } from './thumbnails/thumbnails.component';
 
 @Component({
   standalone: true,
-  selector: 'app-images-view',
-  imports: [ImageLargePreviewComponent, ImageThumbnailsComponent],
-  templateUrl: './images-view.component.html',
+  selector: 'app-gallery',
+  imports: [
+    ImageLargePreviewComponent,
+    ImageThumbnailsComponent,
+    GalleryHeaderComponent,
+    TranslateModule,
+  ],
+  templateUrl: './gallery.component.html',
 })
-export class ImagesViewComponent {
+export class GalleryComponent {
   private bookService = inject(BooksService);
   private translate = inject(TranslateService);
 
@@ -30,10 +36,23 @@ export class ImagesViewComponent {
 
   private fullLoaded = new Set<ID>();
 
+  collapsed = signal(false);
+
   selectedItem = computed(() => {
     const id = this.selectedId();
     return this.items().find((x) => x.id === id) ?? null;
   });
+
+  pageIndex = computed(() => {
+    const id = this.selectedId();
+    const arr = this.items();
+    if (!id) return null;
+
+    const i = arr.findIndex((x) => x.id === id);
+    return i === -1 ? null : i + 1;
+  });
+
+  pageCount = computed(() => this.items().length || null);
 
   pageTypeLabel(pt: PageType | null): string {
     return this.translate.instant(`pageType.${pt ?? 'Unknown'}`);
@@ -143,6 +162,10 @@ export class ImagesViewComponent {
   onSelect(id: ID) {
     this.selectedId.set(id);
     this.ensureFull(id);
+  }
+
+  toggleCollapsed() {
+    this.collapsed.update((v) => !v);
   }
 
   ngOnDestroy() {

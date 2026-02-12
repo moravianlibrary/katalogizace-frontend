@@ -1,0 +1,109 @@
+@if (mode() === "horizontal") {
+  <div class="relative w-full">
+    <div
+      class="w-full overflow-x-auto overflow-y-hidden"
+      #scroller
+      (scroll)="onScroll()"
+    >
+      <div class="flex h-38.5 min-w-max items-center gap-3 pb-4">
+        @for (it of items(); track it.id) {
+          <button
+            class="group h-full shrink-0 hover:cursor-pointer"
+            (click)="onPick(it.id)"
+            type="button"
+          >
+            <div class="relative h-full rounded-lg">
+              <div class="h-full">
+                @if (it.loading) {
+                  <div
+                    class="bg-main-bright h-full w-24 animate-pulse rounded-lg"
+                  ></div>
+                } @else if (it.error) {
+                  <div
+                    class="text-error bg-main-light grid h-full w-24 place-items-center rounded-xl text-xs"
+                  >
+                    {{ it.error }}
+                  </div>
+                } @else {
+                  <img
+                    class="pointer-events-none block h-full w-auto rounded-lg object-contain select-none"
+                    [src]="it.url"
+                    alt="thumbnail"
+                    draggable="false"
+                  />
+                }
+              </div>
+              <div
+                class="pointer-events-none absolute inset-0 rounded-lg border-2 border-transparent transition-colors"
+                [class.!border-primary-default]="
+                  selectedId() === it.id && !it.loading
+                "
+                [class.group-hover:border-additionally-1]="
+                  !it.loading && selectedId() !== it.id
+                "
+              ></div>
+            </div>
+          </button>
+        }
+      </div>
+    </div>
+    @if (canScrollRight()) {
+      <div
+        class="pointer-events-none absolute inset-y-0 right-0 w-20 animate-[fadeIn_100ms_ease-out_forwards] bg-linear-to-l from-white to-transparent opacity-0"
+      ></div>
+    }
+  </div>
+} @else {
+  <div class="relative h-full w-full">
+    <div
+      class="h-full w-full overflow-x-hidden overflow-y-auto pr-3"
+      #scroller
+      (scroll)="onScroll()"
+    >
+      <div class="flex flex-col gap-3">
+        @for (it of items(); track it.id) {
+          <button
+            class="group w-full hover:cursor-pointer"
+            (click)="onPick(it.id)"
+            type="button"
+          >
+            <div class="relative w-full rounded-lg">
+              @if (it.loading) {
+                <div
+                  class="bg-main-bright h-24 w-full animate-pulse rounded-lg"
+                ></div>
+              } @else if (it.error) {
+                <div class="text-error grid h-24 place-items-center text-xs">
+                  !
+                </div>
+              } @else {
+                <img
+                  class="pointer-events-none block h-auto w-full rounded-lg object-contain select-none"
+                  [src]="it.url"
+                  alt="thumbnail"
+                  draggable="false"
+                />
+              }
+
+              <div
+                class="pointer-events-none absolute inset-0 rounded-lg border-2 border-transparent transition-colors"
+                [class.group-hover:border-additionally-1]="
+                  !it.loading && selectedId() !== it.id
+                "
+                [class.!border-primary-default]="
+                  selectedId() === it.id && !it.loading
+                "
+              ></div>
+            </div>
+          </button>
+        }
+      </div>
+    </div>
+
+    @if (canScrollDown()) {
+      <div
+        class="pointer-events-none absolute inset-x-0 bottom-0 h-20 animate-[fadeIn_100ms_ease-out_forwards] bg-linear-to-t from-white to-transparent opacity-0"
+      ></div>
+    }
+  </div>
+}
