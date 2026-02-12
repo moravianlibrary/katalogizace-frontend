@@ -2,9 +2,9 @@ import { ExtractedMarcRecord, SubDiffIndex } from '@/app/models';
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { RecordStore } from '../../../stores/record.store';
+import { MarcRowControlComponent } from '../../marc-row/marc-row-control/marc-row-control.component';
 import { MarcRowLeaderComponent } from '../../marc-row/marc-row-leader/marc-row-leader.component';
 import { MarcRowNormalComponent } from '../../marc-row/marc-row-normal/marc-row-normal.component';
-import { MarcRowSpecialComponent } from '../../marc-row/marc-row-special/marc-row-special.component';
 
 import { MarcDiffService } from '../../../services/marc-diff.service';
 import { RecordStateService } from '../../../services/record-state.service';
@@ -14,7 +14,7 @@ import { isDiffableTag015to830 } from '../../../utils/marc-diff';
   standalone: true,
   selector: 'app-extracted-marc-record-table',
   imports: [
-    MarcRowSpecialComponent,
+    MarcRowControlComponent,
     MarcRowNormalComponent,
     MarcRowLeaderComponent,
     CommonModule,

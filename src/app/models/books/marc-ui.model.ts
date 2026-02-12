@@ -10,7 +10,7 @@ export type UiFieldWithMeta = {
   ind2: string | null;
   subfields: UiSubfield[];
   isManual: boolean;
-  special: boolean;
+  control: boolean;
   value: string;
 };
 

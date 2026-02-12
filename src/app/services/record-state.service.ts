@@ -28,9 +28,9 @@ export class RecordStateService {
     this.focusTagFieldId.set(null);
   }
 
-  SPECIAL_TAGS = new Set(['001', '003', '005', '006', '007', '008']);
+  CONTROL_TAGS = new Set(['001', '003', '005', '006', '007', '008']);
   isControlTag(tag: string): boolean {
-    return this.SPECIAL_TAGS.has(tag);
+    return this.CONTROL_TAGS.has(tag);
   }
 
   touch() {
@@ -85,14 +85,14 @@ export class RecordStateService {
       return;
     }
 
-    const special: UiFieldWithMeta[] = rec.special_fields.map((sf) => ({
+    const control: UiFieldWithMeta[] = rec.control_fields.map((sf) => ({
       fieldId: `${crypto.randomUUID()}`,
       tag: sf.tag,
       ind1: '',
       ind2: '',
       subfields: [],
       isManual: true,
-      special: true,
+      control: true,
       value: sf.value,
     }));
 
@@ -108,14 +108,14 @@ export class RecordStateService {
           isManual: true,
         })) ?? [],
       isManual: true,
-      special: false,
+      control: false,
       value: '',
     }));
 
-    special.sort((a, b) => a.tag.localeCompare(b.tag));
+    control.sort((a, b) => a.tag.localeCompare(b.tag));
     normal.sort((a, b) => a.tag.localeCompare(b.tag));
 
-    this.uiFields.set(special.concat(normal));
+    this.uiFields.set(control.concat(normal));
   }
 
   loadFromExtracted(extracted: ExtractedMarcRecord | null) {
@@ -132,14 +132,14 @@ export class RecordStateService {
 
   addField(fieldType: FieldType) {
     const current = this.uiFields();
-    const isSpecial = fieldType === 'special';
+    const isControl = fieldType === 'control';
 
     const newField: UiFieldWithMeta = {
       fieldId: `manual-${crypto.randomUUID()}`,
       tag: '',
       ind1: '',
       ind2: '',
-      subfields: isSpecial
+      subfields: isControl
         ? []
         : [
             {
@@ -149,7 +149,7 @@ export class RecordStateService {
             },
           ],
       isManual: true,
-      special: isSpecial,
+      control: isControl,
       value: '',
     };
 
@@ -177,7 +177,7 @@ export class RecordStateService {
           required_if_applicable_present: 0,
           required_if_applicable_total: 0,
         },
-        special_fields: [],
+        control_fields: [],
         normal_fields: [],
       };
     }
@@ -192,8 +192,8 @@ export class RecordStateService {
   readonly recordPreview = computed<ExistingMarcRecord | null>(() => {
     const fields = this.uiFields().filter((f) => f.tag.trim().length === 3);
 
-    const special_fields = fields
-      .filter((f) => f.special && f.tag.trim().length === 3)
+    const control_fields = fields
+      .filter((f) => f.control && f.tag.trim().length === 3)
       .map((f) => ({
         tag: f.tag.trim(),
         value: (f.value ?? '').trim(),
@@ -201,7 +201,7 @@ export class RecordStateService {
       .filter((sf) => sf.value.length > 0);
 
     const normal_fields = fields
-      .filter((f) => !f.special)
+      .filter((f) => !f.control)
       .map((f) => {
         const cleanedSubfields =
           f.subfields
@@ -230,7 +230,7 @@ export class RecordStateService {
         required_if_applicable_present: 0,
         required_if_applicable_total: 0,
       },
-      special_fields,
+      control_fields,
       normal_fields,
     };
   });

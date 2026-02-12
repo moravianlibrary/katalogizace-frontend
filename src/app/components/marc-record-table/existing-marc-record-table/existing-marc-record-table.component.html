@@ -20,19 +20,19 @@
       ></tr>
     }
 
-    @for (sf of existingRecord().special_fields; track $index) {
+    @for (cf of existingRecord().control_fields; track $index) {
       <tr
         class="border-tertiary-default border-b-[0.5px]"
         [ngClass]="[
           $index === 0 && !existingRecord().leader ? 'border-t-[0.5px]' : '',
           this.ds.enabledByUser() &&
-          !isDiffableTag015to830(sf.tag) &&
+          !isDiffableTag015to830(cf.tag) &&
           this.recordState.viewMode() === 'table'
             ? 'opacity-60'
             : '',
         ]"
-        [sf]="sf"
-        appMarcRowSpecial
+        [cf]="cf"
+        appMarcRowControl
       ></tr>
     }
 
@@ -42,7 +42,7 @@
           class="border-tertiary-default border-b-[0.5px]"
           [ngClass]="[
             $index === 0 &&
-            existingRecord().special_fields.length === 0 &&
+            existingRecord().control_fields.length === 0 &&
             !existingRecord().leader
               ? 'border-t-[0.5px]'
               : '',

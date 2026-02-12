@@ -75,7 +75,7 @@ export class RecordStore {
         leader: ex.leader,
         source: ex.source,
         quality_assessment: ex.quality_assessment,
-        special_fields: (ex.special_fields ?? []).map((sf) => ({
+        control_fields: (ex.control_fields ?? []).map((sf) => ({
           tag: sf.tag,
           value: sf.value,
         })),
@@ -96,7 +96,7 @@ export class RecordStore {
     if (ex) {
       this.openedExtractedWithMeta.set({
         ...ex,
-        special_fields: [...(ex.special_fields ?? [])],
+        control_fields: [...(ex.control_fields ?? [])],
         normal_fields: [...(ex.normal_fields ?? [])],
       });
       return;
@@ -107,7 +107,7 @@ export class RecordStore {
 
     this.openedExisting.set({
       ...r,
-      special_fields: [...(r.special_fields ?? [])],
+      control_fields: [...(r.control_fields ?? [])],
       normal_fields: [...(r.normal_fields ?? [])],
     });
   }

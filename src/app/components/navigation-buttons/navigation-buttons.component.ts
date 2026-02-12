@@ -37,9 +37,9 @@ export class NavigationButtonsComponent {
     this.recordState.addField('normal');
   }
 
-  addSpecialField() {
+  addControlField() {
     this.showAddMenu.set(false);
-    this.recordState.addField('special');
+    this.recordState.addField('control');
   }
 
   onSave() {

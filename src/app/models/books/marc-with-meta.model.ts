@@ -1,8 +1,8 @@
 import { UUID } from '../shared/id.model';
 import {
   ExistingMarcRecord,
+  ExistingMarcRecordControlField,
   ExistingMarcRecordNormalField,
-  ExistingMarcRecordSpecialField,
   MarcCandidate,
 } from './marc.dto';
 
@@ -17,11 +17,11 @@ export interface ExistingMarcRecordNormalFieldWithMeta
   extends ExistingMarcRecordNormalField,
     ExistingMarcRecordFieldMeta {}
 
-export interface ExistingMarcRecordSpecialFieldWithMeta
-  extends ExistingMarcRecordSpecialField,
+export interface ExistingMarcRecordControlFieldWithMeta
+  extends ExistingMarcRecordControlField,
     ExistingMarcRecordFieldMeta {}
 
 export interface ExistingMarcRecordWithMeta extends ExistingMarcRecord {
-  special_fields: ExistingMarcRecordSpecialFieldWithMeta[];
+  control_fields: ExistingMarcRecordControlFieldWithMeta[];
   normal_fields: ExistingMarcRecordNormalFieldWithMeta[];
 }

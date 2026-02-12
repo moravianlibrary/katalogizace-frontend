@@ -25,7 +25,7 @@
         }
       </div>
 
-      @if (!field().special) {
+      @if (!field().control) {
         <input
           class="border-tertiary-default h-10 w-10.5 rounded-lg border text-center text-sm font-medium outline-none placeholder:text-gray-300"
           [(ngModel)]="field().ind1"
@@ -49,7 +49,7 @@
     </div>
 
     <div class="flex items-center gap-2">
-      @if (!field().special) {
+      @if (!field().control) {
         <button
           class="inline-flex h-10 w-11 cursor-pointer items-center justify-center rounded-lg px-2 py-1.5"
           (click)="onAddSubfield()"
@@ -126,7 +126,7 @@
   </div>
 
   <div class="flex flex-col gap-3">
-    @if (field().special) {
+    @if (field().control) {
       <div class="flex flex-col gap-1">
         <div
           class="border-tertiary-default flex items-center gap-2 rounded-lg border px-4 py-2.5"

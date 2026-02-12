@@ -1,14 +1,14 @@
 import {
   ExistingMarcRecord,
+  ExistingMarcRecordControlField,
+  ExistingMarcRecordControlFieldWithMeta,
   ExistingMarcRecordFieldMeta,
   ExistingMarcRecordNormalField,
   ExistingMarcRecordNormalFieldWithMeta,
-  ExistingMarcRecordSpecialField,
-  ExistingMarcRecordSpecialFieldWithMeta,
   ExistingMarcRecordWithMeta,
+  ExtractedMarcControlField,
   ExtractedMarcNormalField,
   ExtractedMarcRecord,
-  ExtractedMarcSpecialField,
   UiFieldWithMeta,
 } from '@/app/models';
 
@@ -22,9 +22,9 @@ function pickCandidate(f: ExtractedMarcNormalField) {
   return cand!;
 }
 
-const SPECIAL_TAGS = new Set(['001', '003', '005', '006', '007', '008']);
+const CONTROL_TAGS = new Set(['001', '003', '005', '006', '007', '008']);
 function isControlTag(tag: string): boolean {
-  return SPECIAL_TAGS.has(tag);
+  return CONTROL_TAGS.has(tag);
 }
 
 export function extractedToExisting(
@@ -32,7 +32,7 @@ export function extractedToExisting(
 ): ExistingMarcRecord | null {
   if (!extracted) return null;
 
-  const special: ExistingMarcRecordSpecialField[] = [];
+  const control: ExistingMarcRecordControlField[] = [];
   const normal: ExistingMarcRecordNormalField[] = [];
 
   for (const [tag, fields] of Object.entries(extracted)) {
@@ -40,9 +40,9 @@ export function extractedToExisting(
 
     for (const f of fields) {
       if (isControlTag(tag)) {
-        const field = f as ExtractedMarcSpecialField;
+        const field = f as ExtractedMarcControlField;
         const value = field.value;
-        special.push({ tag, value });
+        control.push({ tag, value });
       } else {
         const field = f as ExtractedMarcNormalField;
         if (!field.candidates.length) continue;
@@ -60,7 +60,7 @@ export function extractedToExisting(
     }
   }
 
-  special.sort((a, b) => a.tag.localeCompare(b.tag));
+  control.sort((a, b) => a.tag.localeCompare(b.tag));
   normal.sort((a, b) => a.tag.localeCompare(b.tag));
 
   const existing: ExistingMarcRecord = {
@@ -73,7 +73,7 @@ export function extractedToExisting(
       required_if_applicable_present: 0,
       required_if_applicable_total: 0,
     },
-    special_fields: special,
+    control_fields: control,
     normal_fields: normal,
   };
 
@@ -92,16 +92,16 @@ export function extractedToUiFields(
 
     for (const f of fields) {
       if (isControlTag(tag)) {
-        const field = f as ExtractedMarcSpecialField;
+        const field = f as ExtractedMarcControlField;
 
         out.push({
-          fieldId: `special-${crypto.randomUUID()}`,
+          fieldId: `control-${crypto.randomUUID()}`,
           tag,
           ind1: null,
           ind2: null,
           subfields: [],
           isManual: false,
-          special: true,
+          control: true,
           value: field.value,
         });
       } else {
@@ -120,7 +120,7 @@ export function extractedToUiFields(
             value: sf.value,
           })),
           isManual: false,
-          special: false,
+          control: false,
           value: '',
         });
       }
@@ -136,7 +136,7 @@ export function extractedToExistingWithMeta(
 ): ExistingMarcRecordWithMeta | null {
   if (!extracted) return null;
 
-  const special: ExistingMarcRecordSpecialFieldWithMeta[] = [];
+  const control: ExistingMarcRecordControlFieldWithMeta[] = [];
   const normal: ExistingMarcRecordNormalFieldWithMeta[] = [];
 
   for (const [tag, fields] of Object.entries(extracted)) {
@@ -144,7 +144,7 @@ export function extractedToExistingWithMeta(
 
     for (const f of fields) {
       if (isControlTag(tag)) {
-        const field = f as ExtractedMarcSpecialField;
+        const field = f as ExtractedMarcControlField;
         const meta: ExistingMarcRecordFieldMeta = {
           fieldId: '',
           selectedCandidateId: '',
@@ -152,7 +152,7 @@ export function extractedToExistingWithMeta(
           score: 0,
         };
 
-        special.push({
+        control.push({
           tag,
           value: field.value,
           ...meta,
@@ -181,7 +181,7 @@ export function extractedToExistingWithMeta(
     }
   }
 
-  special.sort((a, b) => a.tag.localeCompare(b.tag));
+  control.sort((a, b) => a.tag.localeCompare(b.tag));
   normal.sort((a, b) => a.tag.localeCompare(b.tag));
 
   const existing: ExistingMarcRecordWithMeta = {
@@ -194,7 +194,7 @@ export function extractedToExistingWithMeta(
       required_if_applicable_present: 0,
       required_if_applicable_total: 0,
     },
-    special_fields: special,
+    control_fields: control,
     normal_fields: normal,
   };
 
