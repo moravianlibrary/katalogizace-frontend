@@ -130,5 +130,11 @@
         "rerun": "Opravdu chcete znovu spustit zpracování této knihy?"
       }
     }
+  },
+  "gallery": {
+    "pageLabel": "strana {{index}}/{{count}}",
+    "choose_image": "Vyberte obrázek",
+    "collapse": "Sbalit galerii",
+    "expand": "Rozbalit galerii"
   }
 }
