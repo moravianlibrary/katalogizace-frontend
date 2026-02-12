@@ -2,17 +2,17 @@ import {
   ExistingMarcRecord,
   ExistingMarcRecordControlField,
   ExistingMarcRecordControlFieldWithMeta,
+  ExistingMarcRecordDataField,
+  ExistingMarcRecordDataFieldWithMeta,
   ExistingMarcRecordFieldMeta,
-  ExistingMarcRecordNormalField,
-  ExistingMarcRecordNormalFieldWithMeta,
   ExistingMarcRecordWithMeta,
   ExtractedMarcControlField,
-  ExtractedMarcNormalField,
+  ExtractedMarcDataField,
   ExtractedMarcRecord,
   UiFieldWithMeta,
 } from '@/app/models';
 
-function pickCandidate(f: ExtractedMarcNormalField) {
+function pickCandidate(f: ExtractedMarcDataField) {
   const cand = f.candidates.find((c) => c.id === f.selected_candidate_id);
   if (!cand) {
     console.warn(
@@ -33,7 +33,7 @@ export function extractedToExisting(
   if (!extracted) return null;
 
   const control: ExistingMarcRecordControlField[] = [];
-  const normal: ExistingMarcRecordNormalField[] = [];
+  const data: ExistingMarcRecordDataField[] = [];
 
   for (const [tag, fields] of Object.entries(extracted)) {
     if (!Array.isArray(fields) || fields.length === 0) continue;
@@ -44,13 +44,13 @@ export function extractedToExisting(
         const value = field.value;
         control.push({ tag, value });
       } else {
-        const field = f as ExtractedMarcNormalField;
+        const field = f as ExtractedMarcDataField;
         if (!field.candidates.length) continue;
 
         const cand = pickCandidate(field);
         const rep = cand.MARC_representation;
 
-        normal.push({
+        data.push({
           tag,
           ind1: rep.ind1 ?? '',
           ind2: rep.ind2 ?? '',
@@ -61,7 +61,7 @@ export function extractedToExisting(
   }
 
   control.sort((a, b) => a.tag.localeCompare(b.tag));
-  normal.sort((a, b) => a.tag.localeCompare(b.tag));
+  data.sort((a, b) => a.tag.localeCompare(b.tag));
 
   const existing: ExistingMarcRecord = {
     record_id: 'extracted-synthetic',
@@ -74,7 +74,7 @@ export function extractedToExisting(
       required_if_applicable_total: 0,
     },
     control_fields: control,
-    normal_fields: normal,
+    data_fields: data,
   };
 
   return existing;
@@ -105,7 +105,7 @@ export function extractedToUiFields(
           value: field.value,
         });
       } else {
-        const field = f as ExtractedMarcNormalField;
+        const field = f as ExtractedMarcDataField;
         if (!field.candidates.length) continue;
         const cand = pickCandidate(field);
         const rep = cand.MARC_representation;
@@ -137,7 +137,7 @@ export function extractedToExistingWithMeta(
   if (!extracted) return null;
 
   const control: ExistingMarcRecordControlFieldWithMeta[] = [];
-  const normal: ExistingMarcRecordNormalFieldWithMeta[] = [];
+  const data: ExistingMarcRecordDataFieldWithMeta[] = [];
 
   for (const [tag, fields] of Object.entries(extracted)) {
     if (!Array.isArray(fields) || fields.length === 0) continue;
@@ -158,7 +158,7 @@ export function extractedToExistingWithMeta(
           ...meta,
         });
       } else {
-        const field = f as ExtractedMarcNormalField;
+        const field = f as ExtractedMarcDataField;
         if (!field.candidates.length) continue;
         const cand = pickCandidate(field);
         const rep = cand.MARC_representation;
@@ -170,7 +170,7 @@ export function extractedToExistingWithMeta(
           score: cand.score,
         };
 
-        normal.push({
+        data.push({
           tag,
           ind1: rep.ind1 ?? '',
           ind2: rep.ind2 ?? '',
@@ -182,7 +182,7 @@ export function extractedToExistingWithMeta(
   }
 
   control.sort((a, b) => a.tag.localeCompare(b.tag));
-  normal.sort((a, b) => a.tag.localeCompare(b.tag));
+  data.sort((a, b) => a.tag.localeCompare(b.tag));
 
   const existing: ExistingMarcRecordWithMeta = {
     record_id: 'extracted-synthetic',
@@ -195,7 +195,7 @@ export function extractedToExistingWithMeta(
       required_if_applicable_total: 0,
     },
     control_fields: control,
-    normal_fields: normal,
+    data_fields: data,
   };
 
   return existing;

@@ -5,15 +5,15 @@ import { MarcDiffService } from '../../../services/marc-diff.service';
 import { RecordStateService } from '../../../services/record-state.service';
 import { isDiffableTag015to830 } from '../../../utils/marc-diff';
 import { MarcRowControlComponent } from '../../marc-row/marc-row-control/marc-row-control.component';
+import { MarcRowDataComponent } from '../../marc-row/marc-row-data/marc-row-data.component';
 import { MarcRowLeaderComponent } from '../../marc-row/marc-row-leader/marc-row-leader.component';
-import { MarcRowNormalComponent } from '../../marc-row/marc-row-normal/marc-row-normal.component';
 
 @Component({
   standalone: true,
   selector: 'app-existing-marc-record-table',
   imports: [
     MarcRowControlComponent,
-    MarcRowNormalComponent,
+    MarcRowDataComponent,
     MarcRowLeaderComponent,
     CommonModule,
   ],

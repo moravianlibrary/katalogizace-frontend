@@ -81,7 +81,7 @@ export class CandidatesTableComponent {
   ): string | null {
     if (!rec) return null;
 
-    const f998 = rec.normal_fields.find((f) => f.tag === '998');
+    const f998 = rec.data_fields.find((f) => f.tag === '998');
     const sfA = f998?.subfields?.find((sf) => sf.code === 'a');
     const value = sfA?.value?.trim();
 

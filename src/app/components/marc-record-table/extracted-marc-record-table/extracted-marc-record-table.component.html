@@ -39,8 +39,8 @@
         ></tr>
       }
 
-      @for (nf of rec.normal_fields; track $index) {
-        @if (nf.tag != "910") {
+      @for (df of rec.data_fields; track $index) {
+        @if (df.tag != "910") {
           <tr
             class="border-tertiary-default border-b-[0.5px]"
             [ngClass]="[
@@ -48,15 +48,15 @@
                 ? 'border-t-[0.5px]'
                 : '',
               this.ds.enabledByUser() &&
-              !isDiffableTag015to830(nf.tag) &&
+              !isDiffableTag015to830(df.tag) &&
               this.recordState.viewMode() === 'table'
                 ? 'opacity-60'
                 : '',
             ]"
-            [nf]="nf"
+            [df]="df"
             [diffIndex]="diffIndex()"
             [diffSide]="diffSide()"
-            appMarcRowNormal
+            appMarcRowData
           ></tr>
         }
       }

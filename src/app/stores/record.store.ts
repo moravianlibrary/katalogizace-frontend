@@ -79,11 +79,11 @@ export class RecordStore {
           tag: sf.tag,
           value: sf.value,
         })),
-        normal_fields: (ex.normal_fields ?? []).map((nf) => ({
-          tag: nf.tag,
-          ind1: nf.ind1 ?? '',
-          ind2: nf.ind2 ?? '',
-          subfields: nf.subfields ?? [],
+        data_fields: (ex.data_fields ?? []).map((df) => ({
+          tag: df.tag,
+          ind1: df.ind1 ?? '',
+          ind2: df.ind2 ?? '',
+          subfields: df.subfields ?? [],
         })),
       };
     }
@@ -97,7 +97,7 @@ export class RecordStore {
       this.openedExtractedWithMeta.set({
         ...ex,
         control_fields: [...(ex.control_fields ?? [])],
-        normal_fields: [...(ex.normal_fields ?? [])],
+        data_fields: [...(ex.data_fields ?? [])],
       });
       return;
     }
@@ -108,7 +108,7 @@ export class RecordStore {
     this.openedExisting.set({
       ...r,
       control_fields: [...(r.control_fields ?? [])],
-      normal_fields: [...(r.normal_fields ?? [])],
+      data_fields: [...(r.data_fields ?? [])],
     });
   }
 
@@ -116,15 +116,13 @@ export class RecordStore {
     const ex = this.openedExtractedWithMeta();
     if (!ex) return;
 
-    const idx = (ex.normal_fields ?? []).findIndex(
-      (f) => f.fieldId === fieldId,
-    );
+    const idx = (ex.data_fields ?? []).findIndex((f) => f.fieldId === fieldId);
     if (idx < 0) return;
 
     const rep = candidate.MARC_representation;
 
     const updatedField = {
-      ...ex.normal_fields[idx],
+      ...ex.data_fields[idx],
       ind1: rep.ind1 ?? '',
       ind2: rep.ind2 ?? '',
       subfields: rep.subfields ?? [],
@@ -132,12 +130,12 @@ export class RecordStore {
       score: candidate.score,
     };
 
-    const nextNormal = [...ex.normal_fields];
-    nextNormal[idx] = updatedField;
+    const nextData = [...ex.data_fields];
+    nextData[idx] = updatedField;
 
     this.openedExtractedWithMeta.set({
       ...ex,
-      normal_fields: nextNormal,
+      data_fields: nextData,
     });
   }
 }

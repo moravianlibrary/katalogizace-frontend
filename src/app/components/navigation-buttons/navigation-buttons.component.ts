@@ -32,9 +32,9 @@ export class NavigationButtonsComponent {
     this.showAddMenu.set(false);
   }
 
-  addNormalField() {
+  addDataField() {
     this.showAddMenu.set(false);
-    this.recordState.addField('normal');
+    this.recordState.addField('data');
   }
 
   addControlField() {

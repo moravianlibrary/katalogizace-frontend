@@ -6,19 +6,19 @@ import { WorkingPanelService } from '../../../services/working-panel.service';
 import { RecordStore } from '../../../stores/record.store';
 
 import {
+  dataSignature,
   enumerateSubfields,
   isDiffableTag015to830,
-  normalSignature,
 } from '../../../utils/marc-diff';
 
 @Component({
   standalone: true,
-  selector: 'tr[appMarcRowNormal]',
+  selector: 'tr[appMarcRowData]',
   imports: [CommonModule],
-  templateUrl: './marc-row-normal.component.html',
+  templateUrl: './marc-row-data.component.html',
 })
-export class MarcRowNormalComponent {
-  nf = input.required<{
+export class MarcRowDataComponent {
+  df = input.required<{
     fieldId?: UUID;
     tag: string;
     ind1?: string;
@@ -42,10 +42,10 @@ export class MarcRowNormalComponent {
 
   onShowCandidates() {
     this.wps.showCandidates(
-      this.nf().tag,
-      this.nf().fieldId!,
-      this.nf().candidates!,
-      this.nf().selectedCandidateId ?? '',
+      this.df().tag,
+      this.df().fieldId!,
+      this.df().candidates!,
+      this.df().selectedCandidateId ?? '',
     );
   }
 
@@ -73,17 +73,17 @@ export class MarcRowNormalComponent {
   }
 
   onShowProvenance() {
-    const nf = this.nf();
-    if (!nf.fieldId || !nf.selectedCandidateId) return;
+    const df = this.df();
+    if (!df.fieldId || !df.selectedCandidateId) return;
 
-    const steps = this.store.provenance()[nf.selectedCandidateId] ?? [];
-    const title = `Jak jsme získali pole ${nf.tag}?`;
-    this.wps.showProvenance(title, steps, nf.fieldId);
+    const steps = this.store.provenance()[df.selectedCandidateId] ?? [];
+    const title = `Jak jsme získali pole ${df.tag}?`;
+    this.wps.showProvenance(title, steps, df.fieldId);
   }
 
   private fieldKey = computed(() => {
-    const f = this.nf();
-    return normalSignature({
+    const f = this.df();
+    return dataSignature({
       tag: f.tag,
       ind1: f.ind1 ?? '',
       ind2: f.ind2 ?? '',
@@ -95,14 +95,14 @@ export class MarcRowNormalComponent {
   });
 
   subfieldsEnumerated = computed(() => {
-    const f = this.nf();
+    const f = this.df();
     return enumerateSubfields(
       (f.subfields ?? []).map((sf) => ({ code: sf.code, value: sf.value })),
     );
   });
 
   subDiffKindAt(i: number): SubDiffKind | null {
-    const f = this.nf();
+    const f = this.df();
     if (!isDiffableTag015to830(f.tag)) return null;
 
     const idx = this.diffIndex();

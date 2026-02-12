@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { RecordStore } from '../../../stores/record.store';
 import { MarcRowControlComponent } from '../../marc-row/marc-row-control/marc-row-control.component';
+import { MarcRowDataComponent } from '../../marc-row/marc-row-data/marc-row-data.component';
 import { MarcRowLeaderComponent } from '../../marc-row/marc-row-leader/marc-row-leader.component';
-import { MarcRowNormalComponent } from '../../marc-row/marc-row-normal/marc-row-normal.component';
 
 import { MarcDiffService } from '../../../services/marc-diff.service';
 import { RecordStateService } from '../../../services/record-state.service';
@@ -15,7 +15,7 @@ import { isDiffableTag015to830 } from '../../../utils/marc-diff';
   selector: 'app-extracted-marc-record-table',
   imports: [
     MarcRowControlComponent,
-    MarcRowNormalComponent,
+    MarcRowDataComponent,
     MarcRowLeaderComponent,
     CommonModule,
   ],

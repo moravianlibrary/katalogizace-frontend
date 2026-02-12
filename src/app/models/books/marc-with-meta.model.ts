@@ -2,7 +2,7 @@ import { UUID } from '../shared/id.model';
 import {
   ExistingMarcRecord,
   ExistingMarcRecordControlField,
-  ExistingMarcRecordNormalField,
+  ExistingMarcRecordDataField,
   MarcCandidate,
 } from './marc.dto';
 
@@ -13,8 +13,8 @@ export interface ExistingMarcRecordFieldMeta {
   score: number;
 }
 
-export interface ExistingMarcRecordNormalFieldWithMeta
-  extends ExistingMarcRecordNormalField,
+export interface ExistingMarcRecordDataFieldWithMeta
+  extends ExistingMarcRecordDataField,
     ExistingMarcRecordFieldMeta {}
 
 export interface ExistingMarcRecordControlFieldWithMeta
@@ -23,5 +23,5 @@ export interface ExistingMarcRecordControlFieldWithMeta
 
 export interface ExistingMarcRecordWithMeta extends ExistingMarcRecord {
   control_fields: ExistingMarcRecordControlFieldWithMeta[];
-  normal_fields: ExistingMarcRecordNormalFieldWithMeta[];
+  data_fields: ExistingMarcRecordDataFieldWithMeta[];
 }

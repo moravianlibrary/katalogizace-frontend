@@ -115,7 +115,7 @@ export class MarcRecordsComponent {
       return null;
     }
 
-    const f245 = rec.normal_fields?.find((f) => f.tag === '245');
+    const f245 = rec.data_fields?.find((f) => f.tag === '245');
     if (!f245) return '';
     return f245.subfields?.find((sf) => sf.code === 'a')?.value ?? '';
   }
@@ -125,7 +125,7 @@ export class MarcRecordsComponent {
       return null;
     }
 
-    const f100 = rec.normal_fields?.find((f) => f.tag === '100');
+    const f100 = rec.data_fields?.find((f) => f.tag === '100');
     if (!f100) return '';
     return f100.subfields?.find((sf) => sf.code === 'a')?.value ?? '';
   }
@@ -135,7 +135,7 @@ export class MarcRecordsComponent {
       return null;
     }
 
-    const f264 = rec.normal_fields?.find((f) => f.tag === '264');
+    const f264 = rec.data_fields?.find((f) => f.tag === '264');
     if (f264) {
       const sf264 = f264.subfields?.find((sf) => sf.code === 'c')?.value ?? '';
       if (sf264 !== '') {
@@ -143,7 +143,7 @@ export class MarcRecordsComponent {
       }
     }
 
-    const f260 = rec.normal_fields?.find((f) => f.tag === '260');
+    const f260 = rec.data_fields?.find((f) => f.tag === '260');
     if (f260) {
       const sf260 = f260.subfields?.find((sf) => sf.code === 'c')?.value ?? '';
       if (sf260 !== '') {

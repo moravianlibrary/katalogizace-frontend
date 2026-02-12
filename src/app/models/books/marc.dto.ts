@@ -2,14 +2,14 @@ import { MarcTag, UUID } from '../shared/id.model';
 
 export type ExtractedMarcRecord = Record<
   MarcTag,
-  ExtractedMarcControlField[] | ExtractedMarcNormalField[]
+  ExtractedMarcControlField[] | ExtractedMarcDataField[]
 >;
 
 export interface ExtractedMarcControlField {
   value: string;
 }
 
-export interface ExtractedMarcNormalField {
+export interface ExtractedMarcDataField {
   id: UUID;
   candidates: MarcCandidate[];
   selected_candidate_id: UUID | null;
@@ -38,7 +38,7 @@ export interface ExistingMarcRecord {
   source: string;
   quality_assessment: QualityScore | null;
   control_fields: ExistingMarcRecordControlField[];
-  normal_fields: ExistingMarcRecordNormalField[];
+  data_fields: ExistingMarcRecordDataField[];
 }
 
 export interface LastEditedRecord extends ExistingMarcRecord {}
@@ -55,7 +55,7 @@ export interface ExistingMarcRecordControlField {
   value: string;
 }
 
-export interface ExistingMarcRecordNormalField {
+export interface ExistingMarcRecordDataField {
   tag: string;
   ind1: string;
   ind2: string;

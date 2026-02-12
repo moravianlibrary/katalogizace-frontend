@@ -96,13 +96,13 @@ export class RecordStateService {
       value: sf.value,
     }));
 
-    const normal: UiFieldWithMeta[] = rec.normal_fields.map((nf) => ({
+    const data: UiFieldWithMeta[] = rec.data_fields.map((df) => ({
       fieldId: `${crypto.randomUUID()}`,
-      tag: nf.tag,
-      ind1: nf.ind1 ?? '',
-      ind2: nf.ind2 ?? '',
+      tag: df.tag,
+      ind1: df.ind1 ?? '',
+      ind2: df.ind2 ?? '',
       subfields:
-        nf.subfields?.map((sf) => ({
+        df.subfields?.map((sf) => ({
           code: sf.code,
           value: sf.value,
           isManual: true,
@@ -113,9 +113,9 @@ export class RecordStateService {
     }));
 
     control.sort((a, b) => a.tag.localeCompare(b.tag));
-    normal.sort((a, b) => a.tag.localeCompare(b.tag));
+    data.sort((a, b) => a.tag.localeCompare(b.tag));
 
-    this.uiFields.set(control.concat(normal));
+    this.uiFields.set(control.concat(data));
   }
 
   loadFromExtracted(extracted: ExtractedMarcRecord | null) {
@@ -178,7 +178,7 @@ export class RecordStateService {
           required_if_applicable_total: 0,
         },
         control_fields: [],
-        normal_fields: [],
+        data_fields: [],
       };
     }
 
@@ -200,7 +200,7 @@ export class RecordStateService {
       }))
       .filter((sf) => sf.value.length > 0);
 
-    const normal_fields = fields
+    const data_fields = fields
       .filter((f) => !f.control)
       .map((f) => {
         const cleanedSubfields =
@@ -218,7 +218,7 @@ export class RecordStateService {
           subfields: cleanedSubfields,
         };
       })
-      .filter((nf) => nf.subfields.length > 0);
+      .filter((df) => df.subfields.length > 0);
 
     return {
       record_id: 'preview',
@@ -231,7 +231,7 @@ export class RecordStateService {
         required_if_applicable_total: 0,
       },
       control_fields,
-      normal_fields,
+      data_fields,
     };
   });
 }

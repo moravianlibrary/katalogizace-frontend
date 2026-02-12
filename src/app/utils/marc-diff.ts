@@ -1,6 +1,6 @@
 import {
   ExistingMarcRecord,
-  ExistingMarcRecordNormalField,
+  ExistingMarcRecordDataField,
   MarcSubfield,
   SubDiffIndex,
   SubDiffKind,
@@ -49,10 +49,10 @@ export function subfieldsSignature(subfields?: MarcSubfield[] | null): string {
 }
 
 /**
- * Field signature pre normal field. Stabilné aj keď sa zmení poradie podpolí.
+ * Field signature pre data field. Stabilné aj keď sa zmení poradie podpolí.
  * (Používa multiset podpis subfields.)
  */
-export function normalSignature(f: ExistingMarcRecordNormalField): string {
+export function dataSignature(f: ExistingMarcRecordDataField): string {
   const tag = normStr(f.tag);
   const ind1 = normInd(f.ind1);
   const ind2 = normInd(f.ind2);
@@ -60,18 +60,18 @@ export function normalSignature(f: ExistingMarcRecordNormalField): string {
   return `N${SEP}${tag}${SEP}${ind1}${SEP}${ind2}${SEP}${subSig}`;
 }
 
-function fieldTag(f: ExistingMarcRecordNormalField): string {
+function fieldTag(f: ExistingMarcRecordDataField): string {
   return normStr(f.tag);
 }
 
 /**
- * Vytiahne len diffovateľné normal fields (015–830).
+ * Vytiahne len diffovateľné data fields (015–830).
  */
-function toNormalFields(
+function toDataFields(
   rec: ExistingMarcRecord | null | undefined,
-): ExistingMarcRecordNormalField[] {
+): ExistingMarcRecordDataField[] {
   if (!rec) return [];
-  return (rec.normal_fields ?? []).filter((f) => isDiffableTag015to830(f.tag));
+  return (rec.data_fields ?? []).filter((f) => isDiffableTag015to830(f.tag));
 }
 
 /**
@@ -111,8 +111,8 @@ function multisetCounts(sfs: MarcSubfield[]): Map<string, number> {
  * + delta multiset subfields
  */
 function matchCost(
-  a: ExistingMarcRecordNormalField,
-  b: ExistingMarcRecordNormalField,
+  a: ExistingMarcRecordDataField,
+  b: ExistingMarcRecordDataField,
 ): number {
   if (fieldTag(a) !== fieldTag(b)) return Number.POSITIVE_INFINITY;
 
@@ -129,12 +129,12 @@ function matchCost(
  * - vygeneruje všetky páry, zoradí podľa cost, a greedy vyberie nekolízne páry
  */
 function greedyPairing(
-  opened: ExistingMarcRecordNormalField[],
-  preview: ExistingMarcRecordNormalField[],
+  opened: ExistingMarcRecordDataField[],
+  preview: ExistingMarcRecordDataField[],
 ) {
   const pairs: Array<{
-    o: ExistingMarcRecordNormalField;
-    p: ExistingMarcRecordNormalField;
+    o: ExistingMarcRecordDataField;
+    p: ExistingMarcRecordDataField;
     cost: number;
   }> = [];
 
@@ -147,11 +147,11 @@ function greedyPairing(
 
   pairs.sort((a, b) => a.cost - b.cost);
 
-  const usedO = new Set<ExistingMarcRecordNormalField>();
-  const usedP = new Set<ExistingMarcRecordNormalField>();
+  const usedO = new Set<ExistingMarcRecordDataField>();
+  const usedP = new Set<ExistingMarcRecordDataField>();
   const chosen: Array<{
-    o: ExistingMarcRecordNormalField;
-    p: ExistingMarcRecordNormalField;
+    o: ExistingMarcRecordDataField;
+    p: ExistingMarcRecordDataField;
     cost: number;
   }> = [];
 
@@ -304,8 +304,8 @@ export function diffMarcRecordsSubfields(
   openedRec: ExistingMarcRecord | null,
   previewRec: ExistingMarcRecord | null,
 ): SubDiffIndex {
-  const openedFields = toNormalFields(openedRec);
-  const previewFields = toNormalFields(previewRec);
+  const openedFields = toDataFields(openedRec);
+  const previewFields = toDataFields(previewRec);
 
   const openedMap = new Map<string, Map<string, SubDiffKind>>();
   const previewMap = new Map<string, Map<string, SubDiffKind>>();
@@ -323,8 +323,8 @@ export function diffMarcRecordsSubfields(
 
     // paired fields => diff subfields
     for (const { o, p } of chosen) {
-      const oKey = normalSignature(o);
-      const pKey = normalSignature(p);
+      const oKey = dataSignature(o);
+      const pKey = dataSignature(p);
 
       const { opened, preview } = diffSubfieldsWithinPairedField(
         o.subfields ?? [],
@@ -337,7 +337,7 @@ export function diffMarcRecordsSubfields(
 
     // unpaired => všetky subfields orange na tej strane
     for (const o of unpairedO) {
-      const oKey = normalSignature(o);
+      const oKey = dataSignature(o);
 
       const m = new Map<string, SubDiffKind>();
       for (const { key } of enumerateSubfields(o.subfields ?? [])) {
@@ -347,7 +347,7 @@ export function diffMarcRecordsSubfields(
     }
 
     for (const p of unpairedP) {
-      const pKey = normalSignature(p);
+      const pKey = dataSignature(p);
 
       const m = new Map<string, SubDiffKind>();
       for (const { key } of enumerateSubfields(p.subfields ?? [])) {

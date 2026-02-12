@@ -1,13 +1,13 @@
 <td class="text-secondary p-2 align-text-top font-bold">
-  {{ nf().tag }}
+  {{ df().tag }}
 </td>
 
 <td class="text-secondary p-2 align-text-top font-bold">
-  {{ nf().ind1 }}
+  {{ df().ind1 }}
 </td>
 
 <td class="text-secondary p-2 align-text-top font-bold">
-  {{ nf().ind2 }}
+  {{ df().ind2 }}
 </td>
 
 <td class="p-2">
@@ -26,7 +26,7 @@
   }
 </td>
 
-@if (nf().fieldId && (nf().candidates?.length ?? 0) > 1) {
+@if (df().fieldId && (df().candidates?.length ?? 0) > 1) {
   <td class="p-2">
     <div class="flex h-full items-center justify-center">
       <button
@@ -70,14 +70,14 @@
   <td></td>
 }
 
-@if (nf().selectedCandidateId && nf().score) {
+@if (df().selectedCandidateId && df().score) {
   <td class="p-2">
     <div class="flex h-full items-center justify-center">
       <button
         class="h-4 w-4 cursor-pointer rounded-full"
-        [ngClass]="scoreClass(nf().score)"
+        [ngClass]="scoreClass(df().score)"
         (click)="onShowProvenance()"
-        title="score {{ nf().score | number: '1.2-2' }}"
+        title="score {{ df().score | number: '1.2-2' }}"
         type="button"
       ></button>
     </div>
