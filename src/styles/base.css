@@ -42,3 +42,9 @@
     line-height: var(--leading-h5);
   }
 }
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
