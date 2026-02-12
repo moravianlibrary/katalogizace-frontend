@@ -28,6 +28,12 @@ export class BookDetailComponent {
   private breadcrumbs = inject(BreadcrumbsService);
   private translate = inject(TranslateService);
 
+  galleryCollapsed = signal(false);
+
+  onGalleryCollapsedChange(v: boolean) {
+    this.galleryCollapsed.set(v);
+  }
+
   bookId: ID | null = (() => {
     const id = this.route.snapshot.paramMap.get('bookId');
     const n = Number(id);

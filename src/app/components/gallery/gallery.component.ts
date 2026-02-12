@@ -5,6 +5,7 @@ import {
   effect,
   inject,
   input,
+  output,
   signal,
 } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -37,6 +38,12 @@ export class GalleryComponent {
   private fullLoaded = new Set<ID>();
 
   collapsed = signal(false);
+  collapsedChange = output<boolean>();
+
+  toggleCollapsed() {
+    this.collapsed.update((v) => !v);
+    this.collapsedChange.emit(this.collapsed());
+  }
 
   selectedItem = computed(() => {
     const id = this.selectedId();
@@ -162,10 +169,6 @@ export class GalleryComponent {
   onSelect(id: ID) {
     this.selectedId.set(id);
     this.ensureFull(id);
-  }
-
-  toggleCollapsed() {
-    this.collapsed.update((v) => !v);
   }
 
   ngOnDestroy() {
