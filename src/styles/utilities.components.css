@@ -113,3 +113,33 @@
     group-active:icon-tertiary-pressed
     group-disabled:icon-tertiary-disable;
 }
+
+/* ========== TABS ========== */
+
+/* prettier-ignore */
+@utility tab-item {
+  @apply
+    inline-flex
+    gap-2
+    px-4 py-6
+    font-medium
+    text-md
+    text-nowrap
+
+    text-btn-tertiary-default
+    hover:text-btn-tertiary-hover
+    active:text-btn-tertiary-pressed
+    disabled:text-btn-tertiary-disable
+
+    border-b-2
+    border-transparent
+    hover:border-primary-disable
+    active:border-primary-disable
+
+    hover:cursor-pointer
+    disabled:cursor-not-allowed
+
+    transition-colors
+    duration-150
+    ease-in-out;
+}
