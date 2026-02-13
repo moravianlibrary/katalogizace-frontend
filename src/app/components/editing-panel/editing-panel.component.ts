@@ -5,13 +5,15 @@ import { RecordStateService } from '../../services/record-state.service';
 import { RecordStore } from '../../stores/record.store';
 import { ExtractedFieldsComponent } from '../extracted-fields/extracted-fields/extracted-fields.component';
 import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
-import { NavigationButtonsComponent } from '../navigation-buttons/navigation-buttons.component';
+
+import { QuickAddItem } from '@/app/models/shared/record-state';
+import { EditingPanelHeaderComponent } from './editing-panel-header/editing-panel-header.component';
 
 @Component({
   standalone: true,
   selector: 'app-editing-panel',
   imports: [
-    NavigationButtonsComponent,
+    EditingPanelHeaderComponent,
     ExtractedFieldsComponent,
     ExistingMarcRecordTableComponent,
   ],
@@ -30,6 +32,10 @@ export class EditingPanelComponent {
 
   diffIndex = this.diff.diffIndex;
   diffEnabled = this.diff.enabledByUser;
+
+  onQuickAdd(it: QuickAddItem) {
+    this.recordState.addFieldWithTag(it.tag, it.type);
+  }
 
   constructor() {
     effect(() => {
