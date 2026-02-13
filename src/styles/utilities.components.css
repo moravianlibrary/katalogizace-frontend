@@ -6,6 +6,7 @@
     inline-flex
     rounded-lg
     font-medium
+    text-nowrap
 
     cursor-pointer
     disabled:cursor-not-allowed
@@ -20,7 +21,8 @@
   @apply
     px-3
     py-2
-    text-sm;
+    text-sm
+    gap-2;
   line-height: var(--text-sm-tight--line-height);
 }
 
@@ -29,7 +31,8 @@
   @apply
     px-4
     py-3
-    text-sm;
+    text-sm
+    gap-3;
   line-height: var(--text-sm-tight--line-height);
 }
 
@@ -38,6 +41,7 @@
   @apply
     px-4
     py-3
+    gap-3
     text-md;
 }
 
