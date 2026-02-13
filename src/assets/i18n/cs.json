@@ -49,7 +49,12 @@
   },
   "buttons": {
     "save": "Uložit",
-    "logout": "Odhlásit"
+    "save_record": "Uložit záznam",
+    "logout": "Odhlásit",
+    "add_data_field": "Přidat datové pole",
+    "add_control_field": "Přidat kontrolní pole",
+    "overview": "Přehled",
+    "mass_edit": "Hromadná úprava"
   },
   "messages": {
     "success": {
