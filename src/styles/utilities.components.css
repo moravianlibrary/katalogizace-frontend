@@ -105,6 +105,26 @@
     disabled:border-tertiary-disable;
 }
 
+/* ========== ICONS ========== */
+
+/* prettier-ignore */
+@utility icon-primary {
+  @apply
+    icon-primary-default
+    group-hover:icon-primary-hover
+    group-active:icon-primary-pressed
+    group-disabled:icon-primary-disable;
+}
+
+/* prettier-ignore */
+@utility icon-secondary {
+  @apply
+    icon-secondary-default
+    group-hover:icon-secondary-hover
+    group-active:icon-secondary-pressed
+    group-disabled:icon-secondary-disable;
+}
+
 /* prettier-ignore */
 @utility icon-tertiary {
   @apply
