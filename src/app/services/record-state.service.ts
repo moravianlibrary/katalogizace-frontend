@@ -20,6 +20,50 @@ export class RecordStateService {
 
   readonly focusTagFieldId = signal<UUID | null>(null);
 
+  readonly QUICK_ADD = [
+    { tag: 100, repeatable: false, type: 'data' as FieldType },
+    { tag: 245, repeatable: false, type: 'data' as FieldType },
+    { tag: 255, repeatable: true, type: 'data' as FieldType },
+    { tag: 264, repeatable: true, type: 'data' as FieldType },
+    { tag: 300, repeatable: true, type: 'data' as FieldType },
+    { tag: 500, repeatable: true, type: 'data' as FieldType },
+    { tag: 651, repeatable: true, type: 'data' as FieldType },
+    { tag: 655, repeatable: true, type: 'data' as FieldType },
+  ];
+
+  readonly visibleQuickAdd = computed(() => {
+    const existing = new Set<number>();
+
+    for (const f of this.uiFields()) {
+      const n = Number(f.tag);
+      if (!Number.isNaN(n)) existing.add(n);
+    }
+
+    return this.QUICK_ADD.filter(
+      (it) => it.repeatable || !existing.has(it.tag),
+    );
+  });
+
+  // TODO rovno predvyplnit polia
+  addFieldWithTag(tag: number, fieldType: FieldType) {
+    const current = this.uiFields();
+    const isControl = fieldType === 'control';
+
+    const newField: UiFieldWithMeta = {
+      fieldId: `manual-${crypto.randomUUID()}`,
+      tag: String(tag).padStart(3, '0'),
+      ind1: '',
+      ind2: '',
+      subfields: isControl ? [] : [{ code: '', value: '', isManual: true }],
+      isManual: true,
+      control: isControl,
+      value: '',
+    };
+
+    this.uiFields.set([newField, ...current]);
+    this.requestFocusTag(newField.fieldId);
+  }
+
   requestFocusTag(fieldId: UUID) {
     this.focusTagFieldId.set(fieldId);
   }
@@ -69,6 +113,11 @@ export class RecordStateService {
     this.clearFocusTag();
 
     this.viewMode.update((m) => (m === 'cards' ? 'table' : 'cards'));
+  }
+
+  setViewMode(mode: RecordViewMode) {
+    this.clearFocusTag();
+    this.viewMode.set(mode);
   }
 
   resetViewMode() {
