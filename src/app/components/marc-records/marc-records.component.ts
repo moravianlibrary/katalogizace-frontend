@@ -33,8 +33,15 @@ export class MarcRecordsComponent {
     return extractedToExisting(this.extractedRecord());
   });
 
-  private diff = inject(MarcDiffService);
+  diff = inject(MarcDiffService);
   diffIndex = this.diff.diffIndex;
+
+  diffEnabled = this.diff.enabledByUser;
+  viewMode = this.recordState.viewMode;
+
+  showDiffToggle = computed(() => {
+    return this.viewMode() === 'table' && this.wps.state().mode === 'records';
+  });
 
   records = computed<MarcRecordsItem[]>(() => {
     const list: MarcRecordsItem[] = [];

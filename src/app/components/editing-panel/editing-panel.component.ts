@@ -28,10 +28,8 @@ export class EditingPanelComponent {
 
   viewMode = this.recordState.viewMode;
   recordPreview = this.recordState.recordPreview;
-  uiFields = this.recordState.uiFields;
 
   diffIndex = this.diff.diffIndex;
-  diffEnabled = this.diff.enabledByUser;
 
   onQuickAdd(it: QuickAddItem) {
     this.recordState.addFieldWithTag(it.tag, it.type);

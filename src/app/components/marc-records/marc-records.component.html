@@ -1,6 +1,34 @@
 <section class="flex h-full flex-col">
   <h2 class="mb-4">Záznamy</h2>
 
+  @if (showDiffToggle()) {
+    <div class="auto ml-auto flex gap-5">
+      <div class="flex items-center gap-3">
+        <span class="text-secondary text-sm-tight font-medium">
+          Porovnání
+        </span>
+        <button
+          class="inline-flex h-8 w-14 shrink-0 cursor-pointer items-center rounded-full transition"
+          [class.bg-main-primary-default]="diffEnabled()"
+          [class.hover:bg-main-primary-hover]="diffEnabled()"
+          [class.bg-main-bright]="!diffEnabled()"
+          [class.hover:bg-main-contrast]="!diffEnabled()"
+          [attr.aria-checked]="diffEnabled()"
+          (click)="diff.toggle()"
+          type="button"
+          role="switch"
+          aria-label="Porovnání záznamů"
+        >
+          <span
+            class="inline-block h-6 w-6 transform rounded-full bg-white shadow transition"
+            [class.translate-x-7]="diffEnabled()"
+            [class.translate-x-1]="!diffEnabled()"
+          ></span>
+        </button>
+      </div>
+    </div>
+  }
+
   <div class="overflow-auto">
     @if (!records().length) {
       <p class="text-light text-sm">Žádné záznamy.</p>
