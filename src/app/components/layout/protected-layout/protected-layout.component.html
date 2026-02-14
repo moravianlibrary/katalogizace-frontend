@@ -3,7 +3,9 @@
     class="bg-main-base sticky top-0 z-10 flex h-16 items-center justify-between gap-4 px-4 py-3"
   >
     <div class="flex items-center gap-4">
-      <h5 class="text-light font-bold whitespace-nowrap">AI Katalogizace</h5>
+      <h5 class="text-light font-bold whitespace-nowrap">
+        {{ "ai_cataloging" | translate }}
+      </h5>
       <nav class="min-w-0">
         <ol class="text-md flex min-w-0 items-center gap-2">
           @for (crumb of breadcrumbs.crumbs(); track $index) {
@@ -59,7 +61,7 @@
       }
 
       <button class="btn btn-m btn-tertiary" (click)="logout()" type="button">
-        Odhlásit
+        {{ "buttons.logout" | translate }}
       </button>
     </div>
   </header>

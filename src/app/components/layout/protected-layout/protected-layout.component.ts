@@ -1,13 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../../services/api/auth.service';
 import { BreadcrumbsService } from '../../../services/breadcrumbs.service';
 
 @Component({
   standalone: true,
   selector: 'app-protected-layout',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TranslateModule],
   templateUrl: './protected-layout.component.html',
 })
 export class ProtectedLayoutComponent {
