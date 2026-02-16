@@ -50,11 +50,10 @@ export class CandidatesTableComponent {
     const list = this.sortedCandidates();
     const preferred = this.selectedCandidateId();
 
-    if (preferred) {
-      this.selectedId.set(preferred);
-    } else {
-      this.selectedId.set(list[0]?.id ?? null);
-    }
+    const next = preferred ?? list[0]?.id ?? null;
+
+    this.selectedId.set(next);
+    this.cps.setSelectedCandidateId(next);
   });
 
   showAutPreview = computed(() => this.tag() === '100' || this.tag() === '700');
@@ -157,6 +156,7 @@ export class CandidatesTableComponent {
 
   onRowClick(id: UUID) {
     this.selectedId.set(id);
+    this.cps.setSelectedCandidateId(id);
   }
 
   onConfirm() {

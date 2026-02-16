@@ -71,6 +71,10 @@ export class ContextPanelService {
     this.showRecords();
   }
 
+  setSelectedCandidateId(id: UUID) {
+    this.state.update((s) => ({ ...s, selectedCandidateId: id }));
+  }
+
   showProvenance(tag: string, title: string, steps: Step[], fieldId: UUID) {
     this.setMode('provenance', { tag, title, steps, fieldId });
   }
