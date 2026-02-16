@@ -40,11 +40,19 @@
                   "
                   routerLinkActive="text-secondary font-medium"
                 >
-                  {{ crumb.label }}
+                  @if (crumb.labelKey) {
+                    {{ crumb.labelKey | translate: crumb.labelParams }}
+                  } @else {
+                    {{ crumb.label }}
+                  }
                 </a>
               } @else {
                 <span class="text-secondary truncate font-medium">
-                  {{ crumb.label }}
+                  @if (crumb.labelKey) {
+                    {{ crumb.labelKey | translate: crumb.labelParams }}
+                  } @else {
+                    {{ crumb.label }}
+                  }
                 </span>
               }
             </li>

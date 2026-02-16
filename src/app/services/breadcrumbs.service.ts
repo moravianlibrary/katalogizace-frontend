@@ -3,7 +3,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { ID } from '../models';
 
 export type BreadcrumbItem = {
-  label: string;
+  labelKey?: string;
+  labelParams?: Record<string, any>;
+  label?: string;
   url?: string;
 };
 
@@ -40,7 +42,7 @@ export class BreadcrumbsService {
   readonly crumbs = computed<BreadcrumbItem[]>(() => {
     const items: BreadcrumbItem[] = [
       {
-        label: this.translate.instant('services.breadcrumbs.list_of_groups'),
+        labelKey: 'services.breadcrumbs.list_of_groups',
         url: '/batches',
       },
     ];
