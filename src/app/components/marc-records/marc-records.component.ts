@@ -36,13 +36,6 @@ export class MarcRecordsComponent {
   diff = inject(MarcDiffService);
   diffIndex = this.diff.diffIndex;
 
-  diffEnabled = this.diff.enabledByUser;
-  viewMode = this.recordState.viewMode;
-
-  showDiffToggle = computed(() => {
-    return this.viewMode() === 'table' && this.cps.state().mode === 'records';
-  });
-
   records = computed<MarcRecordsItem[]>(() => {
     const list: MarcRecordsItem[] = [];
     const extracted = this.extractedRecord();
