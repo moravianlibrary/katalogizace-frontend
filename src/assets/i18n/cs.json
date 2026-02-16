@@ -154,5 +154,8 @@
     "candidate_selection": "Výběr kandidátů pro pole {{tag}}",
     "provenance": "Jak jsme získali pole {{tag}}?",
     "edit": "Úprava pole {{tag}}"
+  },
+  "provenance": {
+    "empty": "Pro tuto hodnotu nejsou dostupné žádné kroky provenience."
   }
 }
