@@ -3,6 +3,7 @@ import { ContextPanelService } from '../../services/context-panel.service';
 import { CandidatesTableComponent } from '../candidates-table/candidates-table.component';
 import { MarcRecordsComponent } from '../marc-records/marc-records.component';
 import { ProvenanceTimelineComponent } from '../provenance-timeline/provenance-timeline.component';
+import { ContextPanelHeaderComponent } from './context-panel-header/context-panel-header.component';
 
 @Component({
   standalone: true,
@@ -11,6 +12,7 @@ import { ProvenanceTimelineComponent } from '../provenance-timeline/provenance-t
     MarcRecordsComponent,
     CandidatesTableComponent,
     ProvenanceTimelineComponent,
+    ContextPanelHeaderComponent,
   ],
   templateUrl: './context-panel.component.html',
 })
