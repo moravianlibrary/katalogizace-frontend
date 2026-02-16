@@ -107,6 +107,17 @@
     disabled:border-tertiary-disable;
 }
 
+/* prettier-ignore */
+@utility btn-error {
+  @apply
+    bg-main-base
+    text-error
+
+    hover:text-error-hover
+    active:text-error-pressed
+    disabled:text-error-disabled;
+}
+
 /* ========== ICONS ========== */
 
 /* prettier-ignore */
@@ -134,6 +145,15 @@
     group-hover:icon-tertiary-hover
     group-active:icon-tertiary-pressed
     group-disabled:icon-tertiary-disable;
+}
+
+/* prettier-ignore */
+@utility icon-btn-error {
+  @apply
+    icon-error
+    group-hover:icon-error-hover
+    group-active:icon-error-pressed
+    group-disabled:icon-error-disabled;
 }
 
 /* ========== TABS ========== */
