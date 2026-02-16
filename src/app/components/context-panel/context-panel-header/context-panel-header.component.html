@@ -1,25 +1,174 @@
-@if (showDiffToggle()) {
-  <div class="auto ml-auto flex gap-5">
-    <div class="flex items-center gap-3">
-      <span class="text-secondary text-sm-tight font-medium"> Porovnání </span>
-      <button
-        class="inline-flex h-8 w-14 shrink-0 cursor-pointer items-center rounded-full transition"
-        [class.bg-main-primary-default]="diffEnabled()"
-        [class.hover:bg-main-primary-hover]="diffEnabled()"
-        [class.bg-main-bright]="!diffEnabled()"
-        [class.hover:bg-main-contrast]="!diffEnabled()"
-        [attr.aria-checked]="diffEnabled()"
-        (click)="diff.toggle()"
-        type="button"
-        role="switch"
-        aria-label="Porovnání záznamů"
-      >
-        <span
-          class="inline-block h-6 w-6 transform rounded-full bg-white shadow transition"
-          [class.translate-x-7]="diffEnabled()"
-          [class.translate-x-1]="!diffEnabled()"
-        ></span>
-      </button>
-    </div>
+<div>
+  <div class="border-bright flex items-center gap-2 border-b p-4">
+    @switch (this.cps.state().mode) {
+      @case ("provenance") {
+        <div class="flex w-full items-center gap-4">
+          <button
+            class="btn btn-m btn-icon btn-tertiary group"
+            (click)="onBack()"
+          >
+            <svg
+              class="icon-tertiary"
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M6.73372 3.59957C6.92898 3.79483 6.92898 4.11142 6.73372 4.30668L3.0406 7.99979L6.73372 11.6929C6.92898 11.8882 6.92898 12.2047 6.73372 12.4C6.53845 12.5953 6.22187 12.5953 6.02661 12.4L1.97994 8.35335C1.88617 8.25958 1.8335 8.1324 1.8335 7.99979C1.8335 7.86718 1.88617 7.74001 1.97994 7.64624L6.02661 3.59957C6.22187 3.40431 6.53845 3.40431 6.73372 3.59957Z"
+              />
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M1.94678 8C1.94678 7.72386 2.17063 7.5 2.44678 7.5H13.6668C13.9429 7.5 14.1668 7.72386 14.1668 8C14.1668 8.27614 13.9429 8.5 13.6668 8.5H2.44678C2.17063 8.5 1.94678 8.27614 1.94678 8Z"
+              />
+            </svg>
+          </button>
+
+          <span class="text-md w-full font-medium">{{ headerTitle() }}</span>
+        </div>
+      }
+      @case ("candidates") {
+        <div class="flex w-full items-center gap-4">
+          <button
+            class="btn btn-m btn-icon btn-tertiary group"
+            (click)="onBack()"
+          >
+            <svg
+              class="icon-tertiary"
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M6.73372 3.59957C6.92898 3.79483 6.92898 4.11142 6.73372 4.30668L3.0406 7.99979L6.73372 11.6929C6.92898 11.8882 6.92898 12.2047 6.73372 12.4C6.53845 12.5953 6.22187 12.5953 6.02661 12.4L1.97994 8.35335C1.88617 8.25958 1.8335 8.1324 1.8335 7.99979C1.8335 7.86718 1.88617 7.74001 1.97994 7.64624L6.02661 3.59957C6.22187 3.40431 6.53845 3.40431 6.73372 3.59957Z"
+              />
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M1.94678 8C1.94678 7.72386 2.17063 7.5 2.44678 7.5H13.6668C13.9429 7.5 14.1668 7.72386 14.1668 8C14.1668 8.27614 13.9429 8.5 13.6668 8.5H2.44678C2.17063 8.5 1.94678 8.27614 1.94678 8Z"
+              />
+            </svg>
+          </button>
+
+          <span class="text-md w-full font-medium">{{ headerTitle() }}</span>
+        </div>
+
+        <button class="btn btn-m btn-primary" (click)="onCandidateConfirm()">
+          {{ "buttons.confirm_selection" | translate }}
+        </button>
+      }
+      @case ("edit") {
+        <span class="text-md w-full font-medium">{{ headerTitle() }}</span>
+        <button class="btn btn-m btn-tertiary">
+          {{ "buttons.cancel" | translate }}
+        </button>
+      }
+      @default {
+        <span class="text-md w-full font-medium">{{ headerTitle() }}</span>
+
+        <button class="btn btn-m btn-error group" (click)="setEdit()">
+          {{ "buttons.reset" | translate }}
+          <svg
+            class="icon-btn-error"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+          >
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M7.99973 3.60042C7.34767 3.60042 6.75604 3.70483 6.21623 3.86615C5.95165 3.94522 5.67307 3.79484 5.594 3.53026C5.51493 3.26568 5.66531 2.9871 5.92989 2.90803C6.55008 2.72268 7.23844 2.60042 7.99973 2.60042C11.4692 2.60042 14.2797 5.41095 14.2797 8.88042C14.2797 12.3499 11.4692 15.1604 7.99973 15.1604C4.53025 15.1604 1.71973 12.3499 1.71973 8.88042C1.71973 7.59134 2.11104 6.38874 2.77703 5.38974C2.93021 5.15998 3.24065 5.09789 3.47041 5.25106C3.70017 5.40424 3.76226 5.71468 3.60909 5.94444C3.04842 6.78544 2.71973 7.79617 2.71973 8.88042C2.71973 11.7976 5.08254 14.1604 7.99973 14.1604C10.9169 14.1604 13.2797 11.7976 13.2797 8.88042C13.2797 5.96323 10.9169 3.60042 7.99973 3.60042Z"
+            />
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M7.50138 0.956372C7.70966 1.13768 7.73153 1.45351 7.55022 1.66179L5.62356 3.87512C5.44225 4.08341 5.12642 4.10528 4.91814 3.92397C4.70986 3.74266 4.68799 3.42683 4.8693 3.21855L6.79596 1.00522C6.97727 0.796933 7.2931 0.775064 7.50138 0.956372Z"
+            />
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M4.8426 3.25227C5.00542 3.02923 5.31821 2.98041 5.54125 3.14322L7.78792 4.78322C8.01096 4.94604 8.05978 5.25883 7.89697 5.48187C7.73416 5.70491 7.42136 5.75373 7.19832 5.59092L4.95166 3.95092C4.72862 3.78811 4.67979 3.47531 4.8426 3.25227Z"
+            />
+          </svg>
+        </button>
+
+        <button
+          class="btn btn-m btn-primary group"
+          [disabled]="!canTakeRecord()"
+          (click)="onTakeRecord()"
+        >
+          {{ "buttons.take_record" | translate }}
+          <svg
+            class="icon-primary"
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+          >
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M11.1666 1.65279C11.3619 1.45753 11.6785 1.45753 11.8737 1.65279L14.3537 4.13277C14.549 4.32804 14.549 4.64462 14.3537 4.83988L11.8737 7.3199C11.6785 7.51516 11.3619 7.51517 11.1666 7.31991C10.9714 7.12465 10.9714 6.80806 11.1666 6.6128L13.2931 4.48633L11.1666 2.3599C10.9714 2.16464 10.9714 1.84806 11.1666 1.65279Z"
+            />
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M1.5 4.48682C1.5 4.21067 1.72386 3.98682 2 3.98682H14C14.2761 3.98682 14.5 4.21067 14.5 4.48682C14.5 4.76296 14.2761 4.98682 14 4.98682H2C1.72386 4.98682 1.5 4.76296 1.5 4.48682Z"
+            />
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M4.83353 8.67948C5.02879 8.87474 5.0288 9.19133 4.83354 9.38659L2.7071 11.5131L4.83353 13.6395C5.0288 13.8348 5.0288 14.1513 4.83353 14.3466C4.63827 14.5419 4.32169 14.5419 4.12643 14.3466L1.64645 11.8666C1.45119 11.6714 1.45118 11.3548 1.64644 11.1595L4.12642 8.67949C4.32168 8.48423 4.63827 8.48422 4.83353 8.67948Z"
+            />
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M1.5 11.5129C1.5 11.2367 1.72386 11.0129 2 11.0129H14C14.2761 11.0129 14.5 11.2367 14.5 11.5129C14.5 11.789 14.2761 12.0129 14 12.0129H2C1.72386 12.0129 1.5 11.789 1.5 11.5129Z"
+            />
+          </svg>
+        </button>
+      }
+    }
   </div>
-}
+
+  @if (showDiffToggle()) {
+    <div class="flex gap-5 p-4">
+      <div class="flex items-center gap-3">
+        <button
+          class="inline-flex h-6 w-10 shrink-0 cursor-pointer items-center rounded-full transition disabled:cursor-not-allowed"
+          [ngClass]="
+            diffEnabled()
+              ? 'bg-main-primary-default hover:bg-main-primary-hover active:bg-main-primary-pressed disabled:bg-main-primary-disable'
+              : 'bg-main-bright hover:bg-main-contrast active:bg-main-additionally-1 disabled:bg-main-light'
+          "
+          [attr.aria-checked]="diffEnabled()"
+          [disabled]="toggleDisabled()"
+          (click)="diff.toggle()"
+          type="button"
+          role="switch"
+          aria-label="'context_panel.compare_results' | translate"
+        >
+          <span
+            class="inline-block h-5 w-5 transform rounded-full bg-white transition"
+            [class.translate-x-[18px]]="diffEnabled()"
+            [class.translate-x-[2px]]="!diffEnabled()"
+          ></span>
+        </button>
+
+        <span
+          class="text-md font-medium"
+          [ngClass]="toggleDisabled() ? 'text-disable' : 'text-secondary'"
+        >
+          {{ "context_panel.compare_results" | translate }}
+        </span>
+      </div>
+    </div>
+  }
+</div>

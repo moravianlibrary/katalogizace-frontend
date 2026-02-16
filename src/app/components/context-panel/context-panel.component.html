@@ -1,5 +1,5 @@
-<section class="bg-main-base h-full overflow-auto rounded-2xl">
-  <app-context-panel-header></app-context-panel-header>
+<section class="bg-main-base h-full rounded-2xl">
+  <app-context-panel-header [headerTitle]="title()"></app-context-panel-header>
   @if (state().mode === "candidates") {
     <app-candidates-table
       [title]="'Výběr kandidátů pole ' + state().tag"
