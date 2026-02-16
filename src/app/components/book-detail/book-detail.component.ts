@@ -8,15 +8,15 @@ import { BooksService } from '../../services/api/books.service';
 import { MarcDiffService } from '../../services/marc-diff.service';
 import { ToastService } from '../../services/toast.service';
 import { RecordStore } from '../../stores/record.store';
+import { ContextPanelComponent } from '../context-panel/context-panel.component';
 import { EditingPanelComponent } from '../editing-panel/editing-panel.component';
 import { GalleryComponent } from '../gallery/gallery.component';
-import { WorkingPanelComponent } from '../working-panel/working-panel.component';
 
 @Component({
   standalone: true,
   selector: 'app-book-detail',
   providers: [RecordStore, MarcDiffService],
-  imports: [GalleryComponent, EditingPanelComponent, WorkingPanelComponent],
+  imports: [GalleryComponent, EditingPanelComponent, ContextPanelComponent],
   templateUrl: 'book-detail.component.html',
 })
 export class BookDetailComponent {

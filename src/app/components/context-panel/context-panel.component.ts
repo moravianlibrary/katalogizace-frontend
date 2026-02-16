@@ -1,21 +1,21 @@
 import { Component, computed, inject } from '@angular/core';
-import { WorkingPanelService } from '../../services/working-panel.service';
+import { ContextPanelService } from '../../services/context-panel.service';
 import { CandidatesTableComponent } from '../candidates-table/candidates-table.component';
 import { MarcRecordsComponent } from '../marc-records/marc-records.component';
 import { ProvenanceTimelineComponent } from '../provenance-timeline/provenance-timeline.component';
 
 @Component({
   standalone: true,
-  selector: 'app-working-panel',
+  selector: 'app-context-panel',
   imports: [
     MarcRecordsComponent,
     CandidatesTableComponent,
     ProvenanceTimelineComponent,
   ],
-  templateUrl: './working-panel.component.html',
+  templateUrl: './context-panel.component.html',
 })
-export class WorkingPanelComponent {
-  private wps = inject(WorkingPanelService);
+export class ContextPanelComponent {
+  private cps = inject(ContextPanelService);
 
-  state = computed(() => this.wps.state());
+  state = computed(() => this.cps.state());
 }

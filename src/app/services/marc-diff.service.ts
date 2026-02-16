@@ -2,13 +2,13 @@ import { SubDiffIndex } from '@/app/models';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { RecordStore } from '../stores/record.store';
 import { diffMarcRecordsSubfields } from '../utils/marc-diff';
+import { ContextPanelService } from './context-panel.service';
 import { RecordStateService } from './record-state.service';
-import { WorkingPanelService } from './working-panel.service';
 
 @Injectable()
 export class MarcDiffService {
   private recordState = inject(RecordStateService);
-  private wps = inject(WorkingPanelService);
+  private cps = inject(ContextPanelService);
   private store = inject(RecordStore);
 
   readonly enabledByUser = signal(false);
@@ -25,7 +25,7 @@ export class MarcDiffService {
     if (!this.enabledByUser()) return false;
 
     const editingIsTable = this.recordState.viewMode() === 'table';
-    const workingIsRecords = this.wps.state().mode === 'records';
+    const workingIsRecords = this.cps.state().mode === 'records';
 
     return editingIsTable && workingIsRecords;
   });

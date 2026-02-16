@@ -9,7 +9,7 @@ import {
 import { Injectable, signal } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
-export class WorkingPanelService {
+export class ContextPanelService {
   readonly state = signal<PanelState>({ mode: 'records' });
 
   readonly applyCandidate = signal<ApplyCandidateEvent | null>(null);

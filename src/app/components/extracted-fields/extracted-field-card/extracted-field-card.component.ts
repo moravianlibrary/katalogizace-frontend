@@ -2,8 +2,8 @@ import { MarcSubfield, UiFieldWithMeta, UiSubfield } from '@/app/models';
 import { CommonModule } from '@angular/common';
 import { Component, effect, ElementRef, inject, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ContextPanelService } from '../../../services/context-panel.service';
 import { RecordStateService } from '../../../services/record-state.service';
-import { WorkingPanelService } from '../../../services/working-panel.service';
 
 @Component({
   standalone: true,
@@ -12,7 +12,7 @@ import { WorkingPanelService } from '../../../services/working-panel.service';
   templateUrl: './extracted-field-card.component.html',
 })
 export class ExtractedFieldCardComponent {
-  wps = inject(WorkingPanelService);
+  cps = inject(ContextPanelService);
   recordState = inject(RecordStateService);
 
   field = input.required<UiFieldWithMeta>();
@@ -79,8 +79,8 @@ export class ExtractedFieldCardComponent {
 
   get isActive() {
     return (
-      this.wps.state().mode !== 'records' &&
-      this.wps.state().fieldId === this.field().fieldId
+      this.cps.state().mode !== 'records' &&
+      this.cps.state().fieldId === this.field().fieldId
     );
   }
 

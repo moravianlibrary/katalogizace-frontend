@@ -1,8 +1,8 @@
 import { Step } from '@/app/models';
+import { ContextPanelService } from '@/app/services/context-panel.service';
 import { CommonModule } from '@angular/common';
 import { Component, inject, input } from '@angular/core';
 import { StepKindLabelPipe } from '../../pipes/step-kind-label.pipe';
-import { WorkingPanelService } from '../../services/working-panel.service';
 
 @Component({
   standalone: true,
@@ -14,9 +14,9 @@ export class ProvenanceTimelineComponent {
   title = input.required<string>();
   steps = input.required<Step[]>();
 
-  private wps = inject(WorkingPanelService);
+  private cps = inject(ContextPanelService);
 
   onClose() {
-    this.wps.showRecords();
+    this.cps.showRecords();
   }
 }

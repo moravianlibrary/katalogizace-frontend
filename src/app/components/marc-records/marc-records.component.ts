@@ -1,9 +1,9 @@
 import { ExistingMarcRecord, MarcRecordsItem } from '@/app/models';
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
+import { ContextPanelService } from '../../services/context-panel.service';
 import { MarcDiffService } from '../../services/marc-diff.service';
 import { RecordStateService } from '../../services/record-state.service';
-import { WorkingPanelService } from '../../services/working-panel.service';
 import { RecordStore } from '../../stores/record.store';
 import { filterExistingRecord015to830 } from '../../utils/marc-filter';
 import { extractedToExisting } from '../../utils/marc-transform';
@@ -24,7 +24,7 @@ export class MarcRecordsComponent {
   store = inject(RecordStore);
   private recordState = inject(RecordStateService);
 
-  private wps = inject(WorkingPanelService);
+  private cps = inject(ContextPanelService);
 
   existingRecords = this.store.existingRecords;
   extractedRecord = this.store.extracted;
@@ -40,7 +40,7 @@ export class MarcRecordsComponent {
   viewMode = this.recordState.viewMode;
 
   showDiffToggle = computed(() => {
-    return this.viewMode() === 'table' && this.wps.state().mode === 'records';
+    return this.viewMode() === 'table' && this.cps.state().mode === 'records';
   });
 
   records = computed<MarcRecordsItem[]>(() => {
@@ -95,7 +95,7 @@ export class MarcRecordsComponent {
     });
 
     effect(() => {
-      const evt = this.wps.applyCandidate();
+      const evt = this.cps.applyCandidate();
       if (!evt) return;
 
       const key = `${evt.fieldId}:${evt.candidate.id}`;
@@ -109,7 +109,7 @@ export class MarcRecordsComponent {
 
       this.store.applyCandidateToOpenedExtracted(evt.fieldId, evt.candidate);
 
-      this.wps.applyCandidate.set(null);
+      this.cps.applyCandidate.set(null);
     });
   }
 

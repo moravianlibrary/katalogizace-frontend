@@ -16,8 +16,8 @@ import { ProcessStateLabelPipe } from '../../pipes/process-state-label.pipe';
 import { RecordStateLabelPipe } from '../../pipes/record-state-label.pipe';
 import { BatchesService } from '../../services/api/batches.service';
 import { BooksService } from '../../services/api/books.service';
+import { ContextPanelService } from '../../services/context-panel.service';
 import { ToastService } from '../../services/toast.service';
-import { WorkingPanelService } from '../../services/working-panel.service';
 
 @Component({
   standalone: true,
@@ -37,7 +37,7 @@ export class BooksListComponent {
   private books = inject(BooksService);
   private destroyRef = inject(DestroyRef);
   private toast = inject(ToastService);
-  private wps = inject(WorkingPanelService);
+  private cps = inject(ContextPanelService);
   private batchesService = inject(BatchesService);
   private breadcrumbs = inject(BreadcrumbsService);
   private translate = inject(TranslateService);
@@ -210,7 +210,7 @@ export class BooksListComponent {
       'books',
       book.book_id.toString(),
     ]);
-    this.wps.setMode('records');
+    this.cps.setMode('records');
   }
 
   onUploadImages(event: Event) {

@@ -15,7 +15,7 @@ import {
 } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { CatalogueService } from '../../services/api/catalogue.service';
-import { WorkingPanelService } from '../../services/working-panel.service';
+import { ContextPanelService } from '../../services/context-panel.service';
 import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
 
 @Component({
@@ -34,7 +34,7 @@ export class CandidatesTableComponent {
 
   tag = input<string>();
 
-  private wps = inject(WorkingPanelService);
+  private cps = inject(ContextPanelService);
   private catalogue = inject(CatalogueService);
 
   sortedCandidates = computed<MarcCandidate[]>(() => {
@@ -162,10 +162,10 @@ export class CandidatesTableComponent {
   onConfirm() {
     const id = this.selectedId();
     if (!id) return;
-    this.wps.confirmCandidate(id);
+    this.cps.confirmCandidate(id);
   }
 
   onClose() {
-    this.wps.showRecords();
+    this.cps.showRecords();
   }
 }

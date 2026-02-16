@@ -1,8 +1,8 @@
 import { MarcCandidate, SubDiffIndex, SubDiffKind, UUID } from '@/app/models';
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
+import { ContextPanelService } from '../../../services/context-panel.service';
 import { RecordStateService } from '../../../services/record-state.service';
-import { WorkingPanelService } from '../../../services/working-panel.service';
 import { RecordStore } from '../../../stores/record.store';
 
 import {
@@ -32,7 +32,7 @@ export class MarcRowDataComponent {
   diffIndex = input<SubDiffIndex | null>(null);
   diffSide = input<'opened' | 'preview'>('opened');
 
-  private wps = inject(WorkingPanelService);
+  private cps = inject(ContextPanelService);
   private store = inject(RecordStore);
   private recordState = inject(RecordStateService);
 
@@ -41,7 +41,7 @@ export class MarcRowDataComponent {
   }
 
   onShowCandidates() {
-    this.wps.showCandidates(
+    this.cps.showCandidates(
       this.df().tag,
       this.df().fieldId!,
       this.df().candidates!,
@@ -78,7 +78,7 @@ export class MarcRowDataComponent {
 
     const steps = this.store.provenance()[df.selectedCandidateId] ?? [];
     const title = `Jak jsme získali pole ${df.tag}?`;
-    this.wps.showProvenance(title, steps, df.fieldId);
+    this.cps.showProvenance(title, steps, df.fieldId);
   }
 
   private fieldKey = computed(() => {
