@@ -171,6 +171,15 @@
 @utility text-error {
   color: var(--color-red-500);
 }
+@utility text-error-hover {
+  color: var(--color-red-600);
+}
+@utility text-error-pressed {
+  color: var(--color-red-700);
+}
+@utility text-error-disabled {
+  color: var(--color-red-100);
+}
 @utility text-warning {
   color: var(--color-orange-500);
 }
@@ -366,6 +375,15 @@
 }
 @utility icon-error {
   fill: var(--color-red-500);
+}
+@utility icon-error-hover {
+  fill: var(--color-red-600);
+}
+@utility icon-error-pressed {
+  fill: var(--color-red-700);
+}
+@utility icon-error-disabled {
+  fill: var(--color-red-100);
 }
 @utility icon-warning {
   fill: var(--color-orange-500);
