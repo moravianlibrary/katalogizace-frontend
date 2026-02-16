@@ -1,8 +1,8 @@
 // shared
+export * from './shared/context-panel.model';
 export * from './shared/id.model';
 export * from './shared/states.model';
 export * from './shared/toast.model';
-export * from './shared/working-panel.model';
 
 // books
 export * from './books/book.dto';

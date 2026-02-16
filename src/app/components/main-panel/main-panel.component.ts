@@ -7,19 +7,19 @@ import { ExtractedFieldsComponent } from '../extracted-fields/extracted-fields/e
 import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
 
 import { QuickAddItem } from '@/app/models/shared/record-state';
-import { EditingPanelHeaderComponent } from './editing-panel-header/editing-panel-header.component';
+import { MainPanelHeaderComponent } from './main-panel-header/main-panel-header.component';
 
 @Component({
   standalone: true,
-  selector: 'app-editing-panel',
+  selector: 'app-main-panel',
   imports: [
-    EditingPanelHeaderComponent,
+    MainPanelHeaderComponent,
     ExtractedFieldsComponent,
     ExistingMarcRecordTableComponent,
   ],
-  templateUrl: './editing-panel.component.html',
+  templateUrl: './main-panel.component.html',
 })
-export class EditingPanelComponent {
+export class MainPanelComponent {
   book_id = input<ID | null>(null);
 
   recordState = inject(RecordStateService);

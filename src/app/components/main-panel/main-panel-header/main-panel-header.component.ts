@@ -10,11 +10,11 @@ import { QuickAddComponent } from '../quick-add/quick-add.component';
 
 @Component({
   standalone: true,
-  selector: 'app-editing-panel-header',
+  selector: 'app-main-panel-header',
   imports: [QuickAddComponent, TranslateModule, NgClass],
-  templateUrl: './editing-panel-header.component.html',
+  templateUrl: './main-panel-header.component.html',
 })
-export class EditingPanelHeaderComponent {
+export class MainPanelHeaderComponent {
   private books = inject(BooksService);
   private toast = inject(ToastService);
   private translate = inject(TranslateService);

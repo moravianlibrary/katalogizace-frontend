@@ -24,10 +24,10 @@ export class MarcDiffService {
   private diffEnabled = computed(() => {
     if (!this.enabledByUser()) return false;
 
-    const editingIsTable = this.recordState.viewMode() === 'table';
-    const workingIsRecords = this.cps.state().mode === 'records';
+    const mainIsTable = this.recordState.viewMode() === 'table';
+    const contextIsRecords = this.cps.state().mode === 'records';
 
-    return editingIsTable && workingIsRecords;
+    return mainIsTable && contextIsRecords;
   });
 
   readonly diffIndex = computed<SubDiffIndex | null>(() => {
