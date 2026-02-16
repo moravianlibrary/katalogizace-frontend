@@ -76,9 +76,10 @@ export class MarcRowDataComponent {
     const df = this.df();
     if (!df.fieldId || !df.selectedCandidateId) return;
 
+    const tag = df.tag;
     const steps = this.store.provenance()[df.selectedCandidateId] ?? [];
     const title = `Jak jsme získali pole ${df.tag}?`;
-    this.cps.showProvenance(title, steps, df.fieldId);
+    this.cps.showProvenance(tag, title, steps, df.fieldId);
   }
 
   private fieldKey = computed(() => {

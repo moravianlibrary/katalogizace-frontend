@@ -71,7 +71,7 @@ export class ContextPanelService {
     this.showRecords();
   }
 
-  showProvenance(title: string, steps: Step[], fieldId: UUID) {
-    this.setMode('provenance', { title, steps, fieldId });
+  showProvenance(tag: string, title: string, steps: Step[], fieldId: UUID) {
+    this.setMode('provenance', { tag, title, steps, fieldId });
   }
 }
