@@ -51,11 +51,15 @@
   "buttons": {
     "save": "Uložit",
     "save_record": "Uložit záznam",
+    "take_record": "Převzít záznam",
+    "confirm_selection": "Potvrdit výběr",
     "logout": "Odhlásit",
     "add_data_field": "Přidat datové pole",
     "add_control_field": "Přidat kontrolní pole",
     "overview": "Přehled",
-    "mass_edit": "Hromadná úprava"
+    "mass_edit": "Hromadná úprava",
+    "reset": "Reset",
+    "cancel": "Zrušit"
   },
   "messages": {
     "success": {
@@ -143,5 +147,12 @@
     "collapse": "Sbalit galerii",
     "expand": "Rozbalit galerii"
   },
-  "ai_cataloging": "AI Katalogizace"
+  "ai_cataloging": "AI Katalogizace",
+  "context_panel": {
+    "compare_results": "Porovnat rozdíly",
+    "records": "Záznamy",
+    "candidate_selection": "Výběr kandidátů pro pole {{tag}}",
+    "provenance": "Jak jsme získali pole {{tag}}?",
+    "edit": "Úprava pole {{tag}}"
+  }
 }
