@@ -1,4 +1,4 @@
-<section class="bg-main-base h-full rounded-2xl">
+<section class="bg-main-base flex h-full min-h-0 flex-col rounded-2xl">
   <app-context-panel-header [headerTitle]="title()"></app-context-panel-header>
   @if (state().mode === "candidates") {
     <app-candidates-table
@@ -9,6 +9,7 @@
     />
   } @else if (state().mode === "provenance") {
     <app-provenance-timeline
+      class="min-h-0 flex-1 py-4 pl-4"
       [title]="state().title ?? ''"
       [steps]="state().steps ?? []"
     />

@@ -1,41 +1,32 @@
-<section class="flex h-full flex-col gap-5">
-  <h2>{{ title() }}</h2>
+<section class="h-full min-h-0">
+  <div class="h-full overflow-auto pr-4">
+    <div class="flex flex-col gap-6">
+      @for (step of steps(); track $index) {
+        <div class="flex flex-row gap-2">
+          <div class="flex flex-col items-center gap-0.5">
+            <div class="flex h-6.5 w-6.5 items-center justify-center">
+              <div class="text-btn-secondary-default text-sm font-bold">
+                {{ $index + 1 }}.
+              </div>
+            </div>
 
-  <div class="flex flex-1 flex-col gap-0.5 overflow-auto">
-    @for (step of steps(); track $index) {
-      <div class="flex flex-row gap-2">
-        <div class="flex flex-col items-center gap-0.5">
-          <div
-            class="bg-main-primary-default text-on-color flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold"
-          >
-            {{ $index + 1 }}
+            <div class="bg-main-bright w-1.5 flex-1 rounded-full"></div>
           </div>
 
-          <div class="bg-main-bright w-1.5 flex-1 rounded-full"></div>
-        </div>
-
-        <div class="flex flex-col">
-          <div class="text-lg font-semibold">
-            {{ step.kind | stepKindLabel }}
+          <div class="flex flex-col">
+            <div class="text-lg font-medium">
+              {{ step.kind | stepKindLabel }}
+            </div>
+            <p class="text-md">
+              {{ step.description }}
+            </p>
           </div>
-          <p class="text-md mb-2">
-            {{ step.description }}
-          </p>
         </div>
-      </div>
-    } @empty {
-      <p class="text-light text-sm">
-        Pro tuto hodnotu nejsou dostupné žádné kroky provenience.
-      </p>
-    }
-  </div>
-
-  <div class="flex justify-start">
-    <button
-      class="border-tertiary-default text-sm-tight text-secondary cursor-pointer rounded-lg border px-4 py-3 font-medium"
-      (click)="onClose()"
-    >
-      Zavřít
-    </button>
+      } @empty {
+        <p class="text-light text-sm">
+          {{ "provenance.empty" | translate }}
+        </p>
+      }
+    </div>
   </div>
 </section>
