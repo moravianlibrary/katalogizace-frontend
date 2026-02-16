@@ -45,7 +45,8 @@
     "BackCover": "Zadní obálka",
     "Impressum": "Tiráž",
     "EndPage": "Poslední čísl. str.",
-    "Unknown": "Neznámý typ str."
+    "Unknown": "Neznámý typ str.",
+    "Fiducial": "Výchozí typ str."
   },
   "buttons": {
     "save": "Uložit",
