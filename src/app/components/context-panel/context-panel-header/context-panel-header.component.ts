@@ -33,6 +33,8 @@ export class ContextPanelHeaderComponent {
 
   canTakeRecord = computed(() => !!this.store.openedForDiff());
 
+  canResetRecord = computed(() => !!this.store.extracted());
+
   onBack() {
     this.cps.setMode('records');
   }

@@ -72,7 +72,11 @@
       @default {
         <span class="text-md w-full font-medium">{{ headerTitle() }}</span>
 
-        <button class="btn btn-m btn-error group" (click)="setEdit()">
+        <button
+          class="btn btn-m btn-error group"
+          [disabled]="!canResetRecord()"
+          (click)="setEdit()"
+        >
           {{ "buttons.reset" | translate }}
           <svg
             class="icon-btn-error"
