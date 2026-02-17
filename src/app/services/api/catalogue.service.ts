@@ -13,11 +13,13 @@ export class CatalogueService {
     return this.envService.get('apiServiceBaseUrl') as string;
   }
 
-  getAutRecord(recordId: string) {
+  getAutRecord(recordId: string, provider: 'aut') {
     return this.http
       .get<{
         record: ExistingMarcRecord;
-      }>(`${this.apiBaseUrl}/catalogue/AUT/record/${recordId}`)
+      }>(
+        `${this.apiBaseUrl}/catalogue/providers/${provider}/authorities/${recordId}`,
+      )
       .pipe(map((resp) => resp.record));
   }
 }

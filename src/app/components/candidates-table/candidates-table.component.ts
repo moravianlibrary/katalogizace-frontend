@@ -116,7 +116,7 @@ export class CandidatesTableComponent {
     }
 
     this.autLoading.set(true);
-    this.catalogue.getAutRecord(recordId).subscribe({
+    this.catalogue.getAutRecord(recordId, 'aut').subscribe({
       next: (rec) => {
         this.autCache.set(recordId, rec);
         this.autRecord.set(rec);
