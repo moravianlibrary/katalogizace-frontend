@@ -31,7 +31,7 @@ export const appConfig: ApplicationConfig = {
     ),
     importProvidersFrom(
       TranslateModule.forRoot({
-        defaultLanguage: 'cs',
+        fallbackLang: 'cs',
       }),
     ),
     provideTranslateHttpLoader({
