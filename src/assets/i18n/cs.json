@@ -173,5 +173,14 @@
   },
   "marc_row": {
     "leader": "LEADER"
+  },
+  "records": {
+    "no_records": "Žádné záznamy.",
+    "source": "Zdroj",
+    "title": "Název",
+    "author": "Autor",
+    "year_of_publishing": "Rok vydání",
+    "source_extracted": "Vyčtený",
+    "no_data": "Žádná data k zobrazení."
   }
 }
