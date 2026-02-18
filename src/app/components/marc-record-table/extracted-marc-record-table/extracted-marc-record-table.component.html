@@ -8,11 +8,13 @@
     <col class="w-10" />
   </colgroup>
 
-  <tbody>
+  <tbody
+    class="[&>tr:nth-child(even)]:bg-main-base [&>tr:nth-child(odd)]:bg-gray-500/5"
+  >
     @if (transformed(); as rec) {
       @if (rec.leader) {
         <tr
-          class="border-tertiary-default border-y-[0.5px]"
+          class="border-light border-b"
           [ngClass]="
             this.ds.enabledByUser() && this.recordState.viewMode() === 'table'
               ? 'opacity-60'
@@ -25,7 +27,7 @@
 
       @for (cf of rec.control_fields; track $index) {
         <tr
-          class="border-tertiary-default border-b-[0.5px]"
+          class="border-light border-b"
           [ngClass]="[
             $index === 0 && !rec.leader ? 'border-t-[0.5px]' : '',
             this.ds.enabledByUser() &&
@@ -42,7 +44,7 @@
       @for (df of rec.data_fields; track $index) {
         @if (df.tag != "910") {
           <tr
-            class="border-tertiary-default border-b-[0.5px]"
+            class="border-light border-b"
             [ngClass]="[
               $index === 0 && rec.control_fields.length === 0 && !rec.leader
                 ? 'border-t-[0.5px]'
@@ -63,7 +65,7 @@
     } @else {
       <tr>
         <td class="text-light p-2 text-sm" colspan="6">
-          Žádná data k zobrazení.
+          {{ "records.no_data" | translate }}
         </td>
       </tr>
     }

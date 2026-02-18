@@ -6,6 +6,7 @@ import { MarcRowControlComponent } from '../../marc-row/marc-row-control/marc-ro
 import { MarcRowDataComponent } from '../../marc-row/marc-row-data/marc-row-data.component';
 import { MarcRowLeaderComponent } from '../../marc-row/marc-row-leader/marc-row-leader.component';
 
+import { TranslateModule } from '@ngx-translate/core';
 import { MarcDiffService } from '../../../services/marc-diff.service';
 import { RecordStateService } from '../../../services/record-state.service';
 import { isDiffableTag015to830 } from '../../../utils/marc-diff';
@@ -18,6 +19,7 @@ import { isDiffableTag015to830 } from '../../../utils/marc-diff';
     MarcRowDataComponent,
     MarcRowLeaderComponent,
     CommonModule,
+    TranslateModule,
   ],
   templateUrl: './extracted-marc-record-table.component.html',
 })

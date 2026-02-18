@@ -1,11 +1,18 @@
 import { ExistingMarcRecord, MarcRecordsItem } from '@/app/models';
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  signal,
+} from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { ContextPanelService } from '../../services/context-panel.service';
 import { MarcDiffService } from '../../services/marc-diff.service';
 import { RecordStateService } from '../../services/record-state.service';
 import { RecordStore } from '../../stores/record.store';
-import { filterExistingRecord015to830 } from '../../utils/marc-filter';
 import { extractedToExisting } from '../../utils/marc-transform';
 import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
 import { ExtractedMarcRecordTableComponent } from '../marc-record-table/extracted-marc-record-table/extracted-marc-record-table.component';
@@ -17,6 +24,7 @@ import { ExtractedMarcRecordTableComponent } from '../marc-record-table/extracte
     ExistingMarcRecordTableComponent,
     CommonModule,
     ExtractedMarcRecordTableComponent,
+    TranslateModule,
   ],
   templateUrl: './marc-records.component.html',
 })
@@ -60,6 +68,31 @@ export class MarcRecordsComponent {
   expandedIndex = signal<number | null>(0);
 
   private lastAppliedKey: string | null = null;
+
+  private hostEl = inject(ElementRef<HTMLElement>);
+
+  private ro: ResizeObserver | null = null;
+
+  private hostHeightPx = signal<number>(0);
+  detailHeightPx = computed(() => Math.floor(this.hostHeightPx() * 0.7));
+
+  ngAfterViewInit(): void {
+    const el = this.hostEl.nativeElement;
+
+    const update = () => {
+      this.hostHeightPx.set(el.getBoundingClientRect().height || 0);
+    };
+
+    update();
+
+    this.ro = new ResizeObserver(() => update());
+    this.ro.observe(el);
+  }
+
+  ngOnDestroy(): void {
+    this.ro?.disconnect();
+    this.ro = null;
+  }
 
   constructor() {
     effect(() => {
@@ -110,7 +143,11 @@ export class MarcRecordsComponent {
     this.expandedIndex.update((current) => (current === index ? null : index));
   }
 
-  getTitle(rec: ExistingMarcRecord | null): string | null {
+  getTitle(idx: number, rec?: ExistingMarcRecord | null): string | null {
+    if (idx === 0) {
+      return this.store.title();
+    }
+
     if (!rec) {
       return null;
     }
@@ -120,7 +157,11 @@ export class MarcRecordsComponent {
     return f245.subfields?.find((sf) => sf.code === 'a')?.value ?? '';
   }
 
-  getAuthorName(rec: ExistingMarcRecord | null): string | null {
+  getAuthorName(idx: number, rec?: ExistingMarcRecord | null): string | null {
+    if (idx === 0) {
+      return this.store.author();
+    }
+
     if (!rec) {
       return null;
     }
@@ -130,7 +171,15 @@ export class MarcRecordsComponent {
     return f100.subfields?.find((sf) => sf.code === 'a')?.value ?? '';
   }
 
-  getPublicationYear(rec: ExistingMarcRecord | null): string | null {
+  getPublicationYear(
+    idx: number,
+    rec?: ExistingMarcRecord | null,
+  ): string | null {
+    if (idx === 0) {
+      const year = this.store.yearOfPublication();
+      return year ? year.toString() : null;
+    }
+
     if (!rec) {
       return null;
     }
@@ -152,24 +201,5 @@ export class MarcRecordsComponent {
     }
 
     return '';
-  }
-
-  onTakeRecord() {
-    const idx = this.expandedIndex();
-    if (idx === null) {
-      return;
-    }
-
-    const rec = this.records()[idx];
-    if (!rec) {
-      return;
-    }
-
-    if (idx === 0) {
-      this.recordState.loadFromExtracted(rec.extracted);
-    } else {
-      const filtered = filterExistingRecord015to830(rec.existing!);
-      this.recordState.loadFromExistingOrLastEdited(filtered);
-    }
   }
 }
