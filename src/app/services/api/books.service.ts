@@ -84,7 +84,7 @@ export class BooksService {
     const params = new HttpParams().set('batch_id', batchId);
 
     return this.http.post<BookUploadResponseDto>(
-      `${this.apiBaseUrl}/books/upload-images`,
+      `${this.apiBaseUrl}/books/images`,
       formData,
       {
         params,
@@ -96,7 +96,7 @@ export class BooksService {
     const params = new HttpParams().set('batch_id', batchId);
 
     return this.http.post<BookUploadResponseDto>(
-      `${this.apiBaseUrl}/books/create`,
+      `${this.apiBaseUrl}/books`,
       null,
       { params },
     );
@@ -107,14 +107,14 @@ export class BooksService {
     formData.append('image_file', file);
 
     return this.http.post<BookImageUploadResponseDto>(
-      `${this.apiBaseUrl}/books/${bookId}/upload-image`,
+      `${this.apiBaseUrl}/books/${bookId}/image`,
       formData,
     );
   }
 
   startBookWorkflow(bookId: string) {
     return this.http.post<BookUploadResponseDto>(
-      `${this.apiBaseUrl}/books/${bookId}/start-workflow`,
+      `${this.apiBaseUrl}/books/${bookId}/workflow`,
       null,
     );
   }
