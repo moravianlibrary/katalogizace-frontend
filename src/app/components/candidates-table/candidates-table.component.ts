@@ -4,6 +4,7 @@ import {
   MarcSubfield,
   UUID,
 } from '@/app/models';
+import { RecordStore } from '@/app/stores/record.store';
 import { CommonModule } from '@angular/common';
 import {
   Component,
@@ -13,7 +14,7 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CatalogueService } from '../../services/api/catalogue.service';
 import { ContextPanelService } from '../../services/context-panel.service';
 import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
@@ -21,11 +22,12 @@ import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-
 @Component({
   standalone: true,
   selector: 'app-candidates-table',
-  imports: [CommonModule, ExistingMarcRecordTableComponent],
+  imports: [CommonModule, ExistingMarcRecordTableComponent, TranslateModule],
   templateUrl: './candidates-table.component.html',
 })
 export class CandidatesTableComponent {
   private translate = inject(TranslateService);
+  private store = inject(RecordStore);
 
   title = input.required<string>();
   candidates = input.required<MarcCandidate[]>();
@@ -159,13 +161,11 @@ export class CandidatesTableComponent {
     this.cps.setSelectedCandidateId(id);
   }
 
-  onConfirm() {
-    const id = this.selectedId();
-    if (!id) return;
-    this.cps.confirmCandidate(id);
-  }
+  onShowProvenance(candidate: MarcCandidate) {
+    if (!candidate.id) return;
 
-  onClose() {
-    this.cps.showRecords();
+    const tag = this.tag();
+    const steps = this.store.provenance()[candidate.id] ?? [];
+    this.cps.showProvenance(tag!, steps, candidate.id);
   }
 }

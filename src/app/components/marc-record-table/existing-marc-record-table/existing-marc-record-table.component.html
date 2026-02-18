@@ -1,15 +1,15 @@
-<table class="w-full border-collapse text-sm">
+<table class="w-full table-fixed border-collapse">
   <colgroup>
-    <col class="w-16" />
-    <col class="w-10" />
-    <col class="w-10" />
+    <col class="w-25" />
     <col />
   </colgroup>
 
-  <tbody>
+  <tbody
+    class="[&>tr:nth-child(even)]:bg-main-base [&>tr:nth-child(odd)]:bg-gray-500/5"
+  >
     @if (existingRecord().leader) {
       <tr
-        class="border-tertiary-default border-y-[0.5px]"
+        class="border-light border-b"
         [ngClass]="
           this.ds.enabledByUser() && this.recordState.viewMode() === 'table'
             ? 'opacity-60'
@@ -22,7 +22,7 @@
 
     @for (cf of existingRecord().control_fields; track $index) {
       <tr
-        class="border-tertiary-default border-b-[0.5px]"
+        class="border-light border-b"
         [ngClass]="[
           $index === 0 && !existingRecord().leader ? 'border-t-[0.5px]' : '',
           this.ds.enabledByUser() &&
@@ -39,7 +39,7 @@
     @for (df of existingRecord().data_fields; track $index) {
       @if (df.tag != "910") {
         <tr
-          class="border-tertiary-default border-b-[0.5px]"
+          class="border-light border-b"
           [ngClass]="[
             $index === 0 &&
             existingRecord().control_fields.length === 0 &&
