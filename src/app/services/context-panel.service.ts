@@ -18,7 +18,6 @@ export class ContextPanelService {
     const cleared: PanelState = {
       mode,
       tag: undefined,
-      title: undefined,
       candidates: undefined,
       steps: undefined,
       fieldId: undefined,
@@ -75,7 +74,7 @@ export class ContextPanelService {
     this.state.update((s) => ({ ...s, selectedCandidateId: id }));
   }
 
-  showProvenance(tag: string, title: string, steps: Step[], fieldId: UUID) {
-    this.setMode('provenance', { tag, title, steps, fieldId });
+  showProvenance(tag: string, steps: Step[], fieldId: UUID) {
+    this.setMode('provenance', { tag, steps, fieldId });
   }
 }

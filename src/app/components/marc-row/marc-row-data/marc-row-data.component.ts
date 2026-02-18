@@ -78,8 +78,7 @@ export class MarcRowDataComponent {
 
     const tag = df.tag;
     const steps = this.store.provenance()[df.selectedCandidateId] ?? [];
-    const title = `Jak jsme získali pole ${df.tag}?`;
-    this.cps.showProvenance(tag, title, steps, df.fieldId);
+    this.cps.showProvenance(tag, steps, df.fieldId);
   }
 
   private fieldKey = computed(() => {
