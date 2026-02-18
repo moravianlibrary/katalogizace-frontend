@@ -157,5 +157,21 @@
   },
   "provenance": {
     "empty": "Pro tuto hodnotu nejsou dostupné žádné kroky provenience."
+  },
+  "candidates": {
+    "select": "Výběr",
+    "first_indicator": "Id1",
+    "second_indicator": "Id2",
+    "subfields": "Podpole",
+    "score": "Skóre",
+    "no_candidates": "Žádní kandidáti.",
+    "authority_record": "Autoritní záznam",
+    "show_in_nkp": "Zobrazit v NKP (AUT)",
+    "loading_authority": "Načítám autoritní záznam…",
+    "no_subfield_7": "Vybraný kandidát nemá podpole |7",
+    "open_in_skc": "Otevřít v souborném katalogu"
+  },
+  "marc_row": {
+    "leader": "LEADER"
   }
 }
