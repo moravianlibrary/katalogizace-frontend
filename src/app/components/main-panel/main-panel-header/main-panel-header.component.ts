@@ -3,8 +3,16 @@ import { QuickAddItem } from '@/app/models/shared/record-state';
 import { BooksService } from '@/app/services/api/books.service';
 import { RecordStateService } from '@/app/services/record-state.service';
 import { ToastService } from '@/app/services/toast.service';
+import { RecordStore } from '@/app/stores/record.store';
 import { NgClass } from '@angular/common';
-import { Component, inject, input, output, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { QuickAddComponent } from '../quick-add/quick-add.component';
 
@@ -18,6 +26,7 @@ export class MainPanelHeaderComponent {
   private books = inject(BooksService);
   private toast = inject(ToastService);
   private translate = inject(TranslateService);
+  private store = inject(RecordStore);
   recordState = inject(RecordStateService);
 
   bookId = input.required<ID>();
@@ -32,6 +41,8 @@ export class MainPanelHeaderComponent {
   // cards mode
   addDataField = output<void>();
   addControlField = output<void>();
+
+  canSaveRecord = computed(() => !!this.store.extracted());
 
   onQuickAdd(it: QuickAddItem) {
     this.quickAddClick.emit(it);

@@ -71,7 +71,7 @@
     <div class="px-4">
       <button
         class="btn btn-m btn-primary group"
-        [disabled]="isSaving()"
+        [disabled]="isSaving() || !canSaveRecord()"
         (click)="onSave()"
         type="button"
       >
