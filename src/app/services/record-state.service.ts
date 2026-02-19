@@ -16,7 +16,7 @@ import { extractedToUiFields } from '../utils/marc-transform';
 export class RecordStateService {
   readonly uiFields = signal<UiFieldWithMeta[]>([]);
 
-  readonly viewMode = signal<RecordViewMode>('cards');
+  readonly viewMode = signal<RecordViewMode>('table');
 
   readonly focusTagFieldId = signal<UUID | null>(null);
 
@@ -121,7 +121,7 @@ export class RecordStateService {
   }
 
   resetViewMode() {
-    this.viewMode.set('cards');
+    this.viewMode.set('table');
   }
 
   loadFromExistingOrLastEdited(
@@ -241,24 +241,22 @@ export class RecordStateService {
   readonly recordPreview = computed<ExistingMarcRecord | null>(() => {
     const fields = this.uiFields().filter((f) => f.tag.trim().length === 3);
 
-    const control_fields = fields
-      .filter((f) => f.control && f.tag.trim().length === 3)
-      .map((f) => ({
-        tag: f.tag.trim(),
-        value: (f.value ?? '').trim(),
-      }))
-      .filter((sf) => sf.value.length > 0);
+    const control_fields = fields.filter((f) => f.control);
+    // .map((f) => ({
+    //   tag: f.tag.trim(),
+    //   value: (f.value ?? '').trim(),
+    // }))
+    // .filter((sf) => sf.value.length > 0);
 
     const data_fields = fields
       .filter((f) => !f.control)
       .map((f) => {
-        const cleanedSubfields =
-          f.subfields
-            ?.map((sf) => ({
-              code: (sf.code ?? '').trim(),
-              value: (sf.value ?? '').trim(),
-            }))
-            .filter((sf) => sf.code.length === 1 && sf.value.length > 0) ?? [];
+        const cleanedSubfields = f.subfields;
+        // ?.map((sf) => ({
+        //   code: (sf.code ?? '').trim(),
+        //   value: (sf.value ?? '').trim(),
+        // }))
+        // .filter((sf) => sf.code.length === 1 && sf.value.length > 0) ?? [];
 
         return {
           tag: f.tag.trim(),
