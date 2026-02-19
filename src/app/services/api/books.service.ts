@@ -124,8 +124,9 @@ export class BooksService {
   }
 
   rerunBookWorkflow(bookId: string) {
-    return this.http.get<BookUploadResponseDto>(
+    return this.http.post<BookUploadResponseDto>(
       `${this.apiBaseUrl}/books/${bookId}/rerun`,
+      null,
     );
   }
 }
