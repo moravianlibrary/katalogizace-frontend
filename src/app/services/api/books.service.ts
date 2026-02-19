@@ -96,7 +96,7 @@ export class BooksService {
     const params = new HttpParams().set('batch_id', batchId);
 
     return this.http.post<BookUploadResponseDto>(
-      `${this.apiBaseUrl}/books`,
+      `${this.apiBaseUrl}/books/`,
       null,
       { params },
     );
