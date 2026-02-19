@@ -14,7 +14,7 @@
       <app-extracted-fields />
     } @else {
       @if (recordPreview(); as rec) {
-        <div class="flex flex-col gap-5">
+        <div class="flex flex-col px-4">
           <app-existing-marc-record-table
             [existingRecord]="rec"
             [diffIndex]="diffIndex()"
