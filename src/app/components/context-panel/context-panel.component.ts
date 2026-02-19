@@ -6,6 +6,7 @@ import { ContextPanelService } from '../../services/context-panel.service';
 import { CandidatesTableComponent } from '../candidates-table/candidates-table.component';
 import { MarcRecordsComponent } from '../marc-records/marc-records.component';
 import { ProvenanceTimelineComponent } from '../provenance-timeline/provenance-timeline.component';
+import { ContextEditComponent } from './context-edit/context-edit.component';
 import { ContextPanelHeaderComponent } from './context-panel-header/context-panel-header.component';
 
 @Component({
@@ -16,6 +17,7 @@ import { ContextPanelHeaderComponent } from './context-panel-header/context-pane
     CandidatesTableComponent,
     ProvenanceTimelineComponent,
     ContextPanelHeaderComponent,
+    ContextEditComponent,
   ],
   templateUrl: './context-panel.component.html',
 })
