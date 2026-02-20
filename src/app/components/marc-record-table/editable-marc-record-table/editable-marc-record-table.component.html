@@ -1,0 +1,79 @@
+<table class="w-full table-fixed border-collapse">
+  <colgroup>
+    <col class="w-25" />
+    <col />
+  </colgroup>
+
+  <tbody
+    class="[&>tr:nth-child(even)]:bg-main-base [&>tr:nth-child(odd)]:bg-gray-500/5"
+  >
+    @if (recordState.editableRecord()?.leader) {
+      <tr
+        class="border-light border-b"
+        [ngClass]="
+          this.ds.enabledByUser() && this.recordState.viewMode() === 'table'
+            ? 'opacity-60'
+            : ''
+        "
+        [leader]="recordState.editableRecord()?.leader!"
+        appMarcRowLeader
+      ></tr>
+    }
+
+    @for (cf of recordState.editableRecord()?.control_fields; track $index) {
+      <tr
+        class="border-light cursor-pointer border-b"
+        [ngClass]="[
+          $index === 0 && !recordState.editableRecord()?.leader
+            ? 'border-t-[0.5px]'
+            : '',
+          this.ds.enabledByUser() &&
+          !isDiffableTag015to830(cf.tag) &&
+          this.recordState.viewMode() === 'table'
+            ? 'opacity-60'
+            : '',
+        ]"
+        [cf]="cf"
+        [editable]="true"
+        (click)="
+          cps.setMode('edit', { tag: cf.tag, fieldId: cf.fieldId });
+          edit.field.set({ tag: cf.tag, fieldId: cf.fieldId, value: cf.value })
+        "
+        appMarcRowControl
+      ></tr>
+    }
+
+    @for (df of recordState.editableRecord()?.data_fields; track $index) {
+      @if (df.tag != "910") {
+        <tr
+          class="border-light cursor-pointer border-b"
+          [ngClass]="[
+            $index === 0 &&
+            recordState.editableRecord()?.control_fields?.length === 0 &&
+            !recordState.editableRecord()?.leader
+              ? 'border-t-[0.5px]'
+              : '',
+            this.ds.enabledByUser() &&
+            !isDiffableTag015to830(df.tag) &&
+            this.recordState.viewMode() === 'table'
+              ? 'opacity-60'
+              : '',
+          ]"
+          [df]="df"
+          [diffIndex]="diffIndex()"
+          [diffSide]="diffSide()"
+          [editable]="true"
+          (click)="
+            cps.setMode('edit', { tag: df.tag, fieldId: df.fieldId });
+            edit.field.set({
+              tag: df.tag,
+              fieldId: df.fieldId,
+              subfields: df.subfields,
+            })
+          "
+          appMarcRowData
+        ></tr>
+      }
+    }
+  </tbody>
+</table>
