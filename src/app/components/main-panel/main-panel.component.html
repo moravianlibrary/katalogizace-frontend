@@ -15,8 +15,7 @@
     } @else {
       @if (recordPreview(); as rec) {
         <div class="flex flex-col px-4">
-          <app-existing-marc-record-table
-            [existingRecord]="rec"
+          <app-editable-marc-record-table
             [diffIndex]="diffIndex()"
             diffSide="preview"
           />

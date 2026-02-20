@@ -14,7 +14,11 @@
             class="text-md w-full bg-transparent text-center font-bold outline-none placeholder:text-gray-300"
             [(ngModel)]="field().tag"
             [attr.data-editable]="'true'"
-            (ngModelChange)="field().tag = $event; notifyChange()"
+            (ngModelChange)="
+              field().control
+                ? patchControl({ tag: $event })
+                : patchData({ tag: $event })
+            "
             (input)="onInputAutoAdvance($event)"
             data-role="field-tag"
             maxlength="3"
@@ -30,7 +34,7 @@
           class="border-tertiary-default text-md h-12 w-11 rounded-lg border text-center font-medium outline-none placeholder:text-gray-300"
           [(ngModel)]="field().ind1"
           [attr.data-editable]="'true'"
-          (ngModelChange)="field().ind1 = $event; notifyChange()"
+          (ngModelChange)="patchData({ ind1: $event })"
           (input)="onInputAutoAdvance($event)"
           maxlength="1"
           placeholder="0"
@@ -40,7 +44,7 @@
           class="border-tertiary-default text-md h-12 w-11 rounded-lg border text-center font-medium outline-none placeholder:text-gray-300"
           [(ngModel)]="field().ind2"
           [attr.data-editable]="'true'"
-          (ngModelChange)="field().ind2 = $event; notifyChange()"
+          (ngModelChange)="patchData({ ind2: $event })"
           (input)="onInputAutoAdvance($event)"
           maxlength="1"
           placeholder="0"
@@ -135,7 +139,7 @@
             class="disabled:text-disable text-md flex-1 bg-transparent outline-none placeholder:text-gray-300 disabled:cursor-not-allowed"
             [(ngModel)]="field().value"
             [attr.data-editable]="true"
-            (ngModelChange)="field().value = $event; notifyChange()"
+            (ngModelChange)="patchControl({ value: $event })"
             placeholder="Aa"
           />
         </div>
@@ -161,7 +165,7 @@
                   [(ngModel)]="sf.code"
                   [attr.data-editable]="'true'"
                   [attr.data-role]="'subfield-code'"
-                  (ngModelChange)="sf.code = $event; notifyChange()"
+                  (ngModelChange)="onSubfieldCodeChange($index, $event)"
                   (input)="onInputAutoAdvance($event)"
                   maxlength="1"
                   placeholder="a"
@@ -181,7 +185,7 @@
               [attr.data-editable]="
                 !isValueDisabled(sf, field()) ? 'true' : null
               "
-              (ngModelChange)="sf.value = $event; notifyChange()"
+              (ngModelChange)="onSubfieldValueChange($index, $event)"
               (keydown.enter)="onEnterSubfieldValue($index, $event)"
               placeholder="Aa"
             />

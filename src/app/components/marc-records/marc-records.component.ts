@@ -128,7 +128,7 @@ export class MarcRecordsComponent {
       if (this.lastAppliedKey === key) return;
       this.lastAppliedKey = key;
 
-      this.recordState.applyCandidateToUiField({
+      this.recordState.applyCandidateToField({
         fieldId: evt.fieldId,
         candidate: evt.candidate,
       });

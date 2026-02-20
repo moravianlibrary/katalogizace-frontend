@@ -1,34 +1,161 @@
 import {
+  EditableMarcRecord,
   ExistingMarcRecord,
   ExtractedMarcRecord,
   FieldType,
   ID,
   LastEditedRecord,
   MarcCandidate,
+  MarcSubfield,
   RecordViewMode,
   UiFieldWithMeta,
   UUID,
 } from '@/app/models';
 import { computed, Injectable, signal } from '@angular/core';
-import { extractedToUiFields } from '../utils/marc-transform';
+import { QuickAddItem } from '../models/shared/record-state';
+import {
+  existingToEditableWithMeta,
+  extractedToEditableWithMeta,
+} from '../utils/marc-transform';
 
 @Injectable({ providedIn: 'root' })
 export class RecordStateService {
-  readonly uiFields = signal<UiFieldWithMeta[]>([]);
-
   readonly viewMode = signal<RecordViewMode>('table');
-
   readonly focusTagFieldId = signal<UUID | null>(null);
 
-  readonly QUICK_ADD = [
-    { tag: 100, repeatable: false, type: 'data' as FieldType },
-    { tag: 245, repeatable: false, type: 'data' as FieldType },
-    { tag: 255, repeatable: true, type: 'data' as FieldType },
-    { tag: 264, repeatable: true, type: 'data' as FieldType },
-    { tag: 300, repeatable: true, type: 'data' as FieldType },
-    { tag: 500, repeatable: true, type: 'data' as FieldType },
-    { tag: 651, repeatable: true, type: 'data' as FieldType },
-    { tag: 655, repeatable: true, type: 'data' as FieldType },
+  readonly editableRecord = signal<EditableMarcRecord | null>(null);
+  readonly selectedFieldId = signal<UUID | null>(null);
+
+  readonly uiFields = computed<UiFieldWithMeta[]>(() => {
+    const rec = this.editableRecord();
+    if (!rec) return [];
+
+    const control = rec.control_fields.map((cf) => ({
+      fieldId: cf.fieldId,
+      tag: cf.tag,
+      ind1: null,
+      ind2: null,
+      subfields: [],
+      isManual: true,
+      control: true,
+      value: cf.value,
+    }));
+
+    const data = rec.data_fields.map((df) => ({
+      fieldId: df.fieldId,
+      tag: df.tag,
+      ind1: df.ind1 ?? '',
+      ind2: df.ind2 ?? '',
+      subfields: (df.subfields ?? []).map((sf) => ({
+        code: sf.code,
+        value: sf.value,
+        isManual: true,
+      })),
+      isManual: true,
+      control: false,
+      value: '',
+    }));
+
+    const all = [...control, ...data];
+    all.sort((a, b) => a.tag.localeCompare(b.tag));
+    return all;
+  });
+
+  readonly selectedField = computed(() => {
+    const rec = this.editableRecord();
+    const id = this.selectedFieldId();
+    if (!rec || !id) return null;
+
+    return (
+      rec.control_fields.find((f) => f.fieldId === id) ??
+      rec.data_fields.find((f) => f.fieldId === id) ??
+      null
+    );
+  });
+
+  readonly QUICK_ADD: QuickAddItem[] = [
+    {
+      tag: 100,
+      ind1: '',
+      ind2: '',
+      subfields: [
+        { code: 'a', value: '' },
+        { code: 'd', value: '' },
+        { code: '7', value: '' },
+        { code: '4', value: '' },
+      ],
+      repeatable: false,
+      type: 'data' as FieldType,
+    },
+    {
+      tag: 245,
+      ind1: '',
+      ind2: '',
+      subfields: [
+        { code: 'a', value: '' },
+        { code: 'b', value: '' },
+        { code: 'c', value: '' },
+      ],
+      repeatable: false,
+      type: 'data' as FieldType,
+    },
+    {
+      tag: 255,
+      ind1: '',
+      ind2: '',
+      subfields: [{ code: 'a', value: '' }],
+      repeatable: true,
+      type: 'data' as FieldType,
+    },
+    {
+      tag: 264,
+      ind1: '',
+      ind2: '',
+      subfields: [
+        { code: 'b', value: '' },
+        { code: 'c', value: '' },
+      ],
+      repeatable: true,
+      type: 'data' as FieldType,
+    },
+    {
+      tag: 300,
+      ind1: '',
+      ind2: '',
+      subfields: [
+        { code: 'a', value: '' },
+        { code: 'b', value: '' },
+      ],
+      repeatable: true,
+      type: 'data' as FieldType,
+    },
+    {
+      tag: 500,
+      ind1: '',
+      ind2: '',
+      subfields: [{ code: 'a', value: '' }],
+      repeatable: true,
+      type: 'data' as FieldType,
+    },
+    {
+      tag: 651,
+      ind1: '',
+      ind2: '',
+      subfields: [{ code: 'a', value: '' }],
+      repeatable: true,
+      type: 'data' as FieldType,
+    },
+    {
+      tag: 655,
+      ind1: '',
+      ind2: '',
+      subfields: [
+        { code: 'a', value: '' },
+        { code: '2', value: '' },
+      ],
+      repeatable: true,
+      type: 'data' as FieldType,
+    },
   ];
 
   readonly visibleQuickAdd = computed(() => {
@@ -44,24 +171,63 @@ export class RecordStateService {
     );
   });
 
+  setEditableRecord(rec: EditableMarcRecord | null) {
+    this.clearFocusTag();
+    this.selectedFieldId.set(null);
+    this.editableRecord.set(rec);
+  }
+
+  selectField(fieldId: UUID) {
+    this.selectedFieldId.set(fieldId);
+  }
+
   // TODO rovno predvyplnit polia
-  addFieldWithTag(tag: number, fieldType: FieldType) {
-    const current = this.uiFields();
-    const isControl = fieldType === 'control';
+  addFieldWithTag(
+    tag: number,
+    fieldType: FieldType,
+    subfields: MarcSubfield[],
+    ind1: string,
+    ind2: string,
+  ) {
+    const rec = this.editableRecord();
+    console.log('before: ', rec);
+    if (!rec) return;
 
-    const newField: UiFieldWithMeta = {
-      fieldId: `manual-${crypto.randomUUID()}`,
-      tag: String(tag).padStart(3, '0'),
-      ind1: '',
-      ind2: '',
-      subfields: isControl ? [] : [{ code: '', value: '', isManual: true }],
-      isManual: true,
-      control: isControl,
-      value: '',
-    };
+    const fieldId = `manual-${crypto.randomUUID()}` as UUID;
 
-    this.uiFields.set([newField, ...current]);
-    this.requestFocusTag(newField.fieldId);
+    if (fieldType === 'control') {
+      const next = {
+        ...rec,
+        control_fields: [
+          {
+            fieldId,
+            tag: String(tag).padStart(3, '0'),
+            value: '',
+          },
+          ...rec.control_fields,
+        ],
+      };
+      this.editableRecord.set(next);
+    } else {
+      const next = {
+        ...rec,
+        data_fields: [
+          {
+            fieldId,
+            tag: String(tag).padStart(3, '0'),
+            ind1: ind1,
+            ind2: ind2,
+            subfields: subfields,
+          },
+          ...rec.data_fields,
+        ],
+      };
+      this.editableRecord.set(next);
+    }
+
+    this.selectField(fieldId);
+    this.requestFocusTag(fieldId);
+    this.editableRecord();
   }
 
   requestFocusTag(fieldId: UUID) {
@@ -77,36 +243,25 @@ export class RecordStateService {
     return this.CONTROL_TAGS.has(tag);
   }
 
-  touch() {
-    const current = this.uiFields();
-    this.uiFields.set([...current]);
-  }
+  applyCandidateToField(evt: { fieldId: UUID; candidate: MarcCandidate }) {
+    const rec = this.editableRecord();
+    if (!rec) return;
 
-  applyCandidateToUiField(evt: { fieldId: UUID; candidate: MarcCandidate }) {
-    const current = this.uiFields();
-    const idx = current.findIndex((f) => f.fieldId === evt.fieldId);
+    const idx = rec.data_fields.findIndex((f) => f.fieldId === evt.fieldId);
     if (idx < 0) return;
 
     const cand = evt.candidate;
     const rep = cand.MARC_representation;
 
-    const updated = {
-      ...current[idx],
+    const nextFields = [...rec.data_fields];
+    nextFields[idx] = {
+      ...nextFields[idx],
       ind1: rep.ind1 ?? '',
       ind2: rep.ind2 ?? '',
-      subfields: (rep.subfields ?? []).map((sf: any) => ({
-        code: sf.code,
-        value: sf.value,
-        isManual: true,
-      })),
-      selectedCandidateId: cand.id,
-      score: cand.score,
+      subfields: rep.subfields ?? [],
     };
 
-    const next = [...current];
-    next[idx] = updated;
-
-    this.uiFields.set(next);
+    this.editableRecord.set({ ...rec, data_fields: nextFields });
   }
 
   toggleViewMode() {
@@ -130,86 +285,78 @@ export class RecordStateService {
     this.clearFocusTag();
 
     if (!rec) {
-      this.uiFields.set([]);
+      this.setEditableRecord(null);
       return;
     }
 
-    const control: UiFieldWithMeta[] = rec.control_fields.map((sf) => ({
-      fieldId: `${crypto.randomUUID()}`,
-      tag: sf.tag,
-      ind1: '',
-      ind2: '',
-      subfields: [],
-      isManual: true,
-      control: true,
-      value: sf.value,
-    }));
-
-    const data: UiFieldWithMeta[] = rec.data_fields.map((df) => ({
-      fieldId: `${crypto.randomUUID()}`,
-      tag: df.tag,
-      ind1: df.ind1 ?? '',
-      ind2: df.ind2 ?? '',
-      subfields:
-        df.subfields?.map((sf) => ({
-          code: sf.code,
-          value: sf.value,
-          isManual: true,
-        })) ?? [],
-      isManual: true,
-      control: false,
-      value: '',
-    }));
-
-    control.sort((a, b) => a.tag.localeCompare(b.tag));
-    data.sort((a, b) => a.tag.localeCompare(b.tag));
-
-    this.uiFields.set(control.concat(data));
+    const editable = existingToEditableWithMeta(rec);
+    this.setEditableRecord(editable);
   }
 
   loadFromExtracted(extracted: ExtractedMarcRecord | null) {
     this.clearFocusTag();
 
     if (!extracted) {
-      this.uiFields.set([]);
+      this.setEditableRecord(null);
       return;
     }
 
-    const fields = extractedToUiFields(extracted);
-    this.uiFields.set(fields);
+    const editable = extractedToEditableWithMeta(extracted);
+    this.setEditableRecord(editable);
   }
 
   addField(fieldType: FieldType) {
-    const current = this.uiFields();
+    const rec = this.editableRecord();
+    if (!rec) return;
+
     const isControl = fieldType === 'control';
+    const fieldId = `manual-${crypto.randomUUID()}` as UUID;
 
-    const newField: UiFieldWithMeta = {
-      fieldId: `manual-${crypto.randomUUID()}`,
-      tag: '',
-      ind1: '',
-      ind2: '',
-      subfields: isControl
-        ? []
-        : [
-            {
-              code: '',
-              value: '',
-              isManual: true,
-            },
-          ],
-      isManual: true,
-      control: isControl,
-      value: '',
-    };
+    if (isControl) {
+      const newField = {
+        fieldId,
+        tag: '',
+        value: '',
+      };
 
-    this.uiFields.set([newField, ...current]);
+      this.editableRecord.set({
+        ...rec,
+        control_fields: [newField, ...rec.control_fields],
+      });
+    } else {
+      const newField = {
+        fieldId,
+        tag: '',
+        ind1: '',
+        ind2: '',
+        subfields: [
+          {
+            code: '',
+            value: '',
+          },
+        ],
+      };
 
-    this.requestFocusTag(newField.fieldId);
+      this.editableRecord.set({
+        ...rec,
+        data_fields: [newField, ...rec.data_fields],
+      });
+    }
+
+    this.requestFocusTag(fieldId);
   }
 
   removeField(fieldId: UUID) {
-    const current = this.uiFields();
-    this.uiFields.set(current.filter((f) => f.fieldId !== fieldId));
+    const rec = this.editableRecord();
+    if (!rec) return;
+
+    this.editableRecord.set({
+      ...rec,
+      control_fields: rec.control_fields.filter((f) => f.fieldId !== fieldId),
+      data_fields: rec.data_fields.filter((f) => f.fieldId !== fieldId),
+    });
+
+    if (this.selectedFieldId() === fieldId) this.selectedFieldId.set(null);
   }
 
   buildExistingRecord(bookId: ID): LastEditedRecord | null {
@@ -239,29 +386,36 @@ export class RecordStateService {
   }
 
   readonly recordPreview = computed<ExistingMarcRecord | null>(() => {
-    const fields = this.uiFields().filter((f) => f.tag.trim().length === 3);
+    const rec = this.editableRecord();
+    console.log();
+    if (!rec) return null;
 
-    const control_fields = fields.filter((f) => f.control);
-    // .map((f) => ({
-    //   tag: f.tag.trim(),
-    //   value: (f.value ?? '').trim(),
-    // }))
-    // .filter((sf) => sf.value.length > 0);
+    const control_fields = rec.control_fields
+      .filter((f) => f.tag.trim().length === 3)
+      // .map((f) => ({ tag: f.tag.trim(), value: (f.value ?? '').trim() }))
+      // .filter((sf) => sf.value.length > 0);
+      .map((f) => ({
+        tag: f.tag.trim(),
+        value: f.value ?? '',
+      }));
 
-    const data_fields = fields
-      .filter((f) => !f.control)
+    const data_fields = rec.data_fields
+      .filter((f) => (f.tag ?? '').trim().length === 3)
       .map((f) => {
         const cleanedSubfields = f.subfields;
-        // ?.map((sf) => ({
-        //   code: (sf.code ?? '').trim(),
-        //   value: (sf.value ?? '').trim(),
-        // }))
-        // .filter((sf) => sf.code.length === 1 && sf.value.length > 0) ?? [];
+
+        // const cleanedSubfields =
+        //   (f.subfields ?? [])
+        //     .map((sf) => ({
+        //       code: (sf.code ?? '').trim(),
+        //       value: (sf.value ?? '').trim(),
+        //     }))
+        //     .filter((sf) => sf.code.length === 1 && sf.value.length > 0);
 
         return {
           tag: f.tag.trim(),
-          ind1: f.ind1?.trim() ?? '',
-          ind2: f.ind2?.trim() ?? '',
+          ind1: f.ind1.trim() ?? '',
+          ind2: f.ind2.trim() ?? '',
           subfields: cleanedSubfields,
         };
       })
@@ -269,9 +423,9 @@ export class RecordStateService {
 
     return {
       record_id: 'preview',
-      leader: '',
+      leader: rec.leader ?? '',
       source: 'user_edit',
-      quality_assessment: {
+      quality_assessment: rec.quality_assessment ?? {
         required_present: 0,
         required_total: 0,
         required_if_applicable_present: 0,
@@ -281,4 +435,36 @@ export class RecordStateService {
       data_fields,
     };
   });
+
+  patchDataField(
+    fieldId: UUID,
+    patch: Partial<EditableMarcRecord['data_fields'][number]>,
+  ) {
+    const rec = this.editableRecord();
+    if (!rec) return;
+
+    const idx = rec.data_fields.findIndex((f) => f.fieldId === fieldId);
+    if (idx < 0) return;
+
+    const nextFields = [...rec.data_fields];
+    nextFields[idx] = { ...nextFields[idx], ...patch };
+
+    this.editableRecord.set({ ...rec, data_fields: nextFields });
+  }
+
+  patchControlField(
+    fieldId: UUID,
+    patch: Partial<EditableMarcRecord['control_fields'][number]>,
+  ) {
+    const rec = this.editableRecord();
+    if (!rec) return;
+
+    const idx = rec.control_fields.findIndex((f) => f.fieldId === fieldId);
+    if (idx < 0) return;
+
+    const nextFields = [...rec.control_fields];
+    nextFields[idx] = { ...nextFields[idx], ...patch };
+
+    this.editableRecord.set({ ...rec, control_fields: nextFields });
+  }
 }

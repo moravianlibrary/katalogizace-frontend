@@ -35,23 +35,6 @@ export class ExtractedFieldCardComponent {
     });
   }
 
-  notifyChange() {
-    this.recordState.touch();
-  }
-
-  onAddSubfield() {
-    const f = this.field();
-    if (!f.subfields) {
-      f.subfields = [];
-    }
-
-    const sf = { code: '', value: '', isManual: true };
-    f.subfields.push(sf);
-    this.notifyChange();
-
-    this.focusNewSubfieldCode();
-  }
-
   onDeleteField() {
     this.recordState.removeField(this.field().fieldId);
   }
@@ -151,5 +134,61 @@ export class ExtractedFieldCardComponent {
 
     e.preventDefault();
     this.onAddSubfield();
+  }
+
+  patchControl(patch: any) {
+    const f = this.field();
+    this.recordState.patchControlField(f.fieldId, patch);
+  }
+
+  patchData(patch: any) {
+    const f = this.field();
+    this.recordState.patchDataField(f.fieldId, patch);
+  }
+
+  private currentSubfields(): {
+    code: string;
+    value: string;
+    isManual?: boolean;
+  }[] {
+    return [...(this.field().subfields ?? [])];
+  }
+
+  onSubfieldCodeChange(i: number, code: string) {
+    const sfs = this.currentSubfields();
+    sfs[i] = { ...sfs[i], code };
+
+    this.patchData({
+      subfields: sfs.map((sf) => ({
+        code: sf.code ?? '',
+        value: sf.value ?? '',
+      })),
+    });
+  }
+
+  onSubfieldValueChange(i: number, value: string) {
+    const sfs = this.currentSubfields();
+    sfs[i] = { ...sfs[i], value };
+
+    this.patchData({
+      subfields: sfs.map((sf) => ({
+        code: sf.code ?? '',
+        value: sf.value ?? '',
+      })),
+    });
+  }
+
+  onAddSubfield() {
+    const sfs = this.currentSubfields();
+    sfs.push({ code: '', value: '', isManual: true });
+
+    this.patchData({
+      subfields: sfs.map((sf) => ({
+        code: sf.code ?? '',
+        value: sf.value ?? '',
+      })),
+    });
+
+    this.focusNewSubfieldCode();
   }
 }

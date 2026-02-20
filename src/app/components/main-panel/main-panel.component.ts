@@ -4,9 +4,13 @@ import { MarcDiffService } from '../../services/marc-diff.service';
 import { RecordStateService } from '../../services/record-state.service';
 import { RecordStore } from '../../stores/record.store';
 import { ExtractedFieldsComponent } from '../extracted-fields/extracted-fields/extracted-fields.component';
-import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
 
 import { QuickAddItem } from '@/app/models/shared/record-state';
+import {
+  existingToEditableWithMeta,
+  extractedToEditableWithMeta,
+} from '@/app/utils/marc-transform';
+import { EditableMarcRecordTableComponent } from '../marc-record-table/editable-marc-record-table/editable-marc-record-table.component';
 import { MainPanelHeaderComponent } from './main-panel-header/main-panel-header.component';
 
 @Component({
@@ -15,7 +19,7 @@ import { MainPanelHeaderComponent } from './main-panel-header/main-panel-header.
   imports: [
     MainPanelHeaderComponent,
     ExtractedFieldsComponent,
-    ExistingMarcRecordTableComponent,
+    EditableMarcRecordTableComponent,
   ],
   templateUrl: './main-panel.component.html',
 })
@@ -32,7 +36,13 @@ export class MainPanelComponent {
   diffIndex = this.diff.diffIndex;
 
   onQuickAdd(it: QuickAddItem) {
-    this.recordState.addFieldWithTag(it.tag, it.type);
+    this.recordState.addFieldWithTag(
+      it.tag,
+      it.type,
+      it.subfields,
+      it.ind1,
+      it.ind2,
+    );
   }
 
   constructor() {
@@ -40,11 +50,11 @@ export class MainPanelComponent {
       const e = this.store.extracted();
       const l = this.store.lastEdited();
 
-      if (l) {
-        this.recordState.loadFromExistingOrLastEdited(l);
-      } else {
-        this.recordState.loadFromExtracted(e);
-      }
+      const editable = l
+        ? existingToEditableWithMeta(l)
+        : extractedToEditableWithMeta(e);
+
+      this.recordState.setEditableRecord(editable);
     });
 
     // auto turn off diff when leaving table view mode

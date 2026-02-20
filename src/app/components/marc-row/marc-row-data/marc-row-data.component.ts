@@ -51,10 +51,6 @@ export class MarcRowDataComponent {
   private recordState = inject(RecordStateService);
   private edit = inject(FieldEditService);
 
-  notifyChange() {
-    this.recordState.touch();
-  }
-
   onShowCandidates() {
     this.cps.showCandidates(
       this.df().tag,
