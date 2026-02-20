@@ -1,4 +1,7 @@
 import {
+  EditableMarcRecord,
+  EditableMarcRecordControlField,
+  EditableMarcRecordDataField,
   ExistingMarcRecord,
   ExistingMarcRecordControlField,
   ExistingMarcRecordControlFieldWithMeta,
@@ -9,6 +12,7 @@ import {
   ExtractedMarcControlField,
   ExtractedMarcDataField,
   ExtractedMarcRecord,
+  LastEditedRecord,
   UiFieldWithMeta,
 } from '@/app/models';
 
@@ -199,4 +203,101 @@ export function extractedToExistingWithMeta(
   };
 
   return existing;
+}
+
+export function extractedToEditableWithMeta(
+  extracted: ExtractedMarcRecord | null,
+): EditableMarcRecord | null {
+  if (!extracted) return null;
+
+  const control: EditableMarcRecordControlField[] = [];
+  const data: EditableMarcRecordDataField[] = [];
+
+  for (const [tag, fields] of Object.entries(extracted)) {
+    if (!Array.isArray(fields) || fields.length === 0) continue;
+
+    for (const f of fields) {
+      if (isControlTag(tag)) {
+        const field = f as ExtractedMarcControlField;
+
+        control.push({
+          tag,
+          value: field.value,
+          fieldId: `control-${crypto.randomUUID()}`,
+        });
+      } else {
+        const field = f as ExtractedMarcDataField;
+
+        if (!field.candidates.length) continue;
+
+        const cand = pickCandidate(field);
+        const rep = cand.MARC_representation;
+
+        data.push({
+          tag,
+          ind1: rep.ind1 ?? '',
+          ind2: rep.ind2 ?? '',
+          subfields: rep.subfields,
+          fieldId: field.id,
+        });
+      }
+    }
+  }
+
+  control.sort((a, b) => a.tag.localeCompare(b.tag));
+  data.sort((a, b) => a.tag.localeCompare(b.tag));
+
+  const editable: EditableMarcRecord = {
+    record_id: `editable-${crypto.randomUUID()}`,
+    leader: '',
+    source: '',
+    quality_assessment: {
+      required_present: 0,
+      required_total: 0,
+      required_if_applicable_present: 0,
+      required_if_applicable_total: 0,
+    },
+    control_fields: control,
+    data_fields: data,
+  };
+
+  return editable;
+}
+
+export function existingToEditableWithMeta(
+  existing: ExistingMarcRecord | LastEditedRecord | null,
+): EditableMarcRecord | null {
+  if (!existing) return null;
+
+  const control: EditableMarcRecordControlField[] = existing.control_fields.map(
+    (cf: ExistingMarcRecordControlField) => ({
+      tag: cf.tag,
+      value: cf.value,
+      fieldId: `control-${crypto.randomUUID()}`,
+    }),
+  );
+
+  const data: EditableMarcRecordDataField[] = existing.data_fields.map(
+    (df: any) => ({
+      tag: df.tag,
+      ind1: df.ind1 ?? '',
+      ind2: df.ind2 ?? '',
+      subfields: df.subfields ?? [],
+      fieldId: `data-${crypto.randomUUID()}`,
+    }),
+  );
+
+  control.sort((a, b) => a.tag.localeCompare(b.tag));
+  data.sort((a, b) => a.tag.localeCompare(b.tag));
+
+  const editable: EditableMarcRecord = {
+    record_id: existing.record_id,
+    leader: existing.leader,
+    source: existing.source,
+    quality_assessment: existing.quality_assessment,
+    control_fields: control,
+    data_fields: data,
+  };
+
+  return editable;
 }
