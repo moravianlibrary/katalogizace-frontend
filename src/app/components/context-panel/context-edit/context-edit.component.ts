@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { FieldEditService } from '@/app/services/edit.service';
+import { Component, inject } from '@angular/core';
 
 @Component({
   standalone: true,
@@ -6,4 +7,6 @@ import { Component } from '@angular/core';
   imports: [],
   templateUrl: './context-edit.component.html',
 })
-export class ContextEditComponent {}
+export class ContextEditComponent {
+  edit = inject(FieldEditService);
+}

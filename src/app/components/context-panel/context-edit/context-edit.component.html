@@ -1,1 +1,6 @@
-<p>context-edit works!</p>
+<p>{{ edit.field()?.fieldId }}</p>
+<p>{{ edit.field()?.tag }}</p>
+<p>{{ edit.field()?.value }}</p>
+@for (item of edit.field()?.subfields; track $index) {
+  <p>{{ item.code }}...{{ item.value }}</p>
+}
