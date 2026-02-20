@@ -60,8 +60,4 @@ export class ContextPanelHeaderComponent {
 
     this.recordState.loadFromExistingOrLastEdited(rec);
   }
-
-  setEdit() {
-    this.cps.setMode('edit');
-  }
 }
