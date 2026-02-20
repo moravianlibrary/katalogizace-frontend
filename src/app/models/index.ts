@@ -6,10 +6,11 @@ export * from './shared/toast.model';
 
 // books
 export * from './books/book.dto';
+export * from './books/editable-marc-with-meta.model';
+export * from './books/existing-marc-with-meta.model';
 export * from './books/images.model';
 export * from './books/marc-diff.model';
 export * from './books/marc-ui.model';
-export * from './books/marc-with-meta.model';
 export * from './books/marc.dto';
 export * from './books/provenance.dto';
 export * from './books/record-view.model';
