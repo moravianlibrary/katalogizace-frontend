@@ -74,7 +74,7 @@ export class MarcRecordsComponent {
   private ro: ResizeObserver | null = null;
 
   private hostHeightPx = signal<number>(0);
-  detailHeightPx = computed(() => Math.floor(this.hostHeightPx() * 0.7));
+  detailMaxHeightPx = computed(() => Math.floor(this.hostHeightPx() * 0.7));
 
   ngAfterViewInit(): void {
     const el = this.hostEl.nativeElement;

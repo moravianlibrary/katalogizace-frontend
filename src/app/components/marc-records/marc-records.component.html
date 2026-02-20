@@ -86,22 +86,23 @@
 
           @if (expandedIndex() === $index) {
             <div class="border-primary-default border-b-2">
-              <div class="min-h-50" [style.height.px]="detailHeightPx()">
-                <div class="h-full overflow-auto overscroll-contain">
-                  @if ($index === 0) {
-                    <app-extracted-marc-record-table
-                      [extractedRecord]="rec.extracted!"
-                      [diffIndex]="diffIndex()"
-                      diffSide="opened"
-                    />
-                  } @else {
-                    <app-existing-marc-record-table
-                      [existingRecord]="store.openedForDiff()!"
-                      [diffIndex]="diffIndex()"
-                      diffSide="opened"
-                    />
-                  }
-                </div>
+              <div
+                class="min-h-0 overflow-auto overscroll-contain"
+                [style.max-height.px]="detailMaxHeightPx()"
+              >
+                @if ($index === 0) {
+                  <app-extracted-marc-record-table
+                    [extractedRecord]="rec.extracted!"
+                    [diffIndex]="diffIndex()"
+                    diffSide="opened"
+                  />
+                } @else {
+                  <app-existing-marc-record-table
+                    [existingRecord]="store.openedForDiff()!"
+                    [diffIndex]="diffIndex()"
+                    diffSide="opened"
+                  />
+                }
               </div>
             </div>
           }
