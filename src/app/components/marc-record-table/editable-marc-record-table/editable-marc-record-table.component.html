@@ -22,7 +22,7 @@
 
     @for (cf of recordState.editableRecord()?.control_fields; track $index) {
       <tr
-        class="border-light cursor-pointer border-b"
+        class="border-light group cursor-pointer border-b"
         [ngClass]="[
           $index === 0 && !recordState.editableRecord()?.leader
             ? 'border-t-[0.5px]'
@@ -46,7 +46,7 @@
     @for (df of recordState.editableRecord()?.data_fields; track $index) {
       @if (df.tag != "910") {
         <tr
-          class="border-light cursor-pointer border-b"
+          class="border-light group cursor-pointer border-b"
           [ngClass]="[
             $index === 0 &&
             recordState.editableRecord()?.control_fields?.length === 0 &&
