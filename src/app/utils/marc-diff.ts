@@ -33,7 +33,7 @@ export function isDiffableTag015to830(tag: unknown): boolean {
 }
 
 export function subfieldsSignature(subfields?: MarcSubfield[] | null): string {
-  const sfs = normalizeSubfields(subfields);
+  const sfs = normalizeSubfieldsNonEmpty(subfields);
 
   const counts = new Map<string, number>();
   for (const sf of sfs) {
@@ -97,7 +97,7 @@ function subfieldsDeltaCount(
 
 function multisetCounts(sfs: MarcSubfield[]): Map<string, number> {
   const m = new Map<string, number>();
-  for (const sf of normalizeSubfields(sfs)) {
+  for (const sf of normalizeSubfieldsNonEmpty(sfs)) {
     const key = `${sf.code}${KV}${sf.value}`;
     m.set(key, (m.get(key) ?? 0) + 1);
   }
@@ -182,7 +182,7 @@ export function subfieldOccKey(
 export function enumerateSubfields(
   subfields?: MarcSubfield[] | null,
 ): Array<{ sf: { code: string; value: string }; key: string }> {
-  const sfs = normalizeSubfields(subfields);
+  const sfs = normalizeSubfieldsKeepEmpty(subfields);
 
   const seen = new Map<string, number>();
   return sfs.map((sf) => {
@@ -215,11 +215,15 @@ function diffSubfieldsWithinPairedField(
   const exactKey = (sf: { code: string; value: string }) =>
     `${sf.code}${KV}${sf.value}`;
 
+  const isNonEmpty = (sf: { code: string; value: string }) =>
+    sf.value.length > 0;
+
   // indexy výskytov podľa exact (code,value)
   const oByExact = new Map<string, number[]>();
   const pByExact = new Map<string, number[]>();
 
   o.forEach(({ sf }, i) => {
+    if (!isNonEmpty(sf)) return;
     const k = exactKey(sf);
     const arr = oByExact.get(k) ?? [];
     arr.push(i);
@@ -227,6 +231,7 @@ function diffSubfieldsWithinPairedField(
   });
 
   p.forEach(({ sf }, i) => {
+    if (!isNonEmpty(sf)) return;
     const k = exactKey(sf);
     const arr = pByExact.get(k) ?? [];
     arr.push(i);
@@ -251,12 +256,13 @@ function diffSubfieldsWithinPairedField(
     }
   }
 
-  // 2) remaining => group by code, pair => changed (red)
+  // 2) remaining non-empty => group by code => changed (red)
   const oByCode = new Map<string, number[]>();
   const pByCode = new Map<string, number[]>();
 
   o.forEach(({ sf }, i) => {
     if (usedO.has(i)) return;
+    if (!isNonEmpty(sf)) return;
     const arr = oByCode.get(sf.code) ?? [];
     arr.push(i);
     oByCode.set(sf.code, arr);
@@ -264,6 +270,7 @@ function diffSubfieldsWithinPairedField(
 
   p.forEach(({ sf }, i) => {
     if (usedP.has(i)) return;
+    if (!isNonEmpty(sf)) return;
     const arr = pByCode.get(sf.code) ?? [];
     arr.push(i);
     pByCode.set(sf.code, arr);
@@ -290,6 +297,19 @@ function diffSubfieldsWithinPairedField(
       previewKinds.set(p[pi[j]].key, 'missing_or_extra');
     }
   }
+
+  // 4) všetky empty subfields, ktoré sa nikdy nepoužili => ORANGE
+  o.forEach(({ sf, key }, i) => {
+    if (!isNonEmpty(sf)) {
+      openedKinds.set(key, 'missing_or_extra');
+    }
+  });
+
+  p.forEach(({ sf, key }, i) => {
+    if (!isNonEmpty(sf)) {
+      previewKinds.set(key, 'missing_or_extra');
+    }
+  });
 
   return { opened: openedKinds, preview: previewKinds };
 }
@@ -358,4 +378,21 @@ export function diffMarcRecordsSubfields(
   }
 
   return { opened: openedMap, preview: previewMap };
+}
+
+function normalizeSubfieldsKeepEmpty(
+  subfields?: MarcSubfield[] | null,
+): MarcSubfield[] {
+  const sfs = subfields ?? [];
+  return sfs
+    .map((sf) => ({ code: normStr(sf.code), value: normStr(sf.value) }))
+    .filter((sf) => sf.code.length === 1); // ✅ value môže byť ''
+}
+
+function normalizeSubfieldsNonEmpty(
+  subfields?: MarcSubfield[] | null,
+): MarcSubfield[] {
+  return normalizeSubfieldsKeepEmpty(subfields).filter(
+    (sf) => sf.value.length > 0,
+  );
 }
