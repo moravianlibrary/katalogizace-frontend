@@ -1,10 +1,17 @@
-import { MarcCandidate, SubDiffIndex, SubDiffKind, UUID } from '@/app/models';
+import {
+  MarcCandidate,
+  MarcSubfield,
+  SubDiffIndex,
+  SubDiffKind,
+  UUID,
+} from '@/app/models';
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { ContextPanelService } from '../../../services/context-panel.service';
 import { RecordStateService } from '../../../services/record-state.service';
 import { RecordStore } from '../../../stores/record.store';
 
+import { FieldEditService } from '@/app/services/edit.service';
 import {
   dataSignature,
   enumerateSubfields,
@@ -23,7 +30,7 @@ export class MarcRowDataComponent {
     tag: string;
     ind1?: string;
     ind2?: string;
-    subfields?: { code: string; value: string }[];
+    subfields?: MarcSubfield[];
     candidates?: MarcCandidate[];
     selectedCandidateId?: UUID | null;
     score?: number;
@@ -31,10 +38,18 @@ export class MarcRowDataComponent {
 
   diffIndex = input<SubDiffIndex | null>(null);
   diffSide = input<'opened' | 'preview'>('opened');
+  editable = input<boolean>(false);
+
+  onDeleteField() {
+    this.recordState.removeField(this.df().fieldId!);
+    this.edit.field.set(null);
+    this.cps.setMode('records');
+  }
 
   private cps = inject(ContextPanelService);
   private store = inject(RecordStore);
   private recordState = inject(RecordStateService);
+  private edit = inject(FieldEditService);
 
   notifyChange() {
     this.recordState.touch();

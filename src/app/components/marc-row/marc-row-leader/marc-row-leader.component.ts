@@ -9,4 +9,5 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class MarcRowLeaderComponent {
   leader = input.required<string>();
+  editable = input<boolean>(false);
 }
