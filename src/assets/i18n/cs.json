@@ -182,5 +182,12 @@
     "year_of_publishing": "Rok vydání",
     "source_extracted": "Vyčtený",
     "no_data": "Žádná data k zobrazení."
+  },
+  "field_edit": {
+    "value": "Hodnota",
+    "no_field_selected": "Nie je vybrané žiadne pole.",
+    "first_indicator": "1. Indikátor",
+    "second_indicator": "2. Indikátor",
+    "undefined_indicator": "Nedefinováno"
   }
 }
