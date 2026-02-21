@@ -1,0 +1,80 @@
+<div class="relative">
+  <button
+    class="border-tertiary-default focus-within:border-primary-default bg-main-base disabled:border-tertiary-disable inline-flex w-full cursor-pointer items-center justify-between overflow-hidden rounded-lg border px-4 py-3 disabled:cursor-not-allowed disabled:bg-gray-500/5"
+    [disabled]="disabled()"
+    (click)="toggle()"
+    type="button"
+  >
+    <span class="text-md" [class.text-disable]="disabled()">
+      {{ value() ? selectedLabel() : placeholder() }}
+    </span>
+
+    <svg
+      class="icon-tertiary-default"
+      xmlns="http://www.w3.org/2000/svg"
+      width="12"
+      height="6"
+      viewBox="0 0 12 6"
+    >
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M0.146447 0.146447C0.341709 -0.0488155 0.658291 -0.0488155 0.853553 0.146447L5.20022 4.49311C5.51829 4.81118 6.04171 4.81118 6.35978 4.49311L10.7064 0.146447C10.9017 -0.0488155 11.2183 -0.0488155 11.4136 0.146447C11.6088 0.341709 11.6088 0.658291 11.4136 0.853553L7.06689 5.20022C6.35829 5.90882 5.20171 5.90882 4.49311 5.20022L0.146447 0.853553C-0.0488155 0.658291 -0.0488155 0.341709 0.146447 0.146447Z"
+      />
+      <path
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M0.146447 0.146447C0.341709 -0.0488155 0.658291 -0.0488155 0.853553 0.146447L5.20022 4.49311C5.51829 4.81118 6.04171 4.81118 6.35978 4.49311L10.7064 0.146447C10.9017 -0.0488155 11.2183 -0.0488155 11.4136 0.146447C11.6088 0.341709 11.6088 0.658291 11.4136 0.853553L7.06689 5.20022C6.35829 5.90882 5.20171 5.90882 4.49311 5.20022L0.146447 0.853553C-0.0488155 0.658291 -0.0488155 0.341709 0.146447 0.146447Z"
+      />
+    </svg>
+  </button>
+
+  @if (open()) {
+    <div
+      class="border-primary-default bg-main-base absolute right-0 left-0 z-30 mt-2 overflow-hidden rounded-lg border shadow-md"
+    >
+      <div class="max-h-114 overflow-auto p-2">
+        @for (opt of options(); track opt.value) {
+          <button
+            class="group text-secondary disabled:text-disable flex w-full items-center justify-between rounded-lg px-4 py-3 text-left transition"
+            [disabled]="disabled()"
+            [ngClass]="[
+              disabled() ? 'cursor-default opacity-50' : 'cursor-pointer',
+
+              'bg-transparent',
+
+              !disabled() ? 'hover:bg-main-light active:bg-main-bright' : '',
+            ]"
+            (click)="select(opt.value)"
+            type="button"
+          >
+            <span class="text-sm-tight font-medium">{{ opt.label }}</span>
+
+            @if (opt.value === value()) {
+              <svg
+                class="icon-secondary-default"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M8 1.33301C11.6654 1.33301 14.667 4.33457 14.667 8C14.667 11.6654 11.6654 14.667 8 14.667C4.33457 14.667 1.33301 11.6654 1.33301 8C1.33301 4.33457 4.33457 1.33301 8 1.33301ZM11.1875 5.75977C10.9924 5.56434 10.6749 5.56371 10.4795 5.75879L7.05371 9.17969L5.52051 7.64648C5.3253 7.45128 5.00875 7.45139 4.81348 7.64648C4.61824 7.84175 4.61822 8.15826 4.81348 8.35352L6.7002 10.2402C6.89534 10.4351 7.21101 10.4351 7.40625 10.2402L11.1865 6.46777C11.382 6.27269 11.3826 5.9552 11.1875 5.75977Z"
+                />
+              </svg>
+            }
+          </button>
+        }
+      </div>
+    </div>
+
+    <button
+      class="fixed inset-0 z-20 cursor-default"
+      (click)="close()"
+      type="button"
+      aria-label="close"
+    ></button>
+  }
+</div>
