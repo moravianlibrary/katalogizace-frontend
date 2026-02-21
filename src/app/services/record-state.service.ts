@@ -467,4 +467,62 @@ export class RecordStateService {
 
     this.editableRecord.set({ ...rec, control_fields: nextFields });
   }
+
+  clearSelection() {
+    this.selectedFieldId.set(null);
+  }
+
+  patchSubfield(
+    fieldId: UUID,
+    subfieldIndex: number,
+    patch: Partial<MarcSubfield>,
+  ) {
+    const rec = this.editableRecord();
+    if (!rec) return;
+
+    const idx = rec.data_fields.findIndex((f) => f.fieldId === fieldId);
+    if (idx < 0) return;
+
+    const f = rec.data_fields[idx];
+    const subfields = (f.subfields ?? []).map((sf, i) =>
+      i === subfieldIndex ? { ...sf, ...patch } : sf,
+    );
+
+    const nextFields = [...rec.data_fields];
+    nextFields[idx] = { ...f, subfields };
+
+    this.editableRecord.set({ ...rec, data_fields: nextFields });
+  }
+
+  addSubfield(fieldId: UUID, sf: MarcSubfield = { code: '', value: '' }) {
+    const rec = this.editableRecord();
+    if (!rec) return;
+
+    const idx = rec.data_fields.findIndex((f) => f.fieldId === fieldId);
+    if (idx < 0) return;
+
+    const f = rec.data_fields[idx];
+    const subfields = [...(f.subfields ?? []), sf];
+
+    const nextFields = [...rec.data_fields];
+    nextFields[idx] = { ...f, subfields };
+
+    this.editableRecord.set({ ...rec, data_fields: nextFields });
+  }
+
+  removeSubfield(fieldId: UUID, subfieldIndex: number) {
+    const rec = this.editableRecord();
+    if (!rec) return;
+
+    const idx = rec.data_fields.findIndex((f) => f.fieldId === fieldId);
+    if (idx < 0) return;
+
+    const f = rec.data_fields[idx];
+    const subfields = (f.subfields ?? []).filter((_, i) => i !== subfieldIndex);
+
+    const nextFields = [...rec.data_fields];
+    nextFields[idx] = { ...f, subfields };
+
+    this.editableRecord.set({ ...rec, data_fields: nextFields });
+  }
 }
