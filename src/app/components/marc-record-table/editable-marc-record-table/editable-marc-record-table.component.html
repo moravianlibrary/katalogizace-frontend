@@ -20,7 +20,10 @@
       ></tr>
     }
 
-    @for (cf of recordState.editableRecord()?.control_fields; track $index) {
+    @for (
+      cf of recordState.editableRecord()?.control_fields;
+      track cf.fieldId
+    ) {
       <tr
         class="border-light group cursor-pointer border-b"
         [ngClass]="[
@@ -37,13 +40,13 @@
         [editable]="true"
         (click)="
           cps.setMode('edit', { tag: cf.tag, fieldId: cf.fieldId });
-          edit.field.set({ tag: cf.tag, fieldId: cf.fieldId, value: cf.value })
+          recordState.selectField(cf.fieldId)
         "
         appMarcRowControl
       ></tr>
     }
 
-    @for (df of recordState.editableRecord()?.data_fields; track $index) {
+    @for (df of recordState.editableRecord()?.data_fields; track df.fieldId) {
       @if (df.tag != "910") {
         <tr
           class="border-light group cursor-pointer border-b"
@@ -65,11 +68,7 @@
           [editable]="true"
           (click)="
             cps.setMode('edit', { tag: df.tag, fieldId: df.fieldId });
-            edit.field.set({
-              tag: df.tag,
-              fieldId: df.fieldId,
-              subfields: df.subfields,
-            })
+            recordState.selectField(df.fieldId)
           "
           appMarcRowData
         ></tr>
