@@ -1,0 +1,113 @@
+<section class="bg-main-base flex h-full flex-col rounded-2xl">
+  <div class="flex-1 overflow-auto">
+    <div
+      class="border-light flex items-center justify-between gap-4 border-b px-4 pt-4 pb-6"
+    >
+      <div class="w-full">
+        <label class="text-light text-sm-tight mb-2 block font-medium">
+          {{ "field_edit.first_indicator" | translate }}
+        </label>
+
+        <app-input-dropdown
+          [value]="field()?.ind1 ?? ''"
+          [options]="INDICATOR_OPTIONS"
+          (valueChange)="setInd(1, $event)"
+        />
+      </div>
+
+      <div class="w-full">
+        <label class="text-light text-sm-tight mb-2 block font-medium">
+          {{ "field_edit.second_indicator" | translate }}
+        </label>
+
+        <app-input-dropdown
+          [value]="field()?.ind2 ?? ''"
+          [options]="INDICATOR_OPTIONS"
+          (valueChange)="setInd(2, $event)"
+        />
+      </div>
+    </div>
+
+    <div class="space-y-6 p-4">
+      <div>
+        <label class="text-light text-sm-tight mb-2 block font-medium">
+          {{ "field_edit.245.a" | translate }}
+        </label>
+
+        <app-input-autocomplete
+          [value]="getSubfield('a')"
+          [field]="'245'"
+          [subfield]="'a'"
+          [bases]="['NKC', 'SKC', 'SCK']"
+          [minChars]="1"
+          [limit]="20"
+          (valueChange)="setSubfield('a', $event)"
+        />
+      </div>
+
+      <div>
+        <label class="text-light text-sm-tight mb-2 block font-medium">
+          {{ "field_edit.245.b" | translate }}
+        </label>
+
+        <app-input-autocomplete
+          [value]="getSubfield('b')"
+          [field]="'245'"
+          [subfield]="'b'"
+          [bases]="['NKC', 'SKC', 'SCK']"
+          [minChars]="1"
+          [limit]="20"
+          (valueChange)="setSubfield('b', $event)"
+        />
+      </div>
+
+      <div>
+        <label class="text-light text-sm-tight mb-2 block font-medium">
+          {{ "field_edit.245.n" | translate }}
+        </label>
+
+        <app-input-autocomplete
+          [value]="getSubfield('n')"
+          [field]="'245'"
+          [subfield]="'n'"
+          [bases]="['NKC', 'SKC', 'SCK']"
+          [minChars]="1"
+          [limit]="20"
+          (valueChange)="setSubfield('n', $event)"
+        />
+      </div>
+
+      <div>
+        <label class="text-light text-sm-tight mb-2 block font-medium">
+          {{ "field_edit.245.p" | translate }}
+        </label>
+
+        <app-input-autocomplete
+          [value]="getSubfield('p')"
+          [field]="'245'"
+          [subfield]="'p'"
+          [bases]="['NKC', 'SKC', 'SCK']"
+          [minChars]="1"
+          [limit]="20"
+          (valueChange)="setSubfield('p', $event)"
+        />
+      </div>
+
+      <div>
+        <label class="text-light text-sm-tight mb-2 block font-medium">
+          {{ "field_edit.245.c" | translate }}
+        </label>
+
+        <app-input-autocomplete
+          [value]="getSubfield('c')"
+          [field]="'245'"
+          [subfield]="'c'"
+          [bases]="['NKC', 'SKC', 'SCK']"
+          [minChars]="1"
+          [limit]="20"
+          (valueChange)="setSubfield('c', $event)"
+        />
+      </div>
+    </div>
+  </div>
+</section>
