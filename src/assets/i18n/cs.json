@@ -188,6 +188,11 @@
     "no_field_selected": "Nie je vybrané žiadne pole.",
     "first_indicator": "1. Indikátor",
     "second_indicator": "2. Indikátor",
-    "undefined_indicator": "Nedefinováno"
+    "undefined_indicator": "Nedefinováno",
+    "264": {
+      "a": "|a Místo vydání",
+      "b": "|b Jméno nakladatele",
+      "c": "|c Datum vydání"
+    }
   }
 }
