@@ -4,6 +4,8 @@
   } @else {
     @if (is264()) {
       <app-field-264-editor [fieldId]="f.fieldId" />
+    } @else if (is245()) {
+      <app-field-245-editor [fieldId]="f.fieldId" />
     } @else {
       <app-generic-data-field-editor [fieldId]="f.fieldId" />
     }

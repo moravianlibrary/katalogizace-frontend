@@ -3,6 +3,7 @@ import { Component, computed, inject } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { GenericControlFieldEditorComponent } from '../../generic-control-field-editor/generic-control-field-editor.component';
 import { GenericDataFieldEditorComponent } from '../../generic-data-field-editor/generic-data-field-editor.component';
+import { Field245EditorComponent } from './field-245-editor/field-245-editor.component';
 import { Field264EditorComponent } from './field-264-editor/field-264-editor.component';
 
 @Component({
@@ -13,6 +14,7 @@ import { Field264EditorComponent } from './field-264-editor/field-264-editor.com
     GenericDataFieldEditorComponent,
     TranslateModule,
     Field264EditorComponent,
+    Field245EditorComponent,
   ],
   templateUrl: './context-edit.component.html',
 })
@@ -26,5 +28,6 @@ export class ContextEditComponent {
     return f ? this.rs.isControlTag(f.tag) : false;
   });
 
+  is245 = computed(() => this.selected()?.tag === '245');
   is264 = computed(() => this.selected()?.tag === '264');
 }
