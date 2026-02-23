@@ -140,18 +140,21 @@ export class RecordStateService {
     {
       tag: 651,
       ind1: '',
-      ind2: '',
-      subfields: [{ code: 'a', value: '' }],
+      ind2: '7',
+      subfields: [
+        { code: 'a', value: '' },
+        { code: '2', value: 'czenas' },
+      ],
       repeatable: true,
       type: 'data' as FieldType,
     },
     {
       tag: 655,
       ind1: '',
-      ind2: '',
+      ind2: '7',
       subfields: [
         { code: 'a', value: '' },
-        { code: '2', value: '' },
+        { code: '2', value: 'czenas' },
       ],
       repeatable: true,
       type: 'data' as FieldType,
