@@ -1,11 +1,8 @@
-import { UUID } from '@/app/models';
+import { INDICATOR_OPTIONS, UUID } from '@/app/models';
 import { RecordStateService } from '@/app/services/record-state.service';
 import { Component, computed, inject, input } from '@angular/core';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import {
-  DropdownOption,
-  InputDropdownComponent,
-} from '../input-dropdown/input-dropdown.component';
+import { TranslateModule } from '@ngx-translate/core';
+import { InputDropdownComponent } from '../input-dropdown/input-dropdown.component';
 
 @Component({
   standalone: true,
@@ -15,26 +12,10 @@ import {
 })
 export class GenericDataFieldEditorComponent {
   private readonly rs = inject(RecordStateService);
-  private translate = inject(TranslateService);
 
   fieldId = input.required<UUID>();
 
-  readonly INDICATOR_OPTIONS: DropdownOption[] = [
-    {
-      value: '',
-      label: this.translate.instant('field_edit.undefined_indicator'),
-    },
-    { value: '0', label: '0' },
-    { value: '1', label: '1' },
-    { value: '2', label: '2' },
-    { value: '3', label: '3' },
-    { value: '4', label: '4' },
-    { value: '5', label: '5' },
-    { value: '6', label: '6' },
-    { value: '7', label: '7' },
-    { value: '8', label: '8' },
-    { value: '9', label: '9' },
-  ];
+  INDICATOR_OPTIONS = INDICATOR_OPTIONS;
 
   readonly field = computed(() => {
     const rec = this.rs.editableRecord();

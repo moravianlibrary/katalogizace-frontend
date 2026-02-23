@@ -1,3 +1,4 @@
+import { DropdownOption } from '@/app/models/shared/dropdown.model';
 import { NgClass } from '@angular/common';
 import {
   Component,
@@ -8,11 +9,6 @@ import {
   signal,
 } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-
-export type DropdownOption = {
-  value: string;
-  label: string;
-};
 
 @Component({
   standalone: true,
