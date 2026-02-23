@@ -200,6 +200,9 @@
       "c": "|c Odpovědnost",
       "n": "|n Číslo části",
       "p": "|p Název části"
+    },
+    "500": {
+      "a": "|a Obecná poznámka"
     }
   }
 }
