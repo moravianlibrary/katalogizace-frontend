@@ -1,4 +1,5 @@
 // shared
+export * from './shared/autocomplete.model';
 export * from './shared/context-panel.model';
 export * from './shared/dropdown.model';
 export * from './shared/id.model';
