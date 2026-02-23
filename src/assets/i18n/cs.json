@@ -193,6 +193,13 @@
       "a": "|a Místo vydání",
       "b": "|b Jméno nakladatele",
       "c": "|c Datum vydání"
+    },
+    "245": {
+      "a": "|a Název",
+      "b": "|b Vedlejší název",
+      "c": "|c Odpovědnost",
+      "n": "|n Číslo části",
+      "p": "|p Název části"
     }
   }
 }
