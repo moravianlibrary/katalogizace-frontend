@@ -5,6 +5,7 @@ import { GenericControlFieldEditorComponent } from '../../generic-control-field-
 import { GenericDataFieldEditorComponent } from '../../generic-data-field-editor/generic-data-field-editor.component';
 import { Field245EditorComponent } from './field-245-editor/field-245-editor.component';
 import { Field264EditorComponent } from './field-264-editor/field-264-editor.component';
+import { Field500EditorComponent } from './field-500-editor/field-500-editor.component';
 
 @Component({
   standalone: true,
@@ -15,6 +16,7 @@ import { Field264EditorComponent } from './field-264-editor/field-264-editor.com
     TranslateModule,
     Field264EditorComponent,
     Field245EditorComponent,
+    Field500EditorComponent,
   ],
   templateUrl: './context-edit.component.html',
 })
@@ -30,4 +32,5 @@ export class ContextEditComponent {
 
   is245 = computed(() => this.selected()?.tag === '245');
   is264 = computed(() => this.selected()?.tag === '264');
+  is500 = computed(() => this.selected()?.tag === '500');
 }
