@@ -1,6 +1,9 @@
 // shared
 export * from './shared/context-panel.model';
+export * from './shared/dropdown.model';
 export * from './shared/id.model';
+export * from './shared/record-patch.model';
+export * from './shared/record-state';
 export * from './shared/states.model';
 export * from './shared/toast.model';
 
