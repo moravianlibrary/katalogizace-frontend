@@ -6,6 +6,7 @@ import { RecordStore } from '../../stores/record.store';
 import { ExtractedFieldsComponent } from '../extracted-fields/extracted-fields/extracted-fields.component';
 
 import { QuickAddItem } from '@/app/models/shared/record-state';
+import { ContextPanelService } from '@/app/services/context-panel.service';
 import {
   existingToEditableWithMeta,
   extractedToEditableWithMeta,
@@ -29,6 +30,7 @@ export class MainPanelComponent {
   recordState = inject(RecordStateService);
   store = inject(RecordStore);
   diff = inject(MarcDiffService);
+  cps = inject(ContextPanelService);
 
   viewMode = this.recordState.viewMode;
   recordPreview = this.recordState.recordPreview;
@@ -43,6 +45,14 @@ export class MainPanelComponent {
       it.ind1,
       it.ind2,
     );
+
+    const selected = this.recordState.selectedFieldId();
+    if (!selected) return;
+
+    this.cps.setMode('edit', {
+      tag: it.tag.toString(),
+      fieldId: selected,
+    });
   }
 
   constructor() {

@@ -190,7 +190,6 @@ export class RecordStateService {
     ind2: string,
   ) {
     const rec = this.editableRecord();
-    console.log('before: ', rec);
     if (!rec) return;
 
     const fieldId = `manual-${crypto.randomUUID()}` as UUID;
