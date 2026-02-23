@@ -1,0 +1,64 @@
+<div class="relative">
+  <span
+    class="border-tertiary-default focus-within:border-primary-default bg-main-base inline-flex w-full overflow-hidden rounded-lg border"
+  >
+    <textarea
+      class="text-secondary text-md w-full resize-none bg-transparent py-3 pr-4 pl-4 font-medium outline-none"
+      #ta
+      [disabled]="disabled()"
+      [value]="query()"
+      [placeholder]="placeholder()"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      (input)="onInput(ta.value)"
+      rows="4"
+    ></textarea>
+
+    @if (query().length && !disabled()) {
+      <button
+        class="group flex items-start px-3 pt-3"
+        (click)="clear()"
+        type="button"
+      >
+        <svg
+          class="icon-tertiary"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+        >
+          <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M3.64645 3.64645C3.84171 3.45118 4.15829 3.45118 4.35355 3.64645L8 7.29289L11.6464 3.64645C11.8417 3.45118 12.1583 3.45118 12.3536 3.64645C12.5488 3.84171 12.5488 4.15829 12.3536 4.35355L8.70711 8L12.3536 11.6464C12.5488 11.8417 12.5488 12.1583 12.3536 12.3536C12.1583 12.5488 11.8417 12.5488 11.6464 12.3536L8 8.70711L4.35355 12.3536C4.15829 12.5488 3.84171 12.5488 3.64645 12.3536C3.45118 12.1583 3.45118 11.8417 3.64645 11.6464L7.29289 8L3.64645 4.35355C3.45118 4.15829 3.45118 3.84171 3.64645 3.64645Z"
+          />
+          <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M3.64645 3.64645C3.84171 3.45118 4.15829 3.45118 4.35355 3.64645L8 7.29289L11.6464 3.64645C11.8417 3.45118 12.1583 3.45118 12.3536 3.64645C12.5488 3.84171 12.5488 4.15829 12.3536 4.35355L8.70711 8L12.3536 11.6464C12.5488 11.8417 12.5488 12.1583 12.3536 12.3536C12.1583 12.5488 11.8417 12.5488 11.6464 12.3536L8 8.70711L4.35355 12.3536C4.15829 12.5488 3.84171 12.5488 3.64645 12.3536C3.45118 12.1583 3.45118 11.8417 3.64645 11.6464L7.29289 8L3.64645 4.35355C3.45118 4.15829 3.45118 3.84171 3.64645 3.64645Z"
+          />
+        </svg>
+      </button>
+    }
+  </span>
+
+  @if (open()) {
+    <div
+      class="border-primary-default bg-main-base absolute right-0 left-0 z-30 mt-2 overflow-hidden rounded-lg border shadow-md"
+    >
+      <div class="max-h-64 overflow-auto p-2">
+        @for (s of suggestions(); track s.value) {
+          <button
+            class="text-secondary hover:bg-main-light active:bg-main-bright flex w-full cursor-pointer items-center justify-between rounded-lg px-4 py-3 text-left transition"
+            (mousedown)="$event.preventDefault()"
+            (click)="pick(s)"
+            type="button"
+          >
+            <span class="text-sm-tight font-medium">{{ s.value }}</span>
+            <span class="text-light text-xs">{{ s.count }}</span>
+          </button>
+        }
+      </div>
+    </div>
+  }
+</div>
