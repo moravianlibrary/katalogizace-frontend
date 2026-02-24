@@ -38,12 +38,23 @@
         <span
           class="border-tertiary-default focus-within:border-primary-default bg-main-base inline-flex w-full overflow-hidden rounded-lg border"
         >
-          <input
-            class="text-secondary text-md w-full bg-transparent py-3 pl-4 font-medium outline-none"
-            #val
-            [value]="sf.value"
-            (input)="setSubfieldValue($index, val.value)"
-          />
+          @if ($index === 0) {
+            <input
+              class="text-secondary text-md w-full bg-transparent py-3 pl-4 font-medium outline-none"
+              #firstSubfieldInput
+              #val
+              [value]="sf.value"
+              (input)="setSubfieldValue($index, val.value)"
+            />
+          } @else {
+            <input
+              class="text-secondary text-md w-full bg-transparent py-3 pl-4 font-medium outline-none"
+              #val
+              [value]="sf.value"
+              (input)="setSubfieldValue($index, val.value)"
+            />
+          }
+
           @if (sf.value.length) {
             <button
               class="group flex items-center px-3"

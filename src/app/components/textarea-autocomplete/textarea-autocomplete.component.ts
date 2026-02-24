@@ -5,11 +5,13 @@ import {
   Component,
   computed,
   effect,
+  ElementRef,
   inject,
   input,
   output,
   signal,
   untracked,
+  viewChild,
 } from '@angular/core';
 
 @Component({
@@ -43,6 +45,17 @@ export class TextareaAutocompleteComponent {
 
   readonly query = signal('');
   readonly suggestions = signal<AutocompleteSuggestion[]>([]);
+
+  private readonly taRef = viewChild<ElementRef<HTMLTextAreaElement>>('ta');
+
+  focus() {
+    const el = this.taRef()?.nativeElement;
+    if (!el) return;
+
+    el.focus();
+    const len = el.value?.length ?? 0;
+    el.setSelectionRange?.(len, len);
+  }
 
   readonly open = computed(() => {
     if (!this.focused()) return false;

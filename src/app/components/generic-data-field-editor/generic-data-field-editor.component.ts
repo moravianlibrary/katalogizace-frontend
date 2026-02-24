@@ -1,6 +1,14 @@
 import { INDICATOR_OPTIONS, UUID } from '@/app/models';
 import { RecordStateService } from '@/app/services/record-state.service';
-import { Component, computed, inject, input } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  input,
+  viewChild,
+} from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { InputDropdownComponent } from '../input-dropdown/input-dropdown.component';
 
@@ -16,6 +24,23 @@ export class GenericDataFieldEditorComponent {
   fieldId = input.required<UUID>();
 
   INDICATOR_OPTIONS = INDICATOR_OPTIONS;
+
+  private readonly firstSubfieldInput =
+    viewChild<ElementRef<HTMLInputElement>>('firstSubfieldInput');
+
+  constructor() {
+    effect(() => {
+      this.fieldId();
+
+      queueMicrotask(() => {
+        const el = this.firstSubfieldInput()?.nativeElement;
+        if (!el) return;
+        el.focus();
+        const len = el.value?.length ?? 0;
+        el.setSelectionRange?.(len, len);
+      });
+    });
+  }
 
   readonly field = computed(() => {
     const rec = this.rs.editableRecord();

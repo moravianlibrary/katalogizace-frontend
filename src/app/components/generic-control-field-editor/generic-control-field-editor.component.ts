@@ -1,6 +1,14 @@
 import { UUID } from '@/app/models';
 import { RecordStateService } from '@/app/services/record-state.service';
-import { Component, computed, inject, input } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  input,
+  viewChild,
+} from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
@@ -13,6 +21,22 @@ export class GenericControlFieldEditorComponent {
   private readonly rs = inject(RecordStateService);
 
   fieldId = input.required<UUID>();
+
+  private readonly firstInput = viewChild<ElementRef<HTMLInputElement>>('ctrl');
+
+  constructor() {
+    effect(() => {
+      this.fieldId();
+
+      queueMicrotask(() => {
+        const el = this.firstInput()?.nativeElement;
+        if (!el) return;
+        el.focus();
+        const len = el.value?.length ?? 0;
+        el.setSelectionRange?.(len, len);
+      });
+    });
+  }
 
   readonly field = computed(() => {
     const rec = this.rs.editableRecord();

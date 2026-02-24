@@ -2,7 +2,14 @@ import { InputAutocompleteComponent } from '@/app/components/input-autocomplete/
 import { InputDropdownComponent } from '@/app/components/input-dropdown/input-dropdown.component';
 import { INDICATOR_OPTIONS, UUID } from '@/app/models';
 import { RecordStateService } from '@/app/services/record-state.service';
-import { Component, computed, inject, input } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  viewChild,
+} from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 
 type SfCode245 = 'a' | 'b' | 'n' | 'p' | 'c';
@@ -23,6 +30,18 @@ export class Field245EditorComponent {
   fieldId = input.required<UUID>();
 
   INDICATOR_OPTIONS = INDICATOR_OPTIONS;
+
+  private readonly firstAutocomplete = viewChild(InputAutocompleteComponent);
+
+  constructor() {
+    effect(() => {
+      this.fieldId();
+
+      queueMicrotask(() => {
+        this.firstAutocomplete()?.focus();
+      });
+    });
+  }
 
   readonly field = computed(() => {
     const rec = this.rs.editableRecord();

@@ -1,7 +1,14 @@
 import { TextareaAutocompleteComponent } from '@/app/components/textarea-autocomplete/textarea-autocomplete.component';
 import { UUID } from '@/app/models';
 import { RecordStateService } from '@/app/services/record-state.service';
-import { Component, computed, inject, input } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  viewChild,
+} from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
@@ -14,6 +21,15 @@ export class Field500EditorComponent {
   private readonly rs = inject(RecordStateService);
 
   fieldId = input.required<UUID>();
+
+  private readonly firstTextarea = viewChild(TextareaAutocompleteComponent);
+
+  constructor() {
+    effect(() => {
+      this.fieldId();
+      queueMicrotask(() => this.firstTextarea()?.focus());
+    });
+  }
 
   readonly field = computed(() => {
     const rec = this.rs.editableRecord();
