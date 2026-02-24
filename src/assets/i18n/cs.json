@@ -189,10 +189,16 @@
     "first_indicator": "1. Indikátor",
     "second_indicator": "2. Indikátor",
     "undefined_indicator": "Nedefinováno",
-    "264": {
-      "a": "|a Místo vydání",
-      "b": "|b Jméno nakladatele",
-      "c": "|c Datum vydání"
+    "008": {
+      "date_entered": "Datum souboru (0-5)",
+      "type_of_date": "Typ data (6)",
+      "date1": "Datum 1 (7-10)",
+      "date2": "Datum 2 (11-14)",
+      "place": "Místo (15-17)",
+      "spec": "Specifikace dokumentu (18-34)",
+      "lang": "Jazyk (35-37)",
+      "modified": "Změněný záznam (38)",
+      "cataloging_source": "Zdroj katalogizace (39)"
     },
     "245": {
       "a": "|a Název",
@@ -200,6 +206,11 @@
       "c": "|c Odpovědnost",
       "n": "|n Číslo části",
       "p": "|p Název části"
+    },
+    "264": {
+      "a": "|a Místo vydání",
+      "b": "|b Jméno nakladatele",
+      "c": "|c Datum vydání"
     },
     "500": {
       "a": "|a Obecná poznámka"
