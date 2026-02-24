@@ -75,6 +75,17 @@ export const QUICK_ADD: QuickAddItem[] = [
     type: 'data' as FieldType,
   },
   {
+    tag: 650,
+    ind1: '',
+    ind2: '7',
+    subfields: [
+      { code: 'a', value: '' },
+      { code: '2', value: 'czenas' },
+    ],
+    repeatable: true,
+    type: 'data' as FieldType,
+  },
+  {
     tag: 651,
     ind1: '',
     ind2: '7',
