@@ -48,19 +48,18 @@ export class InputAutocompleteComponent {
 
   private readonly inpRef = viewChild<ElementRef<HTMLInputElement>>('inp');
 
-  focus() {
-    const el = this.inpRef()?.nativeElement;
-    if (!el) return;
-
-    el.focus();
-    const len = el.value?.length ?? 0;
-    el.setSelectionRange?.(len, len);
-  }
+  readonly activeIndex = signal<number>(-1);
+  private readonly listRef = viewChild<ElementRef<HTMLDivElement>>('list');
 
   readonly open = computed(() => {
     if (!this.focused()) return false;
     if (this.disabled()) return false;
-    return this.suggestions().length > 0;
+
+    const has = this.suggestions().length > 0;
+    if (has && this.activeIndex() === -1) {
+      queueMicrotask(() => this.activeIndex.set(0));
+    }
+    return has;
   });
 
   private debounceTimer: number | null = null;
@@ -118,11 +117,42 @@ export class InputAutocompleteComponent {
     });
   }
 
+  private setActive(i: number) {
+    this.activeIndex.set(i);
+    this.scrollActiveIntoView();
+  }
+
+  private scrollActiveIntoView() {
+    queueMicrotask(() => {
+      const listEl = this.listRef()?.nativeElement;
+      if (!listEl) return;
+
+      const idx = this.activeIndex();
+      const item = listEl.querySelector<HTMLElement>(`[data-idx="${idx}"]`);
+      item?.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' });
+    });
+  }
+
+  private resetActive() {
+    this.activeIndex.set(-1);
+  }
+
   onFocus() {
     this.focused.set(true);
+    this.resetActive();
+
     if ((this.query() ?? '').trim().length >= this.minChars()) {
       this.query.update((x) => x);
     }
+  }
+
+  focus() {
+    const el = this.inpRef()?.nativeElement;
+    if (!el) return;
+
+    el.focus();
+    const len = el.value?.length ?? 0;
+    el.setSelectionRange?.(len, len);
   }
 
   onBlur() {
@@ -130,6 +160,7 @@ export class InputAutocompleteComponent {
       this.focused.set(false);
       this.suggestions.set([]);
       this.loading.set(false);
+      this.resetActive();
     }, 120);
   }
 
@@ -142,6 +173,7 @@ export class InputAutocompleteComponent {
   clear() {
     this.query.set('');
     this.suggestions.set([]);
+    this.resetActive();
     this.valueChange.emit('');
   }
 
@@ -150,5 +182,57 @@ export class InputAutocompleteComponent {
     this.query.set(s.value);
     this.valueChange.emit(s.value);
     this.suggestions.set([]);
+    this.resetActive();
+  }
+
+  onKeydown(e: KeyboardEvent) {
+    if (this.disabled()) return;
+
+    const hasList = this.suggestions().length > 0;
+    const idx = this.activeIndex();
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+
+      if (!hasList) {
+        this.focused.set(true);
+        this.query.update((x) => x);
+        return;
+      }
+
+      const next = Math.min(
+        idx < 0 ? 0 : idx + 1,
+        this.suggestions().length - 1,
+      );
+      this.setActive(next);
+      return;
+    }
+
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!hasList) return;
+
+      const next = Math.max(idx <= 0 ? 0 : idx - 1, 0);
+      this.setActive(next);
+      return;
+    }
+
+    if (e.key === 'Enter') {
+      if (!hasList) return;
+      if (idx < 0) return;
+
+      e.preventDefault();
+      const s = this.suggestions()[idx];
+      if (s) this.pick(s);
+      return;
+    }
+
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      this.suggestions.set([]);
+      this.loading.set(false);
+      this.resetActive();
+      return;
+    }
   }
 }

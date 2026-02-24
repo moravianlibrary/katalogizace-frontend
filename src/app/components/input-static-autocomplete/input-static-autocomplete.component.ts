@@ -3,9 +3,11 @@ import {
   Component,
   computed,
   effect,
+  ElementRef,
   input,
   output,
   signal,
+  viewChild,
 } from '@angular/core';
 
 export type TranslateDropdownItem = {
@@ -40,12 +42,8 @@ export class InputStaticAutocompleteComponent {
 
   private blurTimer: number | null = null;
 
-  constructor() {
-    effect(() => {
-      const v = this.value() ?? '';
-      if (!this.focused()) this.query.set(v);
-    });
-  }
+  readonly activeIndex = signal<number>(-1);
+  private readonly listRef = viewChild<ElementRef<HTMLDivElement>>('list');
 
   readonly filtered = computed(() => {
     const all = this.items() ?? [];
@@ -68,8 +66,40 @@ export class InputStaticAutocompleteComponent {
     if (!this.focused()) return false;
     if (this.disabled()) return false;
     if (this.hideDropdown()) return false;
-    return this.filtered().length > 0;
+
+    const has = this.filtered().length > 0;
+    if (has && this.activeIndex() === -1) {
+      queueMicrotask(() => this.activeIndex.set(0));
+    }
+    return has;
   });
+
+  constructor() {
+    effect(() => {
+      const v = this.value() ?? '';
+      if (!this.focused()) this.query.set(v);
+    });
+  }
+
+  private setActive(i: number) {
+    this.activeIndex.set(i);
+    this.scrollActiveIntoView();
+  }
+
+  private scrollActiveIntoView() {
+    queueMicrotask(() => {
+      const listEl = this.listRef()?.nativeElement;
+      if (!listEl) return;
+
+      const idx = this.activeIndex();
+      const item = listEl.querySelector<HTMLElement>(`[data-idx="${idx}"]`);
+      item?.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' });
+    });
+  }
+
+  private resetActive() {
+    this.activeIndex.set(-1);
+  }
 
   onFocus() {
     if (this.blurTimer) {
@@ -77,6 +107,7 @@ export class InputStaticAutocompleteComponent {
       this.blurTimer = null;
     }
     this.focused.set(true);
+    this.resetActive();
   }
 
   onBlur() {
@@ -85,6 +116,7 @@ export class InputStaticAutocompleteComponent {
     this.blurTimer = window.setTimeout(() => {
       this.focused.set(false);
       this.hideDropdown.set(false);
+      this.resetActive();
       this.blurTimer = null;
     }, 120);
   }
@@ -108,6 +140,7 @@ export class InputStaticAutocompleteComponent {
     }
     this.focused.set(true);
     this.hideDropdown.set(false);
+    this.resetActive();
 
     this.query.set('');
     this.valueChange.emit('');
@@ -124,9 +157,52 @@ export class InputStaticAutocompleteComponent {
     this.valueChange.emit(code);
 
     this.hideDropdown.set(true);
+    this.resetActive();
   }
 
-  isSelected(code: string): boolean {
-    return (this.value() ?? '') === code;
+  onKeydown(e: KeyboardEvent) {
+    if (this.disabled()) return;
+
+    const list = this.filtered();
+    const hasList = list.length > 0;
+    const idx = this.activeIndex();
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+
+      if (this.hideDropdown()) this.hideDropdown.set(false);
+
+      if (!hasList) return;
+
+      const next = Math.min(idx < 0 ? 0 : idx + 1, list.length - 1);
+      this.setActive(next);
+      return;
+    }
+
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!hasList) return;
+
+      const next = Math.max(idx <= 0 ? 0 : idx - 1, 0);
+      this.setActive(next);
+      return;
+    }
+
+    if (e.key === 'Enter') {
+      if (!hasList) return;
+      if (idx < 0) return;
+
+      e.preventDefault();
+      const it = list[idx];
+      if (it) this.pick(it.code);
+      return;
+    }
+
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      this.hideDropdown.set(true);
+      this.resetActive();
+      return;
+    }
   }
 }
