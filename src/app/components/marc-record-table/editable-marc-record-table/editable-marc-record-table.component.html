@@ -42,6 +42,15 @@
           cps.setMode('edit', { tag: cf.tag, fieldId: cf.fieldId });
           recordState.selectField(cf.fieldId)
         "
+        (click)="
+          cps.enterEdit({
+            kind: 'control',
+            fieldId: cf.fieldId,
+            tag: cf.tag,
+            value: cf.value,
+          });
+          recordState.selectField(cf.fieldId)
+        "
         appMarcRowControl
       ></tr>
     }
@@ -67,7 +76,14 @@
           [diffSide]="diffSide()"
           [editable]="true"
           (click)="
-            cps.setMode('edit', { tag: df.tag, fieldId: df.fieldId });
+            cps.enterEdit({
+              kind: 'data',
+              fieldId: df.fieldId,
+              tag: df.tag,
+              ind1: df.ind1,
+              ind2: df.ind2,
+              subfields: df.subfields,
+            });
             recordState.selectField(df.fieldId)
           "
           appMarcRowData

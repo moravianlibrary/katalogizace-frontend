@@ -35,6 +35,14 @@ export class ContextPanelHeaderComponent {
 
   canResetRecord = computed(() => !!this.store.extracted());
 
+  canResetField = computed(
+    () => this.cps.state().mode === 'edit' && !!this.cps.editSnapshot(),
+  );
+
+  onResetField() {
+    this.cps.requestEditReset();
+  }
+
   onBack() {
     this.cps.setMode('records');
   }

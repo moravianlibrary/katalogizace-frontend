@@ -1,5 +1,6 @@
+import { ContextPanelService } from '@/app/services/context-panel.service';
 import { RecordStateService } from '@/app/services/record-state.service';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, effect, inject, untracked } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { GenericControlFieldEditorComponent } from '../../generic-control-field-editor/generic-control-field-editor.component';
 import { GenericDataFieldEditorComponent } from '../../generic-data-field-editor/generic-data-field-editor.component';
@@ -24,8 +25,37 @@ import { Field500EditorComponent } from './field-500-editor/field-500-editor.com
 })
 export class ContextEditComponent {
   private readonly rs = inject(RecordStateService);
+  private readonly cps = inject(ContextPanelService);
 
   readonly selected = computed(() => this.rs.selectedField());
+
+  constructor() {
+    effect(() => {
+      this.cps.editResetNonce();
+      const snap = this.cps.editSnapshot();
+      if (!snap) return;
+
+      untracked(() => {
+        if (snap.kind === 'control') {
+          this.rs.applyEditSnapshot({
+            kind: 'control',
+            tag: snap.tag,
+            fieldId: snap.fieldId,
+            value: snap.value,
+          });
+        } else {
+          this.rs.applyEditSnapshot({
+            kind: 'data',
+            tag: snap.tag,
+            fieldId: snap.fieldId,
+            ind1: snap.ind1,
+            ind2: snap.ind2,
+            subfields: snap.subfields,
+          });
+        }
+      });
+    });
+  }
 
   readonly isControl = computed(() => {
     const f = this.selected();

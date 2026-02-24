@@ -1,6 +1,7 @@
 import {
   ApplyCandidateEvent,
   MarcCandidate,
+  MarcSubfield,
   PanelMode,
   PanelState,
   Step,
@@ -8,13 +9,29 @@ import {
 } from '@/app/models';
 import { Injectable, signal } from '@angular/core';
 
+export type EditSnapshot =
+  | { kind: 'control'; fieldId: UUID; tag: string; value: string }
+  | {
+      kind: 'data';
+      fieldId: UUID;
+      tag: string;
+      ind1: string;
+      ind2: string;
+      subfields: MarcSubfield[];
+    };
+
 @Injectable({ providedIn: 'root' })
 export class ContextPanelService {
   readonly state = signal<PanelState>({ mode: 'records' });
 
   readonly applyCandidate = signal<ApplyCandidateEvent | null>(null);
 
+  readonly editSnapshot = signal<EditSnapshot | null>(null);
+  readonly editResetNonce = signal(0);
+
   setMode(mode: PanelMode, partial: Partial<PanelState> = {}) {
+    const prev = this.state();
+
     const cleared: PanelState = {
       mode,
       tag: undefined,
@@ -25,6 +42,25 @@ export class ContextPanelService {
       selectedCandidateId: undefined,
     };
     this.state.set({ ...cleared, ...partial });
+
+    if (prev.mode === 'edit' && mode !== 'edit') {
+      this.editSnapshot.set(null);
+    }
+  }
+
+  enterEdit(snapshot: EditSnapshot) {
+    const clone =
+      typeof structuredClone === 'function'
+        ? structuredClone(snapshot)
+        : JSON.parse(JSON.stringify(snapshot));
+
+    this.editSnapshot.set(clone);
+    this.setMode('edit', { tag: snapshot.tag, fieldId: snapshot.fieldId });
+  }
+
+  requestEditReset() {
+    if (!this.editSnapshot()) return;
+    this.editResetNonce.update((x) => x + 1);
   }
 
   showRecords() {

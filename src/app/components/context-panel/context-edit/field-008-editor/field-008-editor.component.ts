@@ -9,7 +9,6 @@ import {
   inject,
   input,
   signal,
-  untracked,
   viewChildren,
 } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
@@ -129,17 +128,15 @@ export class Field008EditorComponent {
   readonly seg = signal<string[]>([]);
   private initialized = false;
 
+  private lastValue = '';
+
   constructor() {
     effect(() => {
-      const id = this.fieldId();
-      if (!id) return;
+      const f = this.field();
+      const v = f?.value ?? '';
 
-      const v = untracked(() => {
-        const rec = this.rs.editableRecord();
-        if (!rec) return '';
-        const cf = rec.control_fields.find((f) => f.fieldId === id);
-        return cf?.value ?? '';
-      });
+      if (v === this.lastValue) return;
+      this.lastValue = v;
 
       const next = this.slices.map((s) => v.slice(s.start, s.end) ?? '');
       this.seg.set(next);
@@ -163,8 +160,12 @@ export class Field008EditorComponent {
     next[i] = v;
     this.seg.set(next);
 
+    const composed = this.composeFixed(next);
+
+    this.lastValue = composed;
+
     this.rs.patchControlField(this.fieldId(), {
-      value: this.composeFixed(next),
+      value: composed,
     });
   }
 
@@ -180,6 +181,7 @@ export class Field008EditorComponent {
   private commitFixed40() {
     if (!this.initialized) return;
     const fixed = this.composeFixed(this.seg());
+    this.lastValue = fixed;
     this.rs.patchControlField(this.fieldId(), { value: fixed });
   }
 

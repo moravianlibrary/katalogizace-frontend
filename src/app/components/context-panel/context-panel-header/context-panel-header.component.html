@@ -65,6 +65,16 @@
       }
       @case ("edit") {
         <span class="text-md w-full font-medium">{{ headerTitle() }}</span>
+
+        <button
+          class="btn btn-m btn-error group"
+          [disabled]="!canResetField()"
+          (click)="onResetField()"
+          type="button"
+        >
+          {{ "buttons.reset" | translate }}
+        </button>
+
         <button class="btn btn-m btn-tertiary" (click)="onBack()">
           {{ "buttons.cancel" | translate }}
         </button>

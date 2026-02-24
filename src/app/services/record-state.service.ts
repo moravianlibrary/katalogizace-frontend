@@ -17,6 +17,7 @@ import {
   existingToEditableWithMeta,
   extractedToEditableWithMeta,
 } from '../utils/marc-transform';
+import { EditSnapshot } from './context-panel.service';
 
 @Injectable({ providedIn: 'root' })
 export class RecordStateService {
@@ -451,5 +452,36 @@ export class RecordStateService {
     nextFields[idx] = { ...f, subfields };
 
     this.editableRecord.set({ ...rec, data_fields: nextFields });
+  }
+
+  applyEditSnapshot(snap: EditSnapshot) {
+    const rec = this.editableRecord();
+    if (!rec) return;
+
+    if (snap.kind === 'control') {
+      const idx = rec.control_fields.findIndex(
+        (f) => f.fieldId === snap.fieldId,
+      );
+      if (idx < 0) return;
+
+      const next = [...rec.control_fields];
+      next[idx] = { ...next[idx], value: snap.value };
+
+      this.editableRecord.set({ ...rec, control_fields: next });
+      return;
+    }
+
+    const idx = rec.data_fields.findIndex((f) => f.fieldId === snap.fieldId);
+    if (idx < 0) return;
+
+    const next = [...rec.data_fields];
+    next[idx] = {
+      ...next[idx],
+      ind1: snap.ind1,
+      ind2: snap.ind2,
+      subfields: snap.subfields,
+    };
+
+    this.editableRecord.set({ ...rec, data_fields: next });
   }
 }
