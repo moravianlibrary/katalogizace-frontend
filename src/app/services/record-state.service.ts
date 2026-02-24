@@ -98,6 +98,22 @@ export class RecordStateService {
     this.selectedFieldId.set(fieldId);
   }
 
+  private insertSortedByTag<T extends { tag: string }>(arr: T[], item: T): T[] {
+    const next = [...arr];
+
+    const idx = next.findIndex(
+      (f) => (f.tag ?? '').localeCompare(item.tag ?? '') > 0,
+    );
+
+    if (idx === -1) {
+      next.push(item);
+    } else {
+      next.splice(idx, 0, item);
+    }
+
+    return next;
+  }
+
   // TODO rovno predvyplnit polia
   addFieldWithTag(
     tag: number,
@@ -112,33 +128,28 @@ export class RecordStateService {
     const fieldId = `manual-${crypto.randomUUID()}` as UUID;
 
     if (fieldType === 'control') {
-      const next = {
-        ...rec,
-        control_fields: [
-          {
-            fieldId,
-            tag: String(tag).padStart(3, '0'),
-            value: '',
-          },
-          ...rec.control_fields,
-        ],
+      const newField = {
+        fieldId,
+        tag: String(tag).padStart(3, '0'),
+        value: '',
       };
-      this.editableRecord.set(next);
+      this.editableRecord.set({
+        ...rec,
+        control_fields: this.insertSortedByTag(rec.control_fields, newField),
+      });
     } else {
-      const next = {
-        ...rec,
-        data_fields: [
-          {
-            fieldId,
-            tag: String(tag).padStart(3, '0'),
-            ind1: ind1,
-            ind2: ind2,
-            subfields: subfields,
-          },
-          ...rec.data_fields,
-        ],
+      const newField = {
+        fieldId,
+        tag: String(tag).padStart(3, '0'),
+        ind1: ind1,
+        ind2: ind2,
+        subfields: subfields,
       };
-      this.editableRecord.set(next);
+
+      this.editableRecord.set({
+        ...rec,
+        data_fields: this.insertSortedByTag(rec.data_fields, newField),
+      });
     }
 
     this.selectField(fieldId);
