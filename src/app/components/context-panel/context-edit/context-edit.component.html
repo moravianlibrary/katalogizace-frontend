@@ -1,6 +1,10 @@
 @if (selected(); as f) {
   @if (isControl()) {
-    <app-generic-control-field-editor [fieldId]="f.fieldId" />
+    @if (is008()) {
+      <app-field-008-editor [fieldId]="f.fieldId" />
+    } @else {
+      <app-generic-control-field-editor [fieldId]="f.fieldId" />
+    }
   } @else {
     @if (is264()) {
       <app-field-264-editor [fieldId]="f.fieldId" />
