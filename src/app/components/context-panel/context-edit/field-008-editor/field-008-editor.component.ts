@@ -14,6 +14,9 @@ import {
 } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 
+import { InputStaticAutocompleteComponent } from '@/app/components/input-static-autocomplete/input-static-autocomplete.component';
+import { MarcTranslateService } from '@/app/services/marc-translate.service';
+
 type SliceDef = {
   key: string;
   labelKey: string;
@@ -25,12 +28,26 @@ type SliceDef = {
 @Component({
   standalone: true,
   selector: 'app-field-008-editor',
-  imports: [TranslateModule],
+  imports: [TranslateModule, InputStaticAutocompleteComponent],
   templateUrl: './field-008-editor.component.html',
 })
 export class Field008EditorComponent {
   private readonly rs = inject(RecordStateService);
   private readonly destroyRef = inject(DestroyRef);
+
+  private readonly marcT = inject(MarcTranslateService);
+
+  readonly typeOfDateItems = computed(() =>
+    this.marcT.getMarcStaticValueItems('008.6'),
+  );
+
+  readonly placeItems = computed(() =>
+    this.marcT.getMarcStaticValueItems('008.15-17'),
+  );
+
+  readonly langItems = computed(() =>
+    this.marcT.getMarcStaticValueItems('008.35-37'),
+  );
 
   private readonly segInputs =
     viewChildren<ElementRef<HTMLInputElement>>('segInput');
