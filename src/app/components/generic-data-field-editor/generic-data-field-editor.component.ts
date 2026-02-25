@@ -10,7 +10,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
-import { InputDropdownComponent } from '../input-dropdown/input-dropdown.component';
+import { InputDropdownComponent } from '../inputs/input-dropdown/input-dropdown.component';
 
 @Component({
   standalone: true,

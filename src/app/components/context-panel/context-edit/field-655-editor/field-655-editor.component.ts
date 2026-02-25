@@ -1,5 +1,5 @@
-import { InputAutocompleteDictionaryComponent } from '@/app/components/input-autocomplete-dictionary/input-autocomplete-dictionary.component';
-import { InputDropdownComponent } from '@/app/components/input-dropdown/input-dropdown.component';
+import { InputAutocompleteDictionaryComponent } from '@/app/components/inputs/input-autocomplete-dictionary/input-autocomplete-dictionary.component';
+import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
 import { AutocompletDictionaryResponse, UUID } from '@/app/models';
 import {
   DropdownOption,

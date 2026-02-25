@@ -1,5 +1,5 @@
-import { InputAutocompleteComponent } from '@/app/components/input-autocomplete/input-autocomplete.component';
-import { InputDropdownComponent } from '@/app/components/input-dropdown/input-dropdown.component';
+import { InputAutocompleteComponent } from '@/app/components/inputs/input-autocomplete/input-autocomplete.component';
+import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
 import { INDICATOR_OPTIONS, UUID } from '@/app/models';
 import { RecordStateService } from '@/app/services/record-state.service';
 import {
