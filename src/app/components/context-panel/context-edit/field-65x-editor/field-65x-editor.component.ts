@@ -20,19 +20,21 @@ import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   standalone: true,
-  selector: 'app-field-651-editor',
+  selector: 'app-field-65x-editor',
   imports: [
     CommonModule,
     TranslateModule,
     InputDropdownComponent,
     InputAutocompleteDictionaryComponent,
   ],
-  templateUrl: './field-651-editor.component.html',
+  templateUrl: './field-65x-editor.component.html',
 })
-export class Field651EditorComponent {
+export class Field65xEditorComponent {
   private readonly rs = inject(RecordStateService);
 
   fieldId = input.required<UUID>();
+
+  fieldType = input.required<'df_650' | 'df_651' | 'df_655'>();
 
   INDICATOR_OPTIONS = INDICATOR_OPTIONS;
 

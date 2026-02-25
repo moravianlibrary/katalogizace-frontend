@@ -13,11 +13,11 @@
     } @else if (is500()) {
       <app-field-500-editor [fieldId]="f.fieldId" />
     } @else if (is650()) {
-      <app-field-650-editor [fieldId]="f.fieldId" />
+      <app-field-65x-editor [fieldId]="f.fieldId" [fieldType]="'df_650'" />
     } @else if (is651()) {
-      <app-field-651-editor [fieldId]="f.fieldId" />
+      <app-field-65x-editor [fieldId]="f.fieldId" [fieldType]="'df_651'" />
     } @else if (is655()) {
-      <app-field-655-editor [fieldId]="f.fieldId" />
+      <app-field-65x-editor [fieldId]="f.fieldId" [fieldType]="'df_655'" />
     } @else {
       <app-generic-data-field-editor [fieldId]="f.fieldId" />
     }

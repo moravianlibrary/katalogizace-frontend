@@ -8,9 +8,7 @@ import { Field008EditorComponent } from './field-008-editor/field-008-editor.com
 import { Field245EditorComponent } from './field-245-editor/field-245-editor.component';
 import { Field264EditorComponent } from './field-264-editor/field-264-editor.component';
 import { Field500EditorComponent } from './field-500-editor/field-500-editor.component';
-import { Field650EditorComponent } from './field-650-editor/field-650-editor.component';
-import { Field651EditorComponent } from './field-651-editor/field-651-editor.component';
-import { Field655EditorComponent } from './field-655-editor/field-655-editor.component';
+import { Field65xEditorComponent } from './field-65x-editor/field-65x-editor.component';
 
 @Component({
   standalone: true,
@@ -23,9 +21,7 @@ import { Field655EditorComponent } from './field-655-editor/field-655-editor.com
     Field245EditorComponent,
     Field500EditorComponent,
     Field008EditorComponent,
-    Field650EditorComponent,
-    Field651EditorComponent,
-    Field655EditorComponent,
+    Field65xEditorComponent,
   ],
   templateUrl: './context-edit.component.html',
 })
