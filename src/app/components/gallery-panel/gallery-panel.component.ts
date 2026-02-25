@@ -16,16 +16,16 @@ import { ImageThumbnailsComponent } from './thumbnails/thumbnails.component';
 
 @Component({
   standalone: true,
-  selector: 'app-gallery',
+  selector: 'app-gallery-panel',
   imports: [
     ImageLargePreviewComponent,
     ImageThumbnailsComponent,
     GalleryHeaderComponent,
     TranslateModule,
   ],
-  templateUrl: './gallery.component.html',
+  templateUrl: './gallery-panel.component.html',
 })
-export class GalleryComponent {
+export class GalleryPanelComponent {
   private bookService = inject(BooksService);
   private translate = inject(TranslateService);
 

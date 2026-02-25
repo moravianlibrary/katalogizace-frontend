@@ -9,14 +9,14 @@ import { MarcDiffService } from '../../services/marc-diff.service';
 import { ToastService } from '../../services/toast.service';
 import { RecordStore } from '../../stores/record.store';
 import { ContextPanelComponent } from '../context-panel/context-panel.component';
-import { GalleryComponent } from '../gallery/gallery.component';
+import { GalleryPanelComponent } from '../gallery-panel/gallery-panel.component';
 import { MainPanelComponent } from '../main-panel/main-panel.component';
 
 @Component({
   standalone: true,
   selector: 'app-book-detail',
   providers: [RecordStore, MarcDiffService],
-  imports: [GalleryComponent, MainPanelComponent, ContextPanelComponent],
+  imports: [GalleryPanelComponent, MainPanelComponent, ContextPanelComponent],
   templateUrl: 'book-detail.component.html',
 })
 export class BookDetailComponent {
