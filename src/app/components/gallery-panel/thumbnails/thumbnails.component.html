@@ -9,6 +9,7 @@
         @for (it of items(); track it.id) {
           <button
             class="group h-full shrink-0 hover:cursor-pointer"
+            [class.z-7]="selectedId() === it.id && !it.loading"
             (click)="onPick(it.id)"
             type="button"
           >
@@ -38,8 +39,10 @@
                 [class.!border-primary-default]="
                   selectedId() === it.id && !it.loading
                 "
-                [class.group-hover:border-additionally-1]="
+                [ngClass]="
                   !it.loading && selectedId() !== it.id
+                    ? 'group-hover:border-additionally-1 group-hover:shadow-m group-hover:z-6'
+                    : ''
                 "
               ></div>
             </div>
@@ -64,6 +67,7 @@
         @for (it of items(); track it.id) {
           <button
             class="group w-full hover:cursor-pointer"
+            [class.z-7]="selectedId() === it.id && !it.loading"
             (click)="onPick(it.id)"
             type="button"
           >
@@ -90,8 +94,10 @@
                 [class.group-hover:border-additionally-1]="
                   !it.loading && selectedId() !== it.id
                 "
-                [class.!border-primary-default]="
-                  selectedId() === it.id && !it.loading
+                [ngClass]="
+                  !it.loading && selectedId() !== it.id
+                    ? 'group-hover:border-additionally-1 group-hover:shadow-m group-hover:z-6'
+                    : ''
                 "
               ></div>
             </div>
