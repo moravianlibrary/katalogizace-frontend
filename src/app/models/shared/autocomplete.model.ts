@@ -11,3 +11,8 @@ export type AutocompleteResponse = {
   subfield: string;
   suggestions: AutocompleteSuggestion[];
 };
+
+export type AutocompletDictionaryResponse = {
+  '7': string | null;
+  a: string;
+};
