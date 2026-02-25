@@ -1,4 +1,5 @@
 import {
+  AutocompletAuthorityResponse,
   AutocompletDictionaryResponse,
   AutocompleteResponse,
   CatalogueBase,
@@ -67,6 +68,19 @@ export class CatalogueService {
 
     return this.http.get<AutocompletDictionaryResponse[]>(
       `${this.apiBaseUrl}/catalogue/providers/anakon/autocomplete/dictionary`,
+      { params },
+    );
+  }
+
+  autocompleteAnakonAuthority(opts: { query: string; limit?: number }) {
+    const { query, limit = 20 } = opts;
+
+    let params = new HttpParams()
+      .set('query', query)
+      .set('limit', String(limit));
+
+    return this.http.get<AutocompletAuthorityResponse[]>(
+      `${this.apiBaseUrl}/catalogue/providers/anakon/autocomplete/authority-names`,
       { params },
     );
   }
