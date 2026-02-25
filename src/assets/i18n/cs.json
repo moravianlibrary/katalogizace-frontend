@@ -214,6 +214,11 @@
     },
     "500": {
       "a": "|a Obecná poznámka"
+    },
+    "650": {
+      "a": "|a Hodnota",
+      "2": "|2 Slovník",
+      "7": "|7 ID"
     }
   },
   "marcData": {
