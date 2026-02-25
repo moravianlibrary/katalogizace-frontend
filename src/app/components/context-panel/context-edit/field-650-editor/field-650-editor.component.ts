@@ -7,7 +7,15 @@ import {
 } from '@/app/models/shared/dropdown.model';
 import { RecordStateService } from '@/app/services/record-state.service';
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, input } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  untracked,
+  viewChild,
+} from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
@@ -27,6 +35,23 @@ export class Field650EditorComponent {
   fieldId = input.required<UUID>();
 
   INDICATOR_OPTIONS = INDICATOR_OPTIONS;
+
+  private readonly firstAutocomplete = viewChild(
+    InputAutocompleteDictionaryComponent,
+  );
+
+  constructor() {
+    effect(() => {
+      const id = this.fieldId();
+      const f = this.field();
+      if (!id || !f) return;
+
+      const isLocked = untracked(() => this.locked());
+      if (isLocked) return;
+
+      queueMicrotask(() => this.firstAutocomplete()?.focus());
+    });
+  }
 
   readonly DICT_OPTIONS: DropdownOption[] = [
     { value: 'czenas', label: 'czenas' },
