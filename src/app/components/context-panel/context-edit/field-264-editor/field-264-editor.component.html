@@ -4,9 +4,7 @@
       class="border-light flex items-center justify-between gap-4 border-b px-4 pt-4 pb-6"
     >
       <div class="w-full">
-        <label
-          class="text-light text-sm-tight disabled:text-disable mb-2 block font-medium"
-        >
+        <label class="text-light text-sm-tight mb-2 block font-medium">
           {{ "field_edit.first_indicator" | translate }}
         </label>
 
@@ -73,7 +71,7 @@
           class="border-tertiary-default focus-within:border-primary-default bg-main-base inline-flex w-full overflow-hidden rounded-lg border"
         >
           <input
-            class="text-secondary text-md w-full bg-transparent py-3 pl-4 font-medium outline-none"
+            class="w-full bg-transparent py-3 pl-4 outline-none"
             #year
             [value]="getSubfield('c')"
             (input)="setSubfield('c', year.value)"
