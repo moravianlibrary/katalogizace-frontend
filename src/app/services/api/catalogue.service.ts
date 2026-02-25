@@ -1,4 +1,5 @@
 import {
+  AutocompletDictionaryResponse,
   AutocompleteResponse,
   CatalogueBase,
   ExistingMarcRecord,
@@ -46,6 +47,26 @@ export class CatalogueService {
 
     return this.http.get<AutocompleteResponse>(
       `${this.apiBaseUrl}/catalogue/providers/anakon/autocomplete`,
+      { params },
+    );
+  }
+
+  autocompleteAnakonDictionary(opts: {
+    query: string;
+    limit?: number;
+    dictionary: 'czenas' | 'eczenas';
+    field: 'df_650' | 'df_651' | 'df_655';
+  }) {
+    const { query, limit = 20, dictionary, field } = opts;
+
+    let params = new HttpParams()
+      .set('query', query)
+      .set('limit', String(limit))
+      .set('dictionary', dictionary)
+      .set('field', field);
+
+    return this.http.get<AutocompletDictionaryResponse[]>(
+      `${this.apiBaseUrl}/catalogue/providers/anakon/autocomplete/dictionary`,
       { params },
     );
   }
