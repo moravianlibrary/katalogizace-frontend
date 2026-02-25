@@ -8,6 +8,7 @@ import { Field008EditorComponent } from './field-008-editor/field-008-editor.com
 import { Field245EditorComponent } from './field-245-editor/field-245-editor.component';
 import { Field264EditorComponent } from './field-264-editor/field-264-editor.component';
 import { Field500EditorComponent } from './field-500-editor/field-500-editor.component';
+import { Field650EditorComponent } from './field-650-editor/field-650-editor.component';
 
 @Component({
   standalone: true,
@@ -20,6 +21,7 @@ import { Field500EditorComponent } from './field-500-editor/field-500-editor.com
     Field245EditorComponent,
     Field500EditorComponent,
     Field008EditorComponent,
+    Field650EditorComponent,
   ],
   templateUrl: './context-edit.component.html',
 })
@@ -66,4 +68,5 @@ export class ContextEditComponent {
   is245 = computed(() => this.selected()?.tag === '245');
   is264 = computed(() => this.selected()?.tag === '264');
   is500 = computed(() => this.selected()?.tag === '500');
+  is650 = computed(() => this.selected()?.tag === '650');
 }
