@@ -16,3 +16,9 @@ export type AutocompletDictionaryResponse = {
   '7': string | null;
   a: string;
 };
+
+export type AutocompletAuthorityResponse = {
+  '7': string;
+  a: string;
+  d: string | null;
+};
