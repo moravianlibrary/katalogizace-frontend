@@ -6,7 +6,9 @@
       <app-generic-control-field-editor [fieldId]="f.fieldId" />
     }
   } @else {
-    @if (is264()) {
+    @if (is100()) {
+      <app-field-authority-editor [fieldId]="f.fieldId" />
+    } @else if (is264()) {
       <app-field-264-editor [fieldId]="f.fieldId" />
     } @else if (is245()) {
       <app-field-245-editor [fieldId]="f.fieldId" />
@@ -18,6 +20,8 @@
       <app-field-65x-editor [fieldId]="f.fieldId" [fieldType]="'df_651'" />
     } @else if (is655()) {
       <app-field-65x-editor [fieldId]="f.fieldId" [fieldType]="'df_655'" />
+    } @else if (is700()) {
+      <app-field-authority-editor [fieldId]="f.fieldId" />
     } @else {
       <app-generic-data-field-editor [fieldId]="f.fieldId" />
     }

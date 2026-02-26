@@ -9,6 +9,7 @@ import { Field245EditorComponent } from './field-245-editor/field-245-editor.com
 import { Field264EditorComponent } from './field-264-editor/field-264-editor.component';
 import { Field500EditorComponent } from './field-500-editor/field-500-editor.component';
 import { Field65xEditorComponent } from './field-65x-editor/field-65x-editor.component';
+import { FieldAuthorityEditorComponent } from './field-authority-editor/field-authority-editor.component';
 
 @Component({
   standalone: true,
@@ -22,6 +23,7 @@ import { Field65xEditorComponent } from './field-65x-editor/field-65x-editor.com
     Field500EditorComponent,
     Field008EditorComponent,
     Field65xEditorComponent,
+    FieldAuthorityEditorComponent,
   ],
   templateUrl: './context-edit.component.html',
 })
@@ -65,10 +67,12 @@ export class ContextEditComponent {
   });
 
   is008 = computed(() => this.selected()?.tag === '008');
+  is100 = computed(() => this.selected()?.tag === '100');
   is245 = computed(() => this.selected()?.tag === '245');
   is264 = computed(() => this.selected()?.tag === '264');
   is500 = computed(() => this.selected()?.tag === '500');
   is650 = computed(() => this.selected()?.tag === '650');
   is651 = computed(() => this.selected()?.tag === '651');
   is655 = computed(() => this.selected()?.tag === '655');
+  is700 = computed(() => this.selected()?.tag === '700');
 }
