@@ -200,6 +200,12 @@
       "modified": "Změněný záznam (38)",
       "cataloging_source": "Zdroj katalogizace (39)"
     },
+    "100": {
+      "a": "|a Jméno",
+      "d": "|d Datum",
+      "7": "|7 Číslo autority",
+      "4": "|4 Role"
+    },
     "245": {
       "a": "|a Název",
       "b": "|b Vedlejší název",
