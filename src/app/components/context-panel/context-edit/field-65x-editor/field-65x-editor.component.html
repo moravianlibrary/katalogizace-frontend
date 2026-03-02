@@ -10,7 +10,7 @@
 
         <app-input-dropdown
           [value]="field()?.ind1 ?? ''"
-          [options]="INDICATOR_OPTIONS"
+          [options]="ind1Options()"
           (valueChange)="setInd(1, $event)"
         />
       </div>
@@ -22,7 +22,7 @@
 
         <app-input-dropdown
           [value]="field()?.ind2 ?? ''"
-          [options]="INDICATOR_OPTIONS"
+          [options]="ind2Options()"
           (valueChange)="setInd(2, $event)"
         />
       </div>

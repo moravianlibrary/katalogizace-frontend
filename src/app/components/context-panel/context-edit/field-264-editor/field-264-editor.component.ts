@@ -1,6 +1,6 @@
 import { InputAutocompleteComponent } from '@/app/components/inputs/input-autocomplete/input-autocomplete.component';
 import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
-import { INDICATOR_OPTIONS, UUID } from '@/app/models';
+import { getIndicators, UUID } from '@/app/models';
 import { RecordStateService } from '@/app/services/record-state.service';
 import {
   Component,
@@ -27,7 +27,10 @@ export class Field264EditorComponent {
 
   fieldId = input.required<UUID>();
 
-  readonly INDICATOR_OPTIONS = INDICATOR_OPTIONS;
+  readonly indicators = computed(() => getIndicators('264'));
+
+  readonly ind1Options = computed(() => this.indicators().ind1);
+  readonly ind2Options = computed(() => this.indicators().ind2);
 
   private readonly firstAutocomplete = viewChild(InputAutocompleteComponent);
 

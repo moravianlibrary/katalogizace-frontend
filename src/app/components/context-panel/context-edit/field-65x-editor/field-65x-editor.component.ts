@@ -3,7 +3,7 @@ import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/i
 import { AutocompletDictionaryResponse, UUID } from '@/app/models';
 import {
   DropdownOption,
-  INDICATOR_OPTIONS,
+  getIndicators,
 } from '@/app/models/shared/dropdown.model';
 import { RecordStateService } from '@/app/services/record-state.service';
 import { CommonModule } from '@angular/common';
@@ -36,7 +36,20 @@ export class Field65xEditorComponent {
 
   fieldType = input.required<'df_650' | 'df_651' | 'df_655'>();
 
-  INDICATOR_OPTIONS = INDICATOR_OPTIONS;
+  readonly tag = computed(() => {
+    switch (this.fieldType()) {
+      case 'df_651':
+        return '651';
+      case 'df_655':
+        return '655';
+      default:
+        return '650';
+    }
+  });
+
+  readonly indicators = computed(() => getIndicators(this.tag()));
+  readonly ind1Options = computed(() => this.indicators().ind1);
+  readonly ind2Options = computed(() => this.indicators().ind2);
 
   private readonly firstAutocomplete = viewChild(
     InputAutocompleteDictionaryComponent,

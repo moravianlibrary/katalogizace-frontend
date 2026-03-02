@@ -3,7 +3,7 @@ import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/i
 import { InputStaticAutocompleteComponent } from '@/app/components/inputs/input-static-autocomplete/input-static-autocomplete.component';
 import {
   AutocompletAuthorityResponse,
-  INDICATOR_OPTIONS,
+  getIndicators,
   UUID,
 } from '@/app/models';
 import { MarcTranslateService } from '@/app/services/marc-translate.service';
@@ -35,7 +35,10 @@ export class FieldAuthorityEditorComponent {
 
   fieldId = input.required<UUID>();
 
-  INDICATOR_OPTIONS = INDICATOR_OPTIONS;
+  readonly indicators = computed(() => getIndicators(this.field()?.tag!));
+
+  readonly ind1Options = computed(() => this.indicators().ind1);
+  readonly ind2Options = computed(() => this.indicators().ind2);
 
   private readonly firstAutocomplete = viewChild(
     InputAutocompleteAuthorityComponent,
