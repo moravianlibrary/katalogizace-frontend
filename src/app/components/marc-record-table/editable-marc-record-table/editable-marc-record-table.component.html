@@ -9,12 +9,16 @@
   >
     @if (recordState.editableRecord()?.leader) {
       <tr
-        class="border-light border-b"
-        [ngClass]="
+        class="border-light border-t"
+        [ngClass]="[
+          recordState.editableRecord()?.control_fields?.length! > 0 ||
+          recordState.editableRecord()?.data_fields?.length! > 0
+            ? 'border-b'
+            : '',
           this.ds.enabledByUser() && this.recordState.viewMode() === 'table'
             ? 'opacity-60'
-            : ''
-        "
+            : '',
+        ]"
         [leader]="recordState.editableRecord()?.leader!"
         appMarcRowLeader
       ></tr>
@@ -27,9 +31,7 @@
       <tr
         class="border-light group cursor-pointer border-b"
         [ngClass]="[
-          $index === 0 && !recordState.editableRecord()?.leader
-            ? 'border-t-[0.5px]'
-            : '',
+          recordState.editableRecord()?.leader! === '' ? 'border-t' : '',
           this.ds.enabledByUser() &&
           !isDiffableTag015to830(cf.tag) &&
           this.recordState.viewMode() === 'table'
@@ -60,10 +62,9 @@
         <tr
           class="border-light group cursor-pointer border-b"
           [ngClass]="[
-            $index === 0 &&
-            recordState.editableRecord()?.control_fields?.length === 0 &&
-            !recordState.editableRecord()?.leader
-              ? 'border-t-[0.5px]'
+            recordState.editableRecord()?.leader! === '' &&
+            recordState.editableRecord()?.control_fields?.length! === 0
+              ? 'border-t'
               : '',
             this.ds.enabledByUser() &&
             !isDiffableTag015to830(df.tag) &&
