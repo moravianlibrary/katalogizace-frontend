@@ -126,7 +126,11 @@
     icon-primary-default
     group-hover:icon-primary-hover
     group-active:icon-primary-pressed
-    group-disabled:icon-primary-disable;
+    group-disabled:icon-primary-disable
+
+    transition-colors
+    duration-150
+    ease-in-out;
 }
 
 /* prettier-ignore */
@@ -135,7 +139,11 @@
     icon-secondary-default
     group-hover:icon-secondary-hover
     group-active:icon-secondary-pressed
-    group-disabled:icon-secondary-disable;
+    group-disabled:icon-secondary-disable
+
+    transition-colors
+    duration-150
+    ease-in-out;
 }
 
 /* prettier-ignore */
@@ -144,7 +152,11 @@
     icon-tertiary-default
     group-hover:icon-tertiary-hover
     group-active:icon-tertiary-pressed
-    group-disabled:icon-tertiary-disable;
+    group-disabled:icon-tertiary-disable
+
+    transition-colors
+    duration-150
+    ease-in-out;
 }
 
 /* prettier-ignore */
@@ -153,7 +165,11 @@
     icon-error
     group-hover:icon-error-hover
     group-active:icon-error-pressed
-    group-disabled:icon-error-disabled;
+    group-disabled:icon-error-disabled
+
+    transition-colors
+    duration-150
+    ease-in-out;
 }
 
 /* ========== TABS ========== */
