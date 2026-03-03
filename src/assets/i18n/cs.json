@@ -677,5 +677,10 @@
         "wst": "Autor doplňkového textu"
       }
     }
+  },
+  "batches": {
+    "edit": "Úprava skupiny",
+    "title": "Název",
+    "subtitle": "Poznámka (nepovinné)"
   }
 }
