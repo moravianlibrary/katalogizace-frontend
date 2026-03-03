@@ -59,7 +59,8 @@
     "overview": "Přehled",
     "mass_edit": "Hromadná úprava",
     "reset": "Reset",
-    "cancel": "Zrušit"
+    "cancel": "Zrušit",
+    "candidate_selection": "Výběr kandidáta"
   },
   "messages": {
     "success": {
@@ -185,7 +186,7 @@
   },
   "field_edit": {
     "value": "Hodnota",
-    "no_field_selected": "Nie je vybrané žiadne pole.",
+    "no_field_selected": "Není vybráno žádné pole.",
     "first_indicator": "1. Indikátor",
     "second_indicator": "2. Indikátor",
     "undefined_indicator": "Nedefinováno",
