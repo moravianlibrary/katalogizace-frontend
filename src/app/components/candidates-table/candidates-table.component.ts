@@ -29,7 +29,6 @@ export class CandidatesTableComponent {
   private translate = inject(TranslateService);
   private store = inject(RecordStore);
 
-  title = input.required<string>();
   candidates = input.required<MarcCandidate[]>();
 
   selectedCandidateId = input<UUID | null>(null);

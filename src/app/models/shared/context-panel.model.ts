@@ -2,7 +2,12 @@ import { MarcCandidate } from '../books/marc.dto';
 import { Step } from '../books/provenance.dto';
 import { UUID } from './id.model';
 
-export type PanelMode = 'records' | 'candidates' | 'provenance' | 'edit';
+export type PanelMode =
+  | 'records'
+  | 'candidates'
+  | 'provenance'
+  | 'edit'
+  | 'candidates_edit';
 
 export interface PanelState {
   mode: PanelMode;

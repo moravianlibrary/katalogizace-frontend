@@ -484,4 +484,32 @@ export class RecordStateService {
 
     this.editableRecord.set({ ...rec, data_fields: next });
   }
+
+  applyCandidateToEditableField(fieldId: UUID, candidate: MarcCandidate) {
+    const rec = this.editableRecord();
+    if (!rec) return;
+
+    const idx = (rec.data_fields ?? []).findIndex(
+      (f: any) => f.fieldId === fieldId,
+    );
+    if (idx < 0) return;
+
+    const rep = candidate.MARC_representation;
+
+    const updatedField = {
+      ind1: rep.ind1 ?? '',
+      ind2: rep.ind2 ?? '',
+      subfields: rep.subfields ?? [],
+      fieldId: rec.data_fields[idx].fieldId,
+      tag: rec.data_fields[idx].tag,
+    };
+
+    const nextDataFields = [...rec.data_fields];
+    nextDataFields[idx] = updatedField;
+
+    this.editableRecord.set({
+      ...rec,
+      data_fields: nextDataFields,
+    });
+  }
 }

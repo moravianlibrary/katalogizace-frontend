@@ -40,6 +40,10 @@ export class ContextPanelComponent {
             return this.translate.stream('context_panel.candidate_selection', {
               tag,
             });
+          case 'candidates_edit':
+            return this.translate.stream('context_panel.candidate_selection', {
+              tag,
+            });
           case 'edit':
             return this.translate.stream('context_panel.edit', { tag });
           default:

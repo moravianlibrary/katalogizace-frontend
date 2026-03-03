@@ -68,12 +68,13 @@ export class ContextPanelService {
   }
 
   showCandidates(
+    mode: PanelMode,
     tag: string,
     fieldId: UUID,
     candidates: MarcCandidate[],
     selectedCandidateId: UUID,
   ) {
-    this.setMode('candidates', {
+    this.setMode(mode, {
       tag,
       fieldId,
       candidates,
