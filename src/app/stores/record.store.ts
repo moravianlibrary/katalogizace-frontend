@@ -1,6 +1,7 @@
 import {
   ExistingMarcRecord,
   ExistingMarcRecordWithMeta,
+  ExtractedMarcDataField,
   ExtractedMarcRecord,
   LastEditedRecord,
   MarcCandidate,
@@ -27,6 +28,26 @@ export class RecordStore {
   readonly openedExtractedWithMeta = signal<ExistingMarcRecordWithMeta | null>(
     null,
   );
+
+  readonly candidatesByFieldId = computed<Record<UUID, MarcCandidate[]>>(() => {
+    const ex = this.extracted();
+    if (!ex) return {} as Record<UUID, MarcCandidate[]>;
+
+    const grouped: Record<string, MarcCandidate[]> = {};
+
+    for (const fields of Object.values(ex)) {
+      for (const f of fields as ExtractedMarcDataField[]) {
+        if (!f?.id) continue;
+        grouped[f.id] = f.candidates ?? [];
+      }
+    }
+
+    return grouped as Record<UUID, MarcCandidate[]>;
+  });
+
+  getCandidatesForField(fieldId: UUID): MarcCandidate[] {
+    return this.candidatesByFieldId()[fieldId] ?? [];
+  }
 
   setExtracted(rec: ExtractedMarcRecord | null) {
     this.extracted.set(rec);
