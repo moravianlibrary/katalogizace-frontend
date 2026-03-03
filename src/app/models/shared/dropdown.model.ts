@@ -65,6 +65,15 @@ export const FIELD_INDICATORS: Record<string, IndicatorConfig> = {
     ],
     ind2: [UNDEFINED, { value: '4', label: '4' }, { value: '7', label: '7' }],
   },
+  '651': {
+    ind1: [
+      UNDEFINED,
+      { value: '0', label: '0' },
+      { value: '1', label: '1' },
+      { value: '2', label: '2' },
+    ],
+    ind2: [UNDEFINED, { value: '4', label: '4' }, { value: '7', label: '7' }],
+  },
   '655': {
     ind1: [UNDEFINED, { value: '0', label: '0' }],
     ind2: [UNDEFINED, { value: '4', label: '4' }, { value: '7', label: '7' }],
