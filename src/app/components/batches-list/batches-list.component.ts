@@ -19,7 +19,7 @@ import {
   PaginatedBatchesResponseDto,
 } from '@/app/models';
 import { BreadcrumbsService } from '@/app/services/breadcrumbs.service';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BatchStateLabelPipe } from '../../pipes/batch-state-label.pipe';
 import { BatchesService } from '../../services/api/batches.service';
 import { ToastService } from '../../services/toast.service';
@@ -27,7 +27,13 @@ import { ToastService } from '../../services/toast.service';
 @Component({
   standalone: true,
   selector: 'app-batches-list',
-  imports: [DatePipe, RouterModule, NgClass, BatchStateLabelPipe],
+  imports: [
+    DatePipe,
+    RouterModule,
+    NgClass,
+    BatchStateLabelPipe,
+    TranslateModule,
+  ],
   templateUrl: './batches-list.component.html',
 })
 export class BatchesListComponent {
@@ -42,6 +48,9 @@ export class BatchesListComponent {
   loading = signal(false);
   error = signal<string | null>(null);
   data = signal<PaginatedBatchesResponseDto | null>(null);
+
+  edited = signal(false);
+  inputDisabled = signal(false);
 
   filterMine = signal(false);
 
@@ -250,10 +259,12 @@ export class BatchesListComponent {
 
   onEditNameInput(event: Event) {
     this.editName.set((event.target as HTMLInputElement).value);
+    this.edited.set(true);
   }
 
   onEditDescriptionInput(event: Event) {
     this.editDescription.set((event.target as HTMLInputElement).value);
+    this.edited.set(true);
   }
 
   openEdit(b: BatchDto, event: MouseEvent) {

@@ -2,8 +2,6 @@
   <div
     class="flex flex-col items-center justify-between gap-4 min-[44rem]:flex-row"
   >
-    <h1>Dávky</h1>
-
     <div
       class="flex flex-col items-center justify-between gap-2 min-[44rem]:flex-row"
     >
@@ -224,97 +222,92 @@
   }
 
   <dialog
-    class="m-auto w-full max-w-xl rounded-xl p-0 shadow-2xl backdrop:bg-black/60"
+    class="shadow-s m-auto w-full max-w-115 rounded-2xl bg-white backdrop:bg-black/30"
     #editDialog
   >
     @if (editingBatch()) {
-      <div class="w-full bg-white p-5">
-        <div class="mb-4 flex items-start justify-between gap-3">
-          <div>
-            <div class="text-lg font-semibold">Upravit dávku</div>
-            <div class="text-light text-sm">
-              ID: {{ editingBatch()!.batch_id }}
-            </div>
-          </div>
+      <div class="flex justify-between gap-3 px-4 pt-4 pb-3">
+        <span class="text-md text-base-color font-medium">
+          {{ "batches.edit" | translate }}
+        </span>
 
-          <button
-            class="hover:bg-main-light cursor-pointer rounded-lg p-2"
-            (click)="closeEdit()"
-            type="button"
-            aria-label="Zavřít"
-            title="Zavřít"
+        <button class="btn group" (click)="closeEdit()" type="button">
+          <svg
+            class="icon-tertiary"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
           >
-            <svg
-              class="icon-black"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-            >
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M5.46967 5.46967C5.76256 5.17678 6.23744 5.17678 6.53033 5.46967L12 10.9393L17.4697 5.46967C17.7626 5.17678 18.2374 5.17678 18.5303 5.46967C18.8232 5.76256 18.8232 6.23744 18.5303 6.53033L13.0607 12L18.5303 17.4697C18.8232 17.7626 18.8232 18.2374 18.5303 18.5303C18.2374 18.8232 17.7626 18.8232 17.4697 18.5303L12 13.0607L6.53033 18.5303C6.23744 18.8232 5.76256 18.8232 5.46967 18.5303C5.17678 18.2374 5.17678 17.7626 5.46967 17.4697L10.9393 12L5.46967 6.53033C5.17678 6.23744 5.17678 5.76256 5.46967 5.46967Z"
-              />
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M5.46967 5.46967C5.76256 5.17678 6.23744 5.17678 6.53033 5.46967L12 10.9393L17.4697 5.46967C17.7626 5.17678 18.2374 5.17678 18.5303 5.46967C18.8232 5.76256 18.8232 6.23744 18.5303 6.53033L13.0607 12L18.5303 17.4697C18.8232 17.7626 18.8232 18.2374 18.5303 18.5303C18.2374 18.8232 17.7626 18.8232 17.4697 18.5303L12 13.0607L6.53033 18.5303C6.23744 18.8232 5.76256 18.8232 5.46967 18.5303C5.17678 18.2374 5.17678 17.7626 5.46967 17.4697L10.9393 12L5.46967 6.53033C5.17678 6.23744 5.17678 5.76256 5.46967 5.46967Z"
-              />
-            </svg>
-          </button>
-        </div>
-
-        <div class="space-y-3">
-          <div>
-            <label class="text-sm font-medium">Název</label>
-            <input
-              class="border-tertiary-default mt-1 w-full rounded border px-3 py-2 text-sm"
-              [value]="editName()"
-              (input)="onEditNameInput($event)"
-              (keydown.enter)="!savingEdit() && saveEdit()"
-              placeholder="Název dávky"
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M5.46967 5.46967C5.76256 5.17678 6.23744 5.17678 6.53033 5.46967L12 10.9393L17.4697 5.46967C17.7626 5.17678 18.2374 5.17678 18.5303 5.46967C18.8232 5.76256 18.8232 6.23744 18.5303 6.53033L13.0607 12L18.5303 17.4697C18.8232 17.7626 18.8232 18.2374 18.5303 18.5303C18.2374 18.8232 17.7626 18.8232 17.4697 18.5303L12 13.0607L6.53033 18.5303C6.23744 18.8232 5.76256 18.8232 5.46967 18.5303C5.17678 18.2374 5.17678 17.7626 5.46967 17.4697L10.9393 12L5.46967 6.53033C5.17678 6.23744 5.17678 5.76256 5.46967 5.46967Z"
             />
-          </div>
-
-          <div>
-            <label class="text-sm font-medium">Popis</label>
-            <input
-              class="border-tertiary-default mt-1 w-full rounded border px-3 py-2 text-sm"
-              [value]="editDescription()"
-              (input)="onEditDescriptionInput($event)"
-              (keydown.enter)="!savingEdit() && saveEdit()"
-              placeholder="Popis (volitelné)"
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M5.46967 5.46967C5.76256 5.17678 6.23744 5.17678 6.53033 5.46967L12 10.9393L17.4697 5.46967C17.7626 5.17678 18.2374 5.17678 18.5303 5.46967C18.8232 5.76256 18.8232 6.23744 18.5303 6.53033L13.0607 12L18.5303 17.4697C18.8232 17.7626 18.8232 18.2374 18.5303 18.5303C18.2374 18.8232 17.7626 18.8232 17.4697 18.5303L12 13.0607L6.53033 18.5303C6.23744 18.8232 5.76256 18.8232 5.46967 18.5303C5.17678 18.2374 5.17678 17.7626 5.46967 17.4697L10.9393 12L5.46967 6.53033C5.17678 6.23744 5.17678 5.76256 5.46967 5.46967Z"
             />
-            <div class="text-light mt-1 text-xs">
-              Nechte prázdné pro smazání popisu.
-            </div>
-          </div>
+          </svg>
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-6 px-4 pb-6">
+        <div>
+          <label class="text-light text-sm-tight mb-2 block font-medium">
+            {{ "batches.title" | translate }}
+          </label>
+          <input
+            class="focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border bg-transparent py-3 pl-4 outline-none"
+            [ngClass]="
+              inputDisabled()
+                ? 'text-disable border-tertiary-disable cursor-not-allowed bg-gray-500/5'
+                : 'border-tertiary-default bg-main-base'
+            "
+            [value]="editName()"
+            (input)="onEditNameInput($event)"
+            (keydown.enter)="!savingEdit() && saveEdit()"
+          />
         </div>
 
-        <div class="mt-5 flex justify-end gap-2">
-          <button
-            class="border-tertiary-default cursor-pointer rounded-lg border px-3 py-2 text-sm"
-            [disabled]="savingEdit()"
-            (click)="closeEdit()"
-            type="button"
-          >
-            Zrušit
-          </button>
-
-          <button
-            class="bg-main-primary-default text-on-color hover:bg-main-primary-hover active:bg-main-primary-pressed disabled:bg-main-primary-disable disabled:text-btn-primary-disable cursor-pointer rounded-lg px-4 py-2 text-sm font-medium disabled:cursor-not-allowed"
-            [disabled]="savingEdit()"
-            (click)="saveEdit()"
-            type="button"
-          >
-            @if (savingEdit()) {
-              Ukládám…
-            } @else {
-              Uložit
-            }
-          </button>
+        <div>
+          <label class="text-light text-sm-tight mb-2 block font-medium">
+            {{ "batches.subtitle" | translate }}
+          </label>
+          <input
+            class="focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border bg-transparent py-3 pl-4 outline-none"
+            [ngClass]="
+              inputDisabled()
+                ? 'text-disable border-tertiary-disable cursor-not-allowed bg-gray-500/5'
+                : 'border-tertiary-default bg-main-base'
+            "
+            [value]="editDescription()"
+            (input)="onEditDescriptionInput($event)"
+            (keydown.enter)="!savingEdit() && saveEdit()"
+            cclass="focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border bg-transparent py-3 pl-4 outline-none"
+          />
         </div>
+      </div>
+
+      <div class="border-bright flex justify-center gap-3 border-t px-4 py-3">
+        <button
+          class="btn btn-m btn-tertiary"
+          [disabled]="savingEdit()"
+          (click)="closeEdit()"
+          type="button"
+        >
+          {{ "buttons.cancel" | translate }}
+        </button>
+
+        <button
+          class="btn btn-m btn-primary"
+          [disabled]="savingEdit() || !edited()"
+          (click)="saveEdit()"
+          type="button"
+        >
+          {{ "buttons.save" | translate }}
+        </button>
       </div>
     }
   </dialog>
