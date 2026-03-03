@@ -53,7 +53,7 @@ export class MarcRowDataComponent {
 
   onShowCandidates() {
     this.cps.showCandidates(
-      'edit',
+      'candidates',
       this.df().tag,
       this.df().fieldId!,
       this.df().candidates!,
