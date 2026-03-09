@@ -55,7 +55,7 @@ export class BatchesListComponent {
   filterMine = signal(false);
 
   page = signal<number>(1);
-  pageSize = signal<number>(20);
+  pageSize = signal<number>(100);
 
   totalPages = computed(() =>
     this.data()
@@ -86,10 +86,10 @@ export class BatchesListComponent {
       .pipe(takeUntilDestroyed())
       .subscribe(([_, qp]) => {
         const p = Number(qp.get('page') ?? '1');
-        const ps = Number(qp.get('page_size') ?? '20');
+        const ps = Number(qp.get('page_size') ?? '100');
 
         this.page.set(isNaN(p) || p < 1 ? 1 : p);
-        this.pageSize.set(isNaN(ps) || ps < 1 ? 20 : ps);
+        this.pageSize.set(isNaN(ps) || ps < 1 ? 100 : ps);
 
         const mine = qp.get('mine');
         if (mine === '1' || mine === 'true') this.filterMine.set(true);

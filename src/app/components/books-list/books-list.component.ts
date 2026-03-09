@@ -52,7 +52,7 @@ export class BooksListComponent {
   batch = signal<BatchDto | null>(null);
 
   page = signal<number>(1);
-  pageSize = signal<number>(20);
+  pageSize = signal<number>(100);
 
   totalPages = computed(() =>
     this.data()
@@ -69,9 +69,9 @@ export class BooksListComponent {
         this.batchId.set(bid);
 
         const p = Number(qp.get('page') ?? '1');
-        const ps = Number(qp.get('page_size') ?? '20');
+        const ps = Number(qp.get('page_size') ?? '100');
         this.page.set(isNaN(p) || p < 1 ? 1 : p);
-        this.pageSize.set(isNaN(ps) || ps < 1 ? 20 : ps);
+        this.pageSize.set(isNaN(ps) || ps < 1 ? 100 : ps);
 
         if (bid) {
           this.batchesService.getBatch(bid.toString()).subscribe({
