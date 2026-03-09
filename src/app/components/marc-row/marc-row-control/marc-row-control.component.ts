@@ -10,6 +10,8 @@ import { Component, inject, input } from '@angular/core';
 export class MarcRowControlComponent {
   private recordState = inject(RecordStateService);
 
+  rowClass = input<string>('');
+
   cf = input.required<{ tag: string; value: string; fieldId?: UUID }>();
   editable = input<boolean>(true);
 

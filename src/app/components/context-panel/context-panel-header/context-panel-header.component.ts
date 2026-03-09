@@ -47,6 +47,10 @@ export class ContextPanelHeaderComponent {
     const state = this.cps.state();
     const mode = state.mode === 'candidates_edit' ? 'edit' : 'records';
 
+    if (state.mode === 'edit') {
+      this.recordState.selectField('');
+    }
+
     this.cps.setMode(mode, { tag: state.tag, fieldId: state.fieldId });
   }
 

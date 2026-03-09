@@ -201,3 +201,97 @@
     duration-150
     ease-in-out;
 }
+
+.marc-cell {
+  @apply transition-[filter,border-color,background-color] duration-150;
+}
+
+.marc-cell-left,
+.marc-cell-right {
+  background: transparent;
+  @apply border-light;
+  border-top-width: 0.5px;
+  border-bottom-width: 0.5px;
+  border-top-style: solid;
+  border-bottom-style: solid;
+}
+
+.marc-cell-left {
+  border-left-width: 0;
+}
+
+.marc-cell-right {
+  border-right-width: 0;
+}
+
+tr.marc-row-hovered .marc-cell-left,
+tr.marc-row-hovered .marc-cell-right {
+  @apply border-bright;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+  border-top-style: solid;
+  border-bottom-style: solid;
+}
+
+tr.marc-row-hovered .marc-cell-left {
+  @apply border-bright;
+  border-left-width: 1px;
+  border-left-style: solid;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+tr.marc-row-hovered .marc-cell-right {
+  @apply border-bright;
+  border-right-width: 1px;
+  border-right-style: solid;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+tr.marc-row-hovered {
+  position: relative;
+  z-index: 10;
+  filter: drop-shadow(0 1px 6px rgb(15 23 42 / 0.08));
+}
+
+tr.marc-row-neighbor-above .marc-cell-left,
+tr.marc-row-neighbor-above .marc-cell-right {
+  border-bottom-color: transparent;
+}
+
+tr.marc-row-neighbor-below .marc-cell-left,
+tr.marc-row-neighbor-below .marc-cell-right {
+  border-top-color: transparent;
+}
+
+tr.marc-row-active .marc-cell-left,
+tr.marc-row-active .marc-cell-right {
+  @apply border-primary-default;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+  border-top-style: solid;
+  border-bottom-style: solid;
+}
+
+tr.marc-row-active .marc-cell-left {
+  @apply border-primary-default;
+  border-left-width: 1px;
+  border-left-style: solid;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+tr.marc-row-active .marc-cell-right {
+  @apply border-primary-default;
+  border-right-width: 1px;
+  border-right-style: solid;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+tr.marc-row-active {
+  position: relative;
+  z-index: 20;
+  filter: drop-shadow(0 1px 6px rgb(15 23 42 / 0.08));
+}

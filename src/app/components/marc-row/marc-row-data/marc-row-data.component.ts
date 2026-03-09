@@ -25,6 +25,7 @@ import {
   templateUrl: './marc-row-data.component.html',
 })
 export class MarcRowDataComponent {
+  rowClass = input<string>('');
   df = input.required<{
     fieldId?: UUID;
     tag: string;

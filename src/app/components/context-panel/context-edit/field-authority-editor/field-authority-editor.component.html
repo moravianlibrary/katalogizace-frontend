@@ -508,7 +508,7 @@
             </div>
           } @else if (detailError()) {
             <div class="text-error text-md p-2">{{ detailError() }}</div>
-          } @else {
+          } @else if (!loading()) {
             <div class="text-light text-md bg-gray-500/5 p-4">
               {{ "dialogs.choose_authority" | translate }}
             </div>

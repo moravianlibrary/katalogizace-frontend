@@ -1,25 +1,17 @@
-<table class="w-full table-fixed border-collapse">
+<table class="w-full table-fixed border-separate border-spacing-0">
   <colgroup>
     <col class="w-25" />
     <col />
   </colgroup>
 
-  <tbody
-    class="[&>tr:nth-child(even)]:bg-main-base [&>tr:nth-child(odd)]:bg-gray-500/5"
-  >
+  <tbody>
     @if (recordState.editableRecord()?.leader) {
       <tr
-        class="border-light border-t"
-        [ngClass]="[
-          recordState.editableRecord()?.control_fields?.length! > 0 ||
-          recordState.editableRecord()?.data_fields?.length! > 0
-            ? 'border-b'
-            : '',
-          this.ds.enabledByUser() && this.recordState.viewMode() === 'table'
-            ? 'opacity-60'
-            : '',
-        ]"
+        class="group"
+        [ngClass]="getLeaderRowClasses()"
         [leader]="recordState.editableRecord()?.leader!"
+        (mouseenter)="setHoveredRow('__leader')"
+        (mouseleave)="setHoveredRow(null)"
         appMarcRowLeader
       ></tr>
     }
@@ -29,21 +21,12 @@
       track cf.fieldId
     ) {
       <tr
-        class="border-light group cursor-pointer border-b"
-        [ngClass]="[
-          recordState.editableRecord()?.leader! === '' ? 'border-t' : '',
-          this.ds.enabledByUser() &&
-          !isDiffableTag015to830(cf.tag) &&
-          this.recordState.viewMode() === 'table'
-            ? 'opacity-60'
-            : '',
-        ]"
+        class="group cursor-pointer"
+        [ngClass]="getControlRowClasses(cf.fieldId, cf.tag)"
         [cf]="cf"
         [editable]="true"
-        (click)="
-          cps.setMode('edit', { tag: cf.tag, fieldId: cf.fieldId });
-          recordState.selectField(cf.fieldId)
-        "
+        (mouseenter)="setHoveredRow(cf.fieldId)"
+        (mouseleave)="setHoveredRow(null)"
         (click)="
           cps.enterEdit({
             kind: 'control',
@@ -60,22 +43,14 @@
     @for (df of recordState.editableRecord()?.data_fields; track df.fieldId) {
       @if (df.tag != "910") {
         <tr
-          class="border-light group cursor-pointer border-b"
-          [ngClass]="[
-            recordState.editableRecord()?.leader! === '' &&
-            recordState.editableRecord()?.control_fields?.length! === 0
-              ? 'border-t'
-              : '',
-            this.ds.enabledByUser() &&
-            !isDiffableTag015to830(df.tag) &&
-            this.recordState.viewMode() === 'table'
-              ? 'opacity-60'
-              : '',
-          ]"
+          class="group cursor-pointer"
+          [ngClass]="getDataRowClasses(df.fieldId, df.tag)"
           [df]="df"
           [diffIndex]="diffIndex()"
           [diffSide]="diffSide()"
           [editable]="true"
+          (mouseenter)="setHoveredRow(df.fieldId)"
+          (mouseleave)="setHoveredRow(null)"
           (click)="
             cps.enterEdit({
               kind: 'data',
