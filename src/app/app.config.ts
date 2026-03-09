@@ -36,7 +36,7 @@ export const appConfig: ApplicationConfig = {
     ),
     provideTranslateHttpLoader({
       prefix: './assets/i18n/',
-      suffix: '.json',
+      suffix: `.json?ts=${Date.now()}`,
     }),
 
     provideAppInitializer(() => {
