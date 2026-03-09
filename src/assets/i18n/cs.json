@@ -60,7 +60,9 @@
     "mass_edit": "Hromadná úprava",
     "reset": "Reset",
     "cancel": "Zrušit",
-    "candidate_selection": "Výběr kandidáta"
+    "candidate_selection": "Výběr kandidáta",
+    "take_authority": "Převzít autoritu",
+    "search": "Hledat"
   },
   "messages": {
     "success": {
@@ -205,7 +207,8 @@
       "a": "|a Jméno",
       "d": "|d Datum",
       "7": "|7 Číslo autority",
-      "4": "|4 Role"
+      "4": "|4 Role",
+      "search": "Hledat autoritu"
     },
     "245": {
       "a": "|a Název",
@@ -683,5 +686,13 @@
     "edit": "Úprava skupiny",
     "title": "Název",
     "subtitle": "Poznámka (nepovinné)"
+  },
+  "dialogs": {
+    "authority_search": "Vyhledávání autorit",
+    "choose_authority": "Vyberte autoritu.",
+    "no_authorities": "Pro zadané jméno nebyly nalezeny žádné autority.",
+    "type_authority": "Zadejte jméno autority, kterou chcete  vyhledat.",
+    "authorities_load_error": "Náčítání autorit sa nezdařilo.",
+    "record_load_error": "Náčítání záznamu sa nezdařilo."
   }
 }
