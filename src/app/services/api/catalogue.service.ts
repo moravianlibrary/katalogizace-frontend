@@ -10,6 +10,15 @@ import { inject, Injectable } from '@angular/core';
 import { map } from 'rxjs/operators';
 import { EnvironmentService } from '../environment.service';
 
+export interface SearchAuthoritiesResponse {
+  records: ExistingMarcRecord[];
+  total: number;
+  page: number;
+  limit: number;
+  has_next?: boolean;
+  has_prev?: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class CatalogueService {
   private http = inject(HttpClient);
@@ -81,6 +90,42 @@ export class CatalogueService {
 
     return this.http.get<AutocompletAuthorityResponse[]>(
       `${this.apiBaseUrl}/catalogue/providers/anakon/autocomplete/authority-names`,
+      { params },
+    );
+  }
+
+  searchAuthorities(opts: {
+    provider?: 'aut';
+    person_name: string;
+    backend?: 'z3950' | 'anakon';
+    field_100_a_minimal_similarity?: number | null;
+    page: number;
+    limit: number;
+  }) {
+    const {
+      provider = 'aut',
+      person_name,
+      backend = 'anakon',
+      field_100_a_minimal_similarity = null,
+      page,
+      limit,
+    } = opts;
+
+    let params = new HttpParams()
+      .set('person_name', person_name)
+      .set('backend', backend)
+      .set('page', String(page))
+      .set('limit', String(limit));
+
+    if (field_100_a_minimal_similarity != null) {
+      params = params.set(
+        'field_100_a_minimal_similarity',
+        String(field_100_a_minimal_similarity),
+      );
+    }
+
+    return this.http.get<SearchAuthoritiesResponse>(
+      `${this.apiBaseUrl}/catalogue/providers/${provider}/authorities:search`,
       { params },
     );
   }
