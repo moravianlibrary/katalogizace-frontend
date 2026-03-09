@@ -42,6 +42,38 @@
           (valueChange)="onPickTerm($event)"
           (picked)="applySuggestion($event)"
         ></app-input-autocomplete-authority>
+
+        <button
+          class="text-md text-btn-secondary-default hover:text-btn-secondary-hover active:text-btn-secondary-pressed disabled:text-btn-secondary-disable group mt-2 flex cursor-pointer gap-2 font-medium disabled:cursor-not-allowed"
+          (click)="onAuthoritySearch()"
+          type="button"
+        >
+          {{ "field_edit.100.search" | translate }}
+          <svg
+            class="icon-secondary"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M9.58366 1.04199C4.86623 1.04199 1.04199 4.86623 1.04199 9.58366C1.04199 14.3011 4.86623 18.1253 9.58366 18.1253C14.3011 18.1253 18.1253 14.3011 18.1253 9.58366C18.1253 4.86623 14.3011 1.04199 9.58366 1.04199ZM2.29199 9.58366C2.29199 5.55658 5.55658 2.29199 9.58366 2.29199C13.6107 2.29199 16.8753 5.55658 16.8753 9.58366C16.8753 13.6107 13.6107 16.8753 9.58366 16.8753C5.55658 16.8753 2.29199 13.6107 2.29199 9.58366Z"
+            />
+            <path
+              d="M17.1089 16.225C16.8649 15.981 16.4691 15.981 16.225 16.225C15.981 16.4691 15.981 16.8649 16.225 17.1089L17.8917 18.7756C18.1358 19.0197 18.5315 19.0197 18.7756 18.7756C19.0197 18.5315 19.0197 18.1358 18.7756 17.8917L17.1089 16.225Z"
+            />
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M9.58366 1.04199C4.86623 1.04199 1.04199 4.86623 1.04199 9.58366C1.04199 14.3011 4.86623 18.1253 9.58366 18.1253C14.3011 18.1253 18.1253 14.3011 18.1253 9.58366C18.1253 4.86623 14.3011 1.04199 9.58366 1.04199ZM2.29199 9.58366C2.29199 5.55658 5.55658 2.29199 9.58366 2.29199C13.6107 2.29199 16.8753 5.55658 16.8753 9.58366C16.8753 13.6107 13.6107 16.8753 9.58366 16.8753C5.55658 16.8753 2.29199 13.6107 2.29199 9.58366Z"
+            />
+            <path
+              d="M17.1089 16.225C16.8649 15.981 16.4691 15.981 16.225 16.225C15.981 16.4691 15.981 16.8649 16.225 17.1089L17.8917 18.7756C18.1358 19.0197 18.5315 19.0197 18.7756 18.7756C19.0197 18.5315 19.0197 18.1358 18.7756 17.8917L17.1089 16.225Z"
+            />
+          </svg>
+        </button>
       </div>
 
       <div>
@@ -63,6 +95,7 @@
             <button
               class="group flex items-center px-3"
               (click)="clearD()"
+              (mousedown)="$event.preventDefault()"
               type="button"
             >
               <svg
@@ -135,3 +168,458 @@
     </div>
   </div>
 </section>
+
+<dialog
+  class="shadow-s m-auto h-[calc(100vh-80px)] w-[calc(100vw-80px)] max-w-360 overflow-hidden rounded-2xl bg-white backdrop:bg-black/30"
+  #authorityDialog
+>
+  <div class="flex h-full min-h-0 flex-col">
+    <!-- top -->
+    <div
+      class="items center border-bright flex shrink-0 justify-between gap-3 border-b p-4"
+    >
+      <span class="text-base-color text-lg font-medium">
+        {{ "dialogs.authority_search" | translate }}
+      </span>
+
+      <button class="btn group" (click)="closeAuthorityDialog()" type="button">
+        <svg
+          class="icon-tertiary"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+        >
+          <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M5.46967 5.46967C5.76256 5.17678 6.23744 5.17678 6.53033 5.46967L12 10.9393L17.4697 5.46967C17.7626 5.17678 18.2374 5.17678 18.5303 5.46967C18.8232 5.76256 18.8232 6.23744 18.5303 6.53033L13.0607 12L18.5303 17.4697C18.8232 17.7626 18.8232 18.2374 18.5303 18.5303C18.2374 18.8232 17.7626 18.8232 17.4697 18.5303L12 13.0607L6.53033 18.5303C6.23744 18.8232 5.76256 18.8232 5.46967 18.5303C5.17678 18.2374 5.17678 17.7626 5.46967 17.4697L10.9393 12L5.46967 6.53033C5.17678 6.23744 5.17678 5.76256 5.46967 5.46967Z"
+          />
+          <path
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            d="M5.46967 5.46967C5.76256 5.17678 6.23744 5.17678 6.53033 5.46967L12 10.9393L17.4697 5.46967C17.7626 5.17678 18.2374 5.17678 18.5303 5.46967C18.8232 5.76256 18.8232 6.23744 18.5303 6.53033L13.0607 12L18.5303 17.4697C18.8232 17.7626 18.8232 18.2374 18.5303 18.5303C18.2374 18.8232 17.7626 18.8232 17.4697 18.5303L12 13.0607L6.53033 18.5303C6.23744 18.8232 5.76256 18.8232 5.46967 18.5303C5.17678 18.2374 5.17678 17.7626 5.46967 17.4697L10.9393 12L5.46967 6.53033C5.17678 6.23744 5.17678 5.76256 5.46967 5.46967Z"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <!-- center -->
+    <div class="grid min-h-0 flex-1 grid-cols-[1fr_1fr] overflow-hidden">
+      <div class="border-bright flex min-h-0 overflow-hidden border-r p-4">
+        <div class="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden">
+          <div class="flex shrink-0 gap-2">
+            <span
+              class="focus-within:border-primary-default border-tertiary-default bg-main-base inline-flex w-full items-center justify-between overflow-hidden rounded-lg border"
+            >
+              <input
+                class="w-full bg-transparent py-3 pl-4 outline-none"
+                #q
+                [value]="searchQuery()"
+                (input)="searchQuery.set(q.value)"
+                (keydown.enter)="search(1)"
+              />
+              @if (searchQuery().length && !loading()) {
+                <button
+                  class="group flex items-center px-3"
+                  (click)="clear()"
+                  (mousedown)="$event.preventDefault()"
+                  type="button"
+                >
+                  <svg
+                    class="icon-tertiary"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M3.64645 3.64645C3.84171 3.45118 4.15829 3.45118 4.35355 3.64645L8 7.29289L11.6464 3.64645C11.8417 3.45118 12.1583 3.45118 12.3536 3.64645C12.5488 3.84171 12.5488 4.15829 12.3536 4.35355L8.70711 8L12.3536 11.6464C12.5488 11.8417 12.5488 12.1583 12.3536 12.3536C12.1583 12.5488 11.8417 12.5488 11.6464 12.3536L8 8.70711L4.35355 12.3536C4.15829 12.5488 3.84171 12.5488 3.64645 12.3536C3.45118 12.1583 3.45118 11.8417 3.64645 11.6464L7.29289 8L3.64645 4.35355C3.45118 4.15829 3.45118 3.84171 3.64645 3.64645Z"
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M3.64645 3.64645C3.84171 3.45118 4.15829 3.45118 4.35355 3.64645L8 7.29289L11.6464 3.64645C11.8417 3.45118 12.1583 3.45118 12.3536 3.64645C12.5488 3.84171 12.5488 4.15829 12.3536 4.35355L8.70711 8L12.3536 11.6464C12.5488 11.8417 12.5488 12.1583 12.3536 12.3536C12.1583 12.5488 11.8417 12.5488 11.6464 12.3536L8 8.70711L4.35355 12.3536C4.15829 12.5488 3.84171 12.5488 3.64645 12.3536C3.45118 12.1583 3.45118 11.8417 3.64645 11.6464L7.29289 8L3.64645 4.35355C3.45118 4.15829 3.45118 3.84171 3.64645 3.64645Z"
+                    />
+                  </svg>
+                </button>
+              }
+            </span>
+
+            <button
+              class="btn btn-l btn-primary group shrink-0"
+              [disabled]="loading()"
+              (click)="search(1)"
+              type="button"
+            >
+              {{ "buttons.search" | translate }}
+              <svg
+                class="icon-primary"
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M9.58268 1.04163C4.86525 1.04163 1.04102 4.86586 1.04102 9.58329C1.04102 14.3007 4.86525 18.125 9.58268 18.125C14.3001 18.125 18.1243 14.3007 18.1243 9.58329C18.1243 4.86586 14.3001 1.04163 9.58268 1.04163ZM2.29102 9.58329C2.29102 5.55622 5.55561 2.29163 9.58268 2.29163C13.6098 2.29163 16.8743 5.55622 16.8743 9.58329C16.8743 13.6104 13.6098 16.875 9.58268 16.875C5.55561 16.875 2.29102 13.6104 2.29102 9.58329Z"
+                />
+                <path
+                  d="M17.108 16.2247C16.8639 15.9806 16.4682 15.9806 16.2241 16.2247C15.98 16.4688 15.98 16.8645 16.2241 17.1086L17.8907 18.7752C18.1348 19.0193 18.5305 19.0193 18.7746 18.7752C19.0187 18.5312 19.0187 18.1354 18.7746 17.8914L17.108 16.2247Z"
+                />
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M9.58268 1.04163C4.86525 1.04163 1.04102 4.86586 1.04102 9.58329C1.04102 14.3007 4.86525 18.125 9.58268 18.125C14.3001 18.125 18.1243 14.3007 18.1243 9.58329C18.1243 4.86586 14.3001 1.04163 9.58268 1.04163ZM2.29102 9.58329C2.29102 5.55622 5.55561 2.29163 9.58268 2.29163C13.6098 2.29163 16.8743 5.55622 16.8743 9.58329C16.8743 13.6104 13.6098 16.875 9.58268 16.875C5.55561 16.875 2.29102 13.6104 2.29102 9.58329Z"
+                />
+                <path
+                  d="M17.108 16.2247C16.8639 15.9806 16.4682 15.9806 16.2241 16.2247C15.98 16.4688 15.98 16.8645 16.2241 17.1086L17.8907 18.7752C18.1348 19.0193 18.5305 19.0193 18.7746 18.7752C19.0187 18.5312 19.0197 18.1354 18.7746 17.8914L17.108 16.2247Z"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <div class="min-h-0 flex-1 overflow-hidden">
+            <div class="h-full overflow-auto">
+              <table class="w-full border-collapse text-sm">
+                <colgroup>
+                  <col class="w-12" />
+                  <col class="w-12" />
+                  <col class="w-12" />
+                  <col />
+                </colgroup>
+
+                <thead class="bg-main-bright sticky top-0 z-10">
+                  <tr class="border-light border-b">
+                    <th
+                      class="text-sm-tight rounded-tl-lg p-2 text-left font-medium"
+                    >
+                      {{ "candidates.select" | translate }}
+                    </th>
+                    <th class="text-sm-tight p-2 text-left font-medium">
+                      {{ "candidates.first_indicator" | translate }}
+                    </th>
+                    <th class="text-sm-tight p-2 text-left font-medium">
+                      {{ "candidates.second_indicator" | translate }}
+                    </th>
+                    <th
+                      class="text-sm-tight rounded-tr-lg p-2 text-left font-medium"
+                    >
+                      {{ "candidates.subfields" | translate }}
+                    </th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  @if (loading()) {
+                    @for (row of skeletonRows; track $index) {
+                      <tr
+                        class="border-light border-b"
+                        [ngClass]="
+                          $index % 2 === 1 ? 'bg-main-base' : 'bg-gray-500/5'
+                        "
+                      >
+                        <td class="px-4 py-2 text-center align-middle">
+                          <div
+                            class="mx-auto h-4 w-4 animate-pulse rounded-full bg-gray-200"
+                          ></div>
+                        </td>
+
+                        <td class="p-2 align-text-top">
+                          <div
+                            class="h-4 w-6 animate-pulse rounded bg-gray-200"
+                          ></div>
+                        </td>
+
+                        <td class="p-2 align-text-top">
+                          <div
+                            class="h-4 w-6 animate-pulse rounded bg-gray-200"
+                          ></div>
+                        </td>
+
+                        <td class="p-2 align-text-top">
+                          <div class="flex gap-2">
+                            <div
+                              class="h-4 w-full animate-pulse rounded bg-gray-200"
+                            ></div>
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                  } @else if (errorMessage()) {
+                    <tr>
+                      <td class="text-md text-error p-4" colspan="4">
+                        {{ errorMessage() }}
+                      </td>
+                    </tr>
+                  } @else if (!searchResults().length) {
+                    <tr>
+                      <td
+                        class="text-light text-md bg-gray-500/5 p-4"
+                        colspan="4"
+                      >
+                        {{ "dialogs.no_authorities" | translate }}
+                      </td>
+                    </tr>
+                  } @else {
+                    @for (
+                      rec of searchResults();
+                      track rec.record_id;
+                      let i = $index
+                    ) {
+                      <tr
+                        class="border-light cursor-pointer border-b"
+                        [ngClass]="
+                          i % 2 === 1 ? 'bg-main-base' : 'bg-gray-500/5'
+                        "
+                        (click)="selectRecord(rec)"
+                      >
+                        <td class="align-center px-4 py-2 text-center">
+                          <label
+                            class="flex h-full cursor-pointer items-center justify-center"
+                          >
+                            <input
+                              class="peer sr-only"
+                              [checked]="selectedRecordId() === rec.record_id"
+                              (click)="
+                                $event.stopPropagation(); selectRecord(rec)
+                              "
+                              type="radio"
+                              name="authority-record"
+                            />
+
+                            <span
+                              class="border-contrast peer-hover:border-primary-hover peer-active:border-primary-pressed peer-disabled:border-tertiary-disable after:bg-main-contrast peer-hover:after:bg-primary-hover peer-active:after:bg-primary-pressed peer-disabled:after:bg-tertiary-disable peer-checked:border-primary-default peer-checked:after:bg-main-primary-default peer-checked:peer-hover:border-primary-hover peer-checked:peer-hover:after:bg-main-primary-hover peer-checked:peer-active:border-primary-pressed peer-checked:peer-active:after:bg-main-primary-pressed peer-checked:peer-disabled:border-tertiary-disable peer-checked:peer-disabled:after:bg-main-tertiary-disable disabled:bg-main-light relative flex h-4 w-4 items-center justify-center rounded-full border transition-colors after:absolute after:h-2.5 after:w-2.5 after:scale-0 after:rounded-full after:transition-transform after:content-[''] peer-checked:after:scale-100"
+                            ></span>
+                          </label>
+                        </td>
+
+                        <td
+                          class="text-secondary text-md p-2 text-left align-text-top"
+                        >
+                          {{ getAuthority100(rec)?.ind1 ?? "" }}
+                        </td>
+
+                        <td
+                          class="text-secondary text-md p-2 text-left align-text-top"
+                        >
+                          {{ getAuthority100(rec)?.ind2 ?? "" }}
+                        </td>
+
+                        <td class="p-2 align-text-top">
+                          @if (getAuthority100(rec)?.subfields?.length) {
+                            <div class="flex flex-wrap gap-x-2 gap-y-1">
+                              @for (
+                                sf of getAuthority100(rec)!.subfields;
+                                track $index
+                              ) {
+                                <span>
+                                  <span
+                                    class="text-secondary text-md font-bold"
+                                  >
+                                    |{{ sf.code }}
+                                  </span>
+                                  <span class="text-secondary text-md ml-2">
+                                    {{ sf.value }}
+                                  </span>
+                                </span>
+                              }
+                            </div>
+                          } @else {
+                            <span class="text-light">—</span>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="min-h-0 overflow-hidden p-4">
+        <div class="flex h-full min-h-0 flex-col overflow-hidden">
+          <div
+            class="bg-main-bright border-light flex w-full items-center justify-between rounded-t-lg border-b p-2"
+          >
+            <span class="text-sm-tight font-medium">
+              {{ "candidates.authority_record" | translate }}
+            </span>
+
+            @if (selectedRecordDetail() && catalogueUrl()) {
+              <a
+                class="text-base-color text-sm-tight font-medium underline hover:no-underline"
+                [href]="catalogueUrl()"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Zobrazit v NKP"
+              >
+                <span class="flex items-center gap-1.25">
+                  {{ "candidates.show_in_nkp" | translate }}
+                  <svg
+                    class="icon-black"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M14.487 1.51315C14.6823 1.70841 14.6823 2.02499 14.487 2.22025L9.02038 7.68692C8.82512 7.88218 8.50854 7.88218 8.31328 7.68692C8.11801 7.49166 8.11801 7.17507 8.31328 6.97981L13.7799 1.51315C13.9752 1.31788 14.2918 1.31788 14.487 1.51315Z"
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M10.967 1.3335C10.967 1.05735 11.1908 0.833496 11.467 0.833496H14.667C14.9431 0.833496 15.167 1.05735 15.167 1.3335V4.5335C15.167 4.80964 14.9431 5.0335 14.667 5.0335C14.3908 5.0335 14.167 4.80964 14.167 4.5335V1.8335H11.467C11.1908 1.8335 10.967 1.60964 10.967 1.3335Z"
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M2.06328 2.06328C2.95292 1.17363 4.28418 0.833496 6.00016 0.833496H7.3335C7.60964 0.833496 7.8335 1.05735 7.8335 1.3335C7.8335 1.60964 7.60964 1.8335 7.3335 1.8335H6.00016C4.38281 1.8335 3.38074 2.16003 2.77038 2.77038C2.16003 3.38074 1.8335 4.38281 1.8335 6.00016V10.0002C1.8335 11.6175 2.16003 12.6196 2.77038 13.2299C3.38074 13.8403 4.38281 14.1668 6.00016 14.1668H10.0002C11.6175 14.1668 12.6196 13.8403 13.2299 13.2299C13.8403 12.6196 14.1668 11.6175 14.1668 10.0002V8.66683C14.1668 8.39069 14.3907 8.16683 14.6668 8.16683C14.943 8.16683 15.1668 8.39069 15.1668 8.66683V10.0002C15.1668 11.7161 14.8267 13.0474 13.937 13.937C13.0474 14.8267 11.7161 15.1668 10.0002 15.1668H6.00016C4.28418 15.1668 2.95292 14.8267 2.06328 13.937C1.17363 13.0474 0.833496 11.7161 0.833496 10.0002V6.00016C0.833496 4.28418 1.17363 2.95292 2.06328 2.06328Z"
+                    />
+                  </svg>
+                </span>
+              </a>
+            }
+          </div>
+
+          @if (detailLoading()) {
+            <div class="p-2">
+              <div class="space-y-3">
+                @for (row of skeletonRows; track $index) {
+                  <div class="grid grid-cols-[90px_1fr] gap-4">
+                    <div class="h-5 animate-pulse rounded bg-gray-200"></div>
+                    <div class="h-5 animate-pulse rounded bg-gray-200"></div>
+                  </div>
+                }
+              </div>
+            </div>
+          } @else if (selectedRecordDetail()) {
+            <div class="min-h-0 flex-1 overflow-auto">
+              <app-existing-marc-record-table
+                [existingRecord]="selectedRecordDetail()!"
+              />
+            </div>
+          } @else if (detailError()) {
+            <div class="text-error text-md p-2">{{ detailError() }}</div>
+          } @else {
+            <div class="text-light text-md bg-gray-500/5 p-4">
+              {{ "dialogs.choose_authority" | translate }}
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- bottom -->
+    <div class="border-bright flex shrink-0 justify-between gap-3 border-t p-4">
+      <div class="flex items-center justify-between gap-6">
+        <div class="text-light text-md text-nowrap">
+          {{ from() }}-{{ to() }} / {{ total() }}
+        </div>
+
+        <div class="flex items-center gap-5">
+          <div class="flex items-center gap-2">
+            @for (item of visiblePages(); track $index) {
+              @if (item === "ellipsis-left" || item === "ellipsis-right") {
+                <span
+                  class="text-base-color flex h-10 min-w-8 shrink-0 items-center justify-center"
+                >
+                  ...
+                </span>
+              } @else {
+                <button
+                  class="btn btn-m shrink-0"
+                  [ngClass]="item === page() ? 'btn-primary' : 'btn-tertiary'"
+                  (click)="goToPage(item)"
+                  type="button"
+                >
+                  {{ item }}
+                </button>
+              }
+            }
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button
+              class="btn btn-m btn-tertiary btn-icon group"
+              [disabled]="!hasPrev()"
+              (click)="goPrevPage()"
+              type="button"
+            >
+              <svg
+                class="icon-tertiary"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M6.7342 3.59957C6.92947 3.79483 6.92947 4.11142 6.7342 4.30668L3.04109 7.99979L6.7342 11.6929C6.92947 11.8882 6.92947 12.2047 6.7342 12.4C6.53894 12.5953 6.22236 12.5953 6.0271 12.4L1.98043 8.35335C1.88666 8.25958 1.83398 8.1324 1.83398 7.99979C1.83398 7.86718 1.88666 7.74001 1.98043 7.64624L6.0271 3.59957C6.22236 3.40431 6.53894 3.40431 6.7342 3.59957Z"
+                />
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M1.94727 8C1.94727 7.72386 2.17112 7.5 2.44727 7.5H13.6673C13.9434 7.5 14.1673 7.72386 14.1673 8C14.1673 8.27614 13.9434 8.5 13.6673 8.5H2.44727C2.17112 8.5 1.94727 8.27614 1.94727 8Z"
+                />
+              </svg>
+            </button>
+
+            <button
+              class="btn btn-m btn-tertiary btn-icon group"
+              [disabled]="!hasNext()"
+              (click)="goNextPage()"
+              type="button"
+            >
+              <svg
+                class="icon-tertiary"
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M9.26689 3.59957C9.46215 3.40431 9.77873 3.40431 9.974 3.59957L14.0207 7.64624C14.1144 7.74001 14.1671 7.86718 14.1671 7.99979C14.1671 8.1324 14.1144 8.25958 14.0207 8.35335L9.974 12.4C9.77873 12.5953 9.46215 12.5953 9.26689 12.4C9.07163 12.2047 9.07163 11.8882 9.26689 11.6929L12.96 7.99979L9.26689 4.30668C9.07163 4.11142 9.07163 3.79483 9.26689 3.59957Z"
+                />
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M1.83398 8C1.83398 7.72386 2.05784 7.5 2.33398 7.5H13.554C13.8301 7.5 14.054 7.72386 14.054 8C14.054 8.27614 13.8301 8.5 13.554 8.5H2.33398C2.05784 8.5 1.83398 8.27614 1.83398 8Z"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <button
+          class="btn btn-m btn-tertiary"
+          (click)="closeAuthorityDialog()"
+          type="button"
+        >
+          {{ "buttons.cancel" | translate }}
+        </button>
+
+        <button
+          class="btn btn-m btn-primary"
+          [disabled]="!selectedRecordDetail()"
+          (click)="applyAuthority()"
+          type="button"
+        >
+          {{ "buttons.take_authority" | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</dialog>

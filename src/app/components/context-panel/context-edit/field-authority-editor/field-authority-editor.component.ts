@@ -1,23 +1,30 @@
 import { InputAutocompleteAuthorityComponent } from '@/app/components/inputs/input-autocomplete-authority/input-autocomplete-authority.component';
 import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
 import { InputStaticAutocompleteComponent } from '@/app/components/inputs/input-static-autocomplete/input-static-autocomplete.component';
+import { ExistingMarcRecordTableComponent } from '@/app/components/marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
 import {
   AutocompletAuthorityResponse,
+  ExistingMarcRecord,
   getIndicators,
   UUID,
 } from '@/app/models';
+import { CatalogueService } from '@/app/services/api/catalogue.service';
 import { MarcTranslateService } from '@/app/services/marc-translate.service';
 import { RecordStateService } from '@/app/services/record-state.service';
+import { NgClass } from '@angular/common';
 import {
   Component,
   computed,
   effect,
+  ElementRef,
   inject,
   input,
   signal,
   viewChild,
 } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+
+type PaginationItem = number | 'ellipsis-left' | 'ellipsis-right';
 
 @Component({
   selector: 'app-field-authority-editor',
@@ -26,12 +33,17 @@ import { TranslateModule } from '@ngx-translate/core';
     InputDropdownComponent,
     TranslateModule,
     InputStaticAutocompleteComponent,
+    NgClass,
+    TranslateModule,
+    ExistingMarcRecordTableComponent,
   ],
   templateUrl: './field-authority-editor.component.html',
 })
 export class FieldAuthorityEditorComponent {
   private readonly rs = inject(RecordStateService);
   private readonly marcT = inject(MarcTranslateService);
+  private readonly catalogue = inject(CatalogueService);
+  private translate = inject(TranslateService);
 
   fieldId = input.required<UUID>();
 
@@ -61,6 +73,9 @@ export class FieldAuthorityEditorComponent {
 
   readonly dDraft = signal<string>('');
   private readonly hasAutoFocused = signal(false);
+
+  private readonly authorityDialog =
+    viewChild<ElementRef<HTMLDialogElement>>('authorityDialog');
 
   constructor() {
     effect(() => {
@@ -147,5 +162,249 @@ export class FieldAuthorityEditorComponent {
     this.setSub('a', '');
     this.setSub('7', '');
     this.setSub('d', '');
+  }
+
+  readonly searchQuery = signal('');
+  readonly searchResults = signal<ExistingMarcRecord[]>([]);
+  readonly selectedRecordId = signal<string | null>(null);
+  readonly selectedRecordDetail = signal<ExistingMarcRecord | null>(null);
+  readonly loading = signal(false);
+  readonly page = signal(1);
+  readonly total = signal(0);
+  readonly errorMessage = signal<string | null>(null);
+  readonly limit = signal(100);
+  readonly detailLoading = signal(false);
+  readonly detailError = signal<string | null>(null);
+
+  readonly hasNext = computed(() => this.page() * this.limit() < this.total());
+  readonly hasPrev = computed(() => this.page() > 1);
+
+  getAuthority100(record: ExistingMarcRecord) {
+    return record.data_fields.find((f) => f.tag === '100') ?? null;
+  }
+
+  catalogueUrl = computed<string | null>(() => {
+    const rec = this.selectedRecordDetail();
+    const docNumber = this.getDocNumberFromRecord(rec);
+
+    if (!docNumber) return null;
+
+    return `https://aleph.nkp.cz/F/?func=direct&doc_number=${encodeURIComponent(
+      docNumber,
+    )}&local_base=AUT`;
+  });
+
+  private getDocNumberFromRecord(
+    rec: ExistingMarcRecord | null,
+  ): string | null {
+    if (!rec) return null;
+
+    const f998 = rec.data_fields.find((f) => f.tag === '998');
+    const sfA = f998?.subfields?.find((sf) => sf.code === 'a');
+    const value = sfA?.value?.trim();
+
+    return value ?? null;
+  }
+
+  readonly from = computed(() => {
+    if (!this.total()) return 0;
+    return (this.page() - 1) * this.limit() + 1;
+  });
+
+  readonly to = computed(() => {
+    if (!this.total()) return 0;
+    return Math.min(this.page() * this.limit(), this.total());
+  });
+
+  readonly totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.total() / this.limit())),
+  );
+
+  readonly visiblePages = computed<PaginationItem[]>(() => {
+    const total = this.totalPages();
+    const current = this.page();
+
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+
+    const windowSize = 5;
+    let start = Math.max(2, current - Math.floor(windowSize / 2));
+    let end = Math.min(total - 1, start + windowSize - 1);
+
+    start = Math.max(2, end - windowSize + 1);
+
+    const items: PaginationItem[] = [1];
+
+    if (start > 2) {
+      items.push('ellipsis-left');
+    }
+
+    for (let p = start; p <= end; p++) {
+      items.push(p);
+    }
+
+    if (end < total - 1) {
+      items.push('ellipsis-right');
+    }
+
+    items.push(total);
+
+    return items;
+  });
+
+  search(page = 1) {
+    this.page.set(page);
+
+    const query = this.searchQuery().trim();
+
+    if (!query) {
+      this.searchResults.set([]);
+      this.selectedRecordId.set(null);
+      this.selectedRecordDetail.set(null);
+      this.total.set(0);
+      this.errorMessage.set(null);
+      return;
+    }
+
+    this.loading.set(true);
+
+    this.errorMessage.set(null);
+    this.searchResults.set([]);
+    this.selectedRecordId.set(null);
+    this.selectedRecordDetail.set(null);
+
+    this.catalogue
+      .searchAuthorities({
+        person_name: query,
+        page,
+        limit: this.limit(),
+      })
+      .subscribe({
+        next: (resp) => {
+          this.searchResults.set(resp.records ?? []);
+          this.total.set(resp.total ?? 0);
+
+          const first = resp.records?.[0] ?? null;
+
+          if (first) {
+            this.selectedRecordId.set(String(first.record_id));
+            this.selectedRecordDetail.set(null);
+            this.loadDetail(String(first.record_id));
+          } else {
+            this.selectedRecordId.set(null);
+            this.selectedRecordDetail.set(null);
+          }
+
+          this.loading.set(false);
+        },
+        error: () => {
+          this.loading.set(false);
+          this.searchResults.set([]);
+          this.selectedRecordId.set(null);
+          this.selectedRecordDetail.set(null);
+          this.total.set(0);
+          this.errorMessage.set(
+            this.translate.instant('dialogs.authorities_load_error'),
+          );
+        },
+      });
+  }
+
+  clear() {
+    this.searchQuery.set('');
+  }
+
+  goToPage(page: number) {
+    if (page < 1 || page > this.totalPages() || page === this.page()) return;
+    this.search(page);
+  }
+
+  goPrevPage() {
+    if (!this.hasPrev()) return;
+    this.search(this.page() - 1);
+  }
+
+  goNextPage() {
+    if (!this.hasNext()) return;
+    this.search(this.page() + 1);
+  }
+
+  readonly skeletonRows = Array.from({ length: this.limit() });
+
+  loadDetail(recordId: string) {
+    this.detailLoading.set(true);
+
+    this.catalogue.getAutRecord(recordId, 'aut').subscribe({
+      next: (record) => {
+        if (this.selectedRecordId() !== String(recordId)) {
+          this.detailLoading.set(false);
+          return;
+        }
+
+        this.selectedRecordDetail.set(record);
+        this.detailLoading.set(false);
+        this.detailError.set(null);
+      },
+      error: () => {
+        if (this.selectedRecordId() === String(recordId)) {
+          this.selectedRecordDetail.set(null);
+        }
+        this.detailLoading.set(false);
+        this.detailError.set(
+          this.translate.instant('dialogs.record_load_error'),
+        );
+      },
+    });
+  }
+
+  selectRecord(record: ExistingMarcRecord) {
+    const recordId = String(record.record_id);
+
+    if (this.selectedRecordId() === recordId) return;
+
+    this.selectedRecordId.set(recordId);
+    this.selectedRecordDetail.set(null);
+    this.loadDetail(recordId);
+  }
+
+  applyAuthority() {
+    const record = this.selectedRecordDetail();
+    if (!record) return;
+
+    const field100 = record.data_fields.find((f) => f.tag === '100');
+    if (!field100) return;
+
+    const sub = (code: string) =>
+      field100.subfields.find((s) => s.code === code)?.value ?? '';
+
+    this.setSub('a', sub('a'));
+    this.setSub('d', sub('d'));
+    this.setSub('7', sub('7'));
+
+    this.closeAuthorityDialog();
+  }
+
+  onAuthoritySearch() {
+    const dialog = this.authorityDialog()?.nativeElement;
+    if (!dialog) return;
+
+    this.searchQuery.set(this.getSub('a') ?? '');
+    this.errorMessage.set(null);
+    this.searchResults.set([]);
+    this.selectedRecordId.set(null);
+    this.selectedRecordDetail.set(null);
+    this.total.set(0);
+    this.page.set(1);
+
+    dialog.showModal();
+
+    if (this.searchQuery().trim()) {
+      this.search(1);
+    }
+  }
+
+  closeAuthorityDialog() {
+    this.authorityDialog()?.nativeElement.close();
   }
 }
