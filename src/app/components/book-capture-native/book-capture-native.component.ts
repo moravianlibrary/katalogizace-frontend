@@ -14,6 +14,7 @@ import { ToastService } from '../../services/toast.service';
 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslateService } from '@ngx-translate/core';
+import * as exifr from 'exifr';
 import { of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
@@ -132,14 +133,146 @@ export class BookCaptureNativeComponent {
     input.click();
   }
 
-  onFileSelected(event: Event) {
+  async onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files && input.files[0];
-    if (!file) {
-      return;
+    if (!file) return;
+
+    try {
+      const normalizedFile = await this.normalizeImageOrientation(file);
+      this.pendingFile.set(normalizedFile);
+    } catch (err) {
+      console.error(
+        'Image normalization failed, uploading original file.',
+        err,
+      );
+      this.pendingFile.set(file);
+    }
+  }
+
+  private async normalizeImageOrientation(file: File): Promise<File> {
+    const orientation = await exifr.orientation(file).catch(() => 1);
+
+    if (!orientation || orientation === 1) {
+      return file;
     }
 
-    this.pendingFile.set(file);
+    const img = await this.loadImage(file);
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) {
+      return file;
+    }
+
+    const width = img.naturalWidth;
+    const height = img.naturalHeight;
+
+    const swapSides = [5, 6, 7, 8].includes(orientation);
+    canvas.width = swapSides ? height : width;
+    canvas.height = swapSides ? width : height;
+
+    switch (orientation) {
+      case 2:
+        ctx.translate(width, 0);
+        ctx.scale(-1, 1);
+        break;
+      case 3:
+        ctx.translate(width, height);
+        ctx.rotate(Math.PI);
+        break;
+      case 4:
+        ctx.translate(0, height);
+        ctx.scale(1, -1);
+        break;
+      case 5:
+        ctx.rotate(0.5 * Math.PI);
+        ctx.scale(1, -1);
+        break;
+      case 6:
+        ctx.rotate(0.5 * Math.PI);
+        ctx.translate(0, -height);
+        break;
+      case 7:
+        ctx.rotate(0.5 * Math.PI);
+        ctx.translate(width, -height);
+        ctx.scale(-1, 1);
+        break;
+      case 8:
+        ctx.rotate(-0.5 * Math.PI);
+        ctx.translate(-width, 0);
+        break;
+      default:
+        break;
+    }
+
+    ctx.drawImage(img, 0, 0);
+
+    const blob = await this.canvasToBlob(
+      canvas,
+      file.type && file.type !== 'image/heic' ? file.type : 'image/jpeg',
+      1,
+    );
+
+    const normalizedName = this.replaceExtensionWithJpgIfNeeded(
+      file.name,
+      blob.type,
+    );
+
+    return new File([blob], normalizedName, {
+      type: blob.type,
+      lastModified: Date.now(),
+    });
+  }
+
+  private loadImage(file: File): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        resolve(img);
+      };
+
+      img.onerror = (err) => {
+        URL.revokeObjectURL(url);
+        reject(err);
+      };
+
+      img.src = url;
+    });
+  }
+
+  private canvasToBlob(
+    canvas: HTMLCanvasElement,
+    type: string,
+    quality = 1,
+  ): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error('Canvas blob conversion failed.'));
+            return;
+          }
+          resolve(blob);
+        },
+        type,
+        quality,
+      );
+    });
+  }
+
+  private replaceExtensionWithJpgIfNeeded(
+    fileName: string,
+    mimeType: string,
+  ): string {
+    if (mimeType === 'image/jpeg') {
+      return fileName.replace(/\.[^.]+$/, '') + '.jpg';
+    }
+    return fileName;
   }
 
   finish() {
