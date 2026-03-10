@@ -34,12 +34,9 @@ export class BookCaptureNativeComponent {
 
   bookId = signal<string | null>(null);
   batchId = signal<string>('');
-
   isCreating = signal(false);
   isUploading = signal(false);
   isFinishing = signal(false);
-  isRestoring = signal(false);
-
   photoCount = signal(0);
 
   private didFinish = signal(false);
@@ -50,37 +47,13 @@ export class BookCaptureNativeComponent {
   constructor() {
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((pm) => {
       this.batchId.set(pm.get('batchId') ?? '');
-
-      const id = pm.get('bookId');
-      this.bookId.set(id);
-
-      if (id) {
-        this.refreshBookStatus();
-      }
+      this.bookId.set(pm.get('bookId'));
     });
 
     effect(() => {
       this.bookId();
       this.pendingFile();
       this.tryUploadPending();
-    });
-  }
-
-  private refreshBookStatus() {
-    const id = this.bookId();
-    if (!id) return;
-
-    this.isRestoring.set(true);
-
-    this.books.getBookStatus(id).subscribe({
-      next: (status) => {
-        this.photoCount.set(status.images?.length ?? 0);
-        this.isRestoring.set(false);
-      },
-      error: (err) => {
-        console.error(err);
-        this.isRestoring.set(false);
-      },
     });
   }
 
@@ -96,24 +69,19 @@ export class BookCaptureNativeComponent {
     this.books.uploadBookImage(id, file).subscribe({
       next: () => {
         this.pendingFile.set(null);
-
-        this.refreshBookStatus();
-
+        this.photoCount.update((c) => c + 1);
         this.toast.show(
           this.translate.instant('messages.success.books.photo_upload'),
           'success',
         );
-
         this.isUploading.set(false);
       },
       error: (err) => {
         console.error(err);
-
         this.toast.show(
           this.translate.instant('messages.error.books.photo_upload'),
           'error',
         );
-
         this.isUploading.set(false);
       },
     });
@@ -123,7 +91,6 @@ export class BookCaptureNativeComponent {
     if (this.isCreating()) return;
 
     this.isCreating.set(true);
-
     this.books.createBook(this.batchId()).subscribe({
       next: (res) => {
         this.isCreating.set(false);
@@ -143,25 +110,17 @@ export class BookCaptureNativeComponent {
       },
       error: (err) => {
         console.error(err);
-
         this.toast.show(
           this.translate.instant('messages.error.books.create'),
           'error',
         );
-
         this.isCreating.set(false);
       },
     });
   }
 
   captureClick() {
-    if (
-      !this.bookId() ||
-      this.isUploading() ||
-      this.isFinishing() ||
-      this.isRestoring()
-    )
-      return;
+    if (!this.bookId() || this.isUploading() || this.isFinishing()) return;
 
     this.openNativeCamera();
   }
@@ -169,7 +128,6 @@ export class BookCaptureNativeComponent {
   private openNativeCamera() {
     const input = this.fileInputRef?.nativeElement;
     if (!input) return;
-
     input.value = '';
     input.click();
   }
@@ -177,8 +135,9 @@ export class BookCaptureNativeComponent {
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files && input.files[0];
-
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     this.pendingFile.set(file);
   }
@@ -193,27 +152,22 @@ export class BookCaptureNativeComponent {
     }
 
     this.isFinishing.set(true);
-
     this.books.startBookWorkflow(this.bookId()!).subscribe({
       next: () => {
         this.didFinish.set(true);
         this.isFinishing.set(false);
-
         this.toast.show(
           this.translate.instant('messages.success.books.workflow'),
           'success',
         );
-
         this.router.navigate(['/batches', this.batchId(), 'books']);
       },
       error: (err) => {
         console.error(err);
-
         this.toast.show(
           this.translate.instant('messages.error.books.workflow'),
           'error',
         );
-
         this.isFinishing.set(false);
       },
     });
@@ -238,12 +192,10 @@ export class BookCaptureNativeComponent {
       }),
       catchError((err) => {
         console.error(err);
-
         this.toast.show(
           this.translate.instant('messages.error.books.cancel'),
           'error',
         );
-
         return of(true);
       }),
     );

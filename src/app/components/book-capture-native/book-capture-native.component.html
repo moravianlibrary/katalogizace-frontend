@@ -44,7 +44,7 @@
       <div class="flex flex-wrap items-center gap-5">
         <button
           class="bg-main-primary-default text-on-color hover:bg-main-primary-hover active:bg-main-primary-pressed text-sm-tight disabled:bg-main-primary-disable disabled:text-btn-primary-disable cursor-pointer rounded-lg px-4 py-3 font-medium disabled:cursor-not-allowed"
-          [disabled]="isUploading() || isFinishing() || isRestoring()"
+          [disabled]="isUploading() || isFinishing()"
           (click)="captureClick()"
         >
           {{ isUploading() ? "Nahrávám…" : "Vyfotit stránku" }}
@@ -60,16 +60,12 @@
 
         <button
           class="bg-main-base text-success hover:bg-main-success hover:text-on-color border-success text-sm-tight cursor-pointer rounded-lg border px-4 py-3 font-medium"
-          [disabled]="isFinishing() || isRestoring()"
+          [disabled]="isFinishing()"
           (click)="finish()"
         >
           {{ isFinishing() ? "Spouštím workflow…" : "Hotovo" }}
         </button>
       </div>
-
-      @if (isRestoring()) {
-        <p class="text-light text-sm">Obnovuji stav knihy...</p>
-      }
 
       <span>
         Počet naskenovaných stránek: <strong>{{ photoCount() }}</strong>
