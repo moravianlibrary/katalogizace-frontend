@@ -7,7 +7,7 @@ export type BatchDto = {
   name: string;
   description: string | null;
   state: BatchState;
-  book_ids: ID[];
+  num_books: number;
   created_by: string;
   created_at: string;
   modified_at: string;

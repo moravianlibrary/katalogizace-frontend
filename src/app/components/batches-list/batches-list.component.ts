@@ -168,10 +168,6 @@ export class BatchesListComponent {
     this.router.navigate(['/batches', batchId.toString(), 'books']);
   }
 
-  countBooks(b: BatchDto) {
-    return b.book_ids?.length ?? 0;
-  }
-
   onDelete(batchId: ID, event: MouseEvent) {
     event.stopPropagation();
     event.preventDefault();
