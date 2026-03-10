@@ -21,6 +21,7 @@ export interface BookCommonDto {
   images: ApiImageItem[];
   hatchet_workflow_id: UUID | null;
   error_message: string | null;
+  created_by: string;
 }
 
 export interface BookRecordInfoDto extends BookCommonDto {}
