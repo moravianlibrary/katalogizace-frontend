@@ -77,20 +77,6 @@ export class EditableMarcRecordTableComponent {
     return this.hoveredRowId() === rowId;
   }
 
-  // private isNeighborAbove(rowId: string): boolean {
-  //   const hovered = this.hoveredRowId();
-  //   if (!hovered) return false;
-
-  //   return this.getRowIndex(rowId) === this.getRowIndex(hovered) - 1;
-  // }
-
-  // private isNeighborBelow(rowId: string): boolean {
-  //   const hovered = this.hoveredRowId();
-  //   if (!hovered) return false;
-
-  //   return this.getRowIndex(rowId) === this.getRowIndex(hovered) + 1;
-  // }
-
   getLeaderRowClasses(): string[] {
     const disabled =
       this.ds.enabledByUser() && this.recordState.viewMode() === 'table';
@@ -125,23 +111,9 @@ export class EditableMarcRecordTableComponent {
     ].filter((cls): cls is string => Boolean(cls));
   }
 
-  // private isGrayVisualRow(rowId: string): boolean {
-  //   return this.getRowIndex(rowId) % 2 === 0;
-  // }
-
   private isWhiteVisualRow(rowId: string): boolean {
     return !this.isGrayVisualRow(rowId);
   }
-
-  //og
-  // private baseRowClasses(rowId: string): string[] {
-  //   return [
-  //     this.isEvenVisualRow(rowId) ? 'bg-gray-500/5' : 'bg-main-base',
-  //     this.isHovered(rowId) ? 'marc-row-hovered relative z-10' : '',
-  //     this.isNeighborAbove(rowId) ? 'marc-row-neighbor-above' : '',
-  //     this.isNeighborBelow(rowId) ? 'marc-row-neighbor-below' : '',
-  //   ].filter((cls): cls is string => Boolean(cls));
-  // }
 
   isActiveRow(rowId: string): boolean {
     return this.recordState.selectedField()?.fieldId === rowId;
@@ -166,15 +138,6 @@ export class EditableMarcRecordTableComponent {
 
     return this.getRowIndex(rowId) === this.getRowIndex(focused) + 1;
   }
-
-  // private baseRowClasses(rowId: string): string[] {
-  //   return [
-  //     this.isHovered(rowId) ? 'marc-row-hovered relative z-10' : '',
-  //     this.isActiveRow(rowId) ? 'marc-row-active relative z-20' : '',
-  //     this.isNeighborAbove(rowId) ? 'marc-row-neighbor-above' : '',
-  //     this.isNeighborBelow(rowId) ? 'marc-row-neighbor-below' : '',
-  //   ].filter((cls): cls is string => Boolean(cls));
-  // }
 
   private isGrayVisualRow(rowId: string): boolean {
     return this.getRowIndex(rowId) % 2 === 0;
