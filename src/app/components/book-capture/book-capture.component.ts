@@ -17,6 +17,12 @@ import { TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
+type CameraOption = {
+  id: string;
+  label: string;
+  isRear: boolean;
+};
+
 @Component({
   standalone: true,
   selector: 'app-book-capture',
@@ -42,7 +48,12 @@ export class BookCaptureComponent implements AfterViewInit {
   isCreating = signal(false);
   isUploading = signal(false);
   isFinishing = signal(false);
+  isOpeningCamera = signal(false);
+
   photoCount = signal(0);
+
+  cameraOptions = signal<CameraOption[]>([]);
+  selectedCameraId = signal<string | null>(null);
 
   private didFinish = signal(false);
   private cleanupDone = signal(false);
@@ -53,7 +64,7 @@ export class BookCaptureComponent implements AfterViewInit {
       this.bookId.set(pm.get('bookId'));
 
       if (this.bookId() && this.viewReady() && !this.stream) {
-        this.openCamera();
+        void this.openCamera();
       }
     });
   }
@@ -62,7 +73,7 @@ export class BookCaptureComponent implements AfterViewInit {
     this.viewReady.set(true);
 
     if (this.bookId() && !this.stream) {
-      this.openCamera();
+      void this.openCamera();
     }
   }
 
@@ -98,31 +109,231 @@ export class BookCaptureComponent implements AfterViewInit {
     });
   }
 
+  async switchCamera(cameraId: string) {
+    if (
+      !cameraId ||
+      this.selectedCameraId() === cameraId ||
+      this.isOpeningCamera()
+    ) {
+      return;
+    }
+
+    this.selectedCameraId.set(cameraId);
+    await this.openCamera();
+  }
+
   private async openCamera() {
     try {
-      const constraints: MediaStreamConstraints = {
-        video: {
-          facingMode: { ideal: 'environment' },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
-        },
-        audio: false,
-      };
+      this.isOpeningCamera.set(true);
+      this.stopCamera();
 
-      this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+      await this.ensureCameraOptions();
+
+      const stream = await this.openSelectedCamera();
+      this.stream = stream;
 
       const video = this.videoRef.nativeElement;
-      video.srcObject = this.stream;
+      video.srcObject = stream;
+      video.playsInline = true;
+      video.muted = true;
       await video.play();
+
+      const track = stream.getVideoTracks()[0];
+      console.log('Camera settings:', track?.getSettings?.());
     } catch (e) {
       console.error('Camera error', e);
       this.toast.show(this.translate.instant('messages.error.camera'), 'error');
+    } finally {
+      this.isOpeningCamera.set(false);
     }
   }
 
-  takePhoto() {
-    if (!this.bookId() || !this.stream) return;
+  private async ensureCameraOptions() {
+    if (this.cameraOptions().length) {
+      if (!this.selectedCameraId()) {
+        const best = this.pickBestRearCamera(this.cameraOptions());
+        this.selectedCameraId.set(
+          best?.id ?? this.cameraOptions()[0]?.id ?? null,
+        );
+      }
+      return;
+    }
 
+    const probe = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' } },
+      audio: false,
+    });
+    probe.getTracks().forEach((t) => t.stop());
+
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const cameras = devices
+      .filter((d) => d.kind === 'videoinput')
+      .map<CameraOption>((d, index) => {
+        const lower = d.label.toLowerCase();
+        const isRear =
+          lower.includes('back') ||
+          lower.includes('rear') ||
+          lower.includes('environment');
+
+        return {
+          id: d.deviceId,
+          label: d.label || `Camera ${index + 1}`,
+          isRear,
+        };
+      });
+
+    const sorted = [
+      ...cameras.filter((c) => c.isRear),
+      ...cameras.filter((c) => !c.isRear),
+    ];
+
+    this.cameraOptions.set(sorted);
+
+    const best = this.pickBestRearCamera(sorted);
+    this.selectedCameraId.set(best?.id ?? sorted[0]?.id ?? null);
+  }
+
+  private pickBestRearCamera(cameras: CameraOption[]): CameraOption | null {
+    const ranked = cameras.map((camera) => {
+      const label = camera.label.toLowerCase();
+
+      let score = 0;
+
+      if (camera.isRear) score += 100;
+
+      if (
+        label.includes('main') ||
+        label.includes('standard') ||
+        label.includes('wide angle') ||
+        label.includes('1x')
+      ) {
+        score += 40;
+      }
+
+      if (
+        label.includes('ultra') ||
+        label.includes('ultrawide') ||
+        label.includes('macro') ||
+        label.includes('tele') ||
+        label.includes('depth')
+      ) {
+        score -= 80;
+      }
+
+      return { camera, score };
+    });
+
+    ranked.sort((a, b) => b.score - a.score);
+
+    return ranked[0]?.camera ?? null;
+  }
+
+  private async openSelectedCamera(): Promise<MediaStream> {
+    const selectedId = this.selectedCameraId();
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: selectedId
+        ? {
+            deviceId: { exact: selectedId },
+            width: { ideal: 4096 },
+            height: { ideal: 3072 },
+            aspectRatio: { ideal: 3 / 4 },
+          }
+        : {
+            facingMode: { ideal: 'environment' },
+            width: { ideal: 4096 },
+            height: { ideal: 3072 },
+            aspectRatio: { ideal: 3 / 4 },
+          },
+      audio: false,
+    });
+
+    const track = stream.getVideoTracks()[0];
+
+    try {
+      await track.applyConstraints({
+        width: { ideal: 4096 },
+        height: { ideal: 3072 },
+        aspectRatio: { ideal: 3 / 4 },
+      });
+    } catch (err) {
+      console.warn('applyConstraints failed', err);
+    }
+
+    return stream;
+  }
+
+  async takePhoto() {
+    if (!this.bookId() || !this.stream || this.isUploading()) return;
+
+    this.isUploading.set(true);
+
+    try {
+      const blob = await this.captureBestPhoto();
+
+      this.books.uploadBookImage(this.bookId()!, blob).subscribe({
+        next: () => {
+          this.photoCount.update((c) => c + 1);
+          this.toast.show(
+            this.translate.instant('messages.success.books.photo_upload'),
+            'success',
+          );
+          this.isUploading.set(false);
+        },
+        error: (err) => {
+          console.error(err);
+          this.toast.show(
+            this.translate.instant('messages.error.books.photo_upload'),
+            'error',
+          );
+          this.isUploading.set(false);
+        },
+      });
+    } catch (err) {
+      console.error(err);
+      this.toast.show(
+        this.translate.instant('messages.error.books.photo_capture'),
+        'error',
+      );
+      this.isUploading.set(false);
+    }
+  }
+
+  private async captureBestPhoto(): Promise<Blob> {
+    const track = this.stream?.getVideoTracks?.()[0];
+    if (!track) {
+      throw new Error('No video track available');
+    }
+
+    const ImageCaptureCtor = (
+      window as Window & {
+        ImageCapture?: new (track: MediaStreamTrack) => {
+          takePhoto?: () => Promise<Blob>;
+        };
+      }
+    ).ImageCapture;
+
+    if (ImageCaptureCtor) {
+      try {
+        const imageCapture = new ImageCaptureCtor(track);
+        if (imageCapture.takePhoto) {
+          const blob = await imageCapture.takePhoto();
+          if (blob) {
+            return blob;
+          }
+        }
+      } catch (err) {
+        console.warn(
+          'ImageCapture.takePhoto failed, falling back to canvas',
+          err,
+        );
+      }
+    }
+
+    return this.captureFromCanvas();
+  }
+
+  private captureFromCanvas(): Promise<Blob> {
     const video = this.videoRef.nativeElement;
     const canvas = this.canvasRef.nativeElement;
 
@@ -130,44 +341,25 @@ export class BookCaptureComponent implements AfterViewInit {
     canvas.height = video.videoHeight;
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      throw new Error('Canvas context unavailable');
+    }
 
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    this.isUploading.set(true);
-    canvas.toBlob(
-      (blob) => {
-        if (!blob) {
-          this.isUploading.set(false);
-          this.toast.show(
-            this.translate.instant('messages.error.books.photo_capture'),
-            'error',
-          );
-          return;
-        }
-
-        this.books.uploadBookImage(this.bookId()!, blob).subscribe({
-          next: () => {
-            this.photoCount.update((c) => c + 1);
-            this.toast.show(
-              this.translate.instant('messages.success.books.photo_upload'),
-              'success',
-            );
-            this.isUploading.set(false);
-          },
-          error: (err) => {
-            console.error(err);
-            this.toast.show(
-              this.translate.instant('messages.error.books.photo_upload'),
-              'error',
-            );
-            this.isUploading.set(false);
-          },
-        });
-      },
-      'image/jpeg',
-      0.9,
-    );
+    return new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error('Canvas capture failed'));
+            return;
+          }
+          resolve(blob);
+        },
+        'image/jpeg',
+        0.98,
+      );
+    });
   }
 
   finish() {

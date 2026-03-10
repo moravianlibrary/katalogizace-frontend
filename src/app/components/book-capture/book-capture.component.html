@@ -64,6 +64,26 @@
         </button>
       </div>
 
+      @if (bookId() && cameraOptions().length > 1) {
+        <div class="flex flex-col gap-2">
+          <label class="text-sm">Objektiv</label>
+
+          <select
+            class="bg-main-base border-tertiary-default rounded-lg border px-3 py-2"
+            #cameraSelect
+            [value]="selectedCameraId() ?? ''"
+            [disabled]="isOpeningCamera() || isUploading() || isFinishing()"
+            (change)="switchCamera(cameraSelect.value)"
+          >
+            @for (camera of cameraOptions(); track camera.id) {
+              <option [value]="camera.id">
+                {{ camera.label }}
+              </option>
+            }
+          </select>
+        </div>
+      }
+
       <span>
         Počet naskenovaných stránek: <strong>{{ photoCount() }}</strong>
       </span>
