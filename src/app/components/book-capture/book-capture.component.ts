@@ -140,6 +140,11 @@ export class BookCaptureComponent implements AfterViewInit {
 
       const track = stream.getVideoTracks()[0];
       console.log('Camera settings:', track?.getSettings?.());
+      const settings = track.getSettings();
+      this.toast.show(
+        `Camera: ${settings.width}x${settings.height}`,
+        'success',
+      );
     } catch (e) {
       console.error('Camera error', e);
       this.toast.show(this.translate.instant('messages.error.camera'), 'error');
@@ -235,15 +240,15 @@ export class BookCaptureComponent implements AfterViewInit {
       video: selectedId
         ? {
             deviceId: { exact: selectedId },
-            width: { ideal: 4096 },
-            height: { ideal: 3072 },
-            aspectRatio: { ideal: 3 / 4 },
+            width: { ideal: 4608 },
+            height: { ideal: 3456 },
+            aspectRatio: { ideal: 4 / 3 },
           }
         : {
             facingMode: { ideal: 'environment' },
-            width: { ideal: 4096 },
-            height: { ideal: 3072 },
-            aspectRatio: { ideal: 3 / 4 },
+            width: { ideal: 4608 },
+            height: { ideal: 3456 },
+            aspectRatio: { ideal: 4 / 3 },
           },
       audio: false,
     });
@@ -252,9 +257,9 @@ export class BookCaptureComponent implements AfterViewInit {
 
     try {
       await track.applyConstraints({
-        width: { ideal: 4096 },
-        height: { ideal: 3072 },
-        aspectRatio: { ideal: 3 / 4 },
+        width: { ideal: 4608 },
+        height: { ideal: 3456 },
+        aspectRatio: { ideal: 4 / 3 },
       });
     } catch (err) {
       console.warn('applyConstraints failed', err);
