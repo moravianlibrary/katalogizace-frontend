@@ -14,7 +14,7 @@
       <app-extracted-fields />
     } @else {
       @if (recordPreview(); as rec) {
-        <div class="flex flex-col px-4">
+        <div class="flex flex-col px-4 pb-4">
           <app-editable-marc-record-table
             [diffIndex]="diffIndex()"
             diffSide="preview"
