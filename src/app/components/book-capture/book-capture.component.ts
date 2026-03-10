@@ -137,14 +137,6 @@ export class BookCaptureComponent implements AfterViewInit {
       video.playsInline = true;
       video.muted = true;
       await video.play();
-
-      const track = stream.getVideoTracks()[0];
-      console.log('Camera settings:', track?.getSettings?.());
-      const settings = track.getSettings();
-      this.toast.show(
-        `Camera: ${settings.width}x${settings.height}`,
-        'success',
-      );
     } catch (e) {
       console.error('Camera error', e);
       this.toast.show(this.translate.instant('messages.error.camera'), 'error');
