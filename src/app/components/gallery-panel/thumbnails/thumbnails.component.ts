@@ -28,6 +28,8 @@ export class ImageThumbnailsComponent {
   canScrollRight = signal(false);
   canScrollDown = signal(false);
 
+  toggleCollapse = output<void>();
+
   @ViewChild('scroller', { static: false })
   scroller?: ElementRef<HTMLElement>;
 
@@ -90,5 +92,8 @@ export class ImageThumbnailsComponent {
 
   onPick(id: ID) {
     this.select.emit(id);
+    if (this.mode() === 'vertical') {
+      this.toggleCollapse.emit();
+    }
   }
 }
