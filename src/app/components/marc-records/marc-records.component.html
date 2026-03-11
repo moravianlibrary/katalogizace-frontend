@@ -1,13 +1,15 @@
 <section class="flex h-full flex-col p-4">
-  <div
-    class="text-secondary text-sm-tight bg-main-bright grid shrink-0 grid-cols-[1fr_2fr_2fr_1fr_auto] items-center gap-3 rounded-t-lg p-2 text-left font-medium text-nowrap"
-  >
-    <span>{{ "records.source" | translate }}</span>
-    <span>{{ "records.title" | translate }}</span>
-    <span>{{ "records.author" | translate }}</span>
-    <span>{{ "records.year_of_publishing" | translate }}</span>
-    <span class="h-4 w-6"></span>
-  </div>
+  @if (!isSingleRecord()) {
+    <div
+      class="text-secondary text-sm-tight bg-main-bright grid shrink-0 grid-cols-[1fr_2fr_2fr_1fr_auto] items-center gap-3 rounded-t-lg p-2 text-left font-medium text-nowrap"
+    >
+      <span>{{ "records.source" | translate }}</span>
+      <span>{{ "records.title" | translate }}</span>
+      <span>{{ "records.author" | translate }}</span>
+      <span>{{ "records.year_of_publishing" | translate }}</span>
+      <span class="h-4 w-6"></span>
+    </div>
+  }
 
   <div class="min-h-0 flex-1 overflow-auto">
     @if (!records().length) {
@@ -15,98 +17,108 @@
         {{ "records.no_records" | translate }}
       </p>
     } @else {
-      @for (rec of records(); track $index) {
-        <div>
-          <button
-            class="border-bright w-full border-b px-2 py-3 hover:cursor-pointer hover:bg-gray-500/5"
-            [ngClass]="
-              expandedIndex() === $index ? 'bg-gray-500/5' : 'bg-main-base'
-            "
-            (click)="toggleRow($index)"
-            type="button"
-          >
-            <div
-              class="grid grid-cols-[1fr_2fr_2fr_1fr_auto] items-center gap-3 text-left text-sm"
+      @if (isSingleRecord()) {
+        <div class="min-h-0 overflow-auto">
+          <app-extracted-marc-record-table
+            [extractedRecord]="extractedRecord()!"
+            [diffIndex]="diffIndex()"
+            diffSide="opened"
+          />
+        </div>
+      } @else {
+        @for (rec of records(); track $index) {
+          <div>
+            <button
+              class="border-bright w-full border-b px-2 py-3 hover:cursor-pointer hover:bg-gray-500/5"
+              [ngClass]="
+                expandedIndex() === $index ? 'bg-gray-500/5' : 'bg-main-base'
+              "
+              (click)="toggleRow($index)"
+              type="button"
             >
               <div
-                class="text-md truncate"
-                [ngClass]="expandedIndex() === $index ? 'font-medium' : ''"
+                class="grid grid-cols-[1fr_2fr_2fr_1fr_auto] items-center gap-3 text-left text-sm"
               >
-                {{
-                  rec.extracted
-                    ? ("records.source_extracted" | translate)
-                    : rec.existing!.source
-                }}
-              </div>
-
-              <div
-                class="text-md truncate"
-                [ngClass]="expandedIndex() === $index ? 'font-medium' : ''"
-              >
-                {{ getTitle($index, rec.existing) || "-" }}
-              </div>
-
-              <div
-                class="text-md truncate"
-                [ngClass]="expandedIndex() === $index ? 'font-medium' : ''"
-              >
-                {{ getAuthorName($index, rec.existing) || "-" }}
-              </div>
-
-              <div
-                class="text-md truncate"
-                [ngClass]="expandedIndex() === $index ? 'font-medium' : ''"
-              >
-                {{ getPublicationYear($index, rec.existing) || "-" }}
-              </div>
-
-              <div class="flex items-center justify-end p-2">
-                <svg
-                  class="icon-black transition-transform duration-150"
-                  [ngClass]="{ 'rotate-180': expandedIndex() === $index }"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="15"
-                  height="8"
-                  viewBox="0 0 15 8"
+                <div
+                  class="text-md truncate"
+                  [ngClass]="expandedIndex() === $index ? 'font-medium' : ''"
                 >
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M0.183058 0.183058C0.427136 -0.0610194 0.822864 -0.0610194 1.06694 0.183058L6.50028 5.61639C6.89786 6.01398 7.55214 6.01398 7.94972 5.61639L13.3831 0.183058C13.6271 -0.0610194 14.0229 -0.0610194 14.2669 0.183058C14.511 0.427136 14.511 0.822864 14.2669 1.06694L8.83361 6.50028C7.94786 7.38602 6.50214 7.38602 5.61639 6.50028L0.183058 1.06694C-0.0610194 0.822864 -0.0610194 0.427136 0.183058 0.183058Z"
-                  />
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M0.183058 0.183058C0.427136 -0.0610194 0.822864 -0.0610194 1.06694 0.183058L6.50028 5.61639C6.89786 6.01398 7.55214 6.01398 7.94972 5.61639L13.3831 0.183058C13.6271 -0.0610194 14.0229 -0.0610194 14.2669 0.183058C14.511 0.427136 14.511 0.822864 14.2669 1.06694L8.83361 6.50028C7.94786 7.38602 6.50214 7.38602 5.61639 6.50028L0.183058 1.06694C-0.0610194 0.822864 -0.0610194 0.427136 0.183058 0.183058Z"
-                  />
-                </svg>
-              </div>
-            </div>
-          </button>
+                  {{
+                    rec.extracted
+                      ? ("records.source_extracted" | translate)
+                      : rec.existing!.source
+                  }}
+                </div>
 
-          @if (expandedIndex() === $index) {
-            <div class="border-primary-default border-b-2">
-              <div
-                class="min-h-0 overflow-auto overscroll-contain"
-                [style.max-height.px]="detailMaxHeightPx()"
-              >
-                @if ($index === 0) {
-                  <app-extracted-marc-record-table
-                    [extractedRecord]="rec.extracted!"
-                    [diffIndex]="diffIndex()"
-                    diffSide="opened"
-                  />
-                } @else {
-                  <app-existing-marc-record-table
-                    [existingRecord]="store.openedForDiff()!"
-                    [diffIndex]="diffIndex()"
-                    diffSide="opened"
-                  />
-                }
+                <div
+                  class="text-md truncate"
+                  [ngClass]="expandedIndex() === $index ? 'font-medium' : ''"
+                >
+                  {{ getTitle($index, rec.existing) || "-" }}
+                </div>
+
+                <div
+                  class="text-md truncate"
+                  [ngClass]="expandedIndex() === $index ? 'font-medium' : ''"
+                >
+                  {{ getAuthorName($index, rec.existing) || "-" }}
+                </div>
+
+                <div
+                  class="text-md truncate"
+                  [ngClass]="expandedIndex() === $index ? 'font-medium' : ''"
+                >
+                  {{ getPublicationYear($index, rec.existing) || "-" }}
+                </div>
+
+                <div class="flex items-center justify-end p-2">
+                  <svg
+                    class="icon-black transition-transform duration-150"
+                    [ngClass]="{ 'rotate-180': expandedIndex() === $index }"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="15"
+                    height="8"
+                    viewBox="0 0 15 8"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M0.183058 0.183058C0.427136 -0.0610194 0.822864 -0.0610194 1.06694 0.183058L6.50028 5.61639C6.89786 6.01398 7.55214 6.01398 7.94972 5.61639L13.3831 0.183058C13.6271 -0.0610194 14.0229 -0.0610194 14.2669 0.183058C14.511 0.427136 14.511 0.822864 14.2669 1.06694L8.83361 6.50028C7.94786 7.38602 6.50214 7.38602 5.61639 6.50028L0.183058 1.06694C-0.0610194 0.822864 -0.0610194 0.427136 0.183058 0.183058Z"
+                    />
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M0.183058 0.183058C0.427136 -0.0610194 0.822864 -0.0610194 1.06694 0.183058L6.50028 5.61639C6.89786 6.01398 7.55214 6.01398 7.94972 5.61639L13.3831 0.183058C13.6271 -0.0610194 14.0229 -0.0610194 14.2669 0.183058C14.511 0.427136 14.511 0.822864 14.2669 1.06694L8.83361 6.50028C7.94786 7.38602 6.50214 7.38602 5.61639 6.50028L0.183058 1.06694C-0.0610194 0.822864 -0.0610194 0.427136 0.183058 0.183058Z"
+                    />
+                  </svg>
+                </div>
               </div>
-            </div>
-          }
-        </div>
+            </button>
+
+            @if (expandedIndex() === $index) {
+              <div class="border-primary-default border-b-2">
+                <div
+                  class="min-h-0 overflow-auto overscroll-contain"
+                  [style.max-height.px]="detailMaxHeightPx()"
+                >
+                  @if ($index === 0) {
+                    <app-extracted-marc-record-table
+                      [extractedRecord]="rec.extracted!"
+                      [diffIndex]="diffIndex()"
+                      diffSide="opened"
+                    />
+                  } @else {
+                    <app-existing-marc-record-table
+                      [existingRecord]="store.openedForDiff()!"
+                      [diffIndex]="diffIndex()"
+                      diffSide="opened"
+                    />
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
       }
     }
   </div>

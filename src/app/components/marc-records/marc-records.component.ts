@@ -65,6 +65,12 @@ export class MarcRecordsComponent {
     return list;
   });
 
+  isSingleRecord = computed(() => {
+    const extracted = this.store.extracted();
+    const existing = this.store.existingRecords();
+    return (extracted ? 1 : 0) + existing.length === 1;
+  });
+
   expandedIndex = signal<number | null>(0);
 
   private lastAppliedKey: string | null = null;

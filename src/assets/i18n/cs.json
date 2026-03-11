@@ -154,6 +154,7 @@
   "context_panel": {
     "compare_results": "Porovnat rozdíly",
     "records": "Záznamy",
+    "extracted_record": "Vyčtený záznam",
     "candidate_selection": "Výběr kandidátů pro pole {{tag}}",
     "provenance": "Jak jsme získali pole {{tag}}?",
     "edit": "Úprava pole {{tag}}"
