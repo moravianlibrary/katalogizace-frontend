@@ -1,8 +1,11 @@
+export type UserPermission = 'read' | 'write' | 'delete' | 'save';
+export type UserRole = 'admin' | 'user';
+
 export interface UserDto {
   email: string;
   full_name: string;
-  roles: ('admin' | 'user')[];
-  permissions: ('read' | 'write' | 'delete' | 'save')[];
+  roles: UserRole[];
+  permissions: UserPermission[];
 }
 
 export interface CurrentUserDto {
