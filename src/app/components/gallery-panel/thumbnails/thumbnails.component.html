@@ -91,8 +91,8 @@
 
               <div
                 class="pointer-events-none absolute inset-0 rounded-lg border-2 border-transparent transition-colors"
-                [class.group-hover:border-additionally-1]="
-                  !it.loading && selectedId() !== it.id
+                [class.!border-primary-default]="
+                  selectedId() === it.id && !it.loading
                 "
                 [ngClass]="
                   !it.loading && selectedId() !== it.id
