@@ -12,6 +12,7 @@ import { RecordStateService } from '../../../services/record-state.service';
 import { RecordStore } from '../../../stores/record.store';
 
 import { FieldEditService } from '@/app/services/edit.service';
+import { TranslateService } from '@ngx-translate/core';
 import {
   dataSignature,
   enumerateSubfields,
@@ -25,6 +26,12 @@ import {
   templateUrl: './marc-row-data.component.html',
 })
 export class MarcRowDataComponent {
+  private cps = inject(ContextPanelService);
+  private store = inject(RecordStore);
+  private recordState = inject(RecordStateService);
+  private edit = inject(FieldEditService);
+  private translate = inject(TranslateService);
+
   rowClass = input<string>('');
   df = input.required<{
     fieldId?: UUID;
@@ -41,16 +48,19 @@ export class MarcRowDataComponent {
   diffSide = input<'opened' | 'preview'>('opened');
   editable = input<boolean>(false);
 
-  onDeleteField() {
+  onDeleteField(event: MouseEvent) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    const confirmed = confirm(
+      this.translate.instant('messages.confirm.records.delete'),
+    );
+    if (!confirmed) return;
+
     this.recordState.removeField(this.df().fieldId!);
     this.edit.field.set(null);
     this.cps.setMode('records');
   }
-
-  private cps = inject(ContextPanelService);
-  private store = inject(RecordStore);
-  private recordState = inject(RecordStateService);
-  private edit = inject(FieldEditService);
 
   onShowCandidates() {
     this.cps.showCandidates(

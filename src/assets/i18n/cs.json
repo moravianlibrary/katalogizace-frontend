@@ -141,6 +141,9 @@
       "books": {
         "delete": "Opravdu chcete smazat tuto knihu?",
         "rerun": "Opravdu chcete znovu spustit zpracování této knihy?"
+      },
+      "records": {
+        "delete": "Opravdu chcete smazat toto pole?"
       }
     }
   },
