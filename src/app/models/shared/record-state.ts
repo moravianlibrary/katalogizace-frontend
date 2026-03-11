@@ -62,6 +62,9 @@ export const QUICK_ADD: QuickAddItem[] = [
     subfields: [
       { code: 'a', value: '' },
       { code: 'b', value: '' },
+      { code: 'c', value: '' },
+      { code: 'e', value: '' },
+      { code: '3', value: '' },
     ],
     repeatable: true,
     type: 'data' as FieldType,

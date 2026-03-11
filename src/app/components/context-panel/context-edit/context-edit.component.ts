@@ -7,6 +7,7 @@ import { GenericDataFieldEditorComponent } from '../../generic-data-field-editor
 import { Field008EditorComponent } from './field-008-editor/field-008-editor.component';
 import { Field245EditorComponent } from './field-245-editor/field-245-editor.component';
 import { Field264EditorComponent } from './field-264-editor/field-264-editor.component';
+import { Field300EditorComponent } from './field-300-editor/field-300-editor.component';
 import { Field500EditorComponent } from './field-500-editor/field-500-editor.component';
 import { Field65xEditorComponent } from './field-65x-editor/field-65x-editor.component';
 import { FieldAuthorityEditorComponent } from './field-authority-editor/field-authority-editor.component';
@@ -24,6 +25,7 @@ import { FieldAuthorityEditorComponent } from './field-authority-editor/field-au
     Field008EditorComponent,
     Field65xEditorComponent,
     FieldAuthorityEditorComponent,
+    Field300EditorComponent,
   ],
   templateUrl: './context-edit.component.html',
 })
@@ -70,6 +72,7 @@ export class ContextEditComponent {
   is100 = computed(() => this.selected()?.tag === '100');
   is245 = computed(() => this.selected()?.tag === '245');
   is264 = computed(() => this.selected()?.tag === '264');
+  is300 = computed(() => this.selected()?.tag === '300');
   is500 = computed(() => this.selected()?.tag === '500');
   is650 = computed(() => this.selected()?.tag === '650');
   is651 = computed(() => this.selected()?.tag === '651');

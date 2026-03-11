@@ -52,6 +52,10 @@ export const FIELD_INDICATORS: Record<string, IndicatorConfig> = {
       { value: '4', label: '4' },
     ],
   },
+  '300': {
+    ind1: [UNDEFINED],
+    ind2: [UNDEFINED],
+  },
   '500': {
     ind1: [UNDEFINED],
     ind2: [UNDEFINED],

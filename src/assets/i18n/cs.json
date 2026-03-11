@@ -226,6 +226,13 @@
       "b": "|b Jméno nakladatele",
       "c": "|c Datum vydání"
     },
+    "300": {
+      "a": "|a Rozsah",
+      "b": "|b Další fyzické údaje",
+      "c": "|c Rozměr",
+      "e": "|e Doprovodný materiál",
+      "3": "|3 Bližší určení dokumentu"
+    },
     "500": {
       "a": "|a Obecná poznámka"
     },
