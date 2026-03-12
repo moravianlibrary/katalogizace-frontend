@@ -134,7 +134,10 @@
           </svg>
         </button>
 
-        @if (cps.state().tag === "100" || cps.state().tag === "700") {
+        @if (
+          (cps.state().tag === "100" || cps.state().tag === "700") &&
+          candidatesCount() > 0
+        ) {
           <button
             class="btn btn-m btn-tertiary group"
             (click)="onShowCandidates()"

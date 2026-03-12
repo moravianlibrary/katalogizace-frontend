@@ -75,6 +75,14 @@ export class ContextPanelHeaderComponent {
     this.cps.setMode('edit', { tag: state.tag, fieldId: state.fieldId });
   }
 
+  candidatesCount = computed(() => {
+    const field =
+      this.recordState.selectedField()! as EditableMarcRecordDataField;
+    const candidates = this.store.getCandidatesForField(field.fieldId);
+
+    return candidates.length;
+  });
+
   onShowCandidates() {
     const field =
       this.recordState.selectedField()! as EditableMarcRecordDataField;
