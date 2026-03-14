@@ -35,9 +35,42 @@ export class ContextPanelHeaderComponent {
 
   canResetRecord = computed(() => !!this.store.extracted());
 
-  canResetField = computed(
-    () => this.cps.state().mode === 'edit' && !!this.cps.editSnapshot(),
-  );
+  canResetField = computed(() => {
+    if (this.cps.state().mode !== 'edit') return false;
+
+    const snapshot = this.cps.editSnapshot();
+    const fieldId = this.cps.state().fieldId;
+    const record = this.recordState.editableRecord();
+
+    if (!snapshot || !fieldId || !record) return false;
+
+    if (snapshot.kind === 'data') {
+      const field = record.data_fields.find((f) => f.fieldId === fieldId);
+      if (!field) return false;
+
+      return (
+        JSON.stringify({
+          ind1: field.ind1,
+          ind2: field.ind2,
+          subfields: field.subfields ?? [],
+        }) !==
+        JSON.stringify({
+          ind1: snapshot.ind1,
+          ind2: snapshot.ind2,
+          subfields: snapshot.subfields ?? [],
+        })
+      );
+    }
+
+    if (snapshot.kind === 'control') {
+      const field = record.control_fields.find((f) => f.fieldId === fieldId);
+      if (!field) return false;
+
+      return (field.value ?? '') !== (snapshot.value ?? '');
+    }
+
+    return false;
+  });
 
   onResetField() {
     this.cps.requestEditReset();
