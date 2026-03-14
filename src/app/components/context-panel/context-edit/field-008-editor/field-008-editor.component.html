@@ -57,9 +57,8 @@
                 <button
                   class="group flex items-center px-3"
                   (click)="clearSeg($index)"
+                  (mousedown)="$event.preventDefault()"
                   type="button"
-                  aria-label="Vymazať"
-                  title="Vymazať"
                 >
                   <svg
                     class="icon-tertiary"

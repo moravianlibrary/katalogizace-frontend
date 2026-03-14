@@ -24,6 +24,7 @@
       <button
         class="group flex items-center px-3"
         (click)="clear()"
+        (mousedown)="$event.preventDefault()"
         type="button"
       >
         <svg

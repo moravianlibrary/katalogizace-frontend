@@ -57,6 +57,7 @@
             <button
               class="group flex items-center px-3"
               (click)="setSubfieldValue($index, '')"
+              (mousedown)="$event.preventDefault()"
               type="button"
             >
               <svg
