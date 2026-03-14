@@ -1,5 +1,7 @@
 <section class="bg-main-base flex h-full min-h-0 flex-col rounded-2xl">
-  <app-context-panel-header [headerTitle]="title()"></app-context-panel-header>
+  <app-context-panel-header
+    [headerTitle]="titleKey() | translate: titleParams()"
+  />
   @switch (state().mode) {
     @case ("candidates_edit") {
       <app-candidates-table
