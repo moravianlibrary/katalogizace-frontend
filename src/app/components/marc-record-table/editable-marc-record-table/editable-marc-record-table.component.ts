@@ -11,6 +11,7 @@ import { MarcRowDataComponent } from '../../marc-row/marc-row-data/marc-row-data
 import { MarcRowLeaderComponent } from '../../marc-row/marc-row-leader/marc-row-leader.component';
 
 import { computed, signal } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   standalone: true,
@@ -20,6 +21,7 @@ import { computed, signal } from '@angular/core';
     MarcRowDataComponent,
     MarcRowLeaderComponent,
     CommonModule,
+    TranslateModule,
   ],
   templateUrl: './editable-marc-record-table.component.html',
 })

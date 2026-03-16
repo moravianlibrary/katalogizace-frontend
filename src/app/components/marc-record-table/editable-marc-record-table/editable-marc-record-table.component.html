@@ -66,5 +66,17 @@
         ></tr>
       }
     }
+
+    @if (
+      !recordState.editableRecord()?.leader &&
+      recordState.editableRecord()?.control_fields?.length === 0 &&
+      recordState.editableRecord()?.data_fields?.length === 0
+    ) {
+      <tr>
+        <td class="text-light p-2 text-sm" colspan="6">
+          {{ "records.no_data" | translate }}
+        </td>
+      </tr>
+    }
   </tbody>
 </table>
