@@ -42,6 +42,7 @@ export class InputAutocompleteAuthorityComponent {
   readonly loading = signal(false);
 
   readonly skipNextFetch = signal(false);
+  readonly hasEditedSinceFocus = signal(false);
 
   readonly query = signal('');
   readonly suggestions = signal<AutocompletAuthorityResponse[]>([]);
@@ -80,8 +81,12 @@ export class InputAutocompleteAuthorityComponent {
 
     effect(() => {
       const q = this.query();
+
       const isFocused = this.focused();
       if (!isFocused) return;
+
+      const hasEdited = this.hasEditedSinceFocus();
+      if (!hasEdited) return;
 
       const shouldSkip = untracked(() => this.skipNextFetch());
       if (shouldSkip) {
@@ -129,10 +134,7 @@ export class InputAutocompleteAuthorityComponent {
   onFocus() {
     this.focused.set(true);
     this.resetActive();
-
-    if ((this.query() ?? '').trim().length >= this.minChars()) {
-      this.query.update((x) => x);
-    }
+    this.hasEditedSinceFocus.set(false);
   }
 
   onBlur() {
@@ -141,15 +143,18 @@ export class InputAutocompleteAuthorityComponent {
       this.suggestions.set([]);
       this.loading.set(false);
       this.resetActive();
+      this.hasEditedSinceFocus.set(false);
     }, 120);
   }
 
   onInput(v: string) {
+    this.hasEditedSinceFocus.set(true);
     this.query.set(v);
     this.valueChange.emit(v);
   }
 
   clear() {
+    this.hasEditedSinceFocus.set(true);
     this.query.set('');
     this.suggestions.set([]);
     this.loading.set(false);
@@ -159,6 +164,7 @@ export class InputAutocompleteAuthorityComponent {
 
   pick(s: AutocompletAuthorityResponse) {
     this.skipNextFetch.set(true);
+    this.hasEditedSinceFocus.set(false);
     this.query.set(s.a);
     this.valueChange.emit(s.a);
     this.suggestions.set([]);
@@ -178,7 +184,6 @@ export class InputAutocompleteAuthorityComponent {
 
       if (!hasList) {
         this.focused.set(true);
-        this.query.update((x) => x);
         return;
       }
 

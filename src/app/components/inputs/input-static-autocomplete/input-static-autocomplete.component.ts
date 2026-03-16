@@ -39,6 +39,7 @@ export class InputStaticAutocompleteComponent {
   readonly query = signal('');
 
   readonly hideDropdown = signal(false);
+  readonly hasEditedSinceFocus = signal(false);
 
   private blurTimer: number | null = null;
 
@@ -66,6 +67,7 @@ export class InputStaticAutocompleteComponent {
     if (!this.focused()) return false;
     if (this.disabled()) return false;
     if (this.hideDropdown()) return false;
+    if (!this.hasEditedSinceFocus()) return false;
 
     const has = this.filtered().length > 0;
     if (has && this.activeIndex() === -1) {
@@ -106,7 +108,9 @@ export class InputStaticAutocompleteComponent {
       window.clearTimeout(this.blurTimer);
       this.blurTimer = null;
     }
+
     this.focused.set(true);
+    this.hasEditedSinceFocus.set(false);
     this.resetActive();
   }
 
@@ -116,6 +120,7 @@ export class InputStaticAutocompleteComponent {
     this.blurTimer = window.setTimeout(() => {
       this.focused.set(false);
       this.hideDropdown.set(false);
+      this.hasEditedSinceFocus.set(false);
       this.resetActive();
       this.blurTimer = null;
     }, 120);
@@ -129,6 +134,7 @@ export class InputStaticAutocompleteComponent {
     const max = this.maxlength();
     const next = max != null ? (v ?? '').slice(0, max) : (v ?? '');
 
+    this.hasEditedSinceFocus.set(true);
     this.query.set(next);
     this.valueChange.emit(next);
   }
@@ -138,8 +144,10 @@ export class InputStaticAutocompleteComponent {
       window.clearTimeout(this.blurTimer);
       this.blurTimer = null;
     }
+
     this.focused.set(true);
     this.hideDropdown.set(false);
+    this.hasEditedSinceFocus.set(true);
     this.resetActive();
 
     this.query.set('');
@@ -151,7 +159,9 @@ export class InputStaticAutocompleteComponent {
       window.clearTimeout(this.blurTimer);
       this.blurTimer = null;
     }
+
     this.focused.set(true);
+    this.hasEditedSinceFocus.set(false);
 
     this.query.set(code);
     this.valueChange.emit(code);
@@ -172,6 +182,7 @@ export class InputStaticAutocompleteComponent {
 
       if (this.hideDropdown()) this.hideDropdown.set(false);
 
+      if (!this.hasEditedSinceFocus()) return;
       if (!hasList) return;
 
       const next = Math.min(idx < 0 ? 0 : idx + 1, list.length - 1);
@@ -181,6 +192,8 @@ export class InputStaticAutocompleteComponent {
 
     if (e.key === 'ArrowUp') {
       e.preventDefault();
+
+      if (!this.hasEditedSinceFocus()) return;
       if (!hasList) return;
 
       const next = Math.max(idx <= 0 ? 0 : idx - 1, 0);
@@ -189,6 +202,7 @@ export class InputStaticAutocompleteComponent {
     }
 
     if (e.key === 'Enter') {
+      if (!this.hasEditedSinceFocus()) return;
       if (!hasList) return;
       if (idx < 0) return;
 

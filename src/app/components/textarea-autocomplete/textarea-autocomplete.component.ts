@@ -42,6 +42,7 @@ export class TextareaAutocompleteComponent {
   readonly loading = signal(false);
 
   private readonly skipNextFetch = signal(false);
+  readonly hasEditedSinceFocus = signal(false);
 
   readonly query = signal('');
   readonly suggestions = signal<AutocompleteSuggestion[]>([]);
@@ -60,6 +61,7 @@ export class TextareaAutocompleteComponent {
   readonly open = computed(() => {
     if (!this.focused()) return false;
     if (this.disabled()) return false;
+    if (!this.hasEditedSinceFocus()) return false;
     return this.suggestions().length > 0;
   });
 
@@ -77,6 +79,9 @@ export class TextareaAutocompleteComponent {
       const isFocused = this.focused();
       if (!isFocused) return;
 
+      const hasEdited = this.hasEditedSinceFocus();
+      if (!hasEdited) return;
+
       const shouldSkip = untracked(() => this.skipNextFetch());
       if (shouldSkip) {
         untracked(() => this.skipNextFetch.set(false));
@@ -90,6 +95,7 @@ export class TextareaAutocompleteComponent {
       }
 
       if (this.debounceTimer) window.clearTimeout(this.debounceTimer);
+
       this.debounceTimer = window.setTimeout(() => {
         const seq = ++this.reqSeq;
         this.loading.set(true);
@@ -120,9 +126,7 @@ export class TextareaAutocompleteComponent {
 
   onFocus() {
     this.focused.set(true);
-    if ((this.query() ?? '').trim().length >= this.minChars()) {
-      this.query.update((x) => x);
-    }
+    this.hasEditedSinceFocus.set(false);
   }
 
   onBlur() {
@@ -130,25 +134,31 @@ export class TextareaAutocompleteComponent {
       this.focused.set(false);
       this.suggestions.set([]);
       this.loading.set(false);
+      this.hasEditedSinceFocus.set(false);
     }, 120);
   }
 
   onInput(v: string) {
+    this.hasEditedSinceFocus.set(true);
     this.query.set(v);
 
     this.valueChange.emit(v);
   }
 
   clear() {
+    this.hasEditedSinceFocus.set(true);
     this.query.set('');
     this.suggestions.set([]);
+    this.loading.set(false);
     this.valueChange.emit('');
   }
 
   pick(s: AutocompleteSuggestion) {
     this.skipNextFetch.set(true);
+    this.hasEditedSinceFocus.set(false);
     this.query.set(s.value);
     this.valueChange.emit(s.value);
     this.suggestions.set([]);
+    this.loading.set(false);
   }
 }

@@ -42,6 +42,7 @@ export class InputAutocompleteDictionaryComponent {
   readonly loading = signal(false);
 
   readonly skipNextFetch = signal(false);
+  readonly hasEditedSinceFocus = signal(false);
 
   readonly query = signal('');
   readonly suggestions = signal<AutocompletDictionaryResponse[]>([]);
@@ -81,7 +82,11 @@ export class InputAutocompleteDictionaryComponent {
     effect(() => {
       const q = this.query();
       const isFocused = this.focused();
+
       if (!isFocused) return;
+
+      const hasEdited = this.hasEditedSinceFocus();
+      if (!hasEdited) return;
 
       const shouldSkip = untracked(() => this.skipNextFetch());
       if (shouldSkip) {
@@ -97,6 +102,7 @@ export class InputAutocompleteDictionaryComponent {
       }
 
       if (this.debounceTimer) window.clearTimeout(this.debounceTimer);
+
       this.debounceTimer = window.setTimeout(() => {
         const seq = ++this.reqSeq;
         this.loading.set(true);
@@ -131,10 +137,7 @@ export class InputAutocompleteDictionaryComponent {
   onFocus() {
     this.focused.set(true);
     this.resetActive();
-
-    if ((this.query() ?? '').trim().length >= this.minChars()) {
-      this.query.update((x) => x);
-    }
+    this.hasEditedSinceFocus.set(false);
   }
 
   onBlur() {
@@ -143,15 +146,18 @@ export class InputAutocompleteDictionaryComponent {
       this.suggestions.set([]);
       this.loading.set(false);
       this.resetActive();
+      this.hasEditedSinceFocus.set(false);
     }, 120);
   }
 
   onInput(v: string) {
+    this.hasEditedSinceFocus.set(true);
     this.query.set(v);
     this.valueChange.emit(v);
   }
 
   clear() {
+    this.hasEditedSinceFocus.set(true);
     this.query.set('');
     this.suggestions.set([]);
     this.loading.set(false);
@@ -161,6 +167,7 @@ export class InputAutocompleteDictionaryComponent {
 
   pick(s: AutocompletDictionaryResponse) {
     this.skipNextFetch.set(true);
+    this.hasEditedSinceFocus.set(false);
     this.query.set(s.a);
     this.valueChange.emit(s.a);
     this.suggestions.set([]);

@@ -42,6 +42,7 @@ export class InputAutocompleteComponent {
   readonly loading = signal(false);
 
   readonly skipNextFetch = signal(false);
+  readonly hasEditedSinceFocus = signal(false);
 
   readonly query = signal('');
   readonly suggestions = signal<AutocompleteSuggestion[]>([]);
@@ -74,7 +75,11 @@ export class InputAutocompleteComponent {
     effect(() => {
       const q = this.query();
       const isFocused = this.focused();
+
       if (!isFocused) return;
+
+      const hasEdited = this.hasEditedSinceFocus();
+      if (!hasEdited) return;
 
       const shouldSkip = untracked(() => this.skipNextFetch());
       if (shouldSkip) {
@@ -89,6 +94,7 @@ export class InputAutocompleteComponent {
       }
 
       if (this.debounceTimer) window.clearTimeout(this.debounceTimer);
+
       this.debounceTimer = window.setTimeout(() => {
         const seq = ++this.reqSeq;
         this.loading.set(true);
@@ -140,10 +146,7 @@ export class InputAutocompleteComponent {
   onFocus() {
     this.focused.set(true);
     this.resetActive();
-
-    if ((this.query() ?? '').trim().length >= this.minChars()) {
-      this.query.update((x) => x);
-    }
+    this.hasEditedSinceFocus.set(false);
   }
 
   focus() {
@@ -161,27 +164,33 @@ export class InputAutocompleteComponent {
       this.suggestions.set([]);
       this.loading.set(false);
       this.resetActive();
+      this.hasEditedSinceFocus.set(false);
     }, 120);
   }
 
   onInput(v: string) {
+    this.hasEditedSinceFocus.set(true);
     this.query.set(v);
 
     this.valueChange.emit(v);
   }
 
   clear() {
+    this.hasEditedSinceFocus.set(true);
     this.query.set('');
     this.suggestions.set([]);
+    this.loading.set(false);
     this.resetActive();
     this.valueChange.emit('');
   }
 
   pick(s: AutocompleteSuggestion) {
     this.skipNextFetch.set(true);
+    this.hasEditedSinceFocus.set(false);
     this.query.set(s.value);
     this.valueChange.emit(s.value);
     this.suggestions.set([]);
+    this.loading.set(false);
     this.resetActive();
   }
 
@@ -196,7 +205,6 @@ export class InputAutocompleteComponent {
 
       if (!hasList) {
         this.focused.set(true);
-        this.query.update((x) => x);
         return;
       }
 
