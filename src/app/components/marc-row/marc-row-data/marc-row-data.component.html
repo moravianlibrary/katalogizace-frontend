@@ -20,14 +20,16 @@
       @if (subfieldsEnumerated().length) {
         <div class="flex flex-wrap gap-x-2 gap-y-1">
           @for (e of subfieldsEnumerated(); track $index) {
-            <span [ngClass]="subDiffClass(subDiffKindAt($index))">
-              <span class="text-secondary text-md font-bold"
-                >|{{ e.sf.code }}</span
-              >
-              <span class="text-secondary text-md ml-2 wrap-anywhere">{{
-                e.sf.value
-              }}</span>
-            </span>
+            @if (e.sf.value.length) {
+              <span [ngClass]="subDiffClass(subDiffKindAt($index))">
+                <span class="text-secondary text-md font-bold"
+                  >|{{ e.sf.code }}</span
+                >
+                <span class="text-secondary text-md ml-2 wrap-anywhere">{{
+                  e.sf.value
+                }}</span>
+              </span>
+            }
           }
         </div>
       }
