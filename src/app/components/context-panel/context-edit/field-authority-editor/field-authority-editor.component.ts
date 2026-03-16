@@ -34,7 +34,6 @@ type PaginationItem = number | 'ellipsis-left' | 'ellipsis-right';
     TranslateModule,
     InputStaticAutocompleteComponent,
     NgClass,
-    TranslateModule,
     ExistingMarcRecordTableComponent,
   ],
   templateUrl: './field-authority-editor.component.html',
@@ -43,7 +42,7 @@ export class FieldAuthorityEditorComponent {
   private readonly rs = inject(RecordStateService);
   private readonly marcT = inject(MarcTranslateService);
   private readonly catalogue = inject(CatalogueService);
-  private translate = inject(TranslateService);
+  private readonly translate = inject(TranslateService);
 
   fieldId = input.required<UUID>();
 
@@ -101,6 +100,41 @@ export class FieldAuthorityEditorComponent {
       this.hasAutoFocused.set(true);
       queueMicrotask(() => this.firstAutocomplete()?.focus());
     });
+
+    effect(() => {
+      const id = (this.getSub('7') ?? '').trim();
+
+      if (!id) {
+        this.sevenRecord.set(null);
+        this.loadedSevenId.set(null);
+        return;
+      }
+
+      if (this.loadedSevenId() === id || this.loadingSevenRecord()) return;
+
+      this.loadingSevenRecord.set(true);
+
+      this.catalogue.getAutRecord(id, 'aut').subscribe({
+        next: (record) => {
+          if ((this.getSub('7') ?? '').trim() !== id) {
+            this.loadingSevenRecord.set(false);
+            return;
+          }
+
+          this.sevenRecord.set(record);
+          this.loadedSevenId.set(id);
+          this.loadingSevenRecord.set(false);
+        },
+        error: () => {
+          if ((this.getSub('7') ?? '').trim() === id) {
+            this.sevenRecord.set(null);
+            this.loadedSevenId.set(null);
+          }
+          this.loadingSevenRecord.set(false);
+          console.error(this.translate.instant('dialogs.record_load_error'));
+        },
+      });
+    });
   }
 
   setInd(which: 1 | 2, v: string) {
@@ -132,6 +166,15 @@ export class FieldAuthorityEditorComponent {
     }
 
     this.rs.patchDataField(this.fieldId(), { subfields });
+
+    if (code === '7') {
+      const trimmed = value.trim();
+      this.loadedSevenId.set(null);
+
+      if (!trimmed) {
+        this.sevenRecord.set(null);
+      }
+    }
   }
 
   onPickTerm(term: string) {
@@ -175,6 +218,9 @@ export class FieldAuthorityEditorComponent {
   readonly limit = signal(100);
   readonly detailLoading = signal(false);
   readonly detailError = signal<string | null>(null);
+  sevenRecord = signal<ExistingMarcRecord | null>(null);
+  private readonly loadingSevenRecord = signal(false);
+  private readonly loadedSevenId = signal<string | null>(null);
 
   readonly hasNext = computed(() => this.page() * this.limit() < this.total());
   readonly hasPrev = computed(() => this.page() > 1);
@@ -182,6 +228,15 @@ export class FieldAuthorityEditorComponent {
   getAuthority100(record: ExistingMarcRecord) {
     return record.data_fields.find((f) => f.tag === '100') ?? null;
   }
+
+  catalogueUrlSeven = computed<string | null>(() => {
+    const rec = this.sevenRecord();
+    const docNumber = this.getDocNumberFromRecord(rec);
+
+    if (!docNumber) return null;
+
+    return `https://aleph.nkp.cz/F/?func=direct&doc_number=${encodeURIComponent(docNumber)}&local_base=AUT`;
+  });
 
   catalogueUrl = computed<string | null>(() => {
     const rec = this.selectedRecordDetail();

@@ -1,10 +1,15 @@
 import { InputAutocompleteDictionaryComponent } from '@/app/components/inputs/input-autocomplete-dictionary/input-autocomplete-dictionary.component';
 import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
-import { AutocompletDictionaryResponse, UUID } from '@/app/models';
+import {
+  AutocompletDictionaryResponse,
+  ExistingMarcRecord,
+  UUID,
+} from '@/app/models';
 import {
   DropdownOption,
   getIndicators,
 } from '@/app/models/shared/dropdown.model';
+import { CatalogueService } from '@/app/services/api/catalogue.service';
 import { RecordStateService } from '@/app/services/record-state.service';
 import { CommonModule } from '@angular/common';
 import {
@@ -13,6 +18,7 @@ import {
   effect,
   inject,
   input,
+  signal,
   untracked,
   viewChild,
 } from '@angular/core';
@@ -31,6 +37,7 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class Field65xEditorComponent {
   private readonly rs = inject(RecordStateService);
+  private readonly catalogue = inject(CatalogueService);
 
   fieldId = input.required<UUID>();
 
@@ -51,6 +58,31 @@ export class Field65xEditorComponent {
   readonly ind1Options = computed(() => this.indicators().ind1);
   readonly ind2Options = computed(() => this.indicators().ind2);
 
+  sevenRecord = signal<ExistingMarcRecord | null>(null);
+  private readonly loadingSevenRecord = signal(false);
+  private readonly loadedSevenId = signal<string | null>(null);
+
+  catalogueUrlSeven = computed<string | null>(() => {
+    const rec = this.sevenRecord();
+    const docNumber = this.getDocNumberFromRecord(rec);
+
+    if (!docNumber) return null;
+
+    return `https://aleph.nkp.cz/F/?func=direct&doc_number=${encodeURIComponent(docNumber)}&local_base=AUT`;
+  });
+
+  private getDocNumberFromRecord(
+    rec: ExistingMarcRecord | null,
+  ): string | null {
+    if (!rec) return null;
+
+    const f998 = rec.data_fields.find((f) => f.tag === '998');
+    const sfA = f998?.subfields?.find((sf) => sf.code === 'a');
+    const value = sfA?.value?.trim();
+
+    return value ?? null;
+  }
+
   private readonly firstAutocomplete = viewChild(
     InputAutocompleteDictionaryComponent,
   );
@@ -65,6 +97,40 @@ export class Field65xEditorComponent {
       if (isLocked) return;
 
       queueMicrotask(() => this.firstAutocomplete()?.focus());
+    });
+
+    effect(() => {
+      const id = (this.getSub('7') ?? '').trim();
+
+      if (!id) {
+        this.sevenRecord.set(null);
+        this.loadedSevenId.set(null);
+        return;
+      }
+
+      if (this.loadedSevenId() === id || this.loadingSevenRecord()) return;
+
+      this.loadingSevenRecord.set(true);
+
+      this.catalogue.getAutRecord(id, 'aut').subscribe({
+        next: (record) => {
+          if ((this.getSub('7') ?? '').trim() !== id) {
+            this.loadingSevenRecord.set(false);
+            return;
+          }
+
+          this.sevenRecord.set(record);
+          this.loadedSevenId.set(id);
+          this.loadingSevenRecord.set(false);
+        },
+        error: () => {
+          if ((this.getSub('7') ?? '').trim() === id) {
+            this.sevenRecord.set(null);
+            this.loadedSevenId.set(null);
+          }
+          this.loadingSevenRecord.set(false);
+        },
+      });
     });
   }
 
@@ -117,6 +183,15 @@ export class Field65xEditorComponent {
     }
 
     this.rs.patchDataField(this.fieldId(), { subfields });
+
+    if (code === '7') {
+      const trimmed = value.trim();
+      this.loadedSevenId.set(null);
+
+      if (!trimmed) {
+        this.sevenRecord.set(null);
+      }
+    }
   }
 
   onDictionaryChange(v: string) {
