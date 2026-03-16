@@ -320,25 +320,18 @@ export class RecordStateService {
 
     const control_fields = rec.control_fields
       .filter((f) => f.tag.trim().length === 3)
-      // .map((f) => ({ tag: f.tag.trim(), value: (f.value ?? '').trim() }))
-      // .filter((sf) => sf.value.length > 0);
-      .map((f) => ({
-        tag: f.tag.trim(),
-        value: f.value ?? '',
-      }));
+      .map((f) => ({ tag: f.tag.trim(), value: (f.value ?? '').trim() }))
+      .filter((sf) => sf.value.length > 0);
 
     const data_fields = rec.data_fields
       .filter((f) => (f.tag ?? '').trim().length === 3)
       .map((f) => {
-        const cleanedSubfields = f.subfields;
-
-        // const cleanedSubfields =
-        //   (f.subfields ?? [])
-        //     .map((sf) => ({
-        //       code: (sf.code ?? '').trim(),
-        //       value: (sf.value ?? '').trim(),
-        //     }))
-        //     .filter((sf) => sf.code.length === 1 && sf.value.length > 0);
+        const cleanedSubfields = f.subfields
+          .map((sf) => ({
+            code: (sf.code ?? '').trim(),
+            value: (sf.value ?? '').trim(),
+          }))
+          .filter((sf) => sf.code.length === 1 && sf.value.length > 0);
 
         return {
           tag: f.tag.trim(),
