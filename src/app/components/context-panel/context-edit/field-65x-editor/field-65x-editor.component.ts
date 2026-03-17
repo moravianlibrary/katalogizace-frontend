@@ -1,5 +1,6 @@
 import { InputAutocompleteDictionaryComponent } from '@/app/components/inputs/input-autocomplete-dictionary/input-autocomplete-dictionary.component';
 import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
+import { LockHoverIconComponent } from '@/app/components/shared/lock-hover-icon/lock-hover-icon.component';
 import {
   AutocompletDictionaryResponse,
   ExistingMarcRecord,
@@ -32,6 +33,7 @@ import { TranslateModule } from '@ngx-translate/core';
     TranslateModule,
     InputDropdownComponent,
     InputAutocompleteDictionaryComponent,
+    LockHoverIconComponent,
   ],
   templateUrl: './field-65x-editor.component.html',
 })
@@ -153,6 +155,10 @@ export class Field65xEditorComponent {
   readonly locked = computed(() => {
     return (this.getSub('7') ?? '').trim().length > 0;
   });
+
+  unlock() {
+    this.clearAuthority();
+  }
 
   setInd(which: 1 | 2, v: string) {
     const f = this.field();

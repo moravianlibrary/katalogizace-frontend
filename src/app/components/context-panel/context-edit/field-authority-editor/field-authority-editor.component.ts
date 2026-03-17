@@ -2,6 +2,7 @@ import { InputAutocompleteAuthorityComponent } from '@/app/components/inputs/inp
 import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
 import { InputStaticAutocompleteComponent } from '@/app/components/inputs/input-static-autocomplete/input-static-autocomplete.component';
 import { ExistingMarcRecordTableComponent } from '@/app/components/marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
+import { LockHoverIconComponent } from '@/app/components/shared/lock-hover-icon/lock-hover-icon.component';
 import {
   AutocompletAuthorityResponse,
   ExistingMarcRecord,
@@ -35,6 +36,7 @@ type PaginationItem = number | 'ellipsis-left' | 'ellipsis-right';
     InputStaticAutocompleteComponent,
     NgClass,
     ExistingMarcRecordTableComponent,
+    LockHoverIconComponent,
   ],
   templateUrl: './field-authority-editor.component.html',
 })
@@ -135,6 +137,10 @@ export class FieldAuthorityEditorComponent {
         },
       });
     });
+  }
+
+  unlock() {
+    this.clearAuthority();
   }
 
   setInd(which: 1 | 2, v: string) {
