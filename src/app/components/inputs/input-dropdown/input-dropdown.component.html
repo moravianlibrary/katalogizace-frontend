@@ -1,6 +1,6 @@
 <div class="relative">
   <button
-    class="border-tertiary-default focus-within:border-primary-default bg-main-base disabled:border-tertiary-disable inline-flex w-full cursor-pointer items-center justify-between overflow-hidden rounded-lg border px-4 py-3 disabled:cursor-not-allowed disabled:bg-gray-500/5"
+    class="border-tertiary-default focus-within:border-primary-default bg-main-base disabled:border-tertiary-disable group inline-flex w-full cursor-pointer items-center justify-between overflow-hidden rounded-lg border px-4 py-3 disabled:cursor-not-allowed disabled:bg-gray-500/5"
     [disabled]="disabled()"
     (click)="toggle()"
     (keydown)="onKeydown($event)"
@@ -11,7 +11,7 @@
     </span>
 
     <svg
-      class="icon-tertiary-default"
+      class="icon-tertiary"
       xmlns="http://www.w3.org/2000/svg"
       width="12"
       height="6"
