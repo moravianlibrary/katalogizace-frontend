@@ -208,7 +208,6 @@ export class FieldAuthorityEditorComponent {
   }
 
   clearAuthority() {
-    this.setSub('a', '');
     this.setSub('7', '');
     this.setSub('d', '');
   }

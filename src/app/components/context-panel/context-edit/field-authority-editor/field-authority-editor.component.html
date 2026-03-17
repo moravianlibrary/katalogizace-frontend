@@ -84,10 +84,13 @@
         </label>
 
         <span
-          class="border-tertiary-default bg-main-base focus-within:border-primary-default inline-flex w-full items-center justify-between overflow-hidden rounded-lg border"
+          class="bg-main-base focus-within:border-primary-default inline-flex w-full items-center justify-between overflow-hidden rounded-lg border"
+          [ngClass]="
+            locked() ? 'border-tertiary-disable' : 'border-tertiary-default'
+          "
         >
           <input
-            class="bg-main-base disabled:text-disable disabled:border-tertiary-disable w-full py-3 pl-4 outline-none disabled:cursor-not-allowed disabled:bg-gray-500/5"
+            class="bg-main-base disabled:text-disable w-full py-3 pl-4 outline-none disabled:cursor-not-allowed disabled:bg-gray-500/5"
             [value]="dDraft()"
             [disabled]="locked()"
             (input)="onInputD($event)"
