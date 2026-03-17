@@ -48,6 +48,13 @@ export class ContextPanelService {
     }
   }
 
+  reset() {
+    this.state.set({ mode: 'records' });
+    this.applyCandidate.set(null);
+    this.editSnapshot.set(null);
+    this.editResetNonce.set(0);
+  }
+
   enterEdit(snapshot: EditSnapshot) {
     const clone =
       typeof structuredClone === 'function'

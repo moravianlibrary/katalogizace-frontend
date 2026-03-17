@@ -1,5 +1,5 @@
 import { RecordStore } from '@/app/stores/record.store';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, DestroyRef, inject } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { ContextPanelService } from '../../services/context-panel.service';
 import { CandidatesTableComponent } from '../candidates-table/candidates-table.component';
@@ -24,6 +24,13 @@ import { ContextPanelHeaderComponent } from './context-panel-header/context-pane
 export class ContextPanelComponent {
   private cps = inject(ContextPanelService);
   private store = inject(RecordStore);
+  private destroyRef = inject(DestroyRef);
+
+  constructor() {
+    this.destroyRef.onDestroy(() => {
+      this.cps.reset();
+    });
+  }
 
   hasSingleRecord = computed(() => {
     const extracted = this.store.extracted();
