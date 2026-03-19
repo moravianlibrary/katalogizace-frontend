@@ -60,7 +60,7 @@
     "mass_edit": "Hromadná úprava",
     "reset": "Reset",
     "cancel": "Zrušit",
-    "candidate_selection": "Výběr kandidáta",
+    "candidate_selection": "Kandidáti",
     "take_authority": "Převzít autoritu",
     "search": "Hledat"
   },
@@ -196,6 +196,7 @@
     "first_indicator": "1. Indikátor",
     "second_indicator": "2. Indikátor",
     "undefined_indicator": "Nedefinováno",
+    "add_subfield": "Přidat podpole",
     "008": {
       "date_entered": "Datum souboru (0-5)",
       "type_of_date": "Typ data (6)",
