@@ -64,6 +64,22 @@
 
       <div>
         <label class="text-light text-sm-tight mb-2 block font-medium">
+          {{ "field_edit.245.c" | translate }}
+        </label>
+
+        <app-input-autocomplete
+          [value]="getSubfield('c')"
+          [field]="'245'"
+          [subfield]="'c'"
+          [bases]="['NKC', 'SKC', 'SCK']"
+          [minChars]="1"
+          [limit]="20"
+          (valueChange)="setSubfield('c', $event)"
+        />
+      </div>
+
+      <div>
+        <label class="text-light text-sm-tight mb-2 block font-medium">
           {{ "field_edit.245.n" | translate }}
         </label>
 
@@ -91,22 +107,6 @@
           [minChars]="1"
           [limit]="20"
           (valueChange)="setSubfield('p', $event)"
-        />
-      </div>
-
-      <div>
-        <label class="text-light text-sm-tight mb-2 block font-medium">
-          {{ "field_edit.245.c" | translate }}
-        </label>
-
-        <app-input-autocomplete
-          [value]="getSubfield('c')"
-          [field]="'245'"
-          [subfield]="'c'"
-          [bases]="['NKC', 'SKC', 'SCK']"
-          [minChars]="1"
-          [limit]="20"
-          (valueChange)="setSubfield('c', $event)"
         />
       </div>
     </div>
