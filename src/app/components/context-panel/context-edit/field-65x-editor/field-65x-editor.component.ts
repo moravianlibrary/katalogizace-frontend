@@ -222,7 +222,6 @@ export class Field65xEditorComponent {
   }
 
   clearAuthority() {
-    this.setSub('a', '');
     this.setSub('7', '');
   }
 }
