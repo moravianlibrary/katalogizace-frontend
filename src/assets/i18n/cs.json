@@ -62,7 +62,10 @@
     "cancel": "Zrušit",
     "candidate_selection": "Kandidáti",
     "take_authority": "Převzít autoritu",
-    "search": "Hledat"
+    "search": "Hledat",
+    "add_subfield": "Přidat podpole",
+    "add_field": "Jiné pole",
+    "add": "Přidat"
   },
   "messages": {
     "success": {
@@ -706,5 +709,10 @@
     "type_authority": "Zadejte jméno autority, kterou chcete  vyhledat.",
     "authorities_load_error": "Náčítání autorit sa nezdařilo.",
     "record_load_error": "Náčítání záznamu sa nezdařilo."
+  },
+  "field_add": {
+    "title": "Nové pole",
+    "error": "Zadejte pole ve formátu 245 nebo 245ab.",
+    "non_repeatable_error": "Toto pole už v záznamu existuje a nelze ho přidat znovu."
   }
 }
