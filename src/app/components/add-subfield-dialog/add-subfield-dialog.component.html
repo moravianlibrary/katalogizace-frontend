@@ -1,0 +1,69 @@
+@if (open()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+    (click)="onBackdropClick()"
+  >
+    <div
+      class="bg-main-base shadow-s w-full max-w-64 rounded-2xl"
+      (click)="onDialogClick($event)"
+    >
+      <div class="flex items-center justify-between gap-3 p-4">
+        <h2 class="text-md font-medium">
+          {{ "subfield_add.title" | translate }}
+        </h2>
+
+        <button class="btn group" (click)="closed.emit()" type="button">
+          <svg
+            class="icon-tertiary"
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M5.46967 5.46967C5.76256 5.17678 6.23744 5.17678 6.53033 5.46967L12 10.9393L17.4697 5.46967C17.7626 5.17678 18.2374 5.17678 18.5303 5.46967C18.8232 5.76256 18.8232 6.23744 18.5303 6.53033L13.0607 12L18.5303 17.4697C18.8232 17.7626 18.8232 18.2374 18.5303 18.5303C18.2374 18.8232 17.7626 18.8232 17.4697 18.5303L12 13.0607L6.53033 18.5303C6.23744 18.8232 5.76256 18.8232 5.46967 18.5303C5.17678 18.2374 5.17678 17.7626 5.46967 17.4697L10.9393 12L5.46967 6.53033C5.17678 6.23744 5.17678 5.76256 5.46967 5.46967Z"
+            />
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M5.46967 5.46967C5.76256 5.17678 6.23744 5.17678 6.53033 5.46967L12 10.9393L17.4697 5.46967C17.7626 5.17678 18.2374 5.17678 18.5303 5.46967C18.8232 5.76256 18.8232 6.23744 18.5303 6.53033L13.0607 12L18.5303 17.4697C18.8232 17.7626 18.8232 18.2374 18.5303 18.5303C18.2374 18.8232 17.7626 18.8232 17.4697 18.5303L12 13.0607L6.53033 18.5303C6.23744 18.8232 5.76256 18.8232 5.46967 18.5303C5.17678 18.2374 5.17678 17.7626 5.46967 17.4697L10.9393 12L5.46967 6.53033C5.17678 6.23744 5.17678 5.76256 5.46967 5.46967Z"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <div class="px-4 pb-5">
+        <div class="flex gap-4">
+          <input
+            class="border-tertiary-default bg-main-base focus:border-primary-default w-full rounded-lg border px-4 py-3 outline-none"
+            #subfieldInput
+            [value]="value()"
+            (input)="onInput(subfieldInput.value)"
+            (keydown)="onKeydown($event)"
+            type="text"
+          />
+
+          <button
+            class="btn btn-l btn-primary"
+            [disabled]="value().length < 1"
+            (click)="onSubmit()"
+            type="button"
+          >
+            {{ "buttons.add" | translate }}
+          </button>
+        </div>
+        @if (touched() && !isValid()) {
+          <p class="mt-2 text-sm text-red-500">
+            {{ "subfield_add.error" | translate }}
+          </p>
+        } @else if (error()) {
+          <p class="mt-2 text-sm text-red-500">
+            {{ error()! | translate }}
+          </p>
+        }
+      </div>
+    </div>
+  </div>
+}
