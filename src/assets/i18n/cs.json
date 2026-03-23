@@ -714,5 +714,10 @@
     "title": "Nové pole",
     "error": "Zadejte pole ve formátu 245 nebo 245ab.",
     "non_repeatable_error": "Toto pole už v záznamu existuje a nelze ho přidat znovu."
+  },
+  "subfield_add": {
+    "title": "Nové podpole",
+    "error": "Nepodporovaný formát",
+    "non_repeatable_error": "Podpole již existuje."
   }
 }
