@@ -2,12 +2,14 @@ import { MarcSubfield } from '../books/marc.dto';
 import { FieldType } from '../books/record-view.model';
 
 export interface QuickAddItem {
-  tag: number;
-  ind1: string;
-  ind2: string;
-  subfields: MarcSubfield[];
-  repeatable: boolean;
-  type: FieldType;
+  tag?: number;
+  ind1?: string;
+  ind2?: string;
+  subfields?: MarcSubfield[];
+  repeatable?: boolean;
+  type?: FieldType;
+  action?: 'add-field';
+  label?: string;
 }
 
 export const QUICK_ADD: QuickAddItem[] = [
@@ -32,23 +34,26 @@ export const QUICK_ADD: QuickAddItem[] = [
       { code: 'a', value: '' },
       { code: 'b', value: '' },
       { code: 'c', value: '' },
+      { code: 'n', value: '' },
+      { code: 'p', value: '' },
     ],
     repeatable: false,
     type: 'data' as FieldType,
   },
-  {
-    tag: 255,
-    ind1: '',
-    ind2: '',
-    subfields: [{ code: 'a', value: '' }],
-    repeatable: true,
-    type: 'data' as FieldType,
-  },
+  // {
+  //   tag: 255,
+  //   ind1: '',
+  //   ind2: '',
+  //   subfields: [{ code: 'a', value: '' }],
+  //   repeatable: true,
+  //   type: 'data' as FieldType,
+  // },
   {
     tag: 264,
     ind1: '',
     ind2: '',
     subfields: [
+      { code: 'a', value: '' },
       { code: 'b', value: '' },
       { code: 'c', value: '' },
     ],
@@ -125,5 +130,9 @@ export const QUICK_ADD: QuickAddItem[] = [
     ],
     repeatable: true,
     type: 'data' as FieldType,
+  },
+  {
+    action: 'add-field',
+    label: 'buttons.add_field',
   },
 ];

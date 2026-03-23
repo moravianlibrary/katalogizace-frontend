@@ -84,9 +84,12 @@ export class RecordStateService {
       if (!Number.isNaN(n)) existing.add(n);
     }
 
-    return this.QUICK_ADD.filter(
-      (it) => it.repeatable || !existing.has(it.tag),
-    );
+    return this.QUICK_ADD.filter((it) => {
+      if (it.action === 'add-field') return true;
+      if (it.tag == null) return false;
+
+      return it.repeatable || !existing.has(it.tag);
+    });
   });
 
   setEditableRecord(rec: EditableMarcRecord | null) {

@@ -38,6 +38,21 @@ export class MainPanelComponent {
   diffIndex = this.diff.diffIndex;
 
   onQuickAdd(it: QuickAddItem) {
+    if (it.action === 'add-field') {
+      //this.addField();
+      return;
+    }
+
+    if (
+      it.tag == null ||
+      it.type == null ||
+      it.subfields == null ||
+      it.ind1 == null ||
+      it.ind2 == null
+    ) {
+      return;
+    }
+
     this.recordState.addFieldWithTag(
       it.tag,
       it.type,
@@ -50,7 +65,7 @@ export class MainPanelComponent {
     if (!selected) return;
 
     this.cps.setMode('edit', {
-      tag: it.tag.toString(),
+      tag: String(it.tag).padStart(3, '0'),
       fieldId: selected,
     });
   }
