@@ -11,6 +11,7 @@
       (focus)="onFocus()"
       (blur)="onBlur()"
       (input)="onInput(ta.value)"
+      (keydown)="onKeydown($event)"
       rows="4"
     ></textarea>
 
@@ -48,10 +49,12 @@
     <div
       class="border-primary-default bg-main-base absolute right-0 left-0 z-30 mt-2 overflow-hidden rounded-lg border shadow-md"
     >
-      <div class="max-h-64 overflow-auto p-2">
+      <div class="max-h-64 overflow-auto p-2" #list>
         @for (s of suggestions(); track s.value) {
           <button
             class="text-secondary hover:bg-main-light active:bg-main-bright flex w-full cursor-pointer items-center justify-between rounded-lg px-4 py-3 text-left transition"
+            [attr.data-idx]="$index"
+            [ngClass]="activeIndex() === $index ? 'bg-gray-500/10' : ''"
             (mousedown)="$event.preventDefault()"
             (click)="pick(s)"
             type="button"

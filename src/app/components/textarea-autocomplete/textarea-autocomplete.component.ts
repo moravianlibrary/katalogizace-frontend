@@ -10,7 +10,6 @@ import {
   input,
   output,
   signal,
-  untracked,
   viewChild,
 } from '@angular/core';
 
@@ -46,8 +45,14 @@ export class TextareaAutocompleteComponent {
 
   readonly query = signal('');
   readonly suggestions = signal<AutocompleteSuggestion[]>([]);
+  readonly activeIndex = signal<number>(-1);
 
   private readonly taRef = viewChild<ElementRef<HTMLTextAreaElement>>('ta');
+  private readonly listRef = viewChild<ElementRef<HTMLDivElement>>('list');
+
+  private debounceTimer: number | null = null;
+  private blurTimer: number | null = null;
+  private reqSeq = 0;
 
   focus() {
     const el = this.taRef()?.nativeElement;
@@ -62,11 +67,15 @@ export class TextareaAutocompleteComponent {
     if (!this.focused()) return false;
     if (this.disabled()) return false;
     if (!this.hasEditedSinceFocus()) return false;
-    return this.suggestions().length > 0;
-  });
 
-  private debounceTimer: number | null = null;
-  private reqSeq = 0;
+    const hasSuggestions = this.suggestions().length > 0;
+
+    if (hasSuggestions && this.activeIndex() === -1) {
+      queueMicrotask(() => this.activeIndex.set(0));
+    }
+
+    return hasSuggestions;
+  });
 
   constructor() {
     effect(() => {
@@ -82,15 +91,16 @@ export class TextareaAutocompleteComponent {
       const hasEdited = this.hasEditedSinceFocus();
       if (!hasEdited) return;
 
-      const shouldSkip = untracked(() => this.skipNextFetch());
+      const shouldSkip = this.skipNextFetch();
       if (shouldSkip) {
-        untracked(() => this.skipNextFetch.set(false));
+        this.skipNextFetch.set(false);
         return;
       }
 
       if ((q ?? '').trim().length < this.minChars()) {
         this.suggestions.set([]);
         this.loading.set(false);
+        this.activeIndex.set(-1);
         return;
       }
 
@@ -113,28 +123,60 @@ export class TextareaAutocompleteComponent {
               if (seq !== this.reqSeq) return;
               this.suggestions.set(res.suggestions ?? []);
               this.loading.set(false);
+              this.activeIndex.set((res.suggestions?.length ?? 0) > 0 ? 0 : -1);
             },
             error: () => {
               if (seq !== this.reqSeq) return;
               this.suggestions.set([]);
               this.loading.set(false);
+              this.activeIndex.set(-1);
             },
           });
       }, this.debounceMs());
     });
   }
 
+  private setActive(index: number) {
+    this.activeIndex.set(index);
+    this.scrollActiveIntoView();
+  }
+
+  private scrollActiveIntoView() {
+    queueMicrotask(() => {
+      const listEl = this.listRef()?.nativeElement;
+      if (!listEl) return;
+
+      const idx = this.activeIndex();
+      const item = listEl.querySelector<HTMLElement>(`[data-idx="${idx}"]`);
+      item?.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' });
+    });
+  }
+
+  private resetActive() {
+    this.activeIndex.set(-1);
+  }
+
   onFocus() {
+    if (this.blurTimer) {
+      window.clearTimeout(this.blurTimer);
+      this.blurTimer = null;
+    }
+
     this.focused.set(true);
     this.hasEditedSinceFocus.set(false);
+    this.resetActive();
   }
 
   onBlur() {
-    window.setTimeout(() => {
+    if (this.blurTimer) window.clearTimeout(this.blurTimer);
+
+    this.blurTimer = window.setTimeout(() => {
       this.focused.set(false);
       this.suggestions.set([]);
       this.loading.set(false);
       this.hasEditedSinceFocus.set(false);
+      this.resetActive();
+      this.blurTimer = null;
     }, 120);
   }
 
@@ -146,19 +188,72 @@ export class TextareaAutocompleteComponent {
   }
 
   clear() {
+    if (this.blurTimer) {
+      window.clearTimeout(this.blurTimer);
+      this.blurTimer = null;
+    }
+
+    this.focused.set(true);
     this.hasEditedSinceFocus.set(true);
     this.query.set('');
     this.suggestions.set([]);
     this.loading.set(false);
+    this.resetActive();
     this.valueChange.emit('');
   }
 
   pick(s: AutocompleteSuggestion) {
+    if (this.blurTimer) {
+      window.clearTimeout(this.blurTimer);
+      this.blurTimer = null;
+    }
+
     this.skipNextFetch.set(true);
     this.hasEditedSinceFocus.set(false);
     this.query.set(s.value);
     this.valueChange.emit(s.value);
     this.suggestions.set([]);
     this.loading.set(false);
+    this.resetActive();
+  }
+
+  onKeydown(e: KeyboardEvent) {
+    if (this.disabled()) return;
+    if (!this.open()) return;
+
+    const list = this.suggestions();
+    if (!list.length) return;
+
+    const idx = this.activeIndex();
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      const next = Math.min(idx < 0 ? 0 : idx + 1, list.length - 1);
+      this.setActive(next);
+      return;
+    }
+
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      const next = Math.max(idx <= 0 ? 0 : idx - 1, 0);
+      this.setActive(next);
+      return;
+    }
+
+    if (e.key === 'Enter') {
+      if (idx < 0) return;
+      e.preventDefault();
+      const item = list[idx];
+      if (item) this.pick(item);
+      return;
+    }
+
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      this.suggestions.set([]);
+      this.loading.set(false);
+      this.resetActive();
+      return;
+    }
   }
 }
