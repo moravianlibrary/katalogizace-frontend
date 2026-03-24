@@ -1,3 +1,7 @@
+import {
+  AddSubfieldDialogComponent,
+  AddSubfieldDialogResult,
+} from '@/app/components/add-subfield-dialog/add-subfield-dialog.component';
 import { InputAutocompleteAuthorityComponent } from '@/app/components/inputs/input-autocomplete-authority/input-autocomplete-authority.component';
 import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
 import { InputStaticAutocompleteComponent } from '@/app/components/inputs/input-static-autocomplete/input-static-autocomplete.component';
@@ -6,12 +10,18 @@ import { LockHoverIconComponent } from '@/app/components/shared/lock-hover-icon/
 import {
   AutocompletAuthorityResponse,
   ExistingMarcRecord,
+  FIELD_RULES,
   getIndicators,
+  getSubfieldRuleLabel,
+  isSubfieldRepeatable,
+  MarcSubfield,
   UUID,
 } from '@/app/models';
 import { CatalogueService } from '@/app/services/api/catalogue.service';
+import { ContextPanelService } from '@/app/services/context-panel.service';
 import { MarcTranslateService } from '@/app/services/marc-translate.service';
 import { RecordStateService } from '@/app/services/record-state.service';
+import { compareSubfieldCodes } from '@/app/utils/marc-subfield-sort';
 import { NgClass } from '@angular/common';
 import {
   Component,
@@ -21,14 +31,31 @@ import {
   inject,
   input,
   signal,
+  untracked,
   viewChild,
+  viewChildren,
 } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 type PaginationItem = number | 'ellipsis-left' | 'ellipsis-right';
 
+type VisibleSubfield = {
+  kind: 'template' | 'extra';
+  code: string;
+  value: string;
+  sourceIndex: number | null;
+  templateLocked: boolean;
+};
+
+type PendingFocusTarget = {
+  code: string;
+  occurrence: number;
+  kind: 'template' | 'extra';
+} | null;
+
 @Component({
   selector: 'app-field-authority-editor',
+  standalone: true,
   imports: [
     InputAutocompleteAuthorityComponent,
     InputDropdownComponent,
@@ -37,6 +64,7 @@ type PaginationItem = number | 'ellipsis-left' | 'ellipsis-right';
     NgClass,
     ExistingMarcRecordTableComponent,
     LockHoverIconComponent,
+    AddSubfieldDialogComponent,
   ],
   templateUrl: './field-authority-editor.component.html',
 })
@@ -45,21 +73,27 @@ export class FieldAuthorityEditorComponent {
   private readonly marcT = inject(MarcTranslateService);
   private readonly catalogue = inject(CatalogueService);
   private readonly translate = inject(TranslateService);
+  private readonly cps = inject(ContextPanelService);
+
+  private wasEditingThisField = false;
 
   fieldId = input.required<UUID>();
 
-  readonly indicators = computed(() => getIndicators(this.field()?.tag!));
-
-  readonly ind1Options = computed(() => this.indicators().ind1);
-  readonly ind2Options = computed(() => this.indicators().ind2);
+  readonly addSubfieldDialogOpen = signal(false);
+  readonly addSubfieldDialogError = signal<string | null>(null);
 
   private readonly firstAutocomplete = viewChild(
     InputAutocompleteAuthorityComponent,
   );
 
-  readonly roleItems = computed(() =>
-    this.marcT.getMarcStaticValueItems('100.4'),
+  private readonly roleAutocompletes = viewChildren(
+    InputStaticAutocompleteComponent,
   );
+
+  private readonly plainInputs =
+    viewChildren<ElementRef<HTMLInputElement>>('plainInput');
+
+  readonly pendingFocusTarget = signal<PendingFocusTarget>(null);
 
   readonly field = computed(() => {
     const rec = this.rs.editableRecord();
@@ -67,9 +101,115 @@ export class FieldAuthorityEditorComponent {
     return rec.data_fields.find((f) => f.fieldId === this.fieldId()) ?? null;
   });
 
-  readonly locked = computed(() => (this.getSub('7') ?? '').trim().length > 0);
+  readonly tag = computed(() => this.field()?.tag ?? '100');
 
-  readonly hasSub7 = computed(() => (this.getSub('7') ?? '').trim().length > 0);
+  readonly indicators = computed(() => getIndicators(this.tag()));
+  readonly ind1Options = computed(() => this.indicators().ind1);
+  readonly ind2Options = computed(() => this.indicators().ind2);
+
+  readonly templateOrder = computed(() => {
+    return FIELD_RULES[this.tag()]?.templateOrder ?? ['a', 'd', '7', '4'];
+  });
+
+  readonly templateCodes = computed(() => new Set(this.templateOrder()));
+
+  readonly roleItems = computed(() =>
+    this.marcT.getMarcStaticValueItems('100.4'),
+  );
+
+  readonly locked = computed(
+    () => (this.getFirstSubValue('7') ?? '').trim().length > 0,
+  );
+
+  readonly visibleSubfields = computed<VisibleSubfield[]>(() => {
+    const field = this.field();
+    if (!field) return [];
+
+    const subfields = field.subfields ?? [];
+    const templateOrder = this.templateOrder();
+    const templateItems: VisibleSubfield[] = [];
+
+    for (const code of templateOrder) {
+      const rule = FIELD_RULES[this.tag()]?.subfields?.[code];
+      const matching = subfields
+        .map((sf, sourceIndex) => ({ sf, sourceIndex }))
+        .filter(({ sf }) => sf.code === code);
+
+      if (rule?.repeatable) {
+        if (matching.length) {
+          matching.forEach(({ sf, sourceIndex }, index) => {
+            templateItems.push({
+              kind: 'template',
+              code,
+              value: sf.value,
+              sourceIndex,
+              templateLocked: index === 0,
+            });
+          });
+        } else {
+          templateItems.push({
+            kind: 'template',
+            code,
+            value: '',
+            sourceIndex: null,
+            templateLocked: true,
+          });
+        }
+        continue;
+      }
+
+      const first = matching[0];
+      templateItems.push({
+        kind: 'template',
+        code,
+        value: first?.sf.value ?? '',
+        sourceIndex: first?.sourceIndex ?? null,
+        templateLocked: true,
+      });
+    }
+
+    const templateCodes = this.templateCodes();
+
+    const extraItems: VisibleSubfield[] = subfields
+      .map((sf, sourceIndex) => ({ sf, sourceIndex }))
+      .filter(({ sf }) => !templateCodes.has(sf.code))
+      .sort((a, b) => compareSubfieldCodes(a.sf.code, b.sf.code))
+      .map(({ sf, sourceIndex }) => ({
+        kind: 'extra' as const,
+        code: sf.code,
+        value: sf.value,
+        sourceIndex,
+        templateLocked: false,
+      }));
+
+    return [...templateItems, ...extraItems];
+  });
+
+  readonly extraVisibleSubfields = computed(() =>
+    this.visibleSubfields().filter((sf) => sf.kind === 'extra'),
+  );
+
+  readonly searchQuery = signal('');
+  readonly searchResults = signal<ExistingMarcRecord[]>([]);
+  readonly selectedRecordId = signal<string | null>(null);
+  readonly selectedRecordDetail = signal<ExistingMarcRecord | null>(null);
+  readonly loading = signal(false);
+  readonly page = signal(1);
+  readonly total = signal(0);
+  readonly errorMessage = signal<string | null>(null);
+  readonly limit = signal(100);
+  readonly detailLoading = signal(false);
+  readonly detailError = signal<string | null>(null);
+  readonly sevenRecord = signal<ExistingMarcRecord | null>(null);
+  private readonly loadingSevenRecord = signal(false);
+  private readonly loadedSevenId = signal<string | null>(null);
+
+  readonly hasNext = computed(() => this.page() * this.limit() < this.total());
+  readonly hasPrev = computed(() => this.page() > 1);
+
+  readonly hasSub7 = computed(
+    () => (this.getFirstSubValue('7') ?? '').trim().length > 0,
+  );
   readonly hasSubd = computed(() => (this.dDraft() ?? '').trim().length > 0);
 
   readonly dDraft = signal<string>('');
@@ -85,17 +225,29 @@ export class FieldAuthorityEditorComponent {
     });
 
     effect(() => {
-      this.fieldId(); // dependency
-      const v = this.getSub('d') ?? '';
+      const state = this.cps.state();
+      const isEditingThisField =
+        state.mode === 'edit' && state.fieldId === this.fieldId();
+
+      if (this.wasEditingThisField && !isEditingThisField) {
+        this.cleanupEmptySubfields();
+      }
+
+      this.wasEditingThisField = isEditingThisField;
+    });
+
+    effect(() => {
+      this.fieldId();
+      const v = this.getFirstSubValue('d') ?? '';
       this.dDraft.set(v);
     });
 
     effect(() => {
       const id = this.fieldId();
-      const f = this.field();
-      if (!id || !f) return;
+      if (!id) return;
+      if (this.pendingFocusTarget()) return;
 
-      const isLocked = this.locked();
+      const isLocked = untracked(() => this.locked());
       if (isLocked) return;
       if (this.hasAutoFocused()) return;
 
@@ -104,7 +256,7 @@ export class FieldAuthorityEditorComponent {
     });
 
     effect(() => {
-      const id = (this.getSub('7') ?? '').trim();
+      const id = (this.getFirstSubValue('7') ?? '').trim();
 
       if (!id) {
         this.sevenRecord.set(null);
@@ -118,7 +270,7 @@ export class FieldAuthorityEditorComponent {
 
       this.catalogue.getAutRecord(id, 'aut').subscribe({
         next: (record) => {
-          if ((this.getSub('7') ?? '').trim() !== id) {
+          if ((this.getFirstSubValue('7') ?? '').trim() !== id) {
             this.loadingSevenRecord.set(false);
             return;
           }
@@ -128,7 +280,7 @@ export class FieldAuthorityEditorComponent {
           this.loadingSevenRecord.set(false);
         },
         error: () => {
-          if ((this.getSub('7') ?? '').trim() === id) {
+          if ((this.getFirstSubValue('7') ?? '').trim() === id) {
             this.sevenRecord.set(null);
             this.loadedSevenId.set(null);
           }
@@ -137,98 +289,74 @@ export class FieldAuthorityEditorComponent {
         },
       });
     });
+
+    effect(() => {
+      const target = this.pendingFocusTarget();
+      const visible = this.visibleSubfields();
+      if (!target || !visible.length) return;
+
+      queueMicrotask(() => {
+        if (target.kind === 'template' && target.code === '4') {
+          const roleIndexes = visible
+            .map((sf, index) => ({ sf, index }))
+            .filter((x) => x.sf.kind === 'template' && x.sf.code === '4')
+            .map((x) => x.index);
+
+          const visibleIndex = roleIndexes[target.occurrence - 1];
+          if (visibleIndex == null) return;
+
+          const roleVisibleIndexes = visible
+            .map((sf, index) => (sf.code === '4' ? index : -1))
+            .filter((index) => index !== -1);
+
+          const roleIndex = roleVisibleIndexes.indexOf(visibleIndex);
+          if (roleIndex < 0) return;
+
+          this.roleAutocompletes()[roleIndex]?.focus();
+          this.pendingFocusTarget.set(null);
+          return;
+        }
+
+        if (target.kind === 'extra') {
+          const extraIndexes = visible
+            .map((sf, index) => ({ sf, index }))
+            .filter((x) => x.sf.kind === 'extra' && x.sf.code === target.code)
+            .map((x) => x.index);
+
+          const visibleIndex = extraIndexes[target.occurrence - 1];
+          if (visibleIndex == null) return;
+
+          const plainVisibleIndexes = visible
+            .map((sf, index) =>
+              sf.kind === 'extra' || sf.code === 'd' ? index : -1,
+            )
+            .filter((index) => index !== -1);
+
+          const plainIndex = plainVisibleIndexes.indexOf(visibleIndex);
+          if (plainIndex < 0) return;
+
+          this.plainInputs()[plainIndex]?.nativeElement.focus();
+          this.pendingFocusTarget.set(null);
+        }
+      });
+    });
   }
 
-  unlock() {
-    this.clearAuthority();
+  ngOnDestroy(): void {
+    this.cleanupEmptySubfields();
   }
 
-  setInd(which: 1 | 2, v: string) {
-    const f = this.field();
-    if (!f) return;
-    this.rs.patchDataField(this.fieldId(), {
-      [which === 1 ? 'ind1' : 'ind2']: v,
-    } as any);
+  private cleanupEmptySubfields() {
+    const field = this.field();
+    if (!field) return;
+
+    const current = field.subfields ?? [];
+    const cleaned = current.filter((sf) => (sf.value ?? '').trim().length > 0);
+
+    if (cleaned.length === current.length) return;
+
+    this.rs.patchDataField(this.fieldId(), { subfields: cleaned });
   }
-
-  getSub(code: '4' | 'd' | 'a' | '7'): string {
-    const f = this.field();
-    if (!f) return '';
-    return f.subfields?.find((s: any) => s.code === code)?.value ?? '';
-  }
-
-  setSub(code: '4' | 'd' | 'a' | '7', value: string) {
-    const f = this.field();
-    if (!f) return;
-
-    const subfields = [...(f.subfields ?? [])];
-    const idx = subfields.findIndex((s: any) => s.code === code);
-
-    if (!value) {
-      if (idx >= 0) subfields.splice(idx, 1);
-    } else {
-      if (idx >= 0) subfields[idx] = { ...subfields[idx], value };
-      else subfields.push({ code, value });
-    }
-
-    this.rs.patchDataField(this.fieldId(), { subfields });
-
-    if (code === '7') {
-      const trimmed = value.trim();
-      this.loadedSevenId.set(null);
-
-      if (!trimmed) {
-        this.sevenRecord.set(null);
-      }
-    }
-  }
-
-  onPickTerm(term: string) {
-    if (this.locked()) return;
-    this.setSub('a', term);
-  }
-
-  onInputD(e: Event) {
-    if (this.locked()) return;
-    const value = (e.target as HTMLInputElement | null)?.value ?? '';
-    this.dDraft.set(value);
-    this.setSub('d', value);
-  }
-
-  clearD() {
-    this.dDraft.set('');
-    this.setSub('d', '');
-  }
-
-  applySuggestion(s: AutocompletAuthorityResponse) {
-    if (this.locked()) return;
-    this.setSub('a', s.a);
-    this.setSub('7', s['7'] ?? '');
-    this.setSub('d', s['d'] ?? '');
-  }
-
-  clearAuthority() {
-    this.setSub('7', '');
-    this.setSub('d', '');
-  }
-
-  readonly searchQuery = signal('');
-  readonly searchResults = signal<ExistingMarcRecord[]>([]);
-  readonly selectedRecordId = signal<string | null>(null);
-  readonly selectedRecordDetail = signal<ExistingMarcRecord | null>(null);
-  readonly loading = signal(false);
-  readonly page = signal(1);
-  readonly total = signal(0);
-  readonly errorMessage = signal<string | null>(null);
-  readonly limit = signal(100);
-  readonly detailLoading = signal(false);
-  readonly detailError = signal<string | null>(null);
-  sevenRecord = signal<ExistingMarcRecord | null>(null);
-  private readonly loadingSevenRecord = signal(false);
-  private readonly loadedSevenId = signal<string | null>(null);
-
-  readonly hasNext = computed(() => this.page() * this.limit() < this.total());
-  readonly hasPrev = computed(() => this.page() > 1);
 
   getAuthority100(record: ExistingMarcRecord) {
     return record.data_fields.find((f) => f.tag === '100') ?? null;
@@ -312,6 +440,218 @@ export class FieldAuthorityEditorComponent {
 
     return items;
   });
+
+  deleteTemplateRepeatableSubfield(sourceIndex: number) {
+    const field = this.field();
+    if (!field) return;
+
+    const subfields = [...(field.subfields ?? [])];
+    if (sourceIndex < 0 || sourceIndex >= subfields.length) return;
+
+    subfields.splice(sourceIndex, 1);
+    this.rs.patchDataField(this.fieldId(), { subfields });
+  }
+
+  setInd(which: 1 | 2, v: string) {
+    const f = this.field();
+    if (!f) return;
+
+    this.rs.patchDataField(this.fieldId(), {
+      [which === 1 ? 'ind1' : 'ind2']: v,
+    } as never);
+  }
+
+  getFirstSubValue(code: '4' | 'd' | 'a' | '7'): string {
+    const f = this.field();
+    if (!f) return '';
+    return f.subfields?.find((s) => s.code === code)?.value ?? '';
+  }
+
+  setTemplateSubValue(sf: VisibleSubfield, value: string) {
+    const f = this.field();
+    if (!f) return;
+
+    const subfields = [...(f.subfields ?? [])];
+
+    if (sf.sourceIndex != null) {
+      subfields[sf.sourceIndex] = {
+        ...subfields[sf.sourceIndex],
+        value,
+      };
+    } else if (value) {
+      subfields.push({ code: sf.code, value });
+    } else {
+      return;
+    }
+
+    this.rs.patchDataField(this.fieldId(), { subfields });
+
+    if (sf.code === '7') {
+      const trimmed = value.trim();
+      this.loadedSevenId.set(null);
+
+      if (!trimmed) {
+        this.sevenRecord.set(null);
+      }
+    }
+  }
+
+  setExtraSubValue(sourceIndex: number, value: string) {
+    this.rs.patchSubfield(this.fieldId(), sourceIndex, { value });
+  }
+
+  deleteExtraSubfield(sourceIndex: number) {
+    const field = this.field();
+    if (!field) return;
+
+    const subfields = [...(field.subfields ?? [])];
+    if (sourceIndex < 0 || sourceIndex >= subfields.length) return;
+
+    subfields.splice(sourceIndex, 1);
+    this.rs.patchDataField(this.fieldId(), { subfields });
+  }
+
+  onPickTerm(term: string) {
+    if (this.locked()) return;
+
+    const visibleA = this.visibleSubfields().find(
+      (sf) => sf.kind === 'template' && sf.code === 'a',
+    );
+    if (!visibleA) return;
+
+    this.setTemplateSubValue(visibleA, term);
+  }
+
+  onInputD(sf: VisibleSubfield, e: Event) {
+    if (this.locked()) return;
+
+    const value = (e.target as HTMLInputElement | null)?.value ?? '';
+    this.dDraft.set(value);
+    this.setTemplateSubValue(sf, value);
+  }
+
+  clearD() {
+    const visibleD = this.visibleSubfields().find(
+      (sf) => sf.kind === 'template' && sf.code === 'd',
+    );
+    if (!visibleD) return;
+
+    this.dDraft.set('');
+    this.setTemplateSubValue(visibleD, '');
+  }
+
+  applySuggestion(s: AutocompletAuthorityResponse) {
+    if (this.locked()) return;
+
+    const visibleA = this.visibleSubfields().find(
+      (sf) => sf.kind === 'template' && sf.code === 'a',
+    );
+    const visibleD = this.visibleSubfields().find(
+      (sf) => sf.kind === 'template' && sf.code === 'd',
+    );
+    const visible7 = this.visibleSubfields().find(
+      (sf) => sf.kind === 'template' && sf.code === '7',
+    );
+
+    if (visibleA) this.setTemplateSubValue(visibleA, s.a);
+    if (visibleD) this.setTemplateSubValue(visibleD, s['d'] ?? '');
+    if (visible7) this.setTemplateSubValue(visible7, s['7'] ?? '');
+  }
+
+  clearAuthority() {
+    const field = this.field();
+    if (!field) return;
+
+    const subfields = (field.subfields ?? []).filter(
+      (sf) => sf.code !== '7' && sf.code !== 'd',
+    );
+
+    this.dDraft.set('');
+    this.loadedSevenId.set(null);
+    this.sevenRecord.set(null);
+
+    this.rs.patchDataField(this.fieldId(), { subfields });
+
+    setTimeout(() => {
+      this.firstAutocomplete()?.focus();
+    });
+  }
+
+  openAddSubfieldDialog() {
+    this.addSubfieldDialogError.set(null);
+    this.addSubfieldDialogOpen.set(true);
+  }
+
+  closeAddSubfieldDialog() {
+    this.addSubfieldDialogOpen.set(false);
+    this.addSubfieldDialogError.set(null);
+  }
+
+  onAddSubfieldConfirm(result: AddSubfieldDialogResult) {
+    const field = this.field();
+    if (!field) return;
+
+    const existingSubfields = [...(field.subfields ?? [])];
+    const templateCodes = this.templateCodes();
+
+    for (const code of result.subfieldCodes) {
+      const isTemplateCode = templateCodes.has(code);
+      const repeatable = isSubfieldRepeatable(this.tag(), code) ?? true;
+      const alreadyExists = existingSubfields.some((sf) => sf.code === code);
+
+      if (isTemplateCode && !repeatable) {
+        this.addSubfieldDialogError.set('subfield_add.non_repeatable_error');
+        return;
+      }
+
+      if (!repeatable && alreadyExists) {
+        this.addSubfieldDialogError.set('subfield_add.non_repeatable_error');
+        return;
+      }
+    }
+
+    const firstAddedCode = result.subfieldCodes[0] ?? null;
+    const firstAddedIsTemplate =
+      !!firstAddedCode && templateCodes.has(firstAddedCode);
+
+    const existingSameCodeCount = firstAddedCode
+      ? existingSubfields.filter((sf) => sf.code === firstAddedCode).length
+      : 0;
+
+    const existingExtraSameCodeCount = firstAddedCode
+      ? existingSubfields.filter(
+          (sf) => !templateCodes.has(sf.code) && sf.code === firstAddedCode,
+        ).length
+      : 0;
+
+    const added: MarcSubfield[] = result.subfieldCodes.map((code) => ({
+      code,
+      value: '',
+    }));
+
+    this.rs.patchDataField(this.fieldId(), {
+      subfields: [...existingSubfields, ...added],
+    });
+
+    this.pendingFocusTarget.set(
+      firstAddedCode
+        ? {
+            code: firstAddedCode,
+            kind: firstAddedIsTemplate ? 'template' : 'extra',
+            occurrence: firstAddedIsTemplate
+              ? existingSameCodeCount + 1
+              : existingExtraSameCodeCount + 1,
+          }
+        : null,
+    );
+
+    this.addSubfieldDialogOpen.set(false);
+    this.addSubfieldDialogError.set(null);
+  }
+
+  getSubfieldLabel(code: string): string {
+    return getSubfieldRuleLabel(this.tag(), code) ?? `|${code}`;
+  }
 
   search(page = 1) {
     this.page.set(page);
@@ -438,9 +778,19 @@ export class FieldAuthorityEditorComponent {
     const sub = (code: string) =>
       field100.subfields.find((s) => s.code === code)?.value ?? '';
 
-    this.setSub('a', sub('a'));
-    this.setSub('d', sub('d'));
-    this.setSub('7', sub('7'));
+    const visibleA = this.visibleSubfields().find(
+      (sf) => sf.kind === 'template' && sf.code === 'a',
+    );
+    const visibleD = this.visibleSubfields().find(
+      (sf) => sf.kind === 'template' && sf.code === 'd',
+    );
+    const visible7 = this.visibleSubfields().find(
+      (sf) => sf.kind === 'template' && sf.code === '7',
+    );
+
+    if (visibleA) this.setTemplateSubValue(visibleA, sub('a'));
+    if (visibleD) this.setTemplateSubValue(visibleD, sub('d'));
+    if (visible7) this.setTemplateSubValue(visible7, sub('7'));
 
     this.closeAuthorityDialog();
   }
@@ -449,7 +799,7 @@ export class FieldAuthorityEditorComponent {
     const dialog = this.authorityDialog()?.nativeElement;
     if (!dialog) return;
 
-    this.searchQuery.set(this.getSub('a') ?? '');
+    this.searchQuery.set(this.getFirstSubValue('a') ?? '');
     this.errorMessage.set(null);
     this.searchResults.set([]);
     this.selectedRecordId.set(null);

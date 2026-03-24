@@ -254,6 +254,13 @@
       "a": "|a Hodnota",
       "2": "|2 Slovník",
       "7": "|7 ID"
+    },
+    "700": {
+      "a": "|a Jméno",
+      "d": "|d Datum",
+      "7": "|7 Číslo autority",
+      "4": "|4 Role",
+      "search": "Hledat autoritu"
     }
   },
   "marcData": {
