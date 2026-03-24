@@ -33,7 +33,7 @@ export class AddSubfieldDialogComponent {
 
   readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('subfieldInput');
 
-  readonly isValid = () => /^[a-zA-Z0-9]+$/.test(this.value());
+  readonly isValid = () => /^[a-z0-9]+$/.test(this.value());
 
   constructor() {
     effect(() => {

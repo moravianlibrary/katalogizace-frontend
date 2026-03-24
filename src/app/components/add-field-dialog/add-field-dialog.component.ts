@@ -34,7 +34,7 @@ export class AddFieldDialogComponent {
 
   readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('tagInput');
 
-  readonly isValid = () => /^[0-9]{3}[a-zA-Z0-9]*$/.test(this.value());
+  readonly isValid = () => /^[0-9]{3}[a-z0-9]*$/.test(this.value());
 
   constructor() {
     effect(() => {
