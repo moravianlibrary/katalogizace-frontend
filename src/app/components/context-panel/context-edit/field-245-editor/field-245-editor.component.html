@@ -29,86 +29,64 @@
     </div>
 
     <div class="space-y-6 p-4">
-      <div>
-        <label class="text-light text-sm-tight mb-2 block font-medium">
-          {{ "field_edit.245.a" | translate }}
-        </label>
+      @for (
+        sf of visibleSubfields();
+        track sf.kind + "-" + sf.code + "-" + $index
+      ) {
+        <div>
+          <label class="text-light text-sm-tight mb-2 block font-medium">
+            {{ getSubfieldLabel(sf.code) | translate }}
+          </label>
 
-        <app-input-autocomplete
-          #first
-          [value]="getSubfield('a')"
-          [field]="'245'"
-          [subfield]="'a'"
-          [bases]="['NKC', 'SKC', 'SCK']"
-          [minChars]="1"
-          [limit]="20"
-          (valueChange)="setSubfield('a', $event)"
-        />
-      </div>
-
-      <div>
-        <label class="text-light text-sm-tight mb-2 block font-medium">
-          {{ "field_edit.245.b" | translate }}
-        </label>
-
-        <app-input-autocomplete
-          [value]="getSubfield('b')"
-          [field]="'245'"
-          [subfield]="'b'"
-          [bases]="['NKC', 'SKC', 'SCK']"
-          [minChars]="1"
-          [limit]="20"
-          (valueChange)="setSubfield('b', $event)"
-        />
-      </div>
-
-      <div>
-        <label class="text-light text-sm-tight mb-2 block font-medium">
-          {{ "field_edit.245.c" | translate }}
-        </label>
-
-        <app-input-autocomplete
-          [value]="getSubfield('c')"
-          [field]="'245'"
-          [subfield]="'c'"
-          [bases]="['NKC', 'SKC', 'SCK']"
-          [minChars]="1"
-          [limit]="20"
-          (valueChange)="setSubfield('c', $event)"
-        />
-      </div>
-
-      <div>
-        <label class="text-light text-sm-tight mb-2 block font-medium">
-          {{ "field_edit.245.n" | translate }}
-        </label>
-
-        <app-input-autocomplete
-          [value]="getSubfield('n')"
-          [field]="'245'"
-          [subfield]="'n'"
-          [bases]="['NKC', 'SKC', 'SCK']"
-          [minChars]="1"
-          [limit]="20"
-          (valueChange)="setSubfield('n', $event)"
-        />
-      </div>
-
-      <div>
-        <label class="text-light text-sm-tight mb-2 block font-medium">
-          {{ "field_edit.245.p" | translate }}
-        </label>
-
-        <app-input-autocomplete
-          [value]="getSubfield('p')"
-          [field]="'245'"
-          [subfield]="'p'"
-          [bases]="['NKC', 'SKC', 'SCK']"
-          [minChars]="1"
-          [limit]="20"
-          (valueChange)="setSubfield('p', $event)"
-        />
-      </div>
+          <app-input-autocomplete
+            [value]="sf.value"
+            [field]="'245'"
+            [subfield]="sf.code"
+            [bases]="['NKC', 'SKC', 'SCK']"
+            [minChars]="1"
+            [limit]="20"
+            (valueChange)="
+              sf.kind === 'template'
+                ? setTemplateSub(sf.code, $event)
+                : sf.sourceIndex !== null &&
+                  setExtraSubValue(sf.sourceIndex, $event)
+            "
+          />
+        </div>
+      }
     </div>
   </div>
+
+  <div
+    class="bg-main-base border-light sticky bottom-0 z-10 flex justify-center rounded-b-2xl border-t px-4 py-3"
+  >
+    <button
+      class="btn btn-m btn-tertiary group items-center justify-center"
+      (click)="openAddSubfieldDialog()"
+      type="button"
+    >
+      <svg
+        class="icon-secondary"
+        xmlns="http://www.w3.org/2000/svg"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+      >
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M12 5.25C12.4142 5.25 12.75 5.58579 12.75 6V11.25H18C18.4142 11.25 18.75 11.5858 18.75 12C18.75 12.4142 18.4142 12.75 18 12.75H12.75V18C12.75 18.4142 12.4142 18.75 12 18.75C11.5858 18.75 11.25 18.4142 11.25 18V12.75H6C5.58579 12.75 5.25 12.4142 5.25 12C5.25 11.5858 5.58579 11.25 6 11.25H11.25V6C11.25 5.58579 11.5858 5.25 12 5.25Z"
+        />
+      </svg>
+      <span>{{ "field_edit.add_subfield" | translate }}</span>
+    </button>
+  </div>
+
+  <app-add-subfield-dialog
+    [open]="addSubfieldDialogOpen()"
+    [error]="addSubfieldDialogError()"
+    (closed)="closeAddSubfieldDialog()"
+    (clearedError)="addSubfieldDialogError.set(null)"
+    (confirmed)="onAddSubfieldConfirm($event)"
+  />
 </section>
