@@ -13,6 +13,7 @@ import {
 } from '@/app/models';
 import { computed, Injectable, signal } from '@angular/core';
 import { QUICK_ADD } from '../models/shared/record-state';
+import { compareSubfieldCodes } from '../utils/marc-subfield-sort';
 import {
   existingToEditableWithMeta,
   extractedToEditableWithMeta,
@@ -189,7 +190,7 @@ export class RecordStateService {
       ...nextFields[idx],
       ind1: rep.ind1 ?? '',
       ind2: rep.ind2 ?? '',
-      subfields: rep.subfields ?? [],
+      subfields: this.sortSubfields(rep.subfields ?? []),
     };
 
     this.editableRecord.set({ ...rec, data_fields: nextFields });
@@ -371,7 +372,15 @@ export class RecordStateService {
     if (idx < 0) return;
 
     const nextFields = [...rec.data_fields];
-    nextFields[idx] = { ...nextFields[idx], ...patch };
+    const nextField = { ...nextFields[idx], ...patch };
+
+    nextFields[idx] = {
+      ...nextField,
+      subfields:
+        patch.subfields !== undefined
+          ? this.sortSubfields(nextField.subfields)
+          : nextField.subfields,
+    };
 
     this.editableRecord.set({ ...rec, data_fields: nextFields });
   }
@@ -408,8 +417,10 @@ export class RecordStateService {
     if (idx < 0) return;
 
     const f = rec.data_fields[idx];
-    const subfields = (f.subfields ?? []).map((sf, i) =>
-      i === subfieldIndex ? { ...sf, ...patch } : sf,
+    const subfields = this.sortSubfields(
+      (f.subfields ?? []).map((sf, i) =>
+        i === subfieldIndex ? { ...sf, ...patch } : sf,
+      ),
     );
 
     const nextFields = [...rec.data_fields];
@@ -426,7 +437,7 @@ export class RecordStateService {
     if (idx < 0) return;
 
     const f = rec.data_fields[idx];
-    const subfields = [...(f.subfields ?? []), sf];
+    const subfields = this.sortSubfields([...(f.subfields ?? []), sf]);
 
     const nextFields = [...rec.data_fields];
     nextFields[idx] = { ...f, subfields };
@@ -442,7 +453,9 @@ export class RecordStateService {
     if (idx < 0) return;
 
     const f = rec.data_fields[idx];
-    const subfields = (f.subfields ?? []).filter((_, i) => i !== subfieldIndex);
+    const subfields = this.sortSubfields(
+      (f.subfields ?? []).filter((_, i) => i !== subfieldIndex),
+    );
 
     const nextFields = [...rec.data_fields];
     nextFields[idx] = { ...f, subfields };
@@ -475,7 +488,7 @@ export class RecordStateService {
       ...next[idx],
       ind1: snap.ind1,
       ind2: snap.ind2,
-      subfields: snap.subfields,
+      subfields: this.sortSubfields(snap.subfields),
     };
 
     this.editableRecord.set({ ...rec, data_fields: next });
@@ -495,7 +508,7 @@ export class RecordStateService {
     const updatedField = {
       ind1: rep.ind1 ?? '',
       ind2: rep.ind2 ?? '',
-      subfields: rep.subfields ?? [],
+      subfields: this.sortSubfields(rep.subfields ?? []),
       fieldId: rec.data_fields[idx].fieldId,
       tag: rec.data_fields[idx].tag,
     };
@@ -507,5 +520,13 @@ export class RecordStateService {
       ...rec,
       data_fields: nextDataFields,
     });
+  }
+
+  private sortSubfields(
+    subfields: MarcSubfield[] | undefined | null,
+  ): MarcSubfield[] {
+    return [...(subfields ?? [])].sort((a, b) =>
+      compareSubfieldCodes(a.code, b.code),
+    );
   }
 }
