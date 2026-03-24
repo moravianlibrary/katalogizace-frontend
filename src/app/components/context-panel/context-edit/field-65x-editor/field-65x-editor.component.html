@@ -1,168 +1,103 @@
 <section class="bg-main-base flex h-full flex-col rounded-2xl">
-  <div class="flex-1 overflow-auto">
-    <div
-      class="border-light flex items-center justify-between gap-4 border-b px-4 pt-4 pb-6"
-    >
-      <div class="w-full">
-        <label class="text-light text-sm-tight mb-2 block font-medium">
-          {{ "field_edit.first_indicator" | translate }}
-        </label>
+  <div
+    class="border-light flex items-center justify-between gap-4 border-b px-4 pt-4 pb-6"
+  >
+    <div class="w-full">
+      <label class="text-light text-sm-tight mb-2 block font-medium">
+        {{ "field_edit.first_indicator" | translate }}
+      </label>
 
-        <app-input-dropdown
-          [value]="field()?.ind1 ?? ''"
-          [options]="ind1Options()"
-          [disabled]="locked()"
-          (valueChange)="setInd(1, $event)"
-        />
-      </div>
-
-      <div class="w-full">
-        <label class="text-light text-sm-tight mb-2 block font-medium">
-          {{ "field_edit.second_indicator" | translate }}
-        </label>
-
-        <app-input-dropdown
-          [value]="field()?.ind2 ?? ''"
-          [options]="ind2Options()"
-          [disabled]="locked()"
-          (valueChange)="setInd(2, $event)"
-        />
-      </div>
+      <app-input-dropdown
+        [value]="field()?.ind1 ?? ''"
+        [options]="ind1Options()"
+        [disabled]="locked()"
+        (valueChange)="setInd(1, $event)"
+      />
     </div>
 
-    <div class="space-y-6 p-4">
-      @for (
-        sf of visibleSubfields();
-        track sf.kind + "-" + sf.code + "-" + $index
-      ) {
-        <div>
-          <label
-            class="text-sm-tight text-light mb-2 flex justify-between font-medium"
-          >
-            {{ getSubfieldLabel(sf.code) | translate }}
+    <div class="w-full">
+      <label class="text-light text-sm-tight mb-2 block font-medium">
+        {{ "field_edit.second_indicator" | translate }}
+      </label>
 
-            @if (sf.code === "7" && catalogueUrlSeven()) {
-              <a
-                class="text-base-color text-sm-tight font-medium underline hover:no-underline"
-                [href]="catalogueUrlSeven()"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="{{ 'candidates.open_in_skc' | translate }}"
-              >
-                <span class="flex items-center gap-1">
-                  {{ "candidates.show_in_nkp" | translate }}
-                  <svg
-                    class="icon-black"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                      d="M14.487 1.51315C14.6823 1.70841 14.6823 2.02499 14.487 2.22025L9.02038 7.68692C8.82512 7.88218 8.50854 7.88218 8.31328 7.68692C8.11801 7.49166 8.11801 7.17507 8.31328 6.97981L13.7799 1.51315C13.9752 1.31788 14.2918 1.31788 14.487 1.51315Z"
-                    />
-                    <path
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                      d="M10.967 1.3335C10.967 1.05735 11.1908 0.833496 11.467 0.833496H14.667C14.9431 0.833496 15.167 1.05735 15.167 1.3335V4.5335C15.167 4.80964 14.9431 5.0335 14.667 5.0335C14.3908 5.0335 14.167 4.80964 14.167 4.5335V1.8335H11.467C11.1908 1.8335 10.967 1.60964 10.967 1.3335Z"
-                    />
-                    <path
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                      d="M2.06328 2.06328C2.95292 1.17363 4.28418 0.833496 6.00016 0.833496H7.3335C7.60964 0.833496 7.8335 1.05735 7.8335 1.3335C7.8335 1.60964 7.60964 1.8335 7.3335 1.8335H6.00016C4.38281 1.8335 3.38074 2.16003 2.77038 2.77038C2.16003 3.38074 1.8335 4.38281 1.8335 6.00016V10.0002C1.8335 11.6175 2.16003 12.6196 2.77038 13.2299C3.38074 13.8403 4.38281 14.1668 6.00016 14.1668H10.0002C11.6175 14.1668 12.6196 13.8403 13.2299 13.2299C13.8403 12.6196 14.1668 11.6175 14.1668 10.0002V8.66683C14.1668 8.39069 14.3907 8.16683 14.6668 8.16683C14.943 8.16683 15.1668 8.39069 15.1668 8.66683V10.0002C15.1668 11.7161 14.8267 13.0474 13.937 13.937C13.0474 14.8267 11.7161 15.1668 10.0002 15.1668H6.00016C4.28418 15.1668 2.95292 14.8267 2.06328 13.937C1.17363 13.0474 0.833496 11.7161 0.833496 10.0002V6.00016C0.833496 4.28418 1.17363 2.95292 2.06328 2.06328Z"
-                    />
-                  </svg>
-                </span>
-              </a>
-            }
-          </label>
+      <app-input-dropdown
+        [value]="field()?.ind2 ?? ''"
+        [options]="ind2Options()"
+        [disabled]="locked()"
+        (valueChange)="setInd(2, $event)"
+      />
+    </div>
+  </div>
 
-          @if (sf.code === "2") {
-            <app-input-dropdown
-              [value]="dictionary()"
-              [placeholder]="'-'"
-              [options]="DICT_OPTIONS"
-              [disabled]="locked()"
-              (valueChange)="onDictionaryChange($event)"
-            />
-          } @else if (sf.code === "a") {
-            @if (hasDictionary()) {
-              <app-input-autocomplete-dictionary
-                [value]="sf.value"
-                [dictionary]="autocompleteDictionary()"
-                [disabled]="locked()"
-                [minChars]="1"
-                [limit]="20"
-                [fieldType]="fieldType()"
-                (valueChange)="onPickTerm($event)"
-                (picked)="applySuggestion($event)"
-              />
-            } @else {
-              <span
-                class="border-tertiary-default focus-within:border-primary-default bg-main-base inline-flex w-full overflow-hidden rounded-lg border"
-              >
-                <input
-                  class="w-full bg-transparent py-3 pl-4 outline-none"
-                  #plainInput
-                  [value]="sf.value"
-                  [disabled]="locked()"
-                  (input)="setTemplateSub('a', plainInput.value)"
-                />
+  <div class="space-y-6 overflow-auto p-4">
+    @for (
+      sf of visibleSubfields();
+      track sf.kind + "-" + sf.code + "-" + $index
+    ) {
+      <div>
+        <label
+          class="text-sm-tight text-light mb-2 flex justify-between font-medium"
+        >
+          {{ getSubfieldLabel(sf.code) | translate }}
 
-                @if (sf.value.length && !locked()) {
-                  <button
-                    class="group flex items-center px-3"
-                    (click)="setTemplateSub('a', '')"
-                    (mousedown)="$event.preventDefault()"
-                    tabindex="-1"
-                    type="button"
-                  >
-                    <svg
-                      class="icon-tertiary"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                    >
-                      <path
-                        fill-rule="evenodd"
-                        clip-rule="evenodd"
-                        d="M3.64645 3.64645C3.84171 3.45118 4.15829 3.45118 4.35355 3.64645L8 7.29289L11.6464 3.64645C11.8417 3.45118 12.1583 3.45118 12.3536 3.64645C12.5488 3.84171 12.5488 4.15829 12.3536 4.35355L8.70711 8L12.3536 11.6464C12.5488 11.8417 12.5488 12.1583 12.3536 12.3536C12.1583 12.5488 11.8417 12.5488 11.6464 12.3536L8 8.70711L4.35355 12.3536C4.15829 12.5488 3.84171 12.5488 3.64645 12.3536C3.45118 12.1583 3.45118 11.8417 3.64645 11.6464L7.29289 8L3.64645 4.35355C3.45118 4.15829 3.45118 3.84171 3.64645 3.64645Z"
-                      />
-                    </svg>
-                  </button>
-                }
-              </span>
-            }
-          } @else if (sf.code === "7") {
-            <span
-              class="inline-flex w-full overflow-hidden rounded-lg border"
-              [ngClass]="
-                locked()
-                  ? 'border-tertiary-disable bg-gray-500/5'
-                  : 'border-tertiary-default bg-main-base'
-              "
+          @if (sf.code === "7" && catalogueUrlSeven()) {
+            <a
+              class="text-base-color text-sm-tight font-medium underline hover:no-underline"
+              [href]="catalogueUrlSeven()"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="{{ 'candidates.open_in_skc' | translate }}"
             >
-              <input
-                class="text-disable w-full cursor-not-allowed bg-transparent py-3 pl-4 outline-none"
-                [value]="sf.value"
-                disabled
-              />
-
-              @if (sf.value.length) {
-                <button
-                  class="group flex items-center px-3"
-                  (click)="clearAuthority()"
-                  (mousedown)="$event.preventDefault()"
-                  tabindex="-1"
-                  type="button"
+              <span class="flex items-center gap-1">
+                {{ "candidates.show_in_nkp" | translate }}
+                <svg
+                  class="icon-black"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
                 >
-                  <app-lock-hover-icon></app-lock-hover-icon>
-                </button>
-              }
-            </span>
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M14.487 1.51315C14.6823 1.70841 14.6823 2.02499 14.487 2.22025L9.02038 7.68692C8.82512 7.88218 8.50854 7.88218 8.31328 7.68692C8.11801 7.49166 8.11801 7.17507 8.31328 6.97981L13.7799 1.51315C13.9752 1.31788 14.2918 1.31788 14.487 1.51315Z"
+                  />
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M10.967 1.3335C10.967 1.05735 11.1908 0.833496 11.467 0.833496H14.667C14.9431 0.833496 15.167 1.05735 15.167 1.3335V4.5335C15.167 4.80964 14.9431 5.0335 14.667 5.0335C14.3908 5.0335 14.167 4.80964 14.167 4.5335V1.8335H11.467C11.1908 1.8335 10.967 1.60964 10.967 1.3335Z"
+                  />
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M2.06328 2.06328C2.95292 1.17363 4.28418 0.833496 6.00016 0.833496H7.3335C7.60964 0.833496 7.8335 1.05735 7.8335 1.3335C7.8335 1.60964 7.60964 1.8335 7.3335 1.8335H6.00016C4.38281 1.8335 3.38074 2.16003 2.77038 2.77038C2.16003 3.38074 1.8335 4.38281 1.8335 6.00016V10.0002C1.8335 11.6175 2.16003 12.6196 2.77038 13.2299C3.38074 13.8403 4.38281 14.1668 6.00016 14.1668H10.0002C11.6175 14.1668 12.6196 13.8403 13.2299 13.2299C13.8403 12.6196 14.1668 11.6175 14.1668 10.0002V8.66683C14.1668 8.39069 14.3907 8.16683 14.6668 8.16683C14.943 8.16683 15.1668 8.39069 15.1668 8.66683V10.0002C15.1668 11.7161 14.8267 13.0474 13.937 13.937C13.0474 14.8267 11.7161 15.1668 10.0002 15.1668H6.00016C4.28418 15.1668 2.95292 14.8267 2.06328 13.937C1.17363 13.0474 0.833496 11.7161 0.833496 10.0002V6.00016C0.833496 4.28418 1.17363 2.95292 2.06328 2.06328Z"
+                  />
+                </svg>
+              </span>
+            </a>
+          }
+        </label>
+
+        @if (sf.code === "2") {
+          <app-input-dropdown
+            [value]="dictionary()"
+            [placeholder]="'-'"
+            [options]="DICT_OPTIONS"
+            [disabled]="locked()"
+            (valueChange)="onDictionaryChange($event)"
+          />
+        } @else if (sf.code === "a") {
+          @if (hasDictionary()) {
+            <app-input-autocomplete-dictionary
+              [value]="sf.value"
+              [dictionary]="autocompleteDictionary()"
+              [disabled]="locked()"
+              [minChars]="1"
+              [limit]="20"
+              [fieldType]="fieldType()"
+              (valueChange)="onPickTerm($event)"
+              (picked)="applySuggestion($event)"
+            />
           } @else {
             <span
               class="border-tertiary-default focus-within:border-primary-default bg-main-base inline-flex w-full overflow-hidden rounded-lg border"
@@ -171,19 +106,14 @@
                 class="w-full bg-transparent py-3 pl-4 outline-none"
                 #plainInput
                 [value]="sf.value"
-                (input)="
-                  sf.sourceIndex !== null &&
-                    setExtraSubValue(sf.sourceIndex, plainInput.value)
-                "
+                [disabled]="locked()"
+                (input)="setTemplateSub('a', plainInput.value)"
               />
 
-              @if (sf.value.length) {
+              @if (sf.value.length && !locked()) {
                 <button
                   class="group flex items-center px-3"
-                  (click)="
-                    sf.sourceIndex !== null &&
-                      setExtraSubValue(sf.sourceIndex, '')
-                  "
+                  (click)="setTemplateSub('a', '')"
                   (mousedown)="$event.preventDefault()"
                   tabindex="-1"
                   type="button"
@@ -202,57 +132,124 @@
                     />
                   </svg>
                 </button>
-              } @else {
-                <button
-                  class="group flex items-center px-3"
-                  (click)="
-                    sf.sourceIndex !== null &&
-                      deleteExtraSubfield(sf.sourceIndex)
-                  "
-                  (mousedown)="$event.preventDefault()"
-                  tabindex="-1"
-                  type="button"
-                >
-                  <svg
-                    class="icon-btn-error"
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                      d="M4.13815 4.19545C5.80861 4.02675 7.47927 3.94238 9.15004 3.94238C11.9545 3.94238 14.7668 4.08512 17.5617 4.3621C17.9052 4.39614 18.156 4.70219 18.122 5.04568C18.088 5.38918 17.7819 5.64004 17.4384 5.606C14.6833 5.33298 11.9122 5.19238 9.15004 5.19238C7.52113 5.19238 5.89209 5.27465 4.26286 5.43922L4.26103 5.4394L2.56103 5.60607C2.2175 5.63975 1.91171 5.38856 1.87803 5.04503C1.84435 4.7015 2.09553 4.39571 2.43906 4.36203L4.13815 4.19545Z"
-                    />
-                    <path
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                      d="M7.88309 3.15413L7.6998 4.2455C7.64263 4.58591 7.32033 4.81553 6.97992 4.75836C6.63951 4.70119 6.40989 4.37889 6.46706 4.03848L6.6504 2.94681C6.6536 2.9278 6.6569 2.90789 6.66024 2.88772C6.71762 2.54115 6.8018 2.03272 7.14071 1.6484C7.53576 1.20042 8.13851 1.04199 8.90843 1.04199H11.0918C11.8711 1.04199 12.4732 1.21316 12.8659 1.6657C13.2053 2.05679 13.2873 2.56704 13.3422 2.90775C13.3448 2.92433 13.3474 2.9405 13.35 2.95625L13.533 4.0377C13.5906 4.37804 13.3614 4.70063 13.0211 4.75823C12.6807 4.81583 12.3581 4.58662 12.3005 4.24628L12.1166 3.15923C12.0469 2.73172 12.0028 2.57826 11.9218 2.48495C11.877 2.43333 11.7208 2.29199 11.0918 2.29199H8.90843C8.27002 2.29199 8.1186 2.42939 8.07824 2.47517C8.00147 2.56221 7.95815 2.70846 7.88309 3.15413Z"
-                    />
-                    <path
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                      d="M15.7481 6.99302C16.0926 7.01525 16.3538 7.31252 16.3316 7.65698L15.7897 16.0521L15.7886 16.0679C15.7666 16.3814 15.7425 16.7262 15.6779 17.047C15.6109 17.3797 15.4928 17.7307 15.2535 18.0422C14.7526 18.6945 13.9 18.9584 12.6745 18.9584H7.32453C6.09906 18.9584 5.24651 18.6945 4.74554 18.0422C4.50628 17.7307 4.38821 17.3797 4.32121 17.047C4.2566 16.7262 4.23246 16.3814 4.2105 16.0679L4.20916 16.0486L3.6675 7.65698C3.64526 7.31252 3.90648 7.01525 4.25094 6.99302C4.5954 6.97078 4.89267 7.232 4.9149 7.57646L5.45634 15.9647L5.45646 15.9664C5.47998 16.302 5.49988 16.5682 5.54661 16.8002C5.59211 17.0262 5.65529 17.1746 5.73687 17.2808C5.87756 17.464 6.225 17.7084 7.32453 17.7084H12.6745C13.7741 17.7084 14.1215 17.464 14.2622 17.2808C14.3438 17.1746 14.407 17.0262 14.4525 16.8002C14.4992 16.5682 14.5191 16.302 14.5426 15.9664L14.5427 15.9647L15.0842 7.57646C15.1064 7.232 15.4037 6.97078 15.7481 6.99302Z"
-                    />
-                    <path
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                      d="M7.9834 13.7503C7.9834 13.4051 8.26322 13.1253 8.6084 13.1253H11.3834C11.7286 13.1253 12.0084 13.4051 12.0084 13.7503C12.0084 14.0955 11.7286 14.3753 11.3834 14.3753H8.6084C8.26322 14.3753 7.9834 14.0955 7.9834 13.7503Z"
-                    />
-                    <path
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                      d="M7.29167 10.417C7.29167 10.0718 7.57149 9.79199 7.91667 9.79199H12.0833C12.4285 9.79199 12.7083 10.0718 12.7083 10.417C12.7083 10.7622 12.4285 11.042 12.0833 11.042H7.91667C7.57149 11.042 7.29167 10.7622 7.29167 10.417Z"
-                    />
-                  </svg>
-                </button>
               }
             </span>
           }
-        </div>
-      }
-    </div>
+        } @else if (sf.code === "7") {
+          <span
+            class="inline-flex w-full overflow-hidden rounded-lg border"
+            [ngClass]="
+              locked()
+                ? 'border-tertiary-disable bg-gray-500/5'
+                : 'border-tertiary-default bg-main-base'
+            "
+          >
+            <input
+              class="text-disable w-full cursor-not-allowed bg-transparent py-3 pl-4 outline-none"
+              [value]="sf.value"
+              disabled
+            />
+
+            @if (sf.value.length) {
+              <button
+                class="group flex items-center px-3"
+                (click)="clearAuthority()"
+                (mousedown)="$event.preventDefault()"
+                tabindex="-1"
+                type="button"
+              >
+                <app-lock-hover-icon></app-lock-hover-icon>
+              </button>
+            }
+          </span>
+        } @else {
+          <span
+            class="border-tertiary-default focus-within:border-primary-default bg-main-base inline-flex w-full overflow-hidden rounded-lg border"
+          >
+            <input
+              class="w-full bg-transparent py-3 pl-4 outline-none"
+              #plainInput
+              [value]="sf.value"
+              (input)="
+                sf.sourceIndex !== null &&
+                  setExtraSubValue(sf.sourceIndex, plainInput.value)
+              "
+            />
+
+            @if (sf.value.length) {
+              <button
+                class="group flex items-center px-3"
+                (click)="
+                  sf.sourceIndex !== null &&
+                    setExtraSubValue(sf.sourceIndex, '')
+                "
+                (mousedown)="$event.preventDefault()"
+                tabindex="-1"
+                type="button"
+              >
+                <svg
+                  class="icon-tertiary"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M3.64645 3.64645C3.84171 3.45118 4.15829 3.45118 4.35355 3.64645L8 7.29289L11.6464 3.64645C11.8417 3.45118 12.1583 3.45118 12.3536 3.64645C12.5488 3.84171 12.5488 4.15829 12.3536 4.35355L8.70711 8L12.3536 11.6464C12.5488 11.8417 12.5488 12.1583 12.3536 12.3536C12.1583 12.5488 11.8417 12.5488 11.6464 12.3536L8 8.70711L4.35355 12.3536C4.15829 12.5488 3.84171 12.5488 3.64645 12.3536C3.45118 12.1583 3.45118 11.8417 3.64645 11.6464L7.29289 8L3.64645 4.35355C3.45118 4.15829 3.45118 3.84171 3.64645 3.64645Z"
+                  />
+                </svg>
+              </button>
+            } @else {
+              <button
+                class="group flex items-center px-3"
+                (click)="
+                  sf.sourceIndex !== null && deleteExtraSubfield(sf.sourceIndex)
+                "
+                (mousedown)="$event.preventDefault()"
+                tabindex="-1"
+                type="button"
+              >
+                <svg
+                  class="icon-btn-error"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M4.13815 4.19545C5.80861 4.02675 7.47927 3.94238 9.15004 3.94238C11.9545 3.94238 14.7668 4.08512 17.5617 4.3621C17.9052 4.39614 18.156 4.70219 18.122 5.04568C18.088 5.38918 17.7819 5.64004 17.4384 5.606C14.6833 5.33298 11.9122 5.19238 9.15004 5.19238C7.52113 5.19238 5.89209 5.27465 4.26286 5.43922L4.26103 5.4394L2.56103 5.60607C2.2175 5.63975 1.91171 5.38856 1.87803 5.04503C1.84435 4.7015 2.09553 4.39571 2.43906 4.36203L4.13815 4.19545Z"
+                  />
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M7.88309 3.15413L7.6998 4.2455C7.64263 4.58591 7.32033 4.81553 6.97992 4.75836C6.63951 4.70119 6.40989 4.37889 6.46706 4.03848L6.6504 2.94681C6.6536 2.9278 6.6569 2.90789 6.66024 2.88772C6.71762 2.54115 6.8018 2.03272 7.14071 1.6484C7.53576 1.20042 8.13851 1.04199 8.90843 1.04199H11.0918C11.8711 1.04199 12.4732 1.21316 12.8659 1.6657C13.2053 2.05679 13.2873 2.56704 13.3422 2.90775C13.3448 2.92433 13.3474 2.9405 13.35 2.95625L13.533 4.0377C13.5906 4.37804 13.3614 4.70063 13.0211 4.75823C12.6807 4.81583 12.3581 4.58662 12.3005 4.24628L12.1166 3.15923C12.0469 2.73172 12.0028 2.57826 11.9218 2.48495C11.877 2.43333 11.7208 2.29199 11.0918 2.29199H8.90843C8.27002 2.29199 8.1186 2.42939 8.07824 2.47517C8.00147 2.56221 7.95815 2.70846 7.88309 3.15413Z"
+                  />
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M15.7481 6.99302C16.0926 7.01525 16.3538 7.31252 16.3316 7.65698L15.7897 16.0521L15.7886 16.0679C15.7666 16.3814 15.7425 16.7262 15.6779 17.047C15.6109 17.3797 15.4928 17.7307 15.2535 18.0422C14.7526 18.6945 13.9 18.9584 12.6745 18.9584H7.32453C6.09906 18.9584 5.24651 18.6945 4.74554 18.0422C4.50628 17.7307 4.38821 17.3797 4.32121 17.047C4.2566 16.7262 4.23246 16.3814 4.2105 16.0679L4.20916 16.0486L3.6675 7.65698C3.64526 7.31252 3.90648 7.01525 4.25094 6.99302C4.5954 6.97078 4.89267 7.232 4.9149 7.57646L5.45634 15.9647L5.45646 15.9664C5.47998 16.302 5.49988 16.5682 5.54661 16.8002C5.59211 17.0262 5.65529 17.1746 5.73687 17.2808C5.87756 17.464 6.225 17.7084 7.32453 17.7084H12.6745C13.7741 17.7084 14.1215 17.464 14.2622 17.2808C14.3438 17.1746 14.407 17.0262 14.4525 16.8002C14.4992 16.5682 14.5191 16.302 14.5426 15.9664L14.5427 15.9647L15.0842 7.57646C15.1064 7.232 15.4037 6.97078 15.7481 6.99302Z"
+                  />
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M7.9834 13.7503C7.9834 13.4051 8.26322 13.1253 8.6084 13.1253H11.3834C11.7286 13.1253 12.0084 13.4051 12.0084 13.7503C12.0084 14.0955 11.7286 14.3753 11.3834 14.3753H8.6084C8.26322 14.3753 7.9834 14.0955 7.9834 13.7503Z"
+                  />
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M7.29167 10.417C7.29167 10.0718 7.57149 9.79199 7.91667 9.79199H12.0833C12.4285 9.79199 12.7083 10.0718 12.7083 10.417C12.7083 10.7622 12.4285 11.042 12.0833 11.042H7.91667C7.57149 11.042 7.29167 10.7622 7.29167 10.417Z"
+                  />
+                </svg>
+              </button>
+            }
+          </span>
+        }
+      </div>
+    }
   </div>
 
   <div
