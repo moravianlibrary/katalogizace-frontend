@@ -2,9 +2,11 @@ import {
   AddSubfieldDialogComponent,
   AddSubfieldDialogResult,
 } from '@/app/components/add-subfield-dialog/add-subfield-dialog.component';
+import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
 import { TextareaAutocompleteComponent } from '@/app/components/textarea-autocomplete/textarea-autocomplete.component';
 import {
   FIELD_RULES,
+  getIndicators,
   getSubfieldRuleLabel,
   isSubfieldRepeatable,
   MarcSubfield,
@@ -47,6 +49,7 @@ type PendingFocusTarget = {
     TranslateModule,
     TextareaAutocompleteComponent,
     AddSubfieldDialogComponent,
+    InputDropdownComponent,
   ],
   templateUrl: './field-500-editor.component.html',
 })
@@ -68,6 +71,19 @@ export class Field500EditorComponent {
   readonly pendingFocusTarget = signal<PendingFocusTarget>(null);
 
   readonly tag = '500';
+
+  readonly indicators = computed(() => getIndicators(this.tag));
+  readonly ind1Options = computed(() => this.indicators().ind1);
+  readonly ind2Options = computed(() => this.indicators().ind2);
+
+  setInd(ind: 1 | 2, raw: string) {
+    const v = (raw ?? '').slice(0, 1);
+    if (ind === 1) {
+      this.rs.patchDataField(this.fieldId(), { ind1: v });
+    } else {
+      this.rs.patchDataField(this.fieldId(), { ind2: v });
+    }
+  }
 
   readonly templateOrder = computed(() => {
     return FIELD_RULES[this.tag]?.templateOrder ?? ['a'];
