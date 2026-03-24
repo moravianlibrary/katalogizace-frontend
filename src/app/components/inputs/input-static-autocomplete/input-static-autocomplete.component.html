@@ -9,7 +9,7 @@
   >
     <input
       class="w-full bg-transparent py-3 pl-4 outline-none"
-      #inp
+      #inputEl
       [ngClass]="disabled() ? 'cursor-not-allowed' : ''"
       [disabled]="disabled()"
       [value]="query()"
@@ -17,7 +17,7 @@
       [attr.maxlength]="maxlength() ?? null"
       (focus)="onFocus()"
       (blur)="onBlur()"
-      (input)="onInput(inp.value)"
+      (input)="onInput(inputEl.value)"
       (keydown)="onKeydown($event)"
     />
 

@@ -46,6 +46,12 @@ export class InputStaticAutocompleteComponent {
   readonly activeIndex = signal<number>(-1);
   private readonly listRef = viewChild<ElementRef<HTMLDivElement>>('list');
 
+  private readonly inputEl = viewChild<ElementRef<HTMLInputElement>>('inputEl');
+
+  focus() {
+    this.inputEl()?.nativeElement.focus();
+  }
+
   readonly filtered = computed(() => {
     const all = this.items() ?? [];
     const q = (this.query() ?? '').toLowerCase().trim();
