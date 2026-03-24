@@ -10,6 +10,7 @@ export type FieldRule = {
   ind1Options: DropdownOption[];
   ind2Options: DropdownOption[];
   subfields: Record<string, SubfieldRule>;
+  templateOrder: string[];
   repeatable: boolean;
   type: FieldType;
 };
@@ -38,6 +39,7 @@ export const FIELD_RULES: FieldRulesMap = {
         label: 'field_edit.100.4',
       },
     },
+    templateOrder: ['a', 'd', '7', '4'],
     repeatable: false,
     type: 'data' as FieldType,
   },
@@ -57,15 +59,8 @@ export const FIELD_RULES: FieldRulesMap = {
         repeatable: false,
         label: 'field_edit.245.c',
       },
-      n: {
-        repeatable: true,
-        label: 'field_edit.245.n',
-      },
-      p: {
-        repeatable: true,
-        label: 'field_edit.245.p',
-      },
     },
+    templateOrder: ['a', 'b', 'c'],
     repeatable: false,
     type: 'data' as FieldType,
   },
@@ -86,6 +81,7 @@ export const FIELD_RULES: FieldRulesMap = {
         label: 'field_edit.264.c',
       },
     },
+    templateOrder: ['a', 'b', 'c'],
     repeatable: true,
     type: 'data' as FieldType,
   },
@@ -114,6 +110,7 @@ export const FIELD_RULES: FieldRulesMap = {
         label: 'field_edit.300.3',
       },
     },
+    templateOrder: ['a', 'b', 'c', 'e', '3'],
     repeatable: true,
     type: 'data' as FieldType,
   },
@@ -126,6 +123,7 @@ export const FIELD_RULES: FieldRulesMap = {
         label: 'field_edit.500.a',
       },
     },
+    templateOrder: ['a'],
     repeatable: true,
     type: 'data' as FieldType,
   },
@@ -146,6 +144,7 @@ export const FIELD_RULES: FieldRulesMap = {
         label: 'field_edit.650.7',
       },
     },
+    templateOrder: ['a', '2', '7'],
     repeatable: true,
     type: 'data' as FieldType,
   },
@@ -166,6 +165,7 @@ export const FIELD_RULES: FieldRulesMap = {
         label: 'field_edit.651.7',
       },
     },
+    templateOrder: ['a', '2', '7'],
     repeatable: true,
     type: 'data' as FieldType,
   },
@@ -186,6 +186,7 @@ export const FIELD_RULES: FieldRulesMap = {
         label: 'field_edit.655.7',
       },
     },
+    templateOrder: ['a', '2', '7'],
     repeatable: true,
     type: 'data' as FieldType,
   },
@@ -210,6 +211,7 @@ export const FIELD_RULES: FieldRulesMap = {
         label: 'field_edit.700.4',
       },
     },
+    templateOrder: ['a', 'd', '7', '4'],
     repeatable: true,
     type: 'data' as FieldType,
   },
