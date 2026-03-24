@@ -559,18 +559,10 @@ export class FieldAuthorityEditorComponent {
   }
 
   clearAuthority() {
-    const field = this.field();
-    if (!field) return;
-
-    const subfields = (field.subfields ?? []).filter(
-      (sf) => sf.code !== '7' && sf.code !== 'd',
-    );
-
-    this.dDraft.set('');
-    this.loadedSevenId.set(null);
-    this.sevenRecord.set(null);
-
-    this.rs.patchDataField(this.fieldId(), { subfields });
+    this.patchAuthorityTemplate({
+      d: '',
+      '7': '',
+    });
 
     setTimeout(() => {
       this.firstAutocomplete()?.focus();
@@ -768,6 +760,45 @@ export class FieldAuthorityEditorComponent {
     this.loadDetail(recordId);
   }
 
+  private patchAuthorityTemplate(values: {
+    a?: string;
+    d?: string;
+    '7'?: string;
+  }) {
+    const field = this.field();
+    if (!field) return;
+
+    const subfields = [...(field.subfields ?? [])];
+
+    const upsert = (code: 'a' | 'd' | '7', value: string) => {
+      const idx = subfields.findIndex((sf) => sf.code === code);
+
+      if (!value) {
+        if (idx >= 0) subfields.splice(idx, 1);
+        return;
+      }
+
+      if (idx >= 0) {
+        subfields[idx] = { ...subfields[idx], value };
+      } else {
+        subfields.push({ code, value });
+      }
+    };
+
+    if ('a' in values) upsert('a', values.a ?? '');
+    if ('d' in values) upsert('d', values.d ?? '');
+    if ('7' in values) upsert('7', values['7'] ?? '');
+
+    this.loadedSevenId.set(null);
+
+    if (!(values['7'] ?? '').trim()) {
+      this.sevenRecord.set(null);
+    }
+
+    this.dDraft.set(values.d ?? '');
+    this.rs.patchDataField(this.fieldId(), { subfields });
+  }
+
   applyAuthority() {
     const record = this.selectedRecordDetail();
     if (!record) return;
@@ -778,19 +809,11 @@ export class FieldAuthorityEditorComponent {
     const sub = (code: string) =>
       field100.subfields.find((s) => s.code === code)?.value ?? '';
 
-    const visibleA = this.visibleSubfields().find(
-      (sf) => sf.kind === 'template' && sf.code === 'a',
-    );
-    const visibleD = this.visibleSubfields().find(
-      (sf) => sf.kind === 'template' && sf.code === 'd',
-    );
-    const visible7 = this.visibleSubfields().find(
-      (sf) => sf.kind === 'template' && sf.code === '7',
-    );
-
-    if (visibleA) this.setTemplateSubValue(visibleA, sub('a'));
-    if (visibleD) this.setTemplateSubValue(visibleD, sub('d'));
-    if (visible7) this.setTemplateSubValue(visible7, sub('7'));
+    this.patchAuthorityTemplate({
+      a: sub('a'),
+      d: sub('d'),
+      '7': sub('7'),
+    });
 
     this.closeAuthorityDialog();
   }
