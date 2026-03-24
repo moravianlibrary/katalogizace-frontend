@@ -4,6 +4,7 @@ import { MarcDiffService } from '@/app/services/marc-diff.service';
 import { RecordStateService } from '@/app/services/record-state.service';
 import { RecordStore } from '@/app/stores/record.store';
 import { filterExistingRecord015to830 } from '@/app/utils/marc-filter';
+import { compareSubfieldCodes } from '@/app/utils/marc-subfield-sort';
 import { NgClass } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
@@ -49,16 +50,14 @@ export class ContextPanelHeaderComponent {
       if (!field) return false;
 
       return (
-        JSON.stringify({
-          ind1: field.ind1,
-          ind2: field.ind2,
-          subfields: field.subfields ?? [],
-        }) !==
-        JSON.stringify({
-          ind1: snapshot.ind1,
-          ind2: snapshot.ind2,
-          subfields: snapshot.subfields ?? [],
-        })
+        JSON.stringify(this.normalizeDataFieldState(field)) !==
+        JSON.stringify(
+          this.normalizeDataFieldState({
+            ind1: snapshot.ind1,
+            ind2: snapshot.ind2,
+            subfields: snapshot.subfields ?? [],
+          }),
+        )
       );
     }
 
@@ -71,6 +70,24 @@ export class ContextPanelHeaderComponent {
 
     return false;
   });
+
+  private normalizeDataFieldState(field: {
+    ind1?: string | null;
+    ind2?: string | null;
+    subfields?: { code?: string | null; value?: string | null }[] | null;
+  }) {
+    return {
+      ind1: (field.ind1 ?? '').trim(),
+      ind2: (field.ind2 ?? '').trim(),
+      subfields: [...(field.subfields ?? [])]
+        .map((sf) => ({
+          code: (sf.code ?? '').trim(),
+          value: (sf.value ?? '').trim(),
+        }))
+        .filter((sf) => sf.code.length === 1)
+        .sort((a, b) => compareSubfieldCodes(a.code, b.code)),
+    };
+  }
 
   onResetField() {
     this.cps.requestEditReset();
