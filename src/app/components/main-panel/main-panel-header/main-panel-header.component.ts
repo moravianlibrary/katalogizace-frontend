@@ -1,10 +1,9 @@
-import { ID, RecordViewMode } from '@/app/models';
+import { ID } from '@/app/models';
 import { QuickAddItem } from '@/app/models/shared/record-state';
 import { BooksService } from '@/app/services/api/books.service';
 import { RecordStateService } from '@/app/services/record-state.service';
 import { ToastService } from '@/app/services/toast.service';
 import { RecordStore } from '@/app/stores/record.store';
-import { NgClass } from '@angular/common';
 import {
   Component,
   computed,
@@ -19,7 +18,7 @@ import { QuickAddComponent } from '../quick-add/quick-add.component';
 @Component({
   standalone: true,
   selector: 'app-main-panel-header',
-  imports: [QuickAddComponent, TranslateModule, NgClass],
+  imports: [QuickAddComponent, TranslateModule],
   templateUrl: './main-panel-header.component.html',
 })
 export class MainPanelHeaderComponent {
@@ -30,17 +29,10 @@ export class MainPanelHeaderComponent {
   recordState = inject(RecordStateService);
 
   bookId = input.required<ID>();
-  viewMode = input.required<RecordViewMode>();
   isSaving = signal(false);
-  setViewMode = output<RecordViewMode>();
 
-  // table mode
   quickAddItems = input.required<QuickAddItem[]>();
   quickAddClick = output<QuickAddItem>();
-
-  // cards mode
-  addDataField = output<void>();
-  addControlField = output<void>();
 
   canSaveRecord = computed(() => !!this.store.extracted());
 

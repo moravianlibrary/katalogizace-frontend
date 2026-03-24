@@ -79,8 +79,6 @@ export class BookDetailComponent {
         this.breadcrumbs.setBook(this.bookId!, String(this.bookId));
       },
     });
-
-    this.recordState.resetViewMode();
   }
 
   ngOnDestroy() {

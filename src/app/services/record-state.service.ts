@@ -7,7 +7,6 @@ import {
   LastEditedRecord,
   MarcCandidate,
   MarcSubfield,
-  RecordViewMode,
   UiFieldWithMeta,
   UUID,
 } from '@/app/models';
@@ -22,7 +21,6 @@ import { EditSnapshot } from './context-panel.service';
 
 @Injectable({ providedIn: 'root' })
 export class RecordStateService {
-  readonly viewMode = signal<RecordViewMode>('table');
   readonly focusTagFieldId = signal<UUID | null>(null);
 
   readonly editableRecord = signal<EditableMarcRecord | null>(null);
@@ -194,21 +192,6 @@ export class RecordStateService {
     };
 
     this.editableRecord.set({ ...rec, data_fields: nextFields });
-  }
-
-  toggleViewMode() {
-    this.clearFocusTag();
-
-    this.viewMode.update((m) => (m === 'cards' ? 'table' : 'cards'));
-  }
-
-  setViewMode(mode: RecordViewMode) {
-    this.clearFocusTag();
-    this.viewMode.set(mode);
-  }
-
-  resetViewMode() {
-    this.viewMode.set('table');
   }
 
   loadFromExistingOrLastEdited(

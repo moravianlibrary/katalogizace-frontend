@@ -10,7 +10,6 @@ import { Component, effect, inject, input, signal } from '@angular/core';
 import { MarcDiffService } from '../../services/marc-diff.service';
 import { RecordStateService } from '../../services/record-state.service';
 import { RecordStore } from '../../stores/record.store';
-import { ExtractedFieldsComponent } from '../extracted-fields/extracted-fields/extracted-fields.component';
 
 import { QuickAddItem } from '@/app/models/shared/record-state';
 import { ContextPanelService } from '@/app/services/context-panel.service';
@@ -32,7 +31,6 @@ import { MainPanelHeaderComponent } from './main-panel-header/main-panel-header.
   selector: 'app-main-panel',
   imports: [
     MainPanelHeaderComponent,
-    ExtractedFieldsComponent,
     EditableMarcRecordTableComponent,
     TranslateModule,
     AddFieldDialogComponent,
@@ -47,7 +45,6 @@ export class MainPanelComponent {
   diff = inject(MarcDiffService);
   cps = inject(ContextPanelService);
 
-  viewMode = this.recordState.viewMode;
   recordPreview = this.recordState.recordPreview;
 
   diffIndex = this.diff.diffIndex;

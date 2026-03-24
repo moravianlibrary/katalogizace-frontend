@@ -80,8 +80,7 @@ export class EditableMarcRecordTableComponent {
   }
 
   getLeaderRowClasses(): string[] {
-    const disabled =
-      this.ds.enabledByUser() && this.recordState.viewMode() === 'table';
+    const disabled = this.ds.enabledByUser();
 
     return [
       ...this.baseRowClasses('__leader'),
@@ -91,9 +90,7 @@ export class EditableMarcRecordTableComponent {
 
   getControlRowClasses(fieldId: string, tag: string): string[] {
     const disabled =
-      this.ds.enabledByUser() &&
-      !this.isDiffableTag015to830(tag) &&
-      this.recordState.viewMode() === 'table';
+      this.ds.enabledByUser() && !this.isDiffableTag015to830(tag);
 
     return [
       ...this.baseRowClasses(fieldId),
@@ -103,9 +100,7 @@ export class EditableMarcRecordTableComponent {
 
   getDataRowClasses(fieldId: string, tag: string): string[] {
     const disabled =
-      this.ds.enabledByUser() &&
-      !this.isDiffableTag015to830(tag) &&
-      this.recordState.viewMode() === 'table';
+      this.ds.enabledByUser() && !this.isDiffableTag015to830(tag);
 
     return [
       ...this.baseRowClasses(fieldId),
