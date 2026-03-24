@@ -353,8 +353,47 @@ export class Field65xEditorComponent {
     this.setTemplateSub('7', s['7'] ?? '');
   }
 
+  private patchAuthorityTemplate(values: { a?: string; '7'?: string }) {
+    const field = this.field();
+    if (!field) return;
+
+    const subfields = [...(field.subfields ?? [])];
+
+    const upsert = (code: 'a' | '7', value: string) => {
+      const idx = subfields.findIndex((sf) => sf.code === code);
+
+      if (!value) {
+        if (idx >= 0) subfields.splice(idx, 1);
+        return;
+      }
+
+      if (idx >= 0) {
+        subfields[idx] = { ...subfields[idx], value };
+      } else {
+        subfields.push({ code, value });
+      }
+    };
+
+    if ('a' in values) upsert('a', values.a ?? '');
+    if ('7' in values) upsert('7', values['7'] ?? '');
+
+    this.loadedSevenId.set(null);
+
+    if (!(values['7'] ?? '').trim()) {
+      this.sevenRecord.set(null);
+    }
+
+    this.rs.patchDataField(this.fieldId(), { subfields });
+  }
+
   clearAuthority() {
-    this.setTemplateSub('7', '');
+    this.patchAuthorityTemplate({
+      '7': '',
+    });
+
+    setTimeout(() => {
+      this.firstAutocomplete()?.focus();
+    });
   }
 
   openAddSubfieldDialog() {
