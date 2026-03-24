@@ -23,4 +23,12 @@
       }
     }
   </div>
+
+  <app-add-field-dialog
+    [open]="addFieldDialogOpen()"
+    [error]="addFieldDialogError()"
+    (closed)="closeAddFieldDialog()"
+    (confirmed)="onAddFieldConfirm($event)"
+    (clearedError)="addFieldDialogError.set(null)"
+  />
 </section>
