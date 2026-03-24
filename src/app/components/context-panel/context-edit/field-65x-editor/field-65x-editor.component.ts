@@ -146,6 +146,9 @@ export class Field65xEditorComponent {
     InputAutocompleteDictionaryComponent,
   );
 
+  private readonly firstPlainAInput =
+    viewChild<ElementRef<HTMLInputElement>>('plainAInput');
+
   constructor() {
     effect(() => {
       const state = this.cps.state();
@@ -166,7 +169,13 @@ export class Field65xEditorComponent {
       const isLocked = untracked(() => this.locked());
       if (isLocked) return;
 
-      queueMicrotask(() => this.firstAutocomplete()?.focus());
+      queueMicrotask(() => {
+        if (this.dictionary()) {
+          this.firstAutocomplete()?.focus();
+        } else {
+          this.firstPlainAInput()?.nativeElement.focus();
+        }
+      });
     });
 
     effect(() => {
@@ -230,6 +239,7 @@ export class Field65xEditorComponent {
   readonly DICT_OPTIONS: DropdownOption[] = [
     { value: 'czenas', label: 'czenas' },
     { value: 'eczenas', label: 'eczenas' },
+    { value: '', label: '-' },
   ];
 
   readonly field = computed(() => {
@@ -270,7 +280,16 @@ export class Field65xEditorComponent {
 
   readonly dictionary = computed(() => {
     const v = (this.getTemplateSubValue('2') ?? '').trim();
-    return (v === 'eczenas' ? 'eczenas' : 'czenas') as 'czenas' | 'eczenas';
+
+    if (v === 'eczenas') return 'eczenas';
+    if (v === 'czenas') return 'czenas';
+    return '';
+  });
+
+  readonly hasDictionary = computed(() => this.dictionary() !== '');
+
+  readonly autocompleteDictionary = computed<'czenas' | 'eczenas'>(() => {
+    return this.dictionary() === 'eczenas' ? 'eczenas' : 'czenas';
   });
 
   readonly locked = computed(() => {
@@ -335,7 +354,7 @@ export class Field65xEditorComponent {
   onDictionaryChange(v: string) {
     if (this.locked()) return;
 
-    const dict = v === 'eczenas' ? 'eczenas' : 'czenas';
+    const dict = v === 'eczenas' ? 'eczenas' : v === 'czenas' ? 'czenas' : '';
 
     this.setTemplateSub('2', dict);
     this.setTemplateSub('a', '');
