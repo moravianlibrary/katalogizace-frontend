@@ -28,7 +28,7 @@ export class ContextPanelHeaderComponent {
   diffEnabled = this.diff.enabledByUser;
 
   showDiffToggle = computed(() => {
-    return true;
+    return this.cps.state().mode === 'records';
   });
 
   canTakeRecord = computed(() => !!this.store.openedForDiff());
