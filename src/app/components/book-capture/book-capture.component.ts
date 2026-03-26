@@ -28,6 +28,9 @@ type CameraOption = {
   selector: 'app-book-capture',
   imports: [CommonModule, TranslateModule, NgClass],
   templateUrl: './book-capture.component.html',
+  host: {
+    class: 'flex min-h-0 flex-1 flex-col overflow-hidden',
+  },
 })
 export class BookCaptureComponent implements AfterViewInit, OnDestroy {
   private readonly books = inject(BooksService);
