@@ -65,7 +65,8 @@
     "search": "Hledat",
     "add_subfield": "Přidat podpole",
     "add_field": "Jiné pole",
-    "add": "Přidat"
+    "add": "Přidat",
+    "next": "Další"
   },
   "messages": {
     "success": {
@@ -737,5 +738,8 @@
     "title": "Nové podpole",
     "error": "Nepodporovaný formát",
     "non_repeatable_error": "Podpole již existuje."
+  },
+  "scanning": {
+    "loading_text": "Připravuji kameru"
   }
 }
