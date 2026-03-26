@@ -740,6 +740,9 @@
     "non_repeatable_error": "Podpole již existuje."
   },
   "scanning": {
-    "loading_text": "Připravuji kameru"
+    "title": "Skenování",
+    "loading_text": "Připravuji kameru",
+    "page_count": "Počet stran: ",
+    "uploading_page": "Nahrávám stranu..."
   }
 }

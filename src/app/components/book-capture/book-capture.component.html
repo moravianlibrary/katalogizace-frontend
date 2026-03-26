@@ -4,10 +4,12 @@
       class="border-bright bg-main-base flex shrink-0 items-center justify-between border-y px-4 py-2"
     >
       <div class="flex flex-col">
-        <span class="text-base-color text-md font-medium">Skenování</span>
+        <span class="text-base-color text-md font-medium">
+          {{ "scanning.title" | translate }}
+        </span>
 
         <span class="text-light font-regular text-sm">
-          Počet stran: {{ photoCount() }}
+          {{ "scanning.page_count" | translate }} {{ photoCount() }}
         </span>
       </div>
 
@@ -29,6 +31,18 @@
           <div class="px-6">
             <p class="text-xl font-medium">
               {{ "scanning.loading_text" | translate }}
+            </p>
+          </div>
+        </div>
+      }
+
+      @if (isUploading()) {
+        <div
+          class="absolute inset-0 z-20 flex items-center justify-center bg-[#2c3239]/80 text-center text-white"
+        >
+          <div class="px-6">
+            <p class="text-xl font-medium">
+              {{ "scanning.uploading_page" | translate }}
             </p>
           </div>
         </div>
