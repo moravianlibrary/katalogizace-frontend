@@ -27,7 +27,7 @@
     </div>
   </div>
 
-  <div class="space-y-6 overflow-y-auto p-4">
+  <div class="flex-1 space-y-6 overflow-y-auto p-4">
     @for (
       sf of visibleSubfields();
       track sf.kind + "-" + sf.code + "-" + $index
@@ -56,7 +56,7 @@
   </div>
 
   <div
-    class="bg-main-base border-light sticky bottom-0 z-10 flex justify-center rounded-b-2xl border-t px-4 py-3"
+    class="bg-main-base border-light z-10 flex justify-center rounded-b-2xl border-t px-4 py-3"
   >
     <button
       class="btn btn-m btn-tertiary group items-center justify-center"
