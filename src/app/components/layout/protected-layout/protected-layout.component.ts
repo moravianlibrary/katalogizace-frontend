@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../../services/api/auth.service';
@@ -15,8 +15,18 @@ export class ProtectedLayoutComponent {
   private router = inject(Router);
   auth = inject(AuthService);
   breadcrumbs = inject(BreadcrumbsService);
+  readonly userMenuOpen = signal(false);
+
+  toggleUserMenu() {
+    this.userMenuOpen.update((v) => !v);
+  }
+
+  closeUserMenu() {
+    this.userMenuOpen.set(false);
+  }
 
   logout() {
+    this.closeUserMenu();
     this.auth.logout();
     this.router.navigateByUrl('/login');
   }
