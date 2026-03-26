@@ -1,13 +1,6 @@
 <div class="flex flex-col gap-4 p-4">
-  <h2>Naskenujte knihu</h2>
-
   @if (!bookId()) {
     <div class="flex flex-col gap-5">
-      <p class="text-light text-sm">
-        Nejprve založte knihu. Poté se automaticky otevře kamera pro pořízení
-        první stránky.
-      </p>
-
       <div class="flex gap-4">
         <button
           class="bg-main-base border-tertiary-default hover:border-tertiary-hover active:border-tertiary-pressed text-sm-tight text-base-color cursor-pointer rounded-lg border px-4 py-3 font-medium"
@@ -63,26 +56,6 @@
           {{ isFinishing() ? "Spouštím workflow…" : "Hotovo" }}
         </button>
       </div>
-
-      @if (bookId() && cameraOptions().length > 1) {
-        <div class="flex flex-col gap-2">
-          <label class="text-sm">Objektiv</label>
-
-          <select
-            class="bg-main-base border-tertiary-default rounded-lg border px-3 py-2"
-            #cameraSelect
-            [value]="selectedCameraId() ?? ''"
-            [disabled]="isOpeningCamera() || isUploading() || isFinishing()"
-            (change)="switchCamera(cameraSelect.value)"
-          >
-            @for (camera of cameraOptions(); track camera.id) {
-              <option [value]="camera.id">
-                {{ camera.label }}
-              </option>
-            }
-          </select>
-        </div>
-      }
 
       <span>
         Počet naskenovaných stránek: <strong>{{ photoCount() }}</strong>

@@ -20,7 +20,6 @@ import { catchError, map } from 'rxjs/operators';
 type CameraOption = {
   id: string;
   label: string;
-  isRear: boolean;
 };
 
 @Component({
@@ -109,19 +108,6 @@ export class BookCaptureComponent implements AfterViewInit {
     });
   }
 
-  async switchCamera(cameraId: string) {
-    if (
-      !cameraId ||
-      this.selectedCameraId() === cameraId ||
-      this.isOpeningCamera()
-    ) {
-      return;
-    }
-
-    this.selectedCameraId.set(cameraId);
-    await this.openCamera();
-  }
-
   private async openCamera() {
     try {
       this.isOpeningCamera.set(true);
@@ -148,9 +134,12 @@ export class BookCaptureComponent implements AfterViewInit {
   private async ensureCameraOptions() {
     if (this.cameraOptions().length) {
       if (!this.selectedCameraId()) {
-        const best = this.pickBestRearCamera(this.cameraOptions());
+        const exactBackCamera = this.cameraOptions().find(
+          (camera) => camera.label.toLowerCase() === 'camera 0, facing back',
+        );
+
         this.selectedCameraId.set(
-          best?.id ?? this.cameraOptions()[0]?.id ?? null,
+          exactBackCamera?.id ?? this.cameraOptions()[0]?.id ?? null,
         );
       }
       return;
@@ -165,85 +154,51 @@ export class BookCaptureComponent implements AfterViewInit {
     const devices = await navigator.mediaDevices.enumerateDevices();
     const cameras = devices
       .filter((d) => d.kind === 'videoinput')
-      .map<CameraOption>((d, index) => {
-        const lower = d.label.toLowerCase();
-        const isRear =
-          lower.includes('back') ||
-          lower.includes('rear') ||
-          lower.includes('environment');
+      .map<CameraOption>((d, index) => ({
+        id: d.deviceId,
+        label: d.label || `Camera ${index + 1}`,
+      }));
 
-        return {
-          id: d.deviceId,
-          label: d.label || `Camera ${index + 1}`,
-          isRear,
-        };
-      });
+    this.cameraOptions.set(cameras);
 
-    const sorted = [
-      ...cameras.filter((c) => c.isRear),
-      ...cameras.filter((c) => !c.isRear),
-    ];
+    const exactBackCamera = cameras.find(
+      (camera) => camera.label.toLowerCase() === 'camera 0, facing back',
+    );
 
-    this.cameraOptions.set(sorted);
-
-    const best = this.pickBestRearCamera(sorted);
-    this.selectedCameraId.set(best?.id ?? sorted[0]?.id ?? null);
-  }
-
-  private pickBestRearCamera(cameras: CameraOption[]): CameraOption | null {
-    const ranked = cameras.map((camera) => {
-      const label = camera.label.toLowerCase();
-
-      let score = 0;
-
-      if (camera.isRear) score += 100;
-
-      if (
-        label.includes('main') ||
-        label.includes('standard') ||
-        label.includes('wide angle') ||
-        label.includes('1x')
-      ) {
-        score += 40;
-      }
-
-      if (
-        label.includes('ultra') ||
-        label.includes('ultrawide') ||
-        label.includes('macro') ||
-        label.includes('tele') ||
-        label.includes('depth')
-      ) {
-        score -= 80;
-      }
-
-      return { camera, score };
-    });
-
-    ranked.sort((a, b) => b.score - a.score);
-
-    return ranked[0]?.camera ?? null;
+    this.selectedCameraId.set(exactBackCamera?.id ?? cameras[0]?.id ?? null);
   }
 
   private async openSelectedCamera(): Promise<MediaStream> {
     const selectedId = this.selectedCameraId();
+    let stream: MediaStream;
 
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: selectedId
-        ? {
+    try {
+      if (selectedId) {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
             deviceId: { exact: selectedId },
             width: { ideal: 4608 },
             height: { ideal: 3456 },
             aspectRatio: { ideal: 4 / 3 },
-          }
-        : {
-            facingMode: { ideal: 'environment' },
-            width: { ideal: 4608 },
-            height: { ideal: 3456 },
-            aspectRatio: { ideal: 4 / 3 },
           },
-      audio: false,
-    });
+          audio: false,
+        });
+      } else {
+        throw new Error('No selected camera');
+      }
+    } catch (err) {
+      console.warn('deviceId failed, falling back to environment', err);
+
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 4608 },
+          height: { ideal: 3456 },
+          aspectRatio: { ideal: 4 / 3 },
+        },
+        audio: false,
+      });
+    }
 
     const track = stream.getVideoTracks()[0];
 
