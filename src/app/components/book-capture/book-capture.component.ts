@@ -40,7 +40,6 @@ export class BookCaptureComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
 
   private stream: MediaStream | null = null;
-  private viewReady = signal(false);
 
   batchId = signal<string>('');
   bookId = signal<string | null>(null);
@@ -69,8 +68,6 @@ export class BookCaptureComponent implements AfterViewInit, OnDestroy {
   }
 
   async ngAfterViewInit() {
-    this.viewReady.set(true);
-
     if (!this.batchId()) {
       this.toast.show(
         this.translate.instant('messages.error.books.create'),
@@ -313,16 +310,13 @@ export class BookCaptureComponent implements AfterViewInit, OnDestroy {
         const exactBackCamera = this.cameraOptions().find(
           (camera) => camera.label.toLowerCase() === 'camera 0, facing back',
         );
-
-        this.selectedCameraId.set(
-          exactBackCamera?.id ?? this.cameraOptions()[0]?.id ?? null,
-        );
+        this.selectedCameraId.set(exactBackCamera?.id ?? null);
       }
       return;
     }
 
     const probe = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: 'environment' } },
+      video: true,
       audio: false,
     });
     probe.getTracks().forEach((t) => t.stop());
@@ -340,43 +334,87 @@ export class BookCaptureComponent implements AfterViewInit, OnDestroy {
     const exactBackCamera = cameras.find(
       (camera) => camera.label.toLowerCase() === 'camera 0, facing back',
     );
-
-    this.selectedCameraId.set(exactBackCamera?.id ?? cameras[0]?.id ?? null);
+    this.selectedCameraId.set(exactBackCamera?.id ?? null);
   }
 
   private async openSelectedCamera(): Promise<MediaStream> {
+    const cameras = this.cameraOptions();
     const selectedId = this.selectedCameraId();
-    let stream: MediaStream;
 
-    try {
-      if (selectedId) {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            deviceId: { exact: selectedId },
-            width: { ideal: 3456 },
-            height: { ideal: 4608 },
-            aspectRatio: { ideal: 3 / 4 },
-          },
-          audio: false,
-        });
-      } else {
-        throw new Error('No selected camera');
+    if (selectedId) {
+      try {
+        const stream = await this.openCameraByDeviceId(selectedId);
+        await this.applyPreferredConstraints(stream);
+        return stream;
+      } catch (err) {
+        console.warn('Exact label camera failed', err);
       }
-    } catch (err) {
-      console.warn('deviceId failed, falling back to environment', err);
-
-      stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { ideal: 'environment' },
-          width: { ideal: 3456 },
-          height: { ideal: 4608 },
-          aspectRatio: { ideal: 3 / 4 },
-        },
-        audio: false,
-      });
     }
 
+    const backCamera = this.findAnyBackCamera(cameras);
+    if (backCamera) {
+      try {
+        const stream = await this.openCameraByDeviceId(backCamera.id);
+        await this.applyPreferredConstraints(stream);
+        return stream;
+      } catch (err) {
+        console.warn('Exact back camera failed', err);
+      }
+    }
+
+    const anyCamera = cameras[0];
+    if (anyCamera) {
+      try {
+        const stream = await this.openCameraByDeviceId(anyCamera.id);
+        await this.applyPreferredConstraints(stream);
+        return stream;
+      } catch (err) {
+        console.warn('Any camera fallback failed', err);
+      }
+    }
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: false,
+    });
+
+    await this.applyPreferredConstraints(stream);
+    return stream;
+  }
+
+  private findAnyBackCamera(cameras: CameraOption[]): CameraOption | null {
+    const normalized = cameras.map((camera) => ({
+      ...camera,
+      lower: camera.label.toLowerCase(),
+    }));
+
+    const backMatch = normalized.find(
+      (camera) =>
+        camera.lower.includes('facing back') ||
+        camera.lower.includes('back') ||
+        camera.lower.includes('rear') ||
+        camera.lower.includes('environment') ||
+        camera.lower.includes('world'),
+    );
+
+    return backMatch ? { id: backMatch.id, label: backMatch.label } : null;
+  }
+
+  private async openCameraByDeviceId(deviceId: string): Promise<MediaStream> {
+    return navigator.mediaDevices.getUserMedia({
+      video: {
+        deviceId: { exact: deviceId },
+        width: { ideal: 3456 },
+        height: { ideal: 4608 },
+        aspectRatio: { ideal: 3 / 4 },
+      },
+      audio: false,
+    });
+  }
+
+  private async applyPreferredConstraints(stream: MediaStream) {
     const track = stream.getVideoTracks()[0];
+    if (!track) return;
 
     try {
       await track.applyConstraints({
@@ -387,8 +425,6 @@ export class BookCaptureComponent implements AfterViewInit, OnDestroy {
     } catch (err) {
       console.warn('applyConstraints failed', err);
     }
-
-    return stream;
   }
 
   private async captureBestPhoto(): Promise<Blob> {
