@@ -1,8 +1,9 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
 import {
   AfterViewInit,
   Component,
   ElementRef,
+  OnDestroy,
   ViewChild,
   inject,
   signal,
@@ -13,8 +14,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { BooksService } from '../../services/api/books.service';
 import { ToastService } from '../../services/toast.service';
 
-import { TranslateService } from '@ngx-translate/core';
-import { of } from 'rxjs';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { firstValueFrom, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 type CameraOption = {
@@ -25,15 +26,15 @@ type CameraOption = {
 @Component({
   standalone: true,
   selector: 'app-book-capture',
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule, NgClass],
   templateUrl: './book-capture.component.html',
 })
-export class BookCaptureComponent implements AfterViewInit {
-  private books = inject(BooksService);
-  private router = inject(Router);
-  private toast = inject(ToastService);
-  private route = inject(ActivatedRoute);
-  private translate = inject(TranslateService);
+export class BookCaptureComponent implements AfterViewInit, OnDestroy {
+  private readonly books = inject(BooksService);
+  private readonly router = inject(Router);
+  private readonly toast = inject(ToastService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly translate = inject(TranslateService);
 
   @ViewChild('video') videoRef!: ElementRef<HTMLVideoElement>;
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
@@ -41,13 +42,15 @@ export class BookCaptureComponent implements AfterViewInit {
   private stream: MediaStream | null = null;
   private viewReady = signal(false);
 
-  bookId = signal<string | null>(null);
   batchId = signal<string>('');
+  bookId = signal<string | null>(null);
 
   isCreating = signal(false);
   isUploading = signal(false);
   isFinishing = signal(false);
   isOpeningCamera = signal(false);
+  isCancelling = signal(false);
+  isPreparingNext = signal(false);
 
   photoCount = signal(0);
 
@@ -56,56 +59,229 @@ export class BookCaptureComponent implements AfterViewInit {
 
   private didFinish = signal(false);
   private cleanupDone = signal(false);
+  private currentBookHasPhotos = signal(false);
+  private leavingExplicitly = signal(false);
 
   constructor() {
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((pm) => {
       this.batchId.set(pm.get('batchId') ?? '');
-      this.bookId.set(pm.get('bookId'));
-
-      if (this.bookId() && this.viewReady() && !this.stream) {
-        void this.openCamera();
-      }
     });
   }
 
-  ngAfterViewInit() {
+  async ngAfterViewInit() {
     this.viewReady.set(true);
 
-    if (this.bookId() && !this.stream) {
-      void this.openCamera();
+    if (!this.batchId()) {
+      this.toast.show(
+        this.translate.instant('messages.error.books.create'),
+        'error',
+      );
+      await this.router.navigate(['/batches']);
+      return;
+    }
+
+    await this.openCamera();
+    await this.createAndSetCurrentBook();
+  }
+
+  ngOnDestroy() {
+    this.stopCamera();
+
+    if (!this.leavingExplicitly()) {
+      void this.cleanupIfNeededOnDestroy();
     }
   }
 
-  startNewBook() {
+  async takePhoto() {
+    if (
+      !this.bookId() ||
+      !this.stream ||
+      this.isUploading() ||
+      this.isFinishing() ||
+      this.isPreparingNext() ||
+      this.isCancelling()
+    ) {
+      return;
+    }
+
+    this.isUploading.set(true);
+
+    try {
+      const blob = await this.captureBestPhoto();
+
+      await firstValueFrom(this.books.uploadBookImage(this.bookId()!, blob));
+
+      this.photoCount.update((c) => c + 1);
+      this.currentBookHasPhotos.set(true);
+
+      this.toast.show(
+        this.translate.instant('messages.success.books.photo_upload'),
+        'success',
+      );
+    } catch (err) {
+      console.error(err);
+      this.toast.show(
+        this.translate.instant('messages.error.books.photo_upload'),
+        'error',
+      );
+    } finally {
+      this.isUploading.set(false);
+    }
+  }
+
+  async finish() {
+    if (this.isFinishing() || this.isUploading() || this.isPreparingNext()) {
+      return;
+    }
+
+    if (!this.bookId() || this.photoCount() === 0) {
+      this.toast.show(
+        this.translate.instant('messages.warning.books.no_photo'),
+        'warning',
+      );
+      return;
+    }
+
+    this.isFinishing.set(true);
+
+    try {
+      await firstValueFrom(this.books.startBookWorkflow(this.bookId()!));
+
+      this.didFinish.set(true);
+      this.leavingExplicitly.set(true);
+
+      this.toast.show(
+        this.translate.instant('messages.success.books.workflow'),
+        'success',
+      );
+
+      await this.router.navigate(['/batches', this.batchId(), 'books']);
+    } catch (err) {
+      console.error(err);
+      this.toast.show(
+        this.translate.instant('messages.error.books.workflow'),
+        'error',
+      );
+    } finally {
+      this.isFinishing.set(false);
+    }
+  }
+
+  async nextBook() {
+    if (this.isPreparingNext() || this.isUploading() || this.isFinishing()) {
+      return;
+    }
+
+    if (!this.bookId() || this.photoCount() === 0) {
+      this.toast.show(
+        this.translate.instant('messages.warning.books.no_photo'),
+        'warning',
+      );
+      return;
+    }
+
+    this.isPreparingNext.set(true);
+
+    try {
+      await firstValueFrom(this.books.startBookWorkflow(this.bookId()!));
+
+      const res = await firstValueFrom(this.books.createBook(this.batchId()));
+
+      this.bookId.set(String(res.book_id));
+      this.photoCount.set(0);
+      this.currentBookHasPhotos.set(false);
+
+      this.toast.show(
+        this.translate.instant('messages.success.books.workflow'),
+        'success',
+      );
+    } catch (err) {
+      console.error(err);
+      this.toast.show(
+        this.translate.instant('messages.error.books.workflow'),
+        'error',
+      );
+    } finally {
+      this.isPreparingNext.set(false);
+    }
+  }
+
+  async cancel() {
+    if (this.isCancelling() || this.isUploading() || this.isFinishing()) return;
+
+    this.isCancelling.set(true);
+    this.stopCamera();
+
+    try {
+      if (this.bookId()) {
+        await firstValueFrom(this.books.deleteBookRecord(this.bookId()!));
+      }
+
+      this.leavingExplicitly.set(true);
+
+      this.toast.show(
+        this.translate.instant('messages.success.books.cancel'),
+        'success',
+      );
+
+      await this.router.navigate(['/batches', this.batchId(), 'books']);
+    } catch (err) {
+      console.error(err);
+      this.toast.show(
+        this.translate.instant('messages.error.books.cancel'),
+        'error',
+      );
+    } finally {
+      this.isCancelling.set(false);
+    }
+  }
+
+  cleanupOnExit() {
+    if (this.cleanupDone()) return true;
+    this.cleanupDone.set(true);
+
+    if (this.leavingExplicitly() || this.isFinishing() || this.didFinish()) {
+      return true;
+    }
+
+    this.stopCamera();
+
+    const id = this.bookId();
+    if (!id) return true;
+
+    if (this.currentBookHasPhotos() || this.photoCount() > 0) {
+      return true;
+    }
+
+    return this.books.deleteBookRecord(id).pipe(
+      map(() => true),
+      catchError((err) => {
+        console.error(err);
+        return of(true);
+      }),
+    );
+  }
+
+  private async createAndSetCurrentBook() {
     if (this.isCreating()) return;
 
     this.isCreating.set(true);
-    this.books.createBook(this.batchId()).subscribe({
-      next: (res) => {
-        this.isCreating.set(false);
 
-        this.router.navigate([
-          '/batches',
-          this.batchId(),
-          'books',
-          'capture',
-          res.book_id,
-        ]);
-
-        this.toast.show(
-          this.translate.instant('messages.success.books.create'),
-          'success',
-        );
-      },
-      error: (err) => {
-        console.error(err);
-        this.toast.show(
-          this.translate.instant('messages.error.books.create'),
-          'error',
-        );
-        this.isCreating.set(false);
-      },
-    });
+    try {
+      const res = await firstValueFrom(this.books.createBook(this.batchId()));
+      this.bookId.set(String(res.book_id));
+      this.photoCount.set(0);
+      this.currentBookHasPhotos.set(false);
+    } catch (err) {
+      console.error(err);
+      this.toast.show(
+        this.translate.instant('messages.error.books.create'),
+        'error',
+      );
+      await this.router.navigate(['/batches', this.batchId(), 'books']);
+    } finally {
+      this.isCreating.set(false);
+    }
   }
 
   private async openCamera() {
@@ -177,9 +353,9 @@ export class BookCaptureComponent implements AfterViewInit {
         stream = await navigator.mediaDevices.getUserMedia({
           video: {
             deviceId: { exact: selectedId },
-            width: { ideal: 4608 },
-            height: { ideal: 3456 },
-            aspectRatio: { ideal: 4 / 3 },
+            width: { ideal: 3456 },
+            height: { ideal: 4608 },
+            aspectRatio: { ideal: 3 / 4 },
           },
           audio: false,
         });
@@ -192,9 +368,9 @@ export class BookCaptureComponent implements AfterViewInit {
       stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: { ideal: 'environment' },
-          width: { ideal: 4608 },
-          height: { ideal: 3456 },
-          aspectRatio: { ideal: 4 / 3 },
+          width: { ideal: 3456 },
+          height: { ideal: 4608 },
+          aspectRatio: { ideal: 3 / 4 },
         },
         audio: false,
       });
@@ -204,51 +380,15 @@ export class BookCaptureComponent implements AfterViewInit {
 
     try {
       await track.applyConstraints({
-        width: { ideal: 4608 },
-        height: { ideal: 3456 },
-        aspectRatio: { ideal: 4 / 3 },
+        width: { ideal: 3456 },
+        height: { ideal: 4608 },
+        aspectRatio: { ideal: 3 / 4 },
       });
     } catch (err) {
       console.warn('applyConstraints failed', err);
     }
 
     return stream;
-  }
-
-  async takePhoto() {
-    if (!this.bookId() || !this.stream || this.isUploading()) return;
-
-    this.isUploading.set(true);
-
-    try {
-      const blob = await this.captureBestPhoto();
-
-      this.books.uploadBookImage(this.bookId()!, blob).subscribe({
-        next: () => {
-          this.photoCount.update((c) => c + 1);
-          this.toast.show(
-            this.translate.instant('messages.success.books.photo_upload'),
-            'success',
-          );
-          this.isUploading.set(false);
-        },
-        error: (err) => {
-          console.error(err);
-          this.toast.show(
-            this.translate.instant('messages.error.books.photo_upload'),
-            'error',
-          );
-          this.isUploading.set(false);
-        },
-      });
-    } catch (err) {
-      console.error(err);
-      this.toast.show(
-        this.translate.instant('messages.error.books.photo_capture'),
-        'error',
-      );
-      this.isUploading.set(false);
-    }
   }
 
   private async captureBestPhoto(): Promise<Blob> {
@@ -314,76 +454,50 @@ export class BookCaptureComponent implements AfterViewInit {
     });
   }
 
-  finish() {
-    if (!this.bookId() || this.photoCount() === 0) {
-      this.toast.show(
-        this.translate.instant('messages.warning.books.no_photo'),
-        'warning',
-      );
-      return;
-    }
-
-    this.isFinishing.set(true);
-    this.stopCamera();
-
-    this.books.startBookWorkflow(this.bookId()!).subscribe({
-      next: () => {
-        this.didFinish.set(true);
-        this.isFinishing.set(false);
-        this.toast.show(
-          this.translate.instant('messages.success.books.workflow'),
-          'success',
-        );
-        this.router.navigate(['/batches', this.batchId(), 'books']);
-      },
-      error: (err) => {
-        console.error(err);
-        this.toast.show(
-          this.translate.instant('messages.error.books.workflow'),
-          'error',
-        );
-        this.isFinishing.set(false);
-      },
-    });
-  }
-
-  cleanupOnExit() {
-    if (this.cleanupDone()) return true;
-    this.cleanupDone.set(true);
-
-    if (this.isFinishing() || this.didFinish()) return true;
-
+  private async cleanupIfNeededOnDestroy() {
     this.stopCamera();
 
     const id = this.bookId();
-    if (!id) return true;
+    if (!id) return;
 
-    return this.books.deleteBookRecord(id).pipe(
-      map(() => {
-        this.toast.show(
-          this.translate.instant('messages.success.books.cancel'),
-          'success',
-        );
-        return true;
-      }),
-      catchError((err) => {
-        console.error(err);
-        this.toast.show(
-          this.translate.instant('messages.error.books.cancel'),
-          'error',
-        );
-        return of(true);
-      }),
-    );
-  }
+    if (this.currentBookHasPhotos() || this.photoCount() > 0) return;
+    if (this.didFinish()) return;
 
-  cancel() {
-    this.router.navigate(['/batches', this.batchId(), 'books']);
+    try {
+      await firstValueFrom(this.books.deleteBookRecord(id));
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   private stopCamera() {
     if (!this.stream) return;
     this.stream.getTracks().forEach((t) => t.stop());
     this.stream = null;
+  }
+
+  cellClass(cell: number): string {
+    switch (cell) {
+      case 1:
+        return 'border-r border-b';
+      case 2:
+        return 'border-b';
+      case 3:
+        return 'border-l border-b';
+      case 4:
+        return 'border-r';
+      case 5:
+        return '';
+      case 6:
+        return 'border-l';
+      case 7:
+        return 'border-t border-r';
+      case 8:
+        return 'border-t';
+      case 9:
+        return 'border-t border-l';
+      default:
+        return '';
+    }
   }
 }
