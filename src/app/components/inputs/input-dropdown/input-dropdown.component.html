@@ -6,7 +6,7 @@
     (keydown)="onKeydown($event)"
     type="button"
   >
-    <span [class.text-disable]="disabled()">
+    <span class="text-secondary font-medium" [class.text-disable]="disabled()">
       {{ value() ? selectedLabel() : placeholder() }}
     </span>
 
