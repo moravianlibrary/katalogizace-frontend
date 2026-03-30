@@ -3,7 +3,7 @@ import {
   AddSubfieldDialogResult,
 } from '@/app/components/add-subfield-dialog/add-subfield-dialog.component';
 import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
-import { TextareaAutocompleteComponent } from '@/app/components/textarea-autocomplete/textarea-autocomplete.component';
+import { TextareaAutocompleteComponent } from '@/app/components/inputs/textarea-autocomplete/textarea-autocomplete.component';
 import {
   FIELD_RULES,
   getIndicators,
