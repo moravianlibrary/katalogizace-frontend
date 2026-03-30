@@ -172,10 +172,17 @@
                 </td>
                 <td class="px-3 py-2">{{ b.year_of_publishing }}</td>
                 <td class="px-3 py-2 text-nowrap">
-                  {{ b.created_at | date: "medium" }}
+                  <span>{{ b.created_at | date: "dd.MM.yyyy" }}</span>
+                  <span class="text-light ml-1">
+                    {{ b.created_at | date: "HH:mm:ss" }}
+                  </span>
                 </td>
+
                 <td class="px-3 py-2 text-nowrap">
-                  {{ b.modified_at | date: "medium" }}
+                  <span>{{ b.modified_at | date: "dd.MM.yyyy" }}</span>
+                  <span class="text-light ml-1">
+                    {{ b.modified_at | date: "HH:mm:ss" }}
+                  </span>
                 </td>
                 <td class="px-3 py-2">
                   <span
