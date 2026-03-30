@@ -116,7 +116,7 @@
         </h5>
 
         <button
-          class="btn btn-s btn-primary group"
+          class="btn btn-s btn-primary group relative z-30"
           [attr.aria-expanded]="userMenuOpen()"
           (click)="toggleUserMenu(); $event.stopPropagation()"
           type="button"
@@ -220,9 +220,19 @@
         </ol>
       </nav>
 
+      @if (userMenuOpen()) {
+        <button
+          class="fixed inset-0 z-20 bg-black/10"
+          (click)="closeUserMenu()"
+          type="button"
+          aria-label="Close user menu"
+        ></button>
+      }
+
       @if (userMenuOpen() && auth.user()) {
         <div
-          class="border-primary-default bg-main-base shadow-s absolute top-12 right-4 z-10 max-w-[calc(100vw-2rem)] min-w-40 rounded-md border p-3"
+          class="border-primary-default bg-main-base shadow-s absolute top-12 right-4 z-40 max-w-[calc(100vw-2rem)] min-w-40 rounded-md border p-3"
+          (click)="$event.stopPropagation()"
         >
           <div class="text-base-color text-md font-medium">
             {{ auth.user()!.full_name }}
