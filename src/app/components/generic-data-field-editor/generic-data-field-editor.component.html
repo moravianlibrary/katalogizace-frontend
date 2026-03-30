@@ -46,7 +46,7 @@
 
           @if (sf.value.length) {
             <button
-              class="group flex items-center px-3"
+              class="group mx-3 flex cursor-pointer items-center"
               (click)="setSubfieldValue($index, '')"
               (mousedown)="$event.preventDefault()"
               tabindex="-1"
@@ -73,7 +73,7 @@
             </button>
           } @else {
             <button
-              class="group flex items-center px-3"
+              class="group mx-3 flex cursor-pointer items-center"
               (click)="deleteSubfield($index)"
               (mousedown)="$event.preventDefault()"
               tabindex="-1"

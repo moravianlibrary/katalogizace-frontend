@@ -55,7 +55,7 @@
           @if (sf.kind === "template") {
             @if (sf.value.length) {
               <button
-                class="group flex items-center px-3"
+                class="group mx-3 flex cursor-pointer items-center"
                 (click)="setTemplateSubValue(sf, '')"
                 (mousedown)="$event.preventDefault()"
                 tabindex="-1"
@@ -82,7 +82,7 @@
               </button>
             } @else if (!sf.templateLocked) {
               <button
-                class="group flex items-center px-3"
+                class="group mx-3 flex cursor-pointer items-center"
                 (click)="
                   sf.sourceIndex !== null &&
                     deleteTemplateRepeatableSubfield(sf.sourceIndex)
@@ -129,7 +129,7 @@
           } @else if (sf.kind === "extra") {
             @if (sf.value.length) {
               <button
-                class="group flex items-center px-3"
+                class="group mx-3 flex cursor-pointer items-center"
                 (click)="
                   sf.sourceIndex !== null &&
                     setExtraSubValue(sf.sourceIndex, '')
@@ -154,7 +154,7 @@
               </button>
             } @else {
               <button
-                class="group flex items-center px-3"
+                class="group mx-3 flex cursor-pointer items-center"
                 (click)="
                   sf.sourceIndex !== null && deleteExtraSubfield(sf.sourceIndex)
                 "

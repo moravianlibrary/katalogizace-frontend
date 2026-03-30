@@ -112,7 +112,7 @@
 
               @if (sf.value.length && !locked()) {
                 <button
-                  class="group flex items-center px-3"
+                  class="group mx-3 flex cursor-pointer items-center"
                   (click)="setTemplateSub('a', '')"
                   (mousedown)="$event.preventDefault()"
                   tabindex="-1"
@@ -152,7 +152,7 @@
 
             @if (sf.value.length) {
               <button
-                class="group flex items-center px-3"
+                class="group mx-3 flex cursor-pointer items-center"
                 (click)="clearAuthority()"
                 (mousedown)="$event.preventDefault()"
                 tabindex="-1"
@@ -178,7 +178,7 @@
 
             @if (sf.value.length) {
               <button
-                class="group flex items-center px-3"
+                class="group mx-3 flex cursor-pointer items-center"
                 (click)="
                   sf.sourceIndex !== null &&
                     setExtraSubValue(sf.sourceIndex, '')
@@ -203,7 +203,7 @@
               </button>
             } @else {
               <button
-                class="group flex items-center px-3"
+                class="group mx-3 flex cursor-pointer items-center"
                 (click)="
                   sf.sourceIndex !== null && deleteExtraSubfield(sf.sourceIndex)
                 "

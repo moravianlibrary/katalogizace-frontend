@@ -128,7 +128,7 @@
 
             @if (!locked() && hasSubd()) {
               <button
-                class="group flex items-center px-3"
+                class="group mx-3 flex cursor-pointer items-center"
                 (click)="clearD()"
                 (mousedown)="$event.preventDefault()"
                 tabindex="-1"
@@ -167,7 +167,7 @@
 
             @if (sf.value.length) {
               <button
-                class="group flex items-center px-3"
+                class="group mx-3 flex cursor-pointer items-center"
                 (click)="clearAuthority()"
                 (mousedown)="$event.preventDefault()"
                 tabindex="-1"
@@ -187,7 +187,7 @@
 
             @if (!sf.templateLocked && sf.value.length === 0) {
               <button
-                class="group absolute top-1/2 right-3 -translate-y-1/2"
+                class="group absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
                 (click)="
                   sf.sourceIndex !== null &&
                     deleteTemplateRepeatableSubfield(sf.sourceIndex)
@@ -248,7 +248,7 @@
 
             @if (sf.value.length) {
               <button
-                class="group flex items-center px-3"
+                class="group mx-3 flex cursor-pointer items-center"
                 (click)="
                   sf.sourceIndex !== null &&
                     setExtraSubValue(sf.sourceIndex, '')
@@ -273,7 +273,7 @@
               </button>
             } @else {
               <button
-                class="group flex items-center px-3"
+                class="group mx-3 flex cursor-pointer items-center"
                 (click)="
                   sf.sourceIndex !== null && deleteExtraSubfield(sf.sourceIndex)
                 "
