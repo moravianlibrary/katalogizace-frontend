@@ -53,7 +53,7 @@ export class BatchesService {
   }
 
   updateBatch(batch_id: string, patch: UpdateBatchRequest) {
-    return this.http.put<BatchDto>(
+    return this.http.patch<BatchDto>(
       `${this.apiBaseUrl}/batches/${batch_id}`,
       patch,
     );
