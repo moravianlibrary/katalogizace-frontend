@@ -1,12 +1,14 @@
 <section class="flex h-full flex-col p-4">
   @if (!isSingleRecord()) {
     <div
-      class="text-secondary text-sm-tight bg-main-bright grid shrink-0 grid-cols-[1fr_2fr_2fr_1fr_auto] items-center gap-3 rounded-t-lg p-2 text-left font-medium text-nowrap"
+      class="text-secondary text-sm-tight bg-main-bright grid shrink-0 grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,2fr)_minmax(0,1fr)_auto] items-center gap-3 rounded-t-lg p-2 text-left font-medium text-nowrap"
     >
-      <span>{{ "records.source" | translate }}</span>
-      <span>{{ "records.title" | translate }}</span>
-      <span>{{ "records.author" | translate }}</span>
-      <span>{{ "records.year_of_publishing" | translate }}</span>
+      <span class="min-w-0">{{ "records.source" | translate }}</span>
+      <span class="min-w-0">{{ "records.title" | translate }}</span>
+      <span class="min-w-0">{{ "records.author" | translate }}</span>
+      <span class="min-w-0">{{
+        "records.year_of_publishing" | translate
+      }}</span>
       <span class="h-4 w-6"></span>
     </div>
   }
@@ -37,10 +39,10 @@
               type="button"
             >
               <div
-                class="grid grid-cols-[1fr_2fr_2fr_1fr_auto] items-center gap-3 text-left text-sm"
+                class="grid grid-cols-[minmax(0,1fr)_minmax(0,2fr)_minmax(0,2fr)_minmax(0,1fr)_auto] items-center gap-3 text-left text-sm"
               >
                 <div
-                  class="text-md truncate"
+                  class="text-md min-w-0 truncate"
                   [ngClass]="expandedIndex() === $index ? 'font-medium' : ''"
                 >
                   {{
@@ -51,27 +53,27 @@
                 </div>
 
                 <div
-                  class="text-md truncate"
+                  class="text-md min-w-0 truncate"
                   [ngClass]="expandedIndex() === $index ? 'font-medium' : ''"
                 >
                   {{ getTitle($index, rec.existing) || "-" }}
                 </div>
 
                 <div
-                  class="text-md truncate"
+                  class="text-md min-w-0 truncate"
                   [ngClass]="expandedIndex() === $index ? 'font-medium' : ''"
                 >
                   {{ getAuthorName($index, rec.existing) || "-" }}
                 </div>
 
                 <div
-                  class="text-md truncate"
+                  class="text-md min-w-0 truncate"
                   [ngClass]="expandedIndex() === $index ? 'font-medium' : ''"
                 >
                   {{ getPublicationYear($index, rec.existing) || "-" }}
                 </div>
 
-                <div class="flex items-center justify-end p-2">
+                <div class="flex h-6 w-6 items-center justify-center">
                   <svg
                     class="icon-black transition-transform duration-150"
                     [ngClass]="{ 'rotate-180': expandedIndex() === $index }"
