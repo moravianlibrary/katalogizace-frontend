@@ -86,35 +86,35 @@
                 tabindex="0"
                 role="button"
               >
-                <td class="px-3 py-2">
+                <td class="px-3 py-1">
                   <div class="">{{ b.name }}</div>
                   @if (b.description) {
                     <div class="text-light text-sm">{{ b.description }}</div>
                   }
                 </td>
-                <td class="px-3 py-2">
+                <td class="px-3 py-1">
                   <span
                     class="bg-main-light text-base-color inline-flex items-center rounded-lg px-4 py-1"
                   >
                     {{ b.num_books }}
                   </span>
                 </td>
-                <td class="px-3 py-2">{{ b.created_by }}</td>
-                <td class="px-3 py-2 text-nowrap">
+                <td class="px-3 py-1">{{ b.created_by }}</td>
+                <td class="px-3 py-1 text-nowrap">
                   <span>{{ b.created_at | date: "dd.MM.yyyy" }}</span>
                   <span class="text-light ml-1">
                     {{ b.created_at | date: "HH:mm:ss" }}
                   </span>
                 </td>
 
-                <td class="px-3 py-2 text-nowrap">
+                <td class="px-3 py-1 text-nowrap">
                   <span>{{ b.modified_at | date: "dd.MM.yyyy" }}</span>
                   <span class="text-light ml-1">
                     {{ b.modified_at | date: "HH:mm:ss" }}
                   </span>
                 </td>
 
-                <td class="px-3 py-2">
+                <td class="px-3 py-1">
                   <span
                     class="inline-flex items-center rounded px-2 py-0.5 text-sm font-medium"
                     [ngClass]="batchStateBadgeClass(b.state)"
@@ -122,7 +122,7 @@
                     {{ b.state | batchStateLabel }}
                   </span>
                 </td>
-                <td class="px-3 py-2">
+                <td class="px-3 py-1">
                   <div class="flex items-center gap-2">
                     <button
                       class="group hover:bg-main-primary-default cursor-pointer rounded px-3 py-1"
