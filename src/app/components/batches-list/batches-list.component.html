@@ -11,7 +11,7 @@
           [value]="newName()"
           (input)="onNameInput($event)"
           (keydown.enter)="!creating() && createBatch()"
-          placeholder="Název nové dávky"
+          placeholder="Název nové skupiny"
         />
 
         <input
@@ -55,7 +55,7 @@
   } @else if (error()) {
     <div class="text-md text-error">{{ error() }}</div>
   } @else if (!data() || rows().length === 0) {
-    <div class="text-md">Zatím žádné dávky.</div>
+    <div class="text-md">Zatím žádné skupiny.</div>
   } @else {
     <div class="flex min-h-0 flex-1 flex-col">
       <div class="min-h-0 flex-1 overflow-auto rounded-lg">
@@ -128,7 +128,7 @@
                       class="group hover:bg-main-primary-default cursor-pointer rounded px-3 py-1"
                       (click)="openEdit(b, $event)"
                       type="button"
-                      aria-label="Upravit dávku"
+                      aria-label="Upravit skupinu"
                       title="Upravit"
                     >
                       <svg
@@ -160,7 +160,7 @@
                       class="group text-sm-tight text-error hover:bg-main-error hover:text-on-color cursor-pointer rounded px-3 py-1"
                       (click)="onDelete(b.batch_id, $event)"
                       type="button"
-                      aria-label="Smazat dávku"
+                      aria-label="Smazat skupinu"
                     >
                       <svg
                         class="icon-error group-hover:icon-on-color"
@@ -202,7 +202,7 @@
             } @empty {
               <tr>
                 <td class="px-3 py-4 text-center" colspan="8">
-                  Zatím žádné dávky.
+                  Zatím žádné skupiny.
                 </td>
               </tr>
             }
