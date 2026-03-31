@@ -72,7 +72,7 @@
     </div>
 
     <footer
-      class="border-bright bg-main-base flex shrink-0 items-center justify-between border-t px-4 py-2"
+      class="border-bright bg-main-base relative flex shrink-0 items-center border-t px-4 py-2"
     >
       <button
         class="btn btn-m btn-tertiary"
@@ -91,7 +91,7 @@
       </button>
 
       <button
-        class="btn btn-xl btn-primary rounded-full p-3.5"
+        class="btn btn-xl btn-primary absolute left-1/2 -translate-x-1/2 rounded-full p-3.5"
         [disabled]="
           isUploading() ||
           isFinishing() ||
@@ -129,7 +129,7 @@
       </button>
 
       <button
-        class="btn btn-m btn-tertiary"
+        class="btn btn-m btn-tertiary ml-auto"
         [disabled]="
           photoCount() === 0 ||
           isUploading() ||
