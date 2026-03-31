@@ -5,6 +5,7 @@ import {
 import { INDICATOR_OPTIONS, MarcSubfield, UUID } from '@/app/models';
 import { ContextPanelService } from '@/app/services/context-panel.service';
 import { RecordStateService } from '@/app/services/record-state.service';
+import { bindAddSubfieldShortcut } from '@/app/utils/bind-add-subfield-shortcut';
 import { CommonModule } from '@angular/common';
 import {
   Component,
@@ -20,6 +21,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { InputDropdownComponent } from '../inputs/input-dropdown/input-dropdown.component';
 
 type PendingFocusTarget = {
+  code: string;
   occurrence: number;
 } | null;
 
@@ -84,7 +86,18 @@ export class GenericDataFieldEditorComponent {
       if (!target || !subfields.length) return;
 
       queueMicrotask(() => {
-        const input = this.plainInputs()[target.occurrence - 1]?.nativeElement;
+        let occurrence = 0;
+
+        const index = subfields.findIndex((sf) => {
+          if (sf.code !== target.code) return false;
+
+          occurrence++;
+          return occurrence === target.occurrence;
+        });
+
+        if (index === -1) return;
+
+        const input = this.plainInputs()[index]?.nativeElement;
         if (!input) return;
 
         input.focus();
@@ -92,6 +105,12 @@ export class GenericDataFieldEditorComponent {
         input.setSelectionRange?.(len, len);
         this.pendingFocusTarget.set(null);
       });
+    });
+
+    bindAddSubfieldShortcut({
+      cps: this.cps,
+      fieldId: () => this.fieldId(),
+      openDialog: () => this.openAddSubfieldDialog(),
     });
   }
 
@@ -163,13 +182,17 @@ export class GenericDataFieldEditorComponent {
       subfields: [...existingSubfields, ...added],
     });
 
-    this.pendingFocusTarget.set(
-      firstAddedCode
-        ? {
-            occurrence: existingSubfields.length + 1,
-          }
-        : null,
-    );
+    if (firstAddedCode) {
+      const occurrence =
+        existingSubfields.filter((sf) => sf.code === firstAddedCode).length + 1;
+
+      this.pendingFocusTarget.set({
+        code: firstAddedCode,
+        occurrence,
+      });
+    } else {
+      this.pendingFocusTarget.set(null);
+    }
 
     this.addSubfieldDialogOpen.set(false);
     this.addSubfieldDialogError.set(null);

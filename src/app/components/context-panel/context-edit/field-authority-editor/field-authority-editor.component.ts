@@ -21,6 +21,7 @@ import { CatalogueService } from '@/app/services/api/catalogue.service';
 import { ContextPanelService } from '@/app/services/context-panel.service';
 import { MarcTranslateService } from '@/app/services/marc-translate.service';
 import { RecordStateService } from '@/app/services/record-state.service';
+import { bindAddSubfieldShortcut } from '@/app/utils/bind-add-subfield-shortcut';
 import { compareSubfieldCodes } from '@/app/utils/marc-subfield-sort';
 import { NgClass } from '@angular/common';
 import {
@@ -339,6 +340,12 @@ export class FieldAuthorityEditorComponent {
           this.pendingFocusTarget.set(null);
         }
       });
+    });
+
+    bindAddSubfieldShortcut({
+      cps: this.cps,
+      fieldId: () => this.fieldId(),
+      openDialog: () => this.openAddSubfieldDialog(),
     });
   }
 

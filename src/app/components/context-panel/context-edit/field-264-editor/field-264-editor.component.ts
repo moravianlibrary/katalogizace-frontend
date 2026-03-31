@@ -14,6 +14,7 @@ import {
 } from '@/app/models';
 import { ContextPanelService } from '@/app/services/context-panel.service';
 import { RecordStateService } from '@/app/services/record-state.service';
+import { bindAddSubfieldShortcut } from '@/app/utils/bind-add-subfield-shortcut';
 import { compareSubfieldCodes } from '@/app/utils/marc-subfield-sort';
 import { CommonModule } from '@angular/common';
 import {
@@ -247,6 +248,12 @@ export class Field264EditorComponent {
           this.pendingFocusTarget.set(null);
         }
       });
+    });
+
+    bindAddSubfieldShortcut({
+      cps: this.cps,
+      fieldId: () => this.fieldId(),
+      openDialog: () => this.openAddSubfieldDialog(),
     });
   }
 

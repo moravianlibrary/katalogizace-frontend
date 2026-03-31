@@ -29,6 +29,8 @@ export class ContextPanelService {
   readonly editSnapshot = signal<EditSnapshot | null>(null);
   readonly editResetNonce = signal(0);
 
+  readonly addSubfieldDialogOpenNonce = signal(0);
+
   setMode(mode: PanelMode, partial: Partial<PanelState> = {}) {
     const prev = this.state();
 
@@ -53,6 +55,7 @@ export class ContextPanelService {
     this.applyCandidate.set(null);
     this.editSnapshot.set(null);
     this.editResetNonce.set(0);
+    this.addSubfieldDialogOpenNonce.set(0);
   }
 
   enterEdit(snapshot: EditSnapshot) {
@@ -68,6 +71,13 @@ export class ContextPanelService {
   requestEditReset() {
     if (!this.editSnapshot()) return;
     this.editResetNonce.update((x) => x + 1);
+  }
+
+  requestAddSubfieldDialogOpen() {
+    const s = this.state();
+    if (s.mode !== 'edit' || !s.fieldId || !s.tag) return;
+
+    this.addSubfieldDialogOpenNonce.update((x) => x + 1);
   }
 
   showRecords() {

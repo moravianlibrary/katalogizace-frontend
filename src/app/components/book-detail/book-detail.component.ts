@@ -1,7 +1,13 @@
 import { ApiImageItem, ID } from '@/app/models';
 import { BreadcrumbsService } from '@/app/services/breadcrumbs.service';
-import { RecordStateService } from '@/app/services/record-state.service';
-import { Component, inject, signal } from '@angular/core';
+import { ContextPanelService } from '@/app/services/context-panel.service';
+import {
+  Component,
+  HostListener,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BooksService } from '../../services/api/books.service';
@@ -24,9 +30,11 @@ export class BookDetailComponent {
   private bookService = inject(BooksService);
   private store = inject(RecordStore);
   private toast = inject(ToastService);
-  private recordState = inject(RecordStateService);
   private breadcrumbs = inject(BreadcrumbsService);
   private translate = inject(TranslateService);
+  private contextPanel = inject(ContextPanelService);
+
+  readonly mainPanel = viewChild(MainPanelComponent);
 
   galleryCollapsed = signal(false);
 
@@ -83,5 +91,60 @@ export class BookDetailComponent {
 
   ngOnDestroy() {
     this.breadcrumbs.clearBook();
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  onWindowKeydown(event: KeyboardEvent) {
+    if (this.shouldIgnoreShortcut(event)) return;
+
+    if (this.isAddFieldShortcut(event)) {
+      event.preventDefault();
+      this.openAddFieldModal();
+      return;
+    }
+
+    if (this.isAddSubfieldShortcut(event) && this.canOpenAddSubfield()) {
+      event.preventDefault();
+      this.openAddSubfieldModal();
+    }
+  }
+
+  private isAddFieldShortcut(event: KeyboardEvent): boolean {
+    const mod = event.ctrlKey || event.metaKey;
+    return mod && event.shiftKey && event.key.toLowerCase() === 'f';
+  }
+
+  private isAddSubfieldShortcut(event: KeyboardEvent): boolean {
+    const mod = event.ctrlKey || event.metaKey;
+    return mod && event.shiftKey && event.key.toLowerCase() === 's';
+  }
+
+  private shouldIgnoreShortcut(event: KeyboardEvent): boolean {
+    const target = event.target as HTMLElement | null;
+    if (!target) return false;
+
+    return target.isContentEditable;
+  }
+
+  private canOpenAddSubfield(): boolean {
+    const state = this.contextPanel.state();
+    return (
+      state.mode === 'edit' && !!state.fieldId && this.isDataFieldTag(state.tag)
+    );
+  }
+
+  private isDataFieldTag(tag?: string): boolean {
+    if (!tag) return false;
+
+    const n = Number(tag);
+    return Number.isInteger(n) && n >= 10;
+  }
+
+  private openAddFieldModal() {
+    this.mainPanel()?.addField();
+  }
+
+  private openAddSubfieldModal() {
+    this.contextPanel.requestAddSubfieldDialogOpen();
   }
 }

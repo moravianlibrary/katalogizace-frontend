@@ -14,6 +14,7 @@ import {
 } from '@/app/models';
 import { ContextPanelService } from '@/app/services/context-panel.service';
 import { RecordStateService } from '@/app/services/record-state.service';
+import { bindAddSubfieldShortcut } from '@/app/utils/bind-add-subfield-shortcut';
 import { compareSubfieldCodes } from '@/app/utils/marc-subfield-sort';
 import { CommonModule } from '@angular/common';
 import {
@@ -157,17 +158,32 @@ export class Field500EditorComponent {
       if (!target || !extras.length) return;
 
       queueMicrotask(() => {
-        const matchingIndexes = extras
-          .map((sf, index) => ({ code: sf.code, index }))
-          .filter((x) => x.code === target.code)
-          .map((x) => x.index);
+        let occurrence = 0;
 
-        const targetIndex = matchingIndexes[target.occurrence - 1];
-        if (targetIndex == null) return;
+        const targetIndex = extras.findIndex((sf) => {
+          if (sf.code !== target.code) return false;
 
-        this.plainInputs()[targetIndex]?.nativeElement.focus();
+          occurrence++;
+          return occurrence === target.occurrence;
+        });
+
+        if (targetIndex === -1) return;
+
+        const input = this.plainInputs()[targetIndex]?.nativeElement;
+        if (!input) return;
+
+        input.focus();
+        const len = input.value?.length ?? 0;
+        input.setSelectionRange?.(len, len);
+
         this.pendingFocusTarget.set(null);
       });
+    });
+
+    bindAddSubfieldShortcut({
+      cps: this.cps,
+      fieldId: () => this.fieldId(),
+      openDialog: () => this.openAddSubfieldDialog(),
     });
   }
 
