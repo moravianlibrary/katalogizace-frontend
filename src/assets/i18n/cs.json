@@ -66,7 +66,7 @@
     "add_subfield": "Přidat podpole",
     "add_field": "Jiné pole",
     "add": "Přidat",
-    "next": "Další"
+    "next_book": "Další knihu"
   },
   "messages": {
     "success": {
