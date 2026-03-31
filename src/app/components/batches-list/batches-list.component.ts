@@ -49,7 +49,16 @@ export class BatchesListComponent {
   error = signal<string | null>(null);
   data = signal<PaginatedBatchesResponseDto | null>(null);
 
-  edited = signal(false);
+  edited = computed(() => {
+    const batch = this.editingBatch();
+    if (!batch) return false;
+
+    return (
+      this.editName().trim() !== (batch.name ?? '').trim() ||
+      this.editDescription().trim() !== (batch.description ?? '').trim()
+    );
+  });
+
   inputDisabled = signal(false);
 
   filterMine = signal(false);
@@ -76,6 +85,9 @@ export class BatchesListComponent {
 
   @ViewChild('editDialog', { static: true })
   editDialog!: ElementRef<HTMLDialogElement>;
+
+  @ViewChild('createDialog', { static: true })
+  createDialog!: ElementRef<HTMLDialogElement>;
 
   ngOnInit() {
     this.breadcrumbs.clearBatch();
@@ -223,9 +235,8 @@ export class BatchesListComponent {
           this.translate.instant('messages.success.batches.create'),
           'success',
         );
-        this.newName.set('');
-        this.newDescription.set('');
-        this.creating.set(false);
+
+        this.closeCreate();
 
         this.router.navigate(['/batches', batch.batch_id.toString(), 'books']);
       },
@@ -255,12 +266,10 @@ export class BatchesListComponent {
 
   onEditNameInput(event: Event) {
     this.editName.set((event.target as HTMLInputElement).value);
-    this.edited.set(true);
   }
 
   onEditDescriptionInput(event: Event) {
     this.editDescription.set((event.target as HTMLInputElement).value);
-    this.edited.set(true);
   }
 
   openEdit(b: BatchDto, event: MouseEvent) {
@@ -327,5 +336,21 @@ export class BatchesListComponent {
           this.savingEdit.set(false);
         },
       });
+  }
+
+  openCreate() {
+    this.newName.set('');
+    this.newDescription.set('');
+    this.createDialog.nativeElement.showModal();
+  }
+
+  closeCreate() {
+    if (this.createDialog?.nativeElement.open) {
+      this.createDialog.nativeElement.close();
+    }
+
+    this.newName.set('');
+    this.newDescription.set('');
+    this.creating.set(false);
   }
 }
