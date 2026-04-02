@@ -6,7 +6,10 @@
     (keydown)="onKeydown($event)"
     type="button"
   >
-    <span class="text-secondary font-medium" [class.text-disable]="disabled()">
+    <span
+      class="font-medium"
+      [ngClass]="disabled() ? 'text-disable' : 'text-secondary'"
+    >
       {{ value() ? selectedLabel() : placeholder() }}
     </span>
 

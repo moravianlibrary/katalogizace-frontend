@@ -3,8 +3,9 @@
     class="border-tertiary-default focus-within:border-primary-default bg-main-base inline-flex w-full overflow-hidden rounded-lg border"
   >
     <textarea
-      class="text-secondary text-md w-full resize-none bg-transparent py-3 pr-4 pl-4 font-medium outline-none"
+      class="text-md w-full resize-none bg-transparent py-3 pr-4 pl-4 font-medium outline-none"
       #ta
+      [ngClass]="disabled() ? 'text-disable' : 'text-secondary'"
       [disabled]="disabled()"
       [value]="query()"
       [placeholder]="placeholder()"

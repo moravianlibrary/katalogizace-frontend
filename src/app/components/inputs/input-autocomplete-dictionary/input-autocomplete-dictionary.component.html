@@ -4,11 +4,11 @@
     [ngClass]="
       disabled()
         ? 'text-disable border-tertiary-disable bg-gray-500/5'
-        : 'border-tertiary-default bg-main-base'
+        : 'border-tertiary-default bg-main-base text-secondary'
     "
   >
     <input
-      class="text-secondary w-full bg-transparent py-3 pl-4 font-medium outline-none"
+      class="w-full bg-transparent py-3 pl-4 font-medium outline-none"
       #inp
       [ngClass]="disabled() ? 'cursor-not-allowed' : ''"
       [disabled]="disabled()"
