@@ -67,7 +67,12 @@ export const FIELD_INDICATORS: Record<string, IndicatorConfig> = {
       { value: '1', label: '1' },
       { value: '2', label: '2' },
     ],
-    ind2: [UNDEFINED, { value: '4', label: '4' }, { value: '7', label: '7' }],
+    ind2: [
+      UNDEFINED,
+      { value: '4', label: '4' },
+      { value: '7', label: '7' },
+      { value: '9', label: '9' },
+    ],
   },
   '651': {
     ind1: [
@@ -76,11 +81,21 @@ export const FIELD_INDICATORS: Record<string, IndicatorConfig> = {
       { value: '1', label: '1' },
       { value: '2', label: '2' },
     ],
-    ind2: [UNDEFINED, { value: '4', label: '4' }, { value: '7', label: '7' }],
+    ind2: [
+      UNDEFINED,
+      { value: '4', label: '4' },
+      { value: '7', label: '7' },
+      { value: '9', label: '9' },
+    ],
   },
   '655': {
     ind1: [UNDEFINED, { value: '0', label: '0' }],
-    ind2: [UNDEFINED, { value: '4', label: '4' }, { value: '7', label: '7' }],
+    ind2: [
+      UNDEFINED,
+      { value: '4', label: '4' },
+      { value: '7', label: '7' },
+      { value: '9', label: '9' },
+    ],
   },
   '700': {
     ind1: [
