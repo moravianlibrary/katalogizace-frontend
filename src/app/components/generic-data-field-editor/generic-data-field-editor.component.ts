@@ -2,14 +2,18 @@ import {
   AddSubfieldDialogComponent,
   AddSubfieldDialogResult,
 } from '@/app/components/add-subfield-dialog/add-subfield-dialog.component';
-import { INDICATOR_OPTIONS, MarcSubfield, UUID } from '@/app/models';
+import {
+  getSubfieldRuleLabel,
+  INDICATOR_OPTIONS,
+  MarcSubfield,
+  UUID,
+} from '@/app/models';
 import { ContextPanelService } from '@/app/services/context-panel.service';
 import { RecordStateService } from '@/app/services/record-state.service';
 import { bindAddSubfieldShortcut } from '@/app/utils/bind-add-subfield-shortcut';
 import { CommonModule } from '@angular/common';
 import {
   Component,
-  ElementRef,
   computed,
   effect,
   inject,
@@ -18,6 +22,7 @@ import {
   viewChildren,
 } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
+import { InputAutocompleteComponent } from '../inputs/input-autocomplete/input-autocomplete.component';
 import { InputDropdownComponent } from '../inputs/input-dropdown/input-dropdown.component';
 
 type PendingFocusTarget = {
@@ -33,6 +38,7 @@ type PendingFocusTarget = {
     TranslateModule,
     InputDropdownComponent,
     AddSubfieldDialogComponent,
+    InputAutocompleteComponent,
   ],
   templateUrl: './generic-data-field-editor.component.html',
 })
@@ -50,8 +56,9 @@ export class GenericDataFieldEditorComponent {
   readonly addSubfieldDialogError = signal<string | null>(null);
   readonly pendingFocusTarget = signal<PendingFocusTarget>(null);
 
-  private readonly plainInputs =
-    viewChildren<ElementRef<HTMLInputElement>>('plainInput');
+  private readonly autocompleteInputs = viewChildren(
+    InputAutocompleteComponent,
+  );
 
   constructor() {
     effect(() => {
@@ -71,12 +78,7 @@ export class GenericDataFieldEditorComponent {
       if (!id) return;
 
       queueMicrotask(() => {
-        const el = this.plainInputs()[0]?.nativeElement;
-        if (!el) return;
-
-        el.focus();
-        const len = el.value?.length ?? 0;
-        el.setSelectionRange?.(len, len);
+        this.autocompleteInputs()[0]?.focus();
       });
     });
 
@@ -97,12 +99,7 @@ export class GenericDataFieldEditorComponent {
 
         if (index === -1) return;
 
-        const input = this.plainInputs()[index]?.nativeElement;
-        if (!input) return;
-
-        input.focus();
-        const len = input.value?.length ?? 0;
-        input.setSelectionRange?.(len, len);
+        this.autocompleteInputs()[index]?.focus();
         this.pendingFocusTarget.set(null);
       });
     });
@@ -196,5 +193,9 @@ export class GenericDataFieldEditorComponent {
 
     this.addSubfieldDialogOpen.set(false);
     this.addSubfieldDialogError.set(null);
+  }
+
+  getSubfieldLabel(code: string): string {
+    return getSubfieldRuleLabel(this.field()?.tag!, code) ?? `|${code}`;
   }
 }

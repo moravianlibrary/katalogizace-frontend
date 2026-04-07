@@ -104,52 +104,32 @@
               <path
                 fill-rule="evenodd"
                 clip-rule="evenodd"
-                d="M9.58366 1.04199C4.86623 1.04199 1.04199 4.86623 1.04199 9.58366C1.04199 14.3011 4.86623 18.1253 9.58366 18.1253C14.3011 18.1253 18.1253 14.3011 18.1253 9.58366C18.1253 4.86623 14.3011 1.04199 9.58366 1.04199ZM2.29199 9.58366C2.29199 5.55658 5.55658 2.29199 9.58366 2.29199C13.6107 2.29199 16.8753 5.55658 16.8753 9.58366C16.8753 13.6107 13.6107 16.8753 9.58366 16.8753C5.55658 16.8753 2.29199 13.6107 2.29199 9.58366Z"
+                d="M9.58268 1.04163C4.86525 1.04163 1.04102 4.86586 1.04102 9.58329C1.04102 14.3007 4.86525 18.125 9.58268 18.125C14.3001 18.125 18.1243 14.3007 18.1243 9.58329C18.1243 4.86586 14.3001 1.04163 9.58268 1.04163ZM2.29102 9.58329C2.29102 5.55622 5.55561 2.29163 9.58268 2.29163C13.6098 2.29163 16.8743 5.55622 16.8743 9.58329C16.8743 13.6104 13.6098 16.875 9.58268 16.875C5.55561 16.875 2.29102 13.6104 2.29102 9.58329Z"
               />
               <path
-                d="M17.1089 16.225C16.8649 15.981 16.4691 15.981 16.225 16.225C15.981 16.4691 15.981 16.8649 16.225 17.1089L17.8917 18.7756C18.1358 19.0197 18.5315 19.0197 18.7756 18.7756C19.0197 18.5315 19.0197 18.1358 18.7756 17.8917L17.1089 16.225Z"
+                d="M17.108 16.2247C16.8639 15.9806 16.4682 15.9806 16.2241 16.2247C15.98 16.4688 15.98 16.8645 16.2241 17.1086L17.8907 18.7752C18.1348 19.0193 18.5305 19.0193 18.7746 18.7752C19.0187 18.5312 19.0187 18.1354 18.7746 17.8914L17.108 16.2247Z"
+              />
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M9.58268 1.04163C4.86525 1.04163 1.04102 4.86586 1.04102 9.58329C1.04102 14.3007 4.86525 18.125 9.58268 18.125C14.3001 18.125 18.1243 14.3007 18.1243 9.58329C18.1243 4.86586 14.3001 1.04163 9.58268 1.04163ZM2.29102 9.58329C2.29102 5.55622 5.55561 2.29163 9.58268 2.29163C13.6098 2.29163 16.8743 5.55622 16.8743 9.58329C16.8743 13.6104 13.6098 16.875 9.58268 16.875C5.55561 16.875 2.29102 13.6104 2.29102 9.58329Z"
+              />
+              <path
+                d="M17.108 16.2247C16.8639 15.9806 16.4682 15.9806 16.2241 16.2247C15.98 16.4688 15.98 16.8645 16.2241 17.1086L17.8907 18.7752C18.1348 19.0193 18.5305 19.0193 18.7746 18.7752C19.0187 18.5312 19.0197 18.1354 18.7746 17.8914L17.108 16.2247Z"
               />
             </svg>
           </button>
         } @else if (sf.code === "d") {
-          <span
-            class="bg-main-base focus-within:border-primary-default inline-flex w-full items-center justify-between overflow-hidden rounded-lg border"
-            [ngClass]="
-              locked() ? 'border-tertiary-disable' : 'border-tertiary-default'
-            "
-          >
-            <input
-              class="bg-main-base disabled:text-disable text-secondary w-full py-3 pl-4 font-medium outline-none disabled:cursor-not-allowed disabled:bg-gray-500/5"
-              #plainInput
-              [value]="dDraft()"
-              [disabled]="locked()"
-              (input)="onInputD(sf, $event)"
-            />
-
-            @if (!locked() && hasSubd()) {
-              <button
-                class="group mx-3 flex cursor-pointer items-center"
-                (click)="clearD()"
-                (mousedown)="$event.preventDefault()"
-                tabindex="-1"
-                type="button"
-              >
-                <svg
-                  class="icon-tertiary"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M3.64645 3.64645C3.84171 3.45118 4.15829 3.45118 4.35355 3.64645L8 7.29289L11.6464 3.64645C11.8417 3.45118 12.1583 3.45118 12.3536 3.64645C12.5488 3.84171 12.5488 4.15829 12.3536 4.35355L8.70711 8L12.3536 11.6464C12.5488 11.8417 12.5488 12.1583 12.3536 12.3536C12.1583 12.5488 11.8417 12.5488 11.6464 12.3536L8 8.70711L4.35355 12.3536C4.15829 12.5488 3.84171 12.5488 3.64645 12.3536C3.45118 12.1583 3.45118 11.8417 3.64645 11.6464L7.29289 8L3.64645 4.35355C3.45118 4.15829 3.45118 3.84171 3.64645 3.64645Z"
-                  />
-                </svg>
-              </button>
-            }
-          </span>
+          <app-input-autocomplete
+            [value]="dDraft()"
+            [field]="tag()"
+            [subfield]="sf.code"
+            [bases]="['NKC', 'SKC', 'SCK']"
+            [minChars]="1"
+            [limit]="20"
+            [disabled]="locked()"
+            (valueChange)="onInputD($event, sf)"
+          />
         } @else if (sf.code === "7") {
           <span
             class="inline-flex w-full overflow-hidden rounded-lg border"
@@ -233,47 +213,23 @@
             }
           </div>
         } @else {
-          <span
-            class="border-tertiary-default focus-within:border-primary-default bg-main-base inline-flex w-full overflow-hidden rounded-lg border"
-          >
-            <input
-              class="text-secondary w-full bg-transparent py-3 pl-4 font-medium outline-none"
-              #plainInput
+          <div class="relative">
+            <app-input-autocomplete
               [value]="sf.value"
-              (input)="
+              [field]="tag()"
+              [subfield]="sf.code"
+              [bases]="['NKC', 'SKC', 'SCK']"
+              [minChars]="1"
+              [limit]="20"
+              (valueChange)="
                 sf.sourceIndex !== null &&
-                  setExtraSubValue(sf.sourceIndex, plainInput.value)
+                  setExtraSubValue(sf.sourceIndex, $event)
               "
             />
 
-            @if (sf.value.length) {
+            @if (!sf.value.length) {
               <button
-                class="group mx-3 flex cursor-pointer items-center"
-                (click)="
-                  sf.sourceIndex !== null &&
-                    setExtraSubValue(sf.sourceIndex, '')
-                "
-                (mousedown)="$event.preventDefault()"
-                tabindex="-1"
-                type="button"
-              >
-                <svg
-                  class="icon-tertiary"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M3.64645 3.64645C3.84171 3.45118 4.15829 3.45118 4.35355 3.64645L8 7.29289L11.6464 3.64645C11.8417 3.45118 12.1583 3.45118 12.3536 3.64645C12.5488 3.84171 12.5488 4.15829 12.3536 4.35355L8.70711 8L12.3536 11.6464C12.5488 11.8417 12.5488 12.1583 12.3536 12.3536C12.1583 12.5488 11.8417 12.5488 11.6464 12.3536L8 8.70711L4.35355 12.3536C4.15829 12.5488 3.84171 12.5488 3.64645 12.3536C3.45118 12.1583 3.45118 11.8417 3.64645 11.6464L7.29289 8L3.64645 4.35355C3.45118 4.15829 3.45118 3.84171 3.64645 3.64645Z"
-                  />
-                </svg>
-              </button>
-            } @else {
-              <button
-                class="group mx-3 flex cursor-pointer items-center"
+                class="group absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
                 (click)="
                   sf.sourceIndex !== null && deleteExtraSubfield(sf.sourceIndex)
                 "
@@ -316,7 +272,7 @@
                 </svg>
               </button>
             }
-          </span>
+          </div>
         }
       </div>
     }

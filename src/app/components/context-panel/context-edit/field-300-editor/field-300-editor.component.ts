@@ -2,6 +2,7 @@ import {
   AddSubfieldDialogComponent,
   AddSubfieldDialogResult,
 } from '@/app/components/add-subfield-dialog/add-subfield-dialog.component';
+import { InputAutocompleteComponent } from '@/app/components/inputs/input-autocomplete/input-autocomplete.component';
 import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
 import {
   FIELD_RULES,
@@ -18,7 +19,6 @@ import { compareSubfieldCodes } from '@/app/utils/marc-subfield-sort';
 import { CommonModule } from '@angular/common';
 import {
   Component,
-  ElementRef,
   computed,
   effect,
   inject,
@@ -50,6 +50,7 @@ type PendingFocusTarget = {
     InputDropdownComponent,
     TranslateModule,
     AddSubfieldDialogComponent,
+    InputAutocompleteComponent,
   ],
   templateUrl: './field-300-editor.component.html',
 })
@@ -65,8 +66,7 @@ export class Field300EditorComponent {
   readonly addSubfieldDialogError = signal<string | null>(null);
   readonly pendingFocusTarget = signal<PendingFocusTarget>(null);
 
-  private readonly plainInputs =
-    viewChildren<ElementRef<HTMLInputElement>>('plainInput');
+  private readonly allAutocompletes = viewChildren(InputAutocompleteComponent);
 
   readonly tag = '300';
 
@@ -163,11 +163,14 @@ export class Field300EditorComponent {
     });
 
     effect(() => {
-      const id = this.fieldId();
-      if (!id) return;
+      const state = this.cps.state();
+      const isEditingThisField =
+        state.mode === 'edit' && state.fieldId === this.fieldId();
+
+      if (!isEditingThisField) return;
 
       queueMicrotask(() => {
-        this.plainInputs()[0]?.nativeElement.focus();
+        this.allAutocompletes()[0]?.focus();
       });
     });
 
@@ -185,13 +188,7 @@ export class Field300EditorComponent {
         const visibleIndex = matchingVisibleIndexes[target.occurrence - 1];
         if (visibleIndex == null) return;
 
-        const input = this.plainInputs()[visibleIndex]?.nativeElement;
-        if (!input) return;
-
-        input.focus();
-        const len = input.value?.length ?? 0;
-        input.setSelectionRange?.(len, len);
-
+        this.allAutocompletes()[visibleIndex]?.focus();
         this.pendingFocusTarget.set(null);
       });
     });
@@ -247,6 +244,17 @@ export class Field300EditorComponent {
 
   setExtraSubValue(sourceIndex: number, value: string) {
     this.rs.patchSubfield(this.fieldId(), sourceIndex, { value });
+  }
+
+  onSubfieldValueChange(sf: VisibleSubfield, value: string) {
+    if (sf.kind === 'template') {
+      this.setTemplateSubValue(sf, value);
+      return;
+    }
+
+    if (sf.sourceIndex !== null) {
+      this.setExtraSubValue(sf.sourceIndex, value);
+    }
   }
 
   deleteTemplateRepeatableSubfield(sourceIndex: number) {

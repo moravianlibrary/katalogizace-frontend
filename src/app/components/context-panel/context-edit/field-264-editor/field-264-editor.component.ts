@@ -19,13 +19,11 @@ import { compareSubfieldCodes } from '@/app/utils/marc-subfield-sort';
 import { CommonModule } from '@angular/common';
 import {
   Component,
-  ElementRef,
   computed,
   effect,
   inject,
   input,
   signal,
-  viewChild,
   viewChildren,
 } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
@@ -66,13 +64,9 @@ export class Field264EditorComponent {
 
   readonly addSubfieldDialogOpen = signal(false);
   readonly addSubfieldDialogError = signal<string | null>(null);
-
-  private readonly firstAutocomplete = viewChild(InputAutocompleteComponent);
-  private readonly allAutocompletes = viewChildren(InputAutocompleteComponent);
-  private readonly plainInputs =
-    viewChildren<ElementRef<HTMLInputElement>>('plainInput');
-
   readonly pendingFocusTarget = signal<PendingFocusTarget>(null);
+
+  private readonly allAutocompletes = viewChildren(InputAutocompleteComponent);
 
   readonly tag = '264';
 
@@ -169,10 +163,15 @@ export class Field264EditorComponent {
     });
 
     effect(() => {
-      const id = this.fieldId();
-      if (!id) return;
+      const state = this.cps.state();
+      const isEditingThisField =
+        state.mode === 'edit' && state.fieldId === this.fieldId();
 
-      queueMicrotask(() => this.firstAutocomplete()?.focus());
+      if (!isEditingThisField) return;
+
+      queueMicrotask(() => {
+        this.allAutocompletes()[0]?.focus();
+      });
     });
 
     effect(() => {
@@ -181,72 +180,18 @@ export class Field264EditorComponent {
       if (!target || !visible.length) return;
 
       queueMicrotask(() => {
-        if (target.kind === 'template') {
-          const sameCodeVisibleIndexes = visible
-            .map((sf, index) => ({ sf, index }))
-            .filter(
-              (x) => x.sf.kind === 'template' && x.sf.code === target.code,
-            )
-            .map((x) => x.index);
+        const matchingIndexes = visible
+          .map((sf, index) => ({ sf, index }))
+          .filter(
+            ({ sf }) => sf.kind === target.kind && sf.code === target.code,
+          )
+          .map(({ index }) => index);
 
-          const visibleIndex = sameCodeVisibleIndexes[target.occurrence - 1];
-          if (visibleIndex == null) return;
+        const visibleIndex = matchingIndexes[target.occurrence - 1];
+        if (visibleIndex == null) return;
 
-          if (target.code === 'a' || target.code === 'b') {
-            const autocompleteVisibleIndexes = visible
-              .map((sf, index) =>
-                sf.kind === 'template' && (sf.code === 'a' || sf.code === 'b')
-                  ? index
-                  : -1,
-              )
-              .filter((index) => index !== -1);
-
-            const autocompleteIndex =
-              autocompleteVisibleIndexes.indexOf(visibleIndex);
-            if (autocompleteIndex < 0) return;
-
-            this.allAutocompletes()[autocompleteIndex]?.focus();
-            this.pendingFocusTarget.set(null);
-            return;
-          }
-
-          if (target.code === 'c') {
-            const plainVisibleIndexes = visible
-              .map((sf, index) =>
-                sf.kind === 'template' && sf.code === 'c' ? index : -1,
-              )
-              .filter((index) => index !== -1);
-
-            const plainIndex = plainVisibleIndexes.indexOf(visibleIndex);
-            if (plainIndex < 0) return;
-
-            this.plainInputs()[plainIndex]?.nativeElement.focus();
-            this.pendingFocusTarget.set(null);
-            return;
-          }
-        }
-
-        if (target.kind === 'extra') {
-          const extraVisibleIndexes = visible
-            .map((sf, index) => ({ sf, index }))
-            .filter((x) => x.sf.kind === 'extra' && x.sf.code === target.code)
-            .map((x) => x.index);
-
-          const visibleIndex = extraVisibleIndexes[target.occurrence - 1];
-          if (visibleIndex == null) return;
-
-          const plainVisibleIndexes = visible
-            .map((sf, index) =>
-              sf.code === 'c' || sf.kind === 'extra' ? index : -1,
-            )
-            .filter((index) => index !== -1);
-
-          const plainIndex = plainVisibleIndexes.indexOf(visibleIndex);
-          if (plainIndex < 0) return;
-
-          this.plainInputs()[plainIndex]?.nativeElement.focus();
-          this.pendingFocusTarget.set(null);
-        }
+        this.allAutocompletes()[visibleIndex]?.focus();
+        this.pendingFocusTarget.set(null);
       });
     });
 
@@ -301,6 +246,17 @@ export class Field264EditorComponent {
 
   setExtraSubValue(sourceIndex: number, value: string) {
     this.rs.patchSubfield(this.fieldId(), sourceIndex, { value });
+  }
+
+  onSubfieldValueChange(sf: VisibleSubfield, value: string) {
+    if (sf.kind === 'template') {
+      this.setTemplateSubValue(sf, value);
+      return;
+    }
+
+    if (sf.sourceIndex !== null) {
+      this.setExtraSubValue(sf.sourceIndex, value);
+    }
   }
 
   deleteTemplateRepeatableSubfield(sourceIndex: number) {
@@ -395,10 +351,6 @@ export class Field264EditorComponent {
 
     this.addSubfieldDialogOpen.set(false);
     this.addSubfieldDialogError.set(null);
-  }
-
-  shouldUseAutocomplete(code: string): boolean {
-    return code === 'a' || code === 'b';
   }
 
   getSubfieldLabel(code: string): string {

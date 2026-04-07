@@ -2,6 +2,7 @@ import {
   AddSubfieldDialogComponent,
   AddSubfieldDialogResult,
 } from '@/app/components/add-subfield-dialog/add-subfield-dialog.component';
+import { InputAutocompleteComponent } from '@/app/components/inputs/input-autocomplete/input-autocomplete.component';
 import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
 import { TextareaAutocompleteComponent } from '@/app/components/inputs/textarea-autocomplete/textarea-autocomplete.component';
 import {
@@ -21,7 +22,6 @@ import {
   Component,
   computed,
   effect,
-  ElementRef,
   inject,
   input,
   signal,
@@ -49,6 +49,7 @@ type PendingFocusTarget = {
     CommonModule,
     TranslateModule,
     TextareaAutocompleteComponent,
+    InputAutocompleteComponent,
     AddSubfieldDialogComponent,
     InputDropdownComponent,
   ],
@@ -66,8 +67,9 @@ export class Field500EditorComponent {
   readonly addSubfieldDialogError = signal<string | null>(null);
 
   private readonly firstTextarea = viewChild(TextareaAutocompleteComponent);
-  private readonly plainInputs =
-    viewChildren<ElementRef<HTMLInputElement>>('plainInput');
+  private readonly extraAutocompletes = viewChildren(
+    InputAutocompleteComponent,
+  );
 
   readonly pendingFocusTarget = signal<PendingFocusTarget>(null);
 
@@ -146,8 +148,11 @@ export class Field500EditorComponent {
     });
 
     effect(() => {
-      const id = this.fieldId();
-      if (!id) return;
+      const state = this.cps.state();
+      const isEditingThisField =
+        state.mode === 'edit' && state.fieldId === this.fieldId();
+
+      if (!isEditingThisField) return;
 
       queueMicrotask(() => this.firstTextarea()?.focus());
     });
@@ -169,13 +174,7 @@ export class Field500EditorComponent {
 
         if (targetIndex === -1) return;
 
-        const input = this.plainInputs()[targetIndex]?.nativeElement;
-        if (!input) return;
-
-        input.focus();
-        const len = input.value?.length ?? 0;
-        input.setSelectionRange?.(len, len);
-
+        this.extraAutocompletes()[targetIndex]?.focus();
         this.pendingFocusTarget.set(null);
       });
     });
@@ -303,10 +302,6 @@ export class Field500EditorComponent {
 
     this.addSubfieldDialogOpen.set(false);
     this.addSubfieldDialogError.set(null);
-  }
-
-  shouldUseTextarea(code: string): boolean {
-    return code === 'a';
   }
 
   getSubfieldLabel(code: string): string {

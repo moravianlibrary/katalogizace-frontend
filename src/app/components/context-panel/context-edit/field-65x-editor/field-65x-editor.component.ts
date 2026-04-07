@@ -3,6 +3,7 @@ import {
   AddSubfieldDialogResult,
 } from '@/app/components/add-subfield-dialog/add-subfield-dialog.component';
 import { InputAutocompleteDictionaryComponent } from '@/app/components/inputs/input-autocomplete-dictionary/input-autocomplete-dictionary.component';
+import { InputAutocompleteComponent } from '@/app/components/inputs/input-autocomplete/input-autocomplete.component';
 import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
 import { LockHoverIconComponent } from '@/app/components/shared/lock-hover-icon/lock-hover-icon.component';
 import {
@@ -28,7 +29,6 @@ import {
   Component,
   computed,
   effect,
-  ElementRef,
   inject,
   input,
   signal,
@@ -58,6 +58,7 @@ type PendingFocusTarget = {
     TranslateModule,
     InputDropdownComponent,
     InputAutocompleteDictionaryComponent,
+    InputAutocompleteComponent,
     LockHoverIconComponent,
     AddSubfieldDialogComponent,
   ],
@@ -76,13 +77,18 @@ export class Field65xEditorComponent {
   readonly addSubfieldDialogOpen = signal(false);
   readonly addSubfieldDialogError = signal<string | null>(null);
 
-  private readonly plainInputs =
-    viewChildren<ElementRef<HTMLInputElement>>('plainInput');
-
   readonly pendingFocusTarget = signal<PendingFocusTarget>(null);
 
   readonly extraVisibleSubfields = computed(() =>
     this.visibleSubfields().filter((sf) => sf.kind === 'extra'),
+  );
+
+  private readonly firstDictionaryAutocomplete = viewChild(
+    InputAutocompleteDictionaryComponent,
+  );
+
+  private readonly allGenericAutocompletes = viewChildren(
+    InputAutocompleteComponent,
   );
 
   private cleanupEmptySubfields() {
@@ -143,13 +149,6 @@ export class Field65xEditorComponent {
     return value ?? null;
   }
 
-  private readonly firstAutocomplete = viewChild(
-    InputAutocompleteDictionaryComponent,
-  );
-
-  private readonly firstPlainAInput =
-    viewChild<ElementRef<HTMLInputElement>>('plainAInput');
-
   constructor() {
     effect(() => {
       const state = this.cps.state();
@@ -164,17 +163,20 @@ export class Field65xEditorComponent {
     });
 
     effect(() => {
-      const id = this.fieldId();
-      if (!id) return;
+      const state = this.cps.state();
+      const isEditingThisField =
+        state.mode === 'edit' && state.fieldId === this.fieldId();
+
+      if (!isEditingThisField) return;
 
       const isLocked = untracked(() => this.locked());
       if (isLocked) return;
 
       queueMicrotask(() => {
-        if (this.dictionary()) {
-          this.firstAutocomplete()?.focus();
+        if (this.hasDictionary()) {
+          this.firstDictionaryAutocomplete()?.focus();
         } else {
-          this.firstPlainAInput()?.nativeElement.focus();
+          this.allGenericAutocompletes()[0]?.focus();
         }
       });
     });
@@ -230,13 +232,8 @@ export class Field65xEditorComponent {
 
         if (targetIndex === -1) return;
 
-        const input = this.plainInputs()[targetIndex]?.nativeElement;
-        if (!input) return;
-
-        input.focus();
-        const len = input.value?.length ?? 0;
-        input.setSelectionRange?.(len, len);
-
+        const genericOffset = this.hasDictionary() ? 0 : 1;
+        this.allGenericAutocompletes()[targetIndex + genericOffset]?.focus();
         this.pendingFocusTarget.set(null);
       });
     });
@@ -427,7 +424,11 @@ export class Field65xEditorComponent {
     });
 
     setTimeout(() => {
-      this.firstAutocomplete()?.focus();
+      if (this.hasDictionary()) {
+        this.firstDictionaryAutocomplete()?.focus();
+      } else {
+        this.allGenericAutocompletes()[0]?.focus();
+      }
     });
   }
 

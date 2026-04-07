@@ -31,49 +31,23 @@
     @for (sf of field()?.subfields ?? []; track $index) {
       <div>
         <label class="text-light text-sm-tight mb-2 block font-medium">
-          |{{ sf.code }}
+          {{ getSubfieldLabel(sf.code) | translate }}
         </label>
 
-        <span
-          class="border-tertiary-default focus-within:border-primary-default bg-main-base inline-flex w-full overflow-hidden rounded-lg border"
-        >
-          <input
-            class="text-secondary text-md w-full bg-transparent py-3 pl-4 font-medium outline-none"
-            #plainInput
+        <div class="relative">
+          <app-input-autocomplete
             [value]="sf.value"
-            (input)="setSubfieldValue($index, plainInput.value)"
+            [field]="field()!.tag"
+            [subfield]="sf.code"
+            [bases]="['NKC', 'SKC', 'SCK']"
+            [minChars]="1"
+            [limit]="20"
+            (valueChange)="setSubfieldValue($index, $event)"
           />
 
-          @if (sf.value.length) {
+          @if (!sf.value.length) {
             <button
-              class="group mx-3 flex cursor-pointer items-center"
-              (click)="setSubfieldValue($index, '')"
-              (mousedown)="$event.preventDefault()"
-              tabindex="-1"
-              type="button"
-            >
-              <svg
-                class="icon-tertiary"
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-              >
-                <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M3.64645 3.64645C3.84171 3.45118 4.15829 3.45118 4.35355 3.64645L8 7.29289L11.6464 3.64645C11.8417 3.45118 12.1583 3.45118 12.3536 3.64645C12.5488 3.84171 12.5488 4.15829 12.3536 4.35355L8.70711 8L12.3536 11.6464C12.5488 11.8417 12.5488 12.1583 12.3536 12.3536C12.1583 12.5488 11.8417 12.5488 11.6464 12.3536L8 8.70711L4.35355 12.3536C4.15829 12.5488 3.84171 12.5488 3.64645 12.3536C3.45118 12.1583 3.45118 11.8417 3.64645 11.6464L7.29289 8L3.64645 4.35355C3.45118 4.15829 3.45118 3.84171 3.64645 3.64645Z"
-                />
-                <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M3.64645 3.64645C3.84171 3.45118 4.15829 3.45118 4.35355 3.64645L8 7.29289L11.6464 3.64645C11.8417 3.45118 12.1583 3.45118 12.3536 3.64645C12.5488 3.84171 12.5488 4.15829 12.3536 4.35355L8.70711 8L12.3536 11.6464C12.5488 11.8417 12.5488 12.1583 12.3536 12.3536C12.1583 12.5488 11.8417 12.5488 11.6464 12.3536L8 8.70711L4.35355 12.3536C4.15829 12.5488 3.84171 12.5488 3.64645 12.3536C3.45118 12.1583 3.45118 11.8417 3.64645 11.6464L7.29289 8L3.64645 4.35355C3.45118 4.15829 3.45118 3.84171 3.64645 3.64645Z"
-                />
-              </svg>
-            </button>
-          } @else {
-            <button
-              class="group mx-3 flex cursor-pointer items-center"
+              class="group absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
               (click)="deleteSubfield($index)"
               (mousedown)="$event.preventDefault()"
               tabindex="-1"
@@ -114,7 +88,7 @@
               </svg>
             </button>
           }
-        </span>
+        </div>
       </div>
     }
   </div>

@@ -3,6 +3,7 @@ import {
   AddSubfieldDialogResult,
 } from '@/app/components/add-subfield-dialog/add-subfield-dialog.component';
 import { InputAutocompleteAuthorityComponent } from '@/app/components/inputs/input-autocomplete-authority/input-autocomplete-authority.component';
+import { InputAutocompleteComponent } from '@/app/components/inputs/input-autocomplete/input-autocomplete.component';
 import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
 import { InputStaticAutocompleteComponent } from '@/app/components/inputs/input-static-autocomplete/input-static-autocomplete.component';
 import { ExistingMarcRecordTableComponent } from '@/app/components/marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
@@ -59,6 +60,7 @@ type PendingFocusTarget = {
   standalone: true,
   imports: [
     InputAutocompleteAuthorityComponent,
+    InputAutocompleteComponent,
     InputDropdownComponent,
     TranslateModule,
     InputStaticAutocompleteComponent,
@@ -91,8 +93,9 @@ export class FieldAuthorityEditorComponent {
     InputStaticAutocompleteComponent,
   );
 
-  private readonly plainInputs =
-    viewChildren<ElementRef<HTMLInputElement>>('plainInput');
+  private readonly inputAutocompletes = viewChildren(
+    InputAutocompleteComponent,
+  );
 
   readonly pendingFocusTarget = signal<PendingFocusTarget>(null);
 
@@ -190,6 +193,12 @@ export class FieldAuthorityEditorComponent {
     this.visibleSubfields().filter((sf) => sf.kind === 'extra'),
   );
 
+  readonly nonRoleInputVisibleSubfields = computed(() =>
+    this.visibleSubfields().filter(
+      (sf) => sf.code !== 'a' && sf.code !== '4' && sf.code !== '7',
+    ),
+  );
+
   readonly searchQuery = signal('');
   readonly searchResults = signal<ExistingMarcRecord[]>([]);
   readonly selectedRecordId = signal<string | null>(null);
@@ -244,8 +253,11 @@ export class FieldAuthorityEditorComponent {
     });
 
     effect(() => {
-      const id = this.fieldId();
-      if (!id) return;
+      const state = this.cps.state();
+      const isEditingThisField =
+        state.mode === 'edit' && state.fieldId === this.fieldId();
+
+      if (!isEditingThisField) return;
       if (this.pendingFocusTarget()) return;
 
       const isLocked = untracked(() => this.locked());
@@ -318,25 +330,29 @@ export class FieldAuthorityEditorComponent {
           return;
         }
 
-        if (target.kind === 'extra') {
-          const extraIndexes = visible
+        if (target.code !== 'a' && target.code !== '4' && target.code !== '7') {
+          const matchingIndexes = visible
             .map((sf, index) => ({ sf, index }))
-            .filter((x) => x.sf.kind === 'extra' && x.sf.code === target.code)
+            .filter(
+              (x) => x.sf.kind === target.kind && x.sf.code === target.code,
+            )
             .map((x) => x.index);
 
-          const visibleIndex = extraIndexes[target.occurrence - 1];
+          const visibleIndex = matchingIndexes[target.occurrence - 1];
           if (visibleIndex == null) return;
 
-          const plainVisibleIndexes = visible
+          const inputVisibleIndexes = visible
             .map((sf, index) =>
-              sf.kind === 'extra' || sf.code === 'd' ? index : -1,
+              sf.code !== 'a' && sf.code !== '4' && sf.code !== '7'
+                ? index
+                : -1,
             )
             .filter((index) => index !== -1);
 
-          const plainIndex = plainVisibleIndexes.indexOf(visibleIndex);
-          if (plainIndex < 0) return;
+          const inputIndex = inputVisibleIndexes.indexOf(visibleIndex);
+          if (inputIndex < 0) return;
 
-          this.plainInputs()[plainIndex]?.nativeElement.focus();
+          this.inputAutocompletes()[inputIndex]?.focus();
           this.pendingFocusTarget.set(null);
         }
       });
@@ -529,10 +545,9 @@ export class FieldAuthorityEditorComponent {
     this.setTemplateSubValue(visibleA, term);
   }
 
-  onInputD(sf: VisibleSubfield, e: Event) {
+  onInputD(value: string, sf: VisibleSubfield) {
     if (this.locked()) return;
 
-    const value = (e.target as HTMLInputElement | null)?.value ?? '';
     this.dDraft.set(value);
     this.setTemplateSubValue(sf, value);
   }
