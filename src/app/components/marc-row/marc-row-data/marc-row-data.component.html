@@ -38,12 +38,12 @@
     <div class="flex gap-3 px-2">
       @if (df().fieldId && (df().candidates?.length ?? 0) > 1) {
         <button
-          class="cursor-pointer"
+          class="group cursor-pointer"
           (click)="onShowCandidates(); $event.stopPropagation()"
           type="button"
         >
           <svg
-            class="icon-secondary-default"
+            class="icon-secondary"
             xmlns="http://www.w3.org/2000/svg"
             width="20"
             height="20"
