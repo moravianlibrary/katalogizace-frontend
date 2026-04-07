@@ -41,7 +41,7 @@ export const FIELD_RULES: FieldRulesMap = {
     },
     templateOrder: ['a', 'd', '7', '4'],
     repeatable: false,
-    type: 'data' as FieldType,
+    type: 'data',
   },
   '245': {
     ind1Options: getIndicators('245').ind1,
@@ -62,7 +62,7 @@ export const FIELD_RULES: FieldRulesMap = {
     },
     templateOrder: ['a', 'b', 'c'],
     repeatable: false,
-    type: 'data' as FieldType,
+    type: 'data',
   },
   '264': {
     ind1Options: getIndicators('264').ind1,
@@ -83,7 +83,7 @@ export const FIELD_RULES: FieldRulesMap = {
     },
     templateOrder: ['a', 'b', 'c'],
     repeatable: true,
-    type: 'data' as FieldType,
+    type: 'data',
   },
   '300': {
     ind1Options: getIndicators('300').ind1,
@@ -112,7 +112,7 @@ export const FIELD_RULES: FieldRulesMap = {
     },
     templateOrder: ['a', 'b', 'c', 'e', '3'],
     repeatable: true,
-    type: 'data' as FieldType,
+    type: 'data',
   },
   '500': {
     ind1Options: getIndicators('500').ind1,
@@ -125,7 +125,7 @@ export const FIELD_RULES: FieldRulesMap = {
     },
     templateOrder: ['a'],
     repeatable: true,
-    type: 'data' as FieldType,
+    type: 'data',
   },
   '650': {
     ind1Options: getIndicators('650').ind1,
@@ -146,7 +146,7 @@ export const FIELD_RULES: FieldRulesMap = {
     },
     templateOrder: ['2', 'a', '7'],
     repeatable: true,
-    type: 'data' as FieldType,
+    type: 'data',
   },
   '651': {
     ind1Options: getIndicators('651').ind1,
@@ -167,7 +167,7 @@ export const FIELD_RULES: FieldRulesMap = {
     },
     templateOrder: ['2', 'a', '7'],
     repeatable: true,
-    type: 'data' as FieldType,
+    type: 'data',
   },
   '655': {
     ind1Options: getIndicators('655').ind1,
@@ -188,7 +188,7 @@ export const FIELD_RULES: FieldRulesMap = {
     },
     templateOrder: ['2', 'a', '7'],
     repeatable: true,
-    type: 'data' as FieldType,
+    type: 'data',
   },
   '700': {
     ind1Options: getIndicators('700').ind1,
@@ -213,7 +213,7 @@ export const FIELD_RULES: FieldRulesMap = {
     },
     templateOrder: ['a', 'd', '7', '4'],
     repeatable: true,
-    type: 'data' as FieldType,
+    type: 'data',
   },
 };
 
