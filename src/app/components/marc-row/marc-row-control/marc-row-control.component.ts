@@ -34,4 +34,11 @@ export class MarcRowControlComponent {
     this.edit.field.set(null);
     this.cps.setMode('records');
   }
+
+  onTakeField() {
+    this.recordState.takeControlField({
+      tag: this.cf().tag,
+      value: this.cf().value ?? '',
+    });
+  }
 }

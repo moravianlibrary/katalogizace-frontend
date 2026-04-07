@@ -104,6 +104,15 @@ export class MarcRowDataComponent {
     this.cps.showProvenance(tag, steps, df.fieldId);
   }
 
+  onTakeField() {
+    this.recordState.takeDataField({
+      tag: this.df().tag,
+      ind1: this.df().ind1 ?? '',
+      ind2: this.df().ind2 ?? '',
+      subfields: this.df().subfields ?? [],
+    });
+  }
+
   private fieldKey = computed(() => {
     const f = this.df();
     return dataSignature({
