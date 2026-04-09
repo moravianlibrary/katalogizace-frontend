@@ -69,7 +69,10 @@
     "next_book": "Další kniha",
     "create": "Vytvořit",
     "prev": "Předchozí",
-    "next": "Další"
+    "next": "Další",
+    "scan": "Naskenovat",
+    "upload": "Nahrát",
+    "uploading": "Nahrávám..."
   },
   "messages": {
     "success": {
@@ -733,6 +736,20 @@
     "created": "Vytvořeno",
     "edited": "Upraveno",
     "state": "Stav",
+    "actions": "Akce",
+    "total": "Celkem",
+    "page": "Strana"
+  },
+  "books": {
+    "loading": "Načítám knihy...",
+    "no_books": "Zatím žádné knihy.",
+    "book_title": "Název knihy",
+    "author": "Autor",
+    "publication_year": "Rok vydání",
+    "created": "Vytvořeno",
+    "edited": "Upraveno",
+    "process_state": "Stav zpracování",
+    "record_state": "Stav záznamu",
     "actions": "Akce",
     "total": "Celkem",
     "page": "Strana"

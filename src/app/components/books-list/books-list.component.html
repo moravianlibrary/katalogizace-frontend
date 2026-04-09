@@ -46,7 +46,7 @@
       "
       type="button"
     >
-      Naskenovat
+      {{ "buttons.scan" | translate }}
       <svg
         class="icon-primary"
         xmlns="http://www.w3.org/2000/svg"
@@ -79,9 +79,9 @@
       type="button"
     >
       @if (isUploading) {
-        Nahrávám…
+        {{ "buttons.uploading" | translate }}
       } @else {
-        Nahrát
+        {{ "buttons.upload" | translate }}
       }
 
       <svg
@@ -125,11 +125,11 @@
   />
 
   @if (loading()) {
-    <div class="text-md">Načítám…</div>
+    <div class="text-md">{{ "books.loading" | translate }}</div>
   } @else if (error()) {
     <div class="text-md text-error">{{ error() }}</div>
   } @else if (!data() || data()!.books.length === 0) {
-    <div class="text-md">Zatím žádné záznamy.</div>
+    <div class="text-md">{{ "books.no_books" | translate }}</div>
   } @else {
     <div class="flex min-h-0 flex-1 flex-col">
       <div class="min-h-0 flex-1 overflow-auto rounded-lg">
@@ -137,21 +137,29 @@
           <thead class="bg-main-bright text-secondary sticky top-0 z-2">
             <tr>
               <th class="px-3 py-2 text-left font-medium text-nowrap">
-                Název knihy
+                {{ "books.book_title" | translate }}
               </th>
-              <th class="px-3 py-2 text-left font-medium">Autor</th>
-              <th class="px-3 py-2 text-left font-medium text-nowrap">
-                Rok vydání
-              </th>
-              <th class="px-3 py-2 text-left font-medium">Vytvořeno</th>
-              <th class="px-3 py-2 text-left font-medium">Upraveno</th>
-              <th class="px-3 py-2 text-left font-medium text-nowrap">
-                Stav zpracování
+              <th class="px-3 py-2 text-left font-medium">
+                {{ "books.author" | translate }}
               </th>
               <th class="px-3 py-2 text-left font-medium text-nowrap">
-                Stav záznamu
+                {{ "books.publication_year" | translate }}
               </th>
-              <th class="px-3 py-2 text-left font-medium">Akce</th>
+              <th class="px-3 py-2 text-left font-medium">
+                {{ "books.created" | translate }}
+              </th>
+              <th class="px-3 py-2 text-left font-medium">
+                {{ "books.edited" | translate }}
+              </th>
+              <th class="px-3 py-2 text-left font-medium text-nowrap">
+                {{ "books.process_state" | translate }}
+              </th>
+              <th class="px-3 py-2 text-left font-medium text-nowrap">
+                {{ "books.record_state" | translate }}
+              </th>
+              <th class="px-3 py-2 text-left font-medium">
+                {{ "books.actions" | translate }}
+              </th>
             </tr>
           </thead>
 
@@ -282,7 +290,7 @@
             } @empty {
               <tr>
                 <td class="px-3 py-4 text-center" colspan="5">
-                  Zatím žádné záznamy.
+                  {{ "books.no_books" | translate }}
                 </td>
               </tr>
             }
@@ -293,7 +301,8 @@
 
     <div class="flex items-center justify-between text-sm">
       <div class="text-light">
-        Celkem: {{ data()!.total }} • Strana {{ page() }} / {{ totalPages() }}
+        {{ "books.total" | translate }}: {{ data()!.total }} •
+        {{ "books.page" | translate }} {{ page() }} / {{ totalPages() }}
       </div>
       <div class="flex gap-2">
         <button
@@ -301,14 +310,14 @@
           [disabled]="!data()!.has_prev"
           (click)="goPrev()"
         >
-          Předchozí
+          {{ "buttons.prev" | translate }}
         </button>
         <button
           class="cursor-pointer rounded border px-3 py-1 disabled:cursor-not-allowed disabled:opacity-40"
           [disabled]="!data()!.has_next"
           (click)="goNext()"
         >
-          Další
+          {{ "buttons.next" | translate }}
         </button>
       </div>
     </div>
