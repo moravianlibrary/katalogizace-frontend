@@ -49,11 +49,11 @@
   </div>
 
   @if (loading()) {
-    <div class="text-md">Načítám…</div>
+    <div class="text-md">{{ "batches.loading" | translate }}</div>
   } @else if (error()) {
     <div class="text-md text-error">{{ error() }}</div>
   } @else if (!data() || rows().length === 0) {
-    <div class="text-md">Zatím žádné skupiny.</div>
+    <div class="text-md">{{ "batches.no_batches" | translate }}</div>
   } @else {
     <div class="flex min-h-0 flex-1 flex-col">
       <div class="min-h-0 flex-1 overflow-auto rounded-lg">
@@ -61,16 +61,26 @@
           <thead class="bg-main-bright text-secondary sticky top-0 z-2">
             <tr>
               <th class="px-3 py-2 text-left font-medium text-nowrap">
-                Název a poznámka
+                {{ "batches.title_and_subtitle" | translate }}
               </th>
               <th class="px-3 py-2 text-left font-medium text-nowrap">
-                Počet knih
+                {{ "batches.num_of_books" | translate }}
               </th>
-              <th class="px-3 py-2 text-left font-medium">Autor</th>
-              <th class="px-3 py-2 text-left font-medium">Vytvořeno</th>
-              <th class="px-3 py-2 text-left font-medium">Upraveno</th>
-              <th class="px-3 py-2 text-left font-medium">Stav</th>
-              <th class="px-3 py-2 text-left font-medium">Akce</th>
+              <th class="px-3 py-2 text-left font-medium">
+                {{ "batches.author" | translate }}
+              </th>
+              <th class="px-3 py-2 text-left font-medium">
+                {{ "batches.created" | translate }}
+              </th>
+              <th class="px-3 py-2 text-left font-medium">
+                {{ "batches.edited" | translate }}
+              </th>
+              <th class="px-3 py-2 text-left font-medium">
+                {{ "batches.state" | translate }}
+              </th>
+              <th class="px-3 py-2 text-left font-medium">
+                {{ "batches.actions" | translate }}
+              </th>
             </tr>
           </thead>
 
@@ -202,7 +212,7 @@
             } @empty {
               <tr>
                 <td class="px-3 py-4 text-center" colspan="8">
-                  Zatím žádné skupiny.
+                  {{ "batches.no_batches" | translate }}
                 </td>
               </tr>
             }
@@ -213,7 +223,8 @@
 
     <div class="flex items-center justify-between text-sm">
       <div class="text-light">
-        Celkem: {{ data()!.total }} • Strana {{ page() }} / {{ totalPages() }}
+        {{ "batches.total" | translate }}: {{ data()!.total }} •
+        {{ "batches.page" | translate }} {{ page() }} / {{ totalPages() }}
       </div>
 
       <div class="flex gap-2">
@@ -222,7 +233,7 @@
           [disabled]="!data()!.has_prev"
           (click)="goPrev()"
         >
-          Předchozí
+          {{ "buttons.prev" | translate }}
         </button>
 
         <button
@@ -230,7 +241,7 @@
           [disabled]="!data()!.has_next"
           (click)="goNext()"
         >
-          Další
+          {{ "buttons.next" | translate }}
         </button>
       </div>
     </div>

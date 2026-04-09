@@ -67,7 +67,9 @@
     "add_field": "Jiné pole",
     "add": "Přidat",
     "next_book": "Další kniha",
-    "create": "Vytvořit"
+    "create": "Vytvořit",
+    "prev": "Předchozí",
+    "next": "Další"
   },
   "messages": {
     "success": {
@@ -181,7 +183,7 @@
     "no_candidates": "Žádní kandidáti.",
     "authority_record": "Autoritní záznam",
     "show_in_nkp": "Zobrazit v NKP (AUT)",
-    "loading_authority": "Načítám autoritní záznam…",
+    "loading_authority": "Načítám autoritní záznam...",
     "no_subfield_7": "Vybraný kandidát nemá podpole |7",
     "open_in_skc": "Otevřít v souborném katalogu"
   },
@@ -722,7 +724,18 @@
     "edit": "Úprava skupiny",
     "title": "Název",
     "subtitle": "Poznámka (nepovinné)",
-    "create": "Vytvořit skupinu"
+    "create": "Vytvořit skupinu",
+    "loading": "Načítám skupiny...",
+    "no_batches": "Zatím žádné skupiny.",
+    "title_and_subtitle": "Název a poznámka",
+    "num_of_books": "Počet knih",
+    "author": "Autor",
+    "created": "Vytvořeno",
+    "edited": "Upraveno",
+    "state": "Stav",
+    "actions": "Akce",
+    "total": "Celkem",
+    "page": "Strana"
   },
   "dialogs": {
     "authority_search": "Vyhledávání autorit",
