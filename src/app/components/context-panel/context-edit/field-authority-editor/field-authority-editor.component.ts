@@ -2,6 +2,7 @@ import {
   AddSubfieldDialogComponent,
   AddSubfieldDialogResult,
 } from '@/app/components/add-subfield-dialog/add-subfield-dialog.component';
+import { IconComponent } from '@/app/components/icon/icon.component';
 import { InputAutocompleteAuthorityComponent } from '@/app/components/inputs/input-autocomplete-authority/input-autocomplete-authority.component';
 import { InputAutocompleteComponent } from '@/app/components/inputs/input-autocomplete/input-autocomplete.component';
 import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
@@ -68,6 +69,7 @@ type PendingFocusTarget = {
     ExistingMarcRecordTableComponent,
     LockHoverIconComponent,
     AddSubfieldDialogComponent,
+    IconComponent,
   ],
   templateUrl: './field-authority-editor.component.html',
 })

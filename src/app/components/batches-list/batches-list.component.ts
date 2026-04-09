@@ -23,6 +23,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BatchStateLabelPipe } from '../../pipes/batch-state-label.pipe';
 import { BatchesService } from '../../services/api/batches.service';
 import { ToastService } from '../../services/toast.service';
+import { IconComponent } from '../icon/icon.component';
 
 @Component({
   standalone: true,
@@ -33,6 +34,7 @@ import { ToastService } from '../../services/toast.service';
     NgClass,
     BatchStateLabelPipe,
     TranslateModule,
+    IconComponent,
   ],
   templateUrl: './batches-list.component.html',
 })
