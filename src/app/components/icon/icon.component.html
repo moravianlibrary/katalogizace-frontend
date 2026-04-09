@@ -1,16 +1,7 @@
-<svg
-  [class]="className()"
-  [attr.width]="width()"
-  [attr.height]="height()"
-  [attr.viewBox]="icon().viewBox"
-  xmlns="http://www.w3.org/2000/svg"
->
-  @for (path of icon().paths; track $index) {
-    <path
-      [attr.d]="path.d"
-      [attr.fill-rule]="path.fillRule"
-      [attr.clip-rule]="path.clipRule"
-      fill="currentColor"
-    />
-  }
-</svg>
+@for (path of icon().paths; track $index) {
+  <svg:path
+    [attr.d]="path.d"
+    [attr.fill-rule]="path.fillRule"
+    [attr.clip-rule]="path.clipRule"
+  />
+}
