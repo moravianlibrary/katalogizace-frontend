@@ -5,7 +5,7 @@ import {
 import { InputAutocompleteComponent } from '@/app/components/inputs/input-autocomplete/input-autocomplete.component';
 import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
 import {
-  FIELD_RULES,
+  DATA_FIELD_RULES,
   getIndicators,
   getSubfieldRuleLabel,
   isSubfieldRepeatable,
@@ -76,7 +76,7 @@ export class Field245EditorComponent {
   readonly ind2Options = computed(() => this.indicators().ind2);
 
   readonly templateOrder = computed(() => {
-    return FIELD_RULES[this.tag]?.templateOrder ?? [];
+    return DATA_FIELD_RULES[this.tag]?.templateOrder ?? [];
   });
 
   readonly templateCodes = computed(() => new Set(this.templateOrder()));

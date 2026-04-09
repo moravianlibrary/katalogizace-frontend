@@ -2,9 +2,9 @@ import {
   EditableMarcRecord,
   ExistingMarcRecord,
   ExtractedMarcRecord,
-  FIELD_RULES,
   FieldType,
   ID,
+  isFieldRepeatable,
   LastEditedRecord,
   MarcCandidate,
   MarcSubfield,
@@ -150,6 +150,8 @@ export class RecordStateService {
     if (!rec) return;
 
     const tag = this.normalizeTag(field.tag);
+    const repeatable = isFieldRepeatable(tag);
+
     const newField = this.buildTakenControlField({
       tag,
       value: field.value ?? '',
@@ -157,7 +159,7 @@ export class RecordStateService {
 
     const existingIdx = rec.control_fields.findIndex((f) => f.tag === tag);
 
-    if (existingIdx < 0) {
+    if (existingIdx < 0 || repeatable) {
       this.editableRecord.set({
         ...rec,
         control_fields: this.insertSortedByTag(rec.control_fields, newField),
@@ -190,7 +192,7 @@ export class RecordStateService {
     if (!rec) return;
 
     const tag = this.normalizeTag(field.tag);
-    const repeatable = FIELD_RULES[tag]?.repeatable ?? true;
+    const repeatable = isFieldRepeatable(tag);
     const newField = this.buildTakenDataField({
       tag,
       ind1: field.ind1 ?? '',

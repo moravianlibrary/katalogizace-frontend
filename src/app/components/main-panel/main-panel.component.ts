@@ -138,7 +138,7 @@ export class MainPanelComponent {
       .uiFields()
       .some((f) => f.tag === paddedTag);
 
-    if (!(isFieldRepeatable(paddedTag) ?? true) && alreadyExists) {
+    if (!isFieldRepeatable(paddedTag) && alreadyExists) {
       this.addFieldDialogError.set('field_add.non_repeatable_error');
       return;
     }

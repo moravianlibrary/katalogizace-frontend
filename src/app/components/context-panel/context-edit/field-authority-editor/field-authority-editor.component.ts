@@ -10,8 +10,8 @@ import { ExistingMarcRecordTableComponent } from '@/app/components/marc-record-t
 import { LockHoverIconComponent } from '@/app/components/shared/lock-hover-icon/lock-hover-icon.component';
 import {
   AutocompletAuthorityResponse,
+  DATA_FIELD_RULES,
   ExistingMarcRecord,
-  FIELD_RULES,
   getIndicators,
   getSubfieldRuleLabel,
   isSubfieldRepeatable,
@@ -112,7 +112,7 @@ export class FieldAuthorityEditorComponent {
   readonly ind2Options = computed(() => this.indicators().ind2);
 
   readonly templateOrder = computed(() => {
-    return FIELD_RULES[this.tag()]?.templateOrder ?? ['a', 'd', '7', '4'];
+    return DATA_FIELD_RULES[this.tag()]?.templateOrder ?? ['a', 'd', '7', '4'];
   });
 
   readonly templateCodes = computed(() => new Set(this.templateOrder()));
@@ -134,7 +134,7 @@ export class FieldAuthorityEditorComponent {
     const templateItems: VisibleSubfield[] = [];
 
     for (const code of templateOrder) {
-      const rule = FIELD_RULES[this.tag()]?.subfields?.[code];
+      const rule = DATA_FIELD_RULES[this.tag()]?.subfields?.[code];
       const matching = subfields
         .map((sf, sourceIndex) => ({ sf, sourceIndex }))
         .filter(({ sf }) => sf.code === code);

@@ -8,8 +8,8 @@ import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/i
 import { LockHoverIconComponent } from '@/app/components/shared/lock-hover-icon/lock-hover-icon.component';
 import {
   AutocompletDictionaryResponse,
+  DATA_FIELD_RULES,
   ExistingMarcRecord,
-  FIELD_RULES,
   getSubfieldRuleLabel,
   isSubfieldRepeatable,
   MarcSubfield,
@@ -119,7 +119,7 @@ export class Field65xEditorComponent {
   readonly ind2Options = computed(() => this.indicators().ind2);
 
   readonly templateOrder = computed(() => {
-    return FIELD_RULES[this.tag()]?.templateOrder ?? [];
+    return DATA_FIELD_RULES[this.tag()]?.templateOrder ?? [];
   });
 
   readonly templateCodes = computed(() => new Set(this.templateOrder()));

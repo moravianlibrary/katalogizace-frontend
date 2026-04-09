@@ -6,7 +6,7 @@ import { InputAutocompleteComponent } from '@/app/components/inputs/input-autoco
 import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
 import { TextareaAutocompleteComponent } from '@/app/components/inputs/textarea-autocomplete/textarea-autocomplete.component';
 import {
-  FIELD_RULES,
+  DATA_FIELD_RULES,
   getIndicators,
   getSubfieldRuleLabel,
   isSubfieldRepeatable,
@@ -89,7 +89,7 @@ export class Field500EditorComponent {
   }
 
   readonly templateOrder = computed(() => {
-    return FIELD_RULES[this.tag]?.templateOrder ?? ['a'];
+    return DATA_FIELD_RULES[this.tag]?.templateOrder ?? ['a'];
   });
 
   readonly templateCodes = computed(() => new Set(this.templateOrder()));
