@@ -8,7 +8,8 @@ export type AppIconName =
   | 'rotateRight'
   | 'maximize'
   | 'sidebarLeft'
-  | 'arrowRight';
+  | 'arrowRight'
+  | 'arrowLeft';
 
 export type IconDefinition = {
   paths: Array<{
