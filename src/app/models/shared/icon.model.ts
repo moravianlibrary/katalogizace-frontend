@@ -20,7 +20,8 @@ export type AppIconName =
   | 'task'
   | 'check'
   | 'checkCircle'
-  | 'search';
+  | 'search'
+  | 'camera';
 
 export type IconDefinition = {
   paths: Array<{
