@@ -24,7 +24,8 @@ export type AppIconName =
   | 'camera'
   | 'upload'
   | 'refresh'
-  | 'folderAdd';
+  | 'folderAdd'
+  | 'edit';
 
 export type IconDefinition = {
   paths: Array<{
