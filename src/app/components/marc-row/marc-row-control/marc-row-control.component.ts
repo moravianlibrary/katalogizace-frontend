@@ -4,11 +4,13 @@ import { FieldEditService } from '@/app/services/edit.service';
 import { RecordStateService } from '@/app/services/record-state.service';
 import { Component, inject, input } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { IconComponent } from '../../icon/icon.component';
 
 @Component({
   standalone: true,
   selector: 'tr[appMarcRowControl]',
   templateUrl: './marc-row-control.component.html',
+  imports: [IconComponent],
 })
 export class MarcRowControlComponent {
   private recordState = inject(RecordStateService);
