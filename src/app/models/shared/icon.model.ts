@@ -1,4 +1,10 @@
-export type AppIconName = 'close' | 'reset' | 'play' | 'externalLink' | 'add';
+export type AppIconName =
+  | 'close'
+  | 'reset'
+  | 'play'
+  | 'externalLink'
+  | 'add'
+  | 'minus';
 
 export type IconDefinition = {
   paths: Array<{
