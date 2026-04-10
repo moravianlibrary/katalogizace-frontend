@@ -4,11 +4,12 @@ import { Router, RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../../services/api/auth.service';
 import { BreadcrumbsService } from '../../../services/breadcrumbs.service';
+import { IconComponent } from '../../icon/icon.component';
 
 @Component({
   standalone: true,
   selector: 'app-protected-layout',
-  imports: [CommonModule, RouterModule, TranslateModule],
+  imports: [CommonModule, RouterModule, TranslateModule, IconComponent],
   templateUrl: './protected-layout.component.html',
 })
 export class ProtectedLayoutComponent {
