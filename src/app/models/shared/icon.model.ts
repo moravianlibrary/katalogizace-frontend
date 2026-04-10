@@ -22,7 +22,8 @@ export type AppIconName =
   | 'checkCircle'
   | 'search'
   | 'camera'
-  | 'upload';
+  | 'upload'
+  | 'refresh';
 
 export type IconDefinition = {
   paths: Array<{
