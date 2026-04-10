@@ -8,11 +8,12 @@ import { compareSubfieldCodes } from '@/app/utils/marc-subfield-sort';
 import { NgClass } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
+import { IconComponent } from '../../icon/icon.component';
 
 @Component({
   standalone: true,
   selector: 'app-context-panel-header',
-  imports: [TranslateModule, NgClass],
+  imports: [TranslateModule, NgClass, IconComponent],
   templateUrl: './context-panel-header.component.html',
 })
 export class ContextPanelHeaderComponent {

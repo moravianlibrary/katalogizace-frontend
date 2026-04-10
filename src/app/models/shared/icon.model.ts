@@ -1,4 +1,4 @@
-export type AppIconName = 'close';
+export type AppIconName = 'close' | 'reset';
 
 export type IconDefinition = {
   viewBox: string;
