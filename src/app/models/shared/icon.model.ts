@@ -18,7 +18,8 @@ export type AppIconName =
   | 'swapHorizontal'
   | 'trash'
   | 'task'
-  | 'check';
+  | 'check'
+  | 'checkCircle';
 
 export type IconDefinition = {
   paths: Array<{
