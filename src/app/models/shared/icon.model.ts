@@ -5,7 +5,8 @@ export type AppIconName =
   | 'externalLink'
   | 'add'
   | 'minus'
-  | 'rotateRight';
+  | 'rotateRight'
+  | 'maximize';
 
 export type IconDefinition = {
   paths: Array<{
