@@ -9,7 +9,8 @@ export type AppIconName =
   | 'maximize'
   | 'sidebarLeft'
   | 'arrowRight'
-  | 'arrowLeft';
+  | 'arrowLeft'
+  | 'logout';
 
 export type IconDefinition = {
   paths: Array<{
