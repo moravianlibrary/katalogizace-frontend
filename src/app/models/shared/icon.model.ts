@@ -19,7 +19,8 @@ export type AppIconName =
   | 'trash'
   | 'task'
   | 'check'
-  | 'checkCircle';
+  | 'checkCircle'
+  | 'search';
 
 export type IconDefinition = {
   paths: Array<{
