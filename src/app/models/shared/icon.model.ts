@@ -21,7 +21,8 @@ export type AppIconName =
   | 'check'
   | 'checkCircle'
   | 'search'
-  | 'camera';
+  | 'camera'
+  | 'upload';
 
 export type IconDefinition = {
   paths: Array<{
