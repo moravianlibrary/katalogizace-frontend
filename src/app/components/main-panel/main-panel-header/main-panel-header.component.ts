@@ -13,12 +13,13 @@ import {
   signal,
 } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { IconComponent } from '../../icon/icon.component';
 import { QuickAddComponent } from '../quick-add/quick-add.component';
 
 @Component({
   standalone: true,
   selector: 'app-main-panel-header',
-  imports: [QuickAddComponent, TranslateModule],
+  imports: [QuickAddComponent, TranslateModule, IconComponent],
   templateUrl: './main-panel-header.component.html',
 })
 export class MainPanelHeaderComponent {
