@@ -15,7 +15,8 @@ export type AppIconName =
   | 'chevronDown'
   | 'lock'
   | 'unlock'
-  | 'swapHorizontal';
+  | 'swapHorizontal'
+  | 'trash';
 
 export type IconDefinition = {
   paths: Array<{

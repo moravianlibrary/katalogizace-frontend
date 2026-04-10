@@ -18,6 +18,7 @@ import { BatchesService } from '../../services/api/batches.service';
 import { BooksService } from '../../services/api/books.service';
 import { ContextPanelService } from '../../services/context-panel.service';
 import { ToastService } from '../../services/toast.service';
+import { IconComponent } from '../icon/icon.component';
 
 @Component({
   standalone: true,
@@ -29,6 +30,7 @@ import { ToastService } from '../../services/toast.service';
     RecordStateLabelPipe,
     ProcessStateLabelPipe,
     TranslateModule,
+    IconComponent,
   ],
   templateUrl: 'books-list.component.html',
 })

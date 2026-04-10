@@ -18,11 +18,12 @@ import {
   enumerateSubfields,
   isDiffableTag015to830,
 } from '../../../utils/marc-diff';
+import { IconComponent } from '../../icon/icon.component';
 
 @Component({
   standalone: true,
   selector: 'tr[appMarcRowData]',
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   templateUrl: './marc-row-data.component.html',
 })
 export class MarcRowDataComponent {
