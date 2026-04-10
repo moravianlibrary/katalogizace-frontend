@@ -12,11 +12,12 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { IconComponent } from '../../icon/icon.component';
 
 @Component({
   standalone: true,
   selector: 'app-textarea-autocomplete',
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   templateUrl: './textarea-autocomplete.component.html',
 })
 export class TextareaAutocompleteComponent {

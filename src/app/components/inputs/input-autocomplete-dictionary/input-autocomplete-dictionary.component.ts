@@ -13,11 +13,12 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
+import { IconComponent } from '../../icon/icon.component';
 
 @Component({
   standalone: true,
   selector: 'app-input-autocomplete-dictionary',
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   templateUrl: './input-autocomplete-dictionary.component.html',
 })
 export class InputAutocompleteDictionaryComponent {

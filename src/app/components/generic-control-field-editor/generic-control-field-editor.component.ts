@@ -10,11 +10,12 @@ import {
   viewChild,
 } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
+import { IconComponent } from '../icon/icon.component';
 
 @Component({
   standalone: true,
   selector: 'app-generic-control-field-editor',
-  imports: [TranslateModule],
+  imports: [TranslateModule, IconComponent],
   templateUrl: './generic-control-field-editor.component.html',
 })
 export class GenericControlFieldEditorComponent {
