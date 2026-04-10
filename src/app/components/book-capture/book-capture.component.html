@@ -14,12 +14,13 @@
       </div>
 
       <button
-        class="btn btn-m btn-tertiary"
+        class="btn btn-m btn-tertiary group"
         [disabled]="isCancelling() || isUploading() || isFinishing()"
         (click)="cancel()"
         type="button"
       >
         {{ "buttons.cancel" | translate }}
+        <svg class="icon-tertiary" appIcon="close" width="16" height="16"></svg>
       </button>
     </header>
 
