@@ -4,7 +4,8 @@ export type AppIconName =
   | 'play'
   | 'externalLink'
   | 'add'
-  | 'minus';
+  | 'minus'
+  | 'rotateRight';
 
 export type IconDefinition = {
   paths: Array<{
