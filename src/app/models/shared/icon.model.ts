@@ -23,7 +23,8 @@ export type AppIconName =
   | 'search'
   | 'camera'
   | 'upload'
-  | 'refresh';
+  | 'refresh'
+  | 'folderAdd';
 
 export type IconDefinition = {
   paths: Array<{
