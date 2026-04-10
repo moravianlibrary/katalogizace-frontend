@@ -13,7 +13,8 @@ export type AppIconName =
   | 'logout'
   | 'user'
   | 'chevronDown'
-  | 'lock';
+  | 'lock'
+  | 'unlock';
 
 export type IconDefinition = {
   paths: Array<{
