@@ -6,7 +6,8 @@ export type AppIconName =
   | 'add'
   | 'minus'
   | 'rotateRight'
-  | 'maximize';
+  | 'maximize'
+  | 'sidebarLeft';
 
 export type IconDefinition = {
   paths: Array<{
