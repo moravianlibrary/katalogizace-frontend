@@ -8,7 +8,7 @@ import { ICONS } from './icons.registry';
   templateUrl: './icon.component.html',
   host: {
     xmlns: 'http://www.w3.org/2000/svg',
-    '[attr.viewBox]': 'icon().viewBox',
+    viewBox: '0 0 24 24',
   },
 })
 export class IconComponent {
