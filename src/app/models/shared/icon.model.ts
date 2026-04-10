@@ -1,5 +1,5 @@
 export type AppIconName =
-  | 'close'
+  | 'x'
   | 'reset'
   | 'play'
   | 'externalLink'
