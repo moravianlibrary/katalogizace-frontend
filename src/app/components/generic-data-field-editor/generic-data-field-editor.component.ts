@@ -22,6 +22,7 @@ import {
   viewChildren,
 } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
+import { IconComponent } from '../icon/icon.component';
 import { InputAutocompleteComponent } from '../inputs/input-autocomplete/input-autocomplete.component';
 import { InputDropdownComponent } from '../inputs/input-dropdown/input-dropdown.component';
 
@@ -39,6 +40,7 @@ type PendingFocusTarget = {
     InputDropdownComponent,
     AddSubfieldDialogComponent,
     InputAutocompleteComponent,
+    IconComponent,
   ],
   templateUrl: './generic-data-field-editor.component.html',
 })

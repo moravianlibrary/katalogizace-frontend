@@ -2,6 +2,7 @@ import {
   AddSubfieldDialogComponent,
   AddSubfieldDialogResult,
 } from '@/app/components/add-subfield-dialog/add-subfield-dialog.component';
+import { IconComponent } from '@/app/components/icon/icon.component';
 import { InputAutocompleteComponent } from '@/app/components/inputs/input-autocomplete/input-autocomplete.component';
 import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
 import { TextareaAutocompleteComponent } from '@/app/components/inputs/textarea-autocomplete/textarea-autocomplete.component';
@@ -52,6 +53,7 @@ type PendingFocusTarget = {
     InputAutocompleteComponent,
     AddSubfieldDialogComponent,
     InputDropdownComponent,
+    IconComponent,
   ],
   templateUrl: './field-500-editor.component.html',
 })
