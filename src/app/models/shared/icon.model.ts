@@ -10,7 +10,8 @@ export type AppIconName =
   | 'sidebarLeft'
   | 'arrowRight'
   | 'arrowLeft'
-  | 'logout';
+  | 'logout'
+  | 'user';
 
 export type IconDefinition = {
   paths: Array<{
