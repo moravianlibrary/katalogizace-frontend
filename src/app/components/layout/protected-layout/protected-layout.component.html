@@ -2,7 +2,7 @@
   <header class="bg-main-base sticky top-0 z-10">
     <!-- desktop -->
     <div
-      class="hidden h-16 items-center justify-between gap-4 px-4 py-3 md:flex"
+      class="hidden h-16 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 px-4 py-3 md:grid"
     >
       <div class="flex min-w-0 items-center gap-4">
         <h5 class="text-light shrink-0 font-bold whitespace-nowrap">
@@ -54,7 +54,45 @@
         </nav>
       </div>
 
-      <div class="flex shrink-0 items-center gap-4">
+      <div class="flex items-center justify-center">
+        @if (batchBookNav(); as nav) {
+          <div class="flex shrink-0 items-center gap-2">
+            <button
+              class="btn btn-m btn-tertiary group btn-icon"
+              [disabled]="!nav.prevBookId"
+              (click)="goToPrevBook()"
+              type="button"
+              aria-label="Předchozí"
+              title="Předchozí"
+            >
+              <svg
+                class="icon-tertiary"
+                appIcon="arrowLeft"
+                width="16"
+                height="16"
+              ></svg>
+            </button>
+
+            <button
+              class="btn btn-m btn-tertiary group btn-icon"
+              [disabled]="!nav.nextBookId"
+              (click)="goToNextBook()"
+              type="button"
+              aria-label="Další"
+              title="Další"
+            >
+              <svg
+                class="icon-tertiary"
+                appIcon="arrowRight"
+                width="16"
+                height="16"
+              ></svg>
+            </button>
+          </div>
+        }
+      </div>
+
+      <div class="flex min-w-0 items-center justify-end gap-4">
         @if (auth.user()) {
           <div class="text-base-color text-sm font-medium">
             {{ auth.user()!.full_name }} · {{ auth.user()!.email }}
@@ -105,50 +143,86 @@
         </button>
       </div>
 
-      <nav class="mt-1 min-w-0 overflow-hidden">
-        <ol class="text-md flex min-w-0 items-center gap-2 overflow-hidden">
-          @for (crumb of breadcrumbs.crumbs(); track $index) {
-            <li class="flex min-w-0 shrink items-center gap-2">
+      <div class="mt-2 flex min-w-0 items-center gap-2">
+        <nav class="min-w-0 flex-1 overflow-hidden">
+          <ol class="text-md flex min-w-0 items-center gap-2 overflow-hidden">
+            @for (crumb of breadcrumbs.crumbs(); track $index) {
+              <li class="flex min-w-0 shrink items-center gap-2">
+                <svg
+                  class="icon-tertiary-default shrink-0"
+                  appIcon="arrowRight"
+                  width="16"
+                  height="16"
+                ></svg>
+
+                @if (crumb.url) {
+                  <a
+                    class="block max-w-full min-w-0 truncate"
+                    #rla="routerLinkActive"
+                    [routerLink]="crumb.url"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    [ngClass]="
+                      !rla.isActive ? 'text-light hover:text-secondary' : ''
+                    "
+                    (click)="closeUserMenu()"
+                    routerLinkActive="text-secondary font-medium"
+                  >
+                    @if (crumb.labelKey) {
+                      {{ crumb.labelKey | translate: crumb.labelParams }}
+                    } @else {
+                      {{ crumb.label }}
+                    }
+                  </a>
+                } @else {
+                  <span
+                    class="text-secondary block max-w-full min-w-0 truncate font-medium"
+                  >
+                    @if (crumb.labelKey) {
+                      {{ crumb.labelKey | translate: crumb.labelParams }}
+                    } @else {
+                      {{ crumb.label }}
+                    }
+                  </span>
+                }
+              </li>
+            }
+          </ol>
+        </nav>
+
+        @if (batchBookNav(); as nav) {
+          <div class="flex shrink-0 items-center gap-2">
+            <button
+              class="btn btn-s btn-tertiary btn-icon group"
+              [disabled]="!nav.prevBookId"
+              (click)="goToPrevBook()"
+              type="button"
+              title="{{ 'buttons.prev' | translate }}"
+            >
               <svg
-                class="icon-tertiary-default shrink-0"
+                class="icon-tertiary"
+                appIcon="arrowLeft"
+                width="16"
+                height="16"
+              ></svg>
+            </button>
+
+            <button
+              class="btn btn-s btn-tertiary btn-icon group"
+              [disabled]="!nav.nextBookId"
+              (click)="goToNextBook()"
+              type="button"
+              title="{{ 'buttons.next' | translate }}"
+            >
+              <svg
+                class="icon-tertiary"
                 appIcon="arrowRight"
                 width="16"
                 height="16"
               ></svg>
-
-              @if (crumb.url) {
-                <a
-                  class="block max-w-full min-w-0 truncate"
-                  #rla="routerLinkActive"
-                  [routerLink]="crumb.url"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  [ngClass]="
-                    !rla.isActive ? 'text-light hover:text-secondary' : ''
-                  "
-                  (click)="closeUserMenu()"
-                  routerLinkActive="text-secondary font-medium"
-                >
-                  @if (crumb.labelKey) {
-                    {{ crumb.labelKey | translate: crumb.labelParams }}
-                  } @else {
-                    {{ crumb.label }}
-                  }
-                </a>
-              } @else {
-                <span
-                  class="text-secondary block max-w-full min-w-0 truncate font-medium"
-                >
-                  @if (crumb.labelKey) {
-                    {{ crumb.labelKey | translate: crumb.labelParams }}
-                  } @else {
-                    {{ crumb.label }}
-                  }
-                </span>
-              }
-            </li>
-          }
-        </ol>
-      </nav>
+            </button>
+          </div>
+        }
+      </div>
 
       @if (userMenuOpen()) {
         <button
