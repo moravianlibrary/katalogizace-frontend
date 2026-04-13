@@ -19,6 +19,7 @@ import {
   inject,
   input,
   signal,
+  viewChild,
   viewChildren,
 } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
@@ -60,9 +61,14 @@ export class GenericDataFieldEditorComponent {
   readonly addSubfieldDialogError = signal<string | null>(null);
   readonly pendingFocusTarget = signal<PendingFocusTarget>(null);
 
+  private readonly firstAutocomplete = viewChild(InputAutocompleteComponent);
+  private readonly firstTextarea = viewChild(TextareaAutocompleteComponent);
+
   private readonly autocompleteInputs = viewChildren(
     InputAutocompleteComponent,
   );
+
+  private readonly textareaInputs = viewChildren(TextareaAutocompleteComponent);
 
   constructor() {
     effect(() => {
@@ -82,7 +88,15 @@ export class GenericDataFieldEditorComponent {
       if (!id) return;
 
       queueMicrotask(() => {
-        this.autocompleteInputs()[0]?.focus();
+        const field = this.field();
+        const firstSubfield = field?.subfields?.[0];
+        if (!firstSubfield) return;
+
+        if (this.is5XXaSubfield(field?.tag, firstSubfield.code)) {
+          this.firstTextarea()?.focus();
+        } else {
+          this.firstAutocomplete()?.focus();
+        }
       });
     });
 
@@ -103,7 +117,7 @@ export class GenericDataFieldEditorComponent {
 
         if (index === -1) return;
 
-        this.autocompleteInputs()[index]?.focus();
+        this.focusSubfieldAt(index);
         this.pendingFocusTarget.set(null);
       });
     });
@@ -138,6 +152,57 @@ export class GenericDataFieldEditorComponent {
     if (cleaned.length === current.length) return;
 
     this.rs.patchDataField(this.fieldId(), { subfields: cleaned });
+  }
+
+  private focusSubfieldAt(index: number) {
+    const field = this.field();
+    const subfield = field?.subfields?.[index];
+    const tag = field?.tag;
+
+    if (!subfield) return;
+
+    if (this.is5XXaSubfield(tag, subfield.code)) {
+      const textareaIndex = this.getTextareaIndexForSubfield(index);
+      this.textareaInputs()[textareaIndex]?.focus();
+      return;
+    }
+
+    const autocompleteIndex = this.getAutocompleteIndexForSubfield(index);
+    this.autocompleteInputs()[autocompleteIndex]?.focus();
+  }
+
+  private getAutocompleteIndexForSubfield(subfieldIndex: number): number {
+    const field = this.field();
+    const tag = field?.tag;
+    const subfields = field?.subfields ?? [];
+
+    let autocompleteIndex = -1;
+
+    for (let i = 0; i <= subfieldIndex; i++) {
+      const sf = subfields[i];
+      if (!this.is5XXaSubfield(tag, sf.code)) {
+        autocompleteIndex++;
+      }
+    }
+
+    return autocompleteIndex;
+  }
+
+  private getTextareaIndexForSubfield(subfieldIndex: number): number {
+    const field = this.field();
+    const tag = field?.tag;
+    const subfields = field?.subfields ?? [];
+
+    let textareaIndex = -1;
+
+    for (let i = 0; i <= subfieldIndex; i++) {
+      const sf = subfields[i];
+      if (this.is5XXaSubfield(tag, sf.code)) {
+        textareaIndex++;
+      }
+    }
+
+    return textareaIndex;
   }
 
   setInd(ind: 1 | 2, raw: string) {
