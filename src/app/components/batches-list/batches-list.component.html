@@ -23,9 +23,9 @@
         type="button"
       >
         @if (filterMine()) {
-          Vše
+          {{ "batches.all" | translate }}
         } @else {
-          Jen moje
+          {{ "batches.just_mine" | translate }}
         }
       </button>
     </div>

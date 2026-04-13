@@ -738,7 +738,9 @@
     "state": "Stav",
     "actions": "Akce",
     "total": "Celkem",
-    "page": "Strana"
+    "page": "Strana",
+    "all": "Vše",
+    "just_mine": "Jen moje"
   },
   "books": {
     "loading": "Načítám knihy...",
