@@ -7,6 +7,8 @@ export type PageType =
   | 'BackCover'
   | 'Impressum'
   | 'EndPage'
+  | 'Fiducial'
+  | 'Article'
   | 'Unknown';
 
 export interface ApiImageItem {

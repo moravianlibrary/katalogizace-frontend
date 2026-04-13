@@ -46,7 +46,8 @@
     "Impressum": "Tiráž",
     "EndPage": "Poslední čísl. str.",
     "Unknown": "Neznámý typ str.",
-    "Fiducial": "Výchozí typ str."
+    "Fiducial": "Výchozí typ str.",
+    "Article": "Článek"
   },
   "buttons": {
     "save": "Uložit",
