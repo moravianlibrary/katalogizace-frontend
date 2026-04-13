@@ -302,7 +302,7 @@ export class Field264EditorComponent {
 
     for (const code of result.subfieldCodes) {
       const isTemplateCode = templateCodes.has(code);
-      const repeatable = isSubfieldRepeatable(this.tag, code) ?? true;
+      const repeatable = isSubfieldRepeatable(this.tag, code);
       const alreadyExists = existingSubfields.some((sf) => sf.code === code);
 
       if (isTemplateCode && !repeatable) {

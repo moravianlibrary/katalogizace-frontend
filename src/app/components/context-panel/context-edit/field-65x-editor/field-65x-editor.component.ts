@@ -457,7 +457,7 @@ export class Field65xEditorComponent {
         return;
       }
 
-      const repeatable = isSubfieldRepeatable(this.tag(), code) ?? true;
+      const repeatable = isSubfieldRepeatable(this.tag(), code);
       const alreadyExists = existingSubfields.some((sf) => sf.code === code);
 
       if (!repeatable && alreadyExists) {

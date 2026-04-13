@@ -183,7 +183,7 @@ export class MainPanelComponent {
     const result: string[] = [...templateCodes];
 
     for (const code of userCodes) {
-      if (isSubfieldRepeatable(tag, code) ?? true) {
+      if (isSubfieldRepeatable(tag, code)) {
         result.push(code);
         continue;
       }
