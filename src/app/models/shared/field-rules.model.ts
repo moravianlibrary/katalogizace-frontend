@@ -263,7 +263,7 @@ export function isFieldRepeatable(tag: string) {
 }
 
 export function isSubfieldRepeatable(tag: string, code: string) {
-  return DATA_FIELD_RULES[tag]?.subfields?.[code].repeatable ?? false;
+  return DATA_FIELD_RULES[tag]?.subfields?.[code]?.repeatable ?? false;
 }
 
 export function getSubfields(tag: string) {
