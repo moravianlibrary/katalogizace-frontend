@@ -25,6 +25,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { IconComponent } from '../icon/icon.component';
 import { InputAutocompleteComponent } from '../inputs/input-autocomplete/input-autocomplete.component';
 import { InputDropdownComponent } from '../inputs/input-dropdown/input-dropdown.component';
+import { TextareaAutocompleteComponent } from '../inputs/textarea-autocomplete/textarea-autocomplete.component';
 
 type PendingFocusTarget = {
   code: string;
@@ -41,6 +42,7 @@ type PendingFocusTarget = {
     AddSubfieldDialogComponent,
     InputAutocompleteComponent,
     IconComponent,
+    TextareaAutocompleteComponent,
   ],
   templateUrl: './generic-data-field-editor.component.html',
 })
@@ -199,5 +201,13 @@ export class GenericDataFieldEditorComponent {
 
   getSubfieldLabel(code: string): string {
     return getSubfieldRuleLabel(this.field()?.tag!, code) ?? `|${code}`;
+  }
+
+  is5xxTag(tag?: string | null): boolean {
+    return !!tag && /^5\d\d$/.test(tag);
+  }
+
+  is5XXaSubfield(tag?: string | null, code?: string | null): boolean {
+    return this.is5xxTag(tag) && code === 'a';
   }
 }

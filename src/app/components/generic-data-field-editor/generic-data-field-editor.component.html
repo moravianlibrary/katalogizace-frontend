@@ -35,31 +35,59 @@
         </label>
 
         <div class="relative">
-          <app-input-autocomplete
-            [value]="sf.value"
-            [field]="field()!.tag"
-            [subfield]="sf.code"
-            [bases]="['NKC', 'SKC', 'SCK']"
-            [minChars]="1"
-            [limit]="20"
-            (valueChange)="setSubfieldValue($index, $event)"
-          />
+          @if (is5XXaSubfield(field()?.tag, sf.code)) {
+            <app-textarea-autocomplete
+              [value]="sf.value"
+              [field]="field()?.tag!"
+              [subfield]="sf.code"
+              [bases]="['NKC', 'SKC', 'SCK']"
+              [minChars]="1"
+              [limit]="20"
+              (valueChange)="setSubfieldValue($index, $event)"
+            />
 
-          @if (!sf.value.length) {
-            <button
-              class="group absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
-              (click)="deleteSubfield($index)"
-              (mousedown)="$event.preventDefault()"
-              tabindex="-1"
-              type="button"
-            >
-              <svg
-                class="icon-btn-error"
-                appIcon="trash"
-                width="16"
-                height="16"
-              ></svg>
-            </button>
+            @if (!sf.value.length) {
+              <button
+                class="group absolute top-3 right-3 cursor-pointer"
+                (click)="deleteSubfield($index)"
+                (mousedown)="$event.preventDefault()"
+                tabindex="-1"
+                type="button"
+              >
+                <svg
+                  class="icon-btn-error"
+                  appIcon="trash"
+                  width="16"
+                  height="16"
+                ></svg>
+              </button>
+            }
+          } @else {
+            <app-input-autocomplete
+              [value]="sf.value"
+              [field]="field()!.tag"
+              [subfield]="sf.code"
+              [bases]="['NKC', 'SKC', 'SCK']"
+              [minChars]="1"
+              [limit]="20"
+              (valueChange)="setSubfieldValue($index, $event)"
+            />
+            @if (!sf.value.length) {
+              <button
+                class="group absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
+                (click)="deleteSubfield($index)"
+                (mousedown)="$event.preventDefault()"
+                tabindex="-1"
+                type="button"
+              >
+                <svg
+                  class="icon-btn-error"
+                  appIcon="trash"
+                  width="16"
+                  height="16"
+                ></svg>
+              </button>
+            }
           }
         </div>
       </div>
