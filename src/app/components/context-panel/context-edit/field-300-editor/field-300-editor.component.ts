@@ -356,6 +356,6 @@ export class Field300EditorComponent {
   }
 
   getSubfieldLabel(code: string): string {
-    return getSubfieldRuleLabel(this.tag, code) ?? `|${code}`;
+    return getSubfieldRuleLabel(this.tag, code);
   }
 }

@@ -505,7 +505,7 @@ export class Field65xEditorComponent {
   }
 
   getSubfieldLabel(code: string): string {
-    return getSubfieldRuleLabel(this.tag(), code) ?? `|${code}`;
+    return getSubfieldRuleLabel(this.tag(), code);
   }
 
   isTemplateSubfield(code: string): boolean {

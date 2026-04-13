@@ -666,7 +666,7 @@ export class FieldAuthorityEditorComponent {
   }
 
   getSubfieldLabel(code: string): string {
-    return getSubfieldRuleLabel(this.tag(), code) ?? `|${code}`;
+    return getSubfieldRuleLabel(this.tag(), code);
   }
 
   search(page = 1) {

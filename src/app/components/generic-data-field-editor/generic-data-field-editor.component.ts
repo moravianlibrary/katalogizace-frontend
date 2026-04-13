@@ -265,7 +265,7 @@ export class GenericDataFieldEditorComponent {
   }
 
   getSubfieldLabel(code: string): string {
-    return getSubfieldRuleLabel(this.field()?.tag!, code) ?? `|${code}`;
+    return getSubfieldRuleLabel(this.field()?.tag!, code);
   }
 
   is5xxTag(tag?: string | null): boolean {

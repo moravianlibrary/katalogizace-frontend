@@ -307,6 +307,6 @@ export class Field500EditorComponent {
   }
 
   getSubfieldLabel(code: string): string {
-    return getSubfieldRuleLabel(this.tag, code) ?? `|${code}`;
+    return getSubfieldRuleLabel(this.tag, code);
   }
 }

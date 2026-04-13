@@ -271,5 +271,5 @@ export function getSubfields(tag: string) {
 }
 
 export function getSubfieldRuleLabel(tag: string, code: string) {
-  return DATA_FIELD_RULES[tag]?.subfields?.[code]?.label ?? '';
+  return DATA_FIELD_RULES[tag]?.subfields?.[code]?.label ?? `|${code}`;
 }
