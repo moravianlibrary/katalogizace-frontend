@@ -47,7 +47,8 @@
     "EndPage": "Poslední čísl. str.",
     "Unknown": "Neznámý typ str.",
     "Fiducial": "Výchozí typ str.",
-    "Article": "Článek"
+    "Article": "Článek",
+    "Map": "Mapa"
   },
   "buttons": {
     "save": "Uložit",

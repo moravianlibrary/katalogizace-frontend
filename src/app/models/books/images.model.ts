@@ -9,6 +9,7 @@ export type PageType =
   | 'EndPage'
   | 'Fiducial'
   | 'Article'
+  | 'Map'
   | 'Unknown';
 
 export interface ApiImageItem {
