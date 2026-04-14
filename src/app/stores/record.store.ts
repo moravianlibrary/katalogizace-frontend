@@ -65,15 +65,15 @@ export class RecordStore {
     this.provenance.set(p);
   }
 
-  setTitle(t: string) {
+  setTitle(t: string | null) {
     this.title.set(t);
   }
 
-  setAuthor(a: string) {
+  setAuthor(a: string | null) {
     this.author.set(a);
   }
 
-  setYearOfPublication(year: number) {
+  setYearOfPublication(year: number | null) {
     this.yearOfPublication.set(year);
   }
 

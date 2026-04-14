@@ -59,8 +59,19 @@ export class BookDetailComponent {
       }
 
       this.bookId.set(bookId);
+      this.resetBookDetail();
       this.loadBook(bookId);
     });
+  }
+
+  private resetBookDetail() {
+    this.store.setExtracted(null);
+    this.store.setProvenance({});
+    this.store.setLastEdited(null);
+    this.store.setExistingRecords([]);
+    this.store.setTitle(null);
+    this.store.setAuthor(null);
+    this.store.setYearOfPublication(null);
   }
 
   private loadBook(bookId: ID) {
