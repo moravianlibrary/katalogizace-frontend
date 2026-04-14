@@ -14,6 +14,7 @@ import { MarcDiffService } from '../../services/marc-diff.service';
 import { RecordStateService } from '../../services/record-state.service';
 import { RecordStore } from '../../stores/record.store';
 import { extractedToExisting } from '../../utils/marc-transform';
+import { IconComponent } from '../icon/icon.component';
 import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
 import { ExtractedMarcRecordTableComponent } from '../marc-record-table/extracted-marc-record-table/extracted-marc-record-table.component';
 
@@ -25,6 +26,7 @@ import { ExtractedMarcRecordTableComponent } from '../marc-record-table/extracte
     CommonModule,
     ExtractedMarcRecordTableComponent,
     TranslateModule,
+    IconComponent,
   ],
   templateUrl: './marc-records.component.html',
 })

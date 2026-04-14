@@ -1,0 +1,7 @@
+@for (path of icon().paths; track $index) {
+  <svg:path
+    [attr.d]="path.d"
+    [attr.fill-rule]="path.fillRule"
+    [attr.clip-rule]="path.clipRule"
+  />
+}

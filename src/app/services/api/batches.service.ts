@@ -1,5 +1,6 @@
 import {
   BatchDto,
+  BatchWithBooksDto,
   PaginatedBatchesResponseDto,
   UpdateBatchRequest,
 } from '@/app/models';
@@ -42,7 +43,9 @@ export class BatchesService {
   }
 
   getBatch(batch_id: string) {
-    return this.http.get<BatchDto>(`${this.apiBaseUrl}/batches/${batch_id}`);
+    return this.http.get<BatchWithBooksDto>(
+      `${this.apiBaseUrl}/batches/${batch_id}`,
+    );
   }
 
   createBatch(name: string, description: string | null) {

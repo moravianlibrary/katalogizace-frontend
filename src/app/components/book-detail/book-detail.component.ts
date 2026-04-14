@@ -37,29 +37,36 @@ export class BookDetailComponent {
   readonly mainPanel = viewChild(MainPanelComponent);
 
   galleryCollapsed = signal(false);
+  bookId = signal<ID | null>(null);
+  images = signal<ApiImageItem[]>([]);
 
   onGalleryCollapsedChange(v: boolean) {
     this.galleryCollapsed.set(v);
   }
 
-  bookId: ID | null = (() => {
-    const id = this.route.snapshot.paramMap.get('bookId');
-    const n = Number(id);
-    return Number.isFinite(n) ? n : null;
-  })();
-
-  images = signal<ApiImageItem[]>([]);
-
   ngOnInit() {
-    if (this.bookId === null) {
-      this.toast.show(
-        this.translate.instant('messages.error.books.incorrect_id'),
-        'error',
-      );
-      return;
-    }
+    this.route.paramMap.subscribe((params) => {
+      const id = params.get('bookId');
+      const n = Number(id);
+      const bookId = Number.isFinite(n) ? n : null;
 
-    this.bookService.getBookResult(this.bookId.toString()).subscribe({
+      if (bookId === null) {
+        this.toast.show(
+          this.translate.instant('messages.error.books.incorrect_id'),
+          'error',
+        );
+        return;
+      }
+
+      this.bookId.set(bookId);
+      this.loadBook(bookId);
+    });
+  }
+
+  private loadBook(bookId: ID) {
+    this.images.set([]);
+
+    this.bookService.getBookResult(bookId.toString()).subscribe({
       next: (data) => {
         this.images.set(data.images);
 
@@ -75,7 +82,7 @@ export class BookDetailComponent {
           this.breadcrumbs.setBatch(data.batch_id, data.batch_name ?? null);
         }
 
-        this.breadcrumbs.setBook(this.bookId!, data.title);
+        this.breadcrumbs.setBook(bookId, data.title);
       },
       error: (err) => {
         this.toast.show(
@@ -84,7 +91,7 @@ export class BookDetailComponent {
         );
         console.error('Error:', err);
 
-        this.breadcrumbs.setBook(this.bookId!, String(this.bookId));
+        this.breadcrumbs.setBook(bookId, String(bookId));
       },
     });
   }

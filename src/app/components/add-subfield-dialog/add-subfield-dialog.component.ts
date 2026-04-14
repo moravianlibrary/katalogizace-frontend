@@ -9,6 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
+import { IconComponent } from '../icon/icon.component';
 
 export type AddSubfieldDialogResult = {
   subfieldCodes: string[];
@@ -17,7 +18,7 @@ export type AddSubfieldDialogResult = {
 @Component({
   standalone: true,
   selector: 'app-add-subfield-dialog',
-  imports: [CommonModule, TranslateModule],
+  imports: [CommonModule, TranslateModule, IconComponent],
   templateUrl: './add-subfield-dialog.component.html',
 })
 export class AddSubfieldDialogComponent {

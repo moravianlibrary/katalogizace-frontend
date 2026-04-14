@@ -14,6 +14,10 @@ export type BatchDto = {
   modified_at: string;
 };
 
+export type BatchWithBooksDto = BatchDto & {
+  book_ids: number[];
+};
+
 export type PaginatedBatchesResponseDto = {
   batches: BatchDto[];
   total: number;

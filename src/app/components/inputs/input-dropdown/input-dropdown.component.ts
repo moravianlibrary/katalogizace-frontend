@@ -11,11 +11,12 @@ import {
   viewChild,
 } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
+import { IconComponent } from '../../icon/icon.component';
 
 @Component({
   standalone: true,
   selector: 'app-input-dropdown',
-  imports: [NgClass],
+  imports: [NgClass, IconComponent],
   templateUrl: './input-dropdown.component.html',
 })
 export class InputDropdownComponent {

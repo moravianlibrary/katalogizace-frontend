@@ -17,12 +17,18 @@ import {
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CatalogueService } from '../../services/api/catalogue.service';
 import { ContextPanelService } from '../../services/context-panel.service';
+import { IconComponent } from '../icon/icon.component';
 import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
 
 @Component({
   standalone: true,
   selector: 'app-candidates-table',
-  imports: [CommonModule, ExistingMarcRecordTableComponent, TranslateModule],
+  imports: [
+    CommonModule,
+    ExistingMarcRecordTableComponent,
+    TranslateModule,
+    IconComponent,
+  ],
   templateUrl: './candidates-table.component.html',
 })
 export class CandidatesTableComponent {

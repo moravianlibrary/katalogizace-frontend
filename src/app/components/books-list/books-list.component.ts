@@ -10,7 +10,7 @@ import { DatePipe, NgClass } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { combineLatest } from 'rxjs';
 import { ProcessStateLabelPipe } from '../../pipes/process-state-label.pipe';
 import { RecordStateLabelPipe } from '../../pipes/record-state-label.pipe';
@@ -18,6 +18,7 @@ import { BatchesService } from '../../services/api/batches.service';
 import { BooksService } from '../../services/api/books.service';
 import { ContextPanelService } from '../../services/context-panel.service';
 import { ToastService } from '../../services/toast.service';
+import { IconComponent } from '../icon/icon.component';
 
 @Component({
   standalone: true,
@@ -28,6 +29,8 @@ import { ToastService } from '../../services/toast.service';
     RouterModule,
     RecordStateLabelPipe,
     ProcessStateLabelPipe,
+    TranslateModule,
+    IconComponent,
   ],
   templateUrl: 'books-list.component.html',
 })

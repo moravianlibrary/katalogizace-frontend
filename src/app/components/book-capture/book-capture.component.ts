@@ -17,6 +17,7 @@ import { ToastService } from '../../services/toast.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { IconComponent } from '../icon/icon.component';
 
 type CameraOption = {
   id: string;
@@ -26,7 +27,7 @@ type CameraOption = {
 @Component({
   standalone: true,
   selector: 'app-book-capture',
-  imports: [CommonModule, TranslateModule, NgClass],
+  imports: [CommonModule, TranslateModule, NgClass, IconComponent],
   templateUrl: './book-capture.component.html',
 })
 export class BookCaptureComponent implements AfterViewInit, OnDestroy {

@@ -9,6 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
+import { IconComponent } from '../icon/icon.component';
 
 export type AddFieldDialogResult = {
   tag: string;
@@ -18,7 +19,7 @@ export type AddFieldDialogResult = {
 @Component({
   standalone: true,
   selector: 'app-add-field-dialog',
-  imports: [CommonModule, TranslateModule],
+  imports: [CommonModule, TranslateModule, IconComponent],
   templateUrl: './add-field-dialog.component.html',
 })
 export class AddFieldDialogComponent {

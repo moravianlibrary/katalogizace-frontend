@@ -2,6 +2,7 @@ import {
   AddSubfieldDialogComponent,
   AddSubfieldDialogResult,
 } from '@/app/components/add-subfield-dialog/add-subfield-dialog.component';
+import { IconComponent } from '@/app/components/icon/icon.component';
 import { InputAutocompleteAuthorityComponent } from '@/app/components/inputs/input-autocomplete-authority/input-autocomplete-authority.component';
 import { InputAutocompleteComponent } from '@/app/components/inputs/input-autocomplete/input-autocomplete.component';
 import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
@@ -10,8 +11,8 @@ import { ExistingMarcRecordTableComponent } from '@/app/components/marc-record-t
 import { LockHoverIconComponent } from '@/app/components/shared/lock-hover-icon/lock-hover-icon.component';
 import {
   AutocompletAuthorityResponse,
+  DATA_FIELD_RULES,
   ExistingMarcRecord,
-  FIELD_RULES,
   getIndicators,
   getSubfieldRuleLabel,
   isSubfieldRepeatable,
@@ -68,6 +69,7 @@ type PendingFocusTarget = {
     ExistingMarcRecordTableComponent,
     LockHoverIconComponent,
     AddSubfieldDialogComponent,
+    IconComponent,
   ],
   templateUrl: './field-authority-editor.component.html',
 })
@@ -112,7 +114,7 @@ export class FieldAuthorityEditorComponent {
   readonly ind2Options = computed(() => this.indicators().ind2);
 
   readonly templateOrder = computed(() => {
-    return FIELD_RULES[this.tag()]?.templateOrder ?? ['a', 'd', '7', '4'];
+    return DATA_FIELD_RULES[this.tag()]?.templateOrder ?? ['a', 'd', '7', '4'];
   });
 
   readonly templateCodes = computed(() => new Set(this.templateOrder()));
@@ -134,7 +136,7 @@ export class FieldAuthorityEditorComponent {
     const templateItems: VisibleSubfield[] = [];
 
     for (const code of templateOrder) {
-      const rule = FIELD_RULES[this.tag()]?.subfields?.[code];
+      const rule = DATA_FIELD_RULES[this.tag()]?.subfields?.[code];
       const matching = subfields
         .map((sf, sourceIndex) => ({ sf, sourceIndex }))
         .filter(({ sf }) => sf.code === code);
@@ -610,7 +612,7 @@ export class FieldAuthorityEditorComponent {
 
     for (const code of result.subfieldCodes) {
       const isTemplateCode = templateCodes.has(code);
-      const repeatable = isSubfieldRepeatable(this.tag(), code) ?? true;
+      const repeatable = isSubfieldRepeatable(this.tag(), code);
       const alreadyExists = existingSubfields.some((sf) => sf.code === code);
 
       if (isTemplateCode && !repeatable) {
@@ -664,7 +666,7 @@ export class FieldAuthorityEditorComponent {
   }
 
   getSubfieldLabel(code: string): string {
-    return getSubfieldRuleLabel(this.tag(), code) ?? `|${code}`;
+    return getSubfieldRuleLabel(this.tag(), code);
   }
 
   search(page = 1) {

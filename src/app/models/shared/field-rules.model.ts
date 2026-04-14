@@ -1,4 +1,3 @@
-import { FieldType } from '../books/record-view.model';
 import { DropdownOption, getIndicators } from './dropdown.model';
 
 export type SubfieldRule = {
@@ -6,18 +5,37 @@ export type SubfieldRule = {
   label: string;
 };
 
-export type FieldRule = {
-  ind1Options: DropdownOption[];
-  ind2Options: DropdownOption[];
-  subfields: Record<string, SubfieldRule>;
-  templateOrder: string[];
+export type DataFieldRule = {
+  ind1Options?: DropdownOption[];
+  ind2Options?: DropdownOption[];
+  subfields?: Record<string, SubfieldRule>;
+  templateOrder?: string[];
   repeatable: boolean;
-  type: FieldType;
 };
 
-export type FieldRulesMap = Record<string, FieldRule>;
+export type ControlFieldRule = {
+  repeatable: boolean;
+};
 
-export const FIELD_RULES: FieldRulesMap = {
+export type ControlFieldRulesMap = Record<string, ControlFieldRule>;
+export type DataFieldRulesMap = Record<string, DataFieldRule>;
+
+export const CONTROL_FIELD_RULES: ControlFieldRulesMap = {
+  '001': { repeatable: false },
+  '003': { repeatable: false },
+  '005': { repeatable: false },
+  '007': { repeatable: true },
+  '008': { repeatable: false },
+};
+
+export const DATA_FIELD_RULES: DataFieldRulesMap = {
+  '015': { repeatable: true },
+  '020': { repeatable: true },
+  '040': { repeatable: false },
+  '041': { repeatable: true },
+  '044': { repeatable: false },
+  '072': { repeatable: true },
+  '080': { repeatable: true },
   '100': {
     ind1Options: getIndicators('100').ind1,
     ind2Options: getIndicators('100').ind2,
@@ -41,8 +59,11 @@ export const FIELD_RULES: FieldRulesMap = {
     },
     templateOrder: ['a', 'd', '7', '4'],
     repeatable: false,
-    type: 'data' as FieldType,
   },
+  '110': { repeatable: false },
+  '111': { repeatable: false },
+  '130': { repeatable: false },
+  '240': { repeatable: false },
   '245': {
     ind1Options: getIndicators('245').ind1,
     ind2Options: getIndicators('245').ind2,
@@ -62,8 +83,9 @@ export const FIELD_RULES: FieldRulesMap = {
     },
     templateOrder: ['a', 'b', 'c'],
     repeatable: false,
-    type: 'data' as FieldType,
   },
+  '246': { repeatable: true },
+  '250': { repeatable: true },
   '264': {
     ind1Options: getIndicators('264').ind1,
     ind2Options: getIndicators('264').ind2,
@@ -83,7 +105,6 @@ export const FIELD_RULES: FieldRulesMap = {
     },
     templateOrder: ['a', 'b', 'c'],
     repeatable: true,
-    type: 'data' as FieldType,
   },
   '300': {
     ind1Options: getIndicators('300').ind1,
@@ -112,8 +133,12 @@ export const FIELD_RULES: FieldRulesMap = {
     },
     templateOrder: ['a', 'b', 'c', 'e', '3'],
     repeatable: true,
-    type: 'data' as FieldType,
   },
+  '336': { repeatable: true },
+  '337': { repeatable: true },
+  '338': { repeatable: true },
+  '362': { repeatable: true },
+  '490': { repeatable: true },
   '500': {
     ind1Options: getIndicators('500').ind1,
     ind2Options: getIndicators('500').ind2,
@@ -125,8 +150,14 @@ export const FIELD_RULES: FieldRulesMap = {
     },
     templateOrder: ['a'],
     repeatable: true,
-    type: 'data' as FieldType,
   },
+  '502': { repeatable: true },
+  '504': { repeatable: true },
+  '505': { repeatable: true },
+  '520': { repeatable: true },
+  '546': { repeatable: true },
+  '550': { repeatable: true },
+  '588': { repeatable: true },
   '650': {
     ind1Options: getIndicators('650').ind1,
     ind2Options: getIndicators('650').ind2,
@@ -146,7 +177,6 @@ export const FIELD_RULES: FieldRulesMap = {
     },
     templateOrder: ['2', 'a', '7'],
     repeatable: true,
-    type: 'data' as FieldType,
   },
   '651': {
     ind1Options: getIndicators('651').ind1,
@@ -167,7 +197,6 @@ export const FIELD_RULES: FieldRulesMap = {
     },
     templateOrder: ['2', 'a', '7'],
     repeatable: true,
-    type: 'data' as FieldType,
   },
   '655': {
     ind1Options: getIndicators('655').ind1,
@@ -188,7 +217,6 @@ export const FIELD_RULES: FieldRulesMap = {
     },
     templateOrder: ['2', 'a', '7'],
     repeatable: true,
-    type: 'data' as FieldType,
   },
   '700': {
     ind1Options: getIndicators('700').ind1,
@@ -213,22 +241,35 @@ export const FIELD_RULES: FieldRulesMap = {
     },
     templateOrder: ['a', 'd', '7', '4'],
     repeatable: true,
-    type: 'data' as FieldType,
   },
+  '710': { repeatable: true },
+  '711': { repeatable: true },
+  '730': { repeatable: true },
+  '740': { repeatable: true },
+  '765': { repeatable: true },
+  '787': { repeatable: true },
+  '800': { repeatable: true },
+  '810': { repeatable: true },
+  '811': { repeatable: true },
+  '830': { repeatable: true },
 };
 
 export function isFieldRepeatable(tag: string) {
-  return FIELD_RULES[tag]?.repeatable;
+  return (
+    DATA_FIELD_RULES[tag]?.repeatable ??
+    CONTROL_FIELD_RULES[tag]?.repeatable ??
+    false
+  );
 }
 
 export function isSubfieldRepeatable(tag: string, code: string) {
-  return FIELD_RULES[tag]?.subfields[code]?.repeatable;
+  return DATA_FIELD_RULES[tag]?.subfields?.[code]?.repeatable ?? true;
 }
 
 export function getSubfields(tag: string) {
-  return FIELD_RULES[tag]?.subfields;
+  return DATA_FIELD_RULES[tag]?.subfields ?? {};
 }
 
 export function getSubfieldRuleLabel(tag: string, code: string) {
-  return FIELD_RULES[tag]?.subfields[code]?.label;
+  return DATA_FIELD_RULES[tag]?.subfields?.[code]?.label ?? `|${code}`;
 }

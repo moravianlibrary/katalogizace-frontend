@@ -2,11 +2,12 @@ import {
   AddSubfieldDialogComponent,
   AddSubfieldDialogResult,
 } from '@/app/components/add-subfield-dialog/add-subfield-dialog.component';
+import { IconComponent } from '@/app/components/icon/icon.component';
 import { InputAutocompleteComponent } from '@/app/components/inputs/input-autocomplete/input-autocomplete.component';
 import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
 import { TextareaAutocompleteComponent } from '@/app/components/inputs/textarea-autocomplete/textarea-autocomplete.component';
 import {
-  FIELD_RULES,
+  DATA_FIELD_RULES,
   getIndicators,
   getSubfieldRuleLabel,
   isSubfieldRepeatable,
@@ -52,6 +53,7 @@ type PendingFocusTarget = {
     InputAutocompleteComponent,
     AddSubfieldDialogComponent,
     InputDropdownComponent,
+    IconComponent,
   ],
   templateUrl: './field-500-editor.component.html',
 })
@@ -89,7 +91,7 @@ export class Field500EditorComponent {
   }
 
   readonly templateOrder = computed(() => {
-    return FIELD_RULES[this.tag]?.templateOrder ?? ['a'];
+    return DATA_FIELD_RULES[this.tag]?.templateOrder ?? ['a'];
   });
 
   readonly templateCodes = computed(() => new Set(this.templateOrder()));
@@ -257,7 +259,7 @@ export class Field500EditorComponent {
         return;
       }
 
-      const repeatable = isSubfieldRepeatable(this.tag, code) ?? true;
+      const repeatable = isSubfieldRepeatable(this.tag, code);
       const alreadyExists = existingSubfields.some((sf) => sf.code === code);
 
       if (!repeatable && alreadyExists) {
@@ -305,6 +307,6 @@ export class Field500EditorComponent {
   }
 
   getSubfieldLabel(code: string): string {
-    return getSubfieldRuleLabel(this.tag, code) ?? `|${code}`;
+    return getSubfieldRuleLabel(this.tag, code);
   }
 }

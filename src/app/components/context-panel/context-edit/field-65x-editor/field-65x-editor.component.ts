@@ -2,14 +2,15 @@ import {
   AddSubfieldDialogComponent,
   AddSubfieldDialogResult,
 } from '@/app/components/add-subfield-dialog/add-subfield-dialog.component';
+import { IconComponent } from '@/app/components/icon/icon.component';
 import { InputAutocompleteDictionaryComponent } from '@/app/components/inputs/input-autocomplete-dictionary/input-autocomplete-dictionary.component';
 import { InputAutocompleteComponent } from '@/app/components/inputs/input-autocomplete/input-autocomplete.component';
 import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
 import { LockHoverIconComponent } from '@/app/components/shared/lock-hover-icon/lock-hover-icon.component';
 import {
   AutocompletDictionaryResponse,
+  DATA_FIELD_RULES,
   ExistingMarcRecord,
-  FIELD_RULES,
   getSubfieldRuleLabel,
   isSubfieldRepeatable,
   MarcSubfield,
@@ -61,6 +62,7 @@ type PendingFocusTarget = {
     InputAutocompleteComponent,
     LockHoverIconComponent,
     AddSubfieldDialogComponent,
+    IconComponent,
   ],
   templateUrl: './field-65x-editor.component.html',
 })
@@ -119,7 +121,7 @@ export class Field65xEditorComponent {
   readonly ind2Options = computed(() => this.indicators().ind2);
 
   readonly templateOrder = computed(() => {
-    return FIELD_RULES[this.tag()]?.templateOrder ?? [];
+    return DATA_FIELD_RULES[this.tag()]?.templateOrder ?? [];
   });
 
   readonly templateCodes = computed(() => new Set(this.templateOrder()));
@@ -455,7 +457,7 @@ export class Field65xEditorComponent {
         return;
       }
 
-      const repeatable = isSubfieldRepeatable(this.tag(), code) ?? true;
+      const repeatable = isSubfieldRepeatable(this.tag(), code);
       const alreadyExists = existingSubfields.some((sf) => sf.code === code);
 
       if (!repeatable && alreadyExists) {
@@ -503,7 +505,7 @@ export class Field65xEditorComponent {
   }
 
   getSubfieldLabel(code: string): string {
-    return getSubfieldRuleLabel(this.tag(), code) ?? `|${code}`;
+    return getSubfieldRuleLabel(this.tag(), code);
   }
 
   isTemplateSubfield(code: string): boolean {

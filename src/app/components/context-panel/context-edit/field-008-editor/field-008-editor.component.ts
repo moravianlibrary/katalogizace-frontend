@@ -13,6 +13,7 @@ import {
 } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 
+import { IconComponent } from '@/app/components/icon/icon.component';
 import { InputStaticAutocompleteComponent } from '@/app/components/inputs/input-static-autocomplete/input-static-autocomplete.component';
 import { MarcTranslateService } from '@/app/services/marc-translate.service';
 
@@ -27,7 +28,7 @@ type SliceDef = {
 @Component({
   standalone: true,
   selector: 'app-field-008-editor',
-  imports: [TranslateModule, InputStaticAutocompleteComponent],
+  imports: [TranslateModule, InputStaticAutocompleteComponent, IconComponent],
   templateUrl: './field-008-editor.component.html',
 })
 export class Field008EditorComponent {

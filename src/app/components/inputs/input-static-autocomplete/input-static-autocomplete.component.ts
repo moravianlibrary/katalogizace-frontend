@@ -9,6 +9,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { IconComponent } from '../../icon/icon.component';
 
 export type TranslateDropdownItem = {
   code: string;
@@ -20,7 +21,7 @@ export type TranslateDropdownItem = {
 @Component({
   standalone: true,
   selector: 'app-input-static-autocomplete',
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   templateUrl: './input-static-autocomplete.component.html',
 })
 export class InputStaticAutocompleteComponent {

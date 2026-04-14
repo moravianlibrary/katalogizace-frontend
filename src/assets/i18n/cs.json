@@ -46,7 +46,8 @@
     "Impressum": "Tiráž",
     "EndPage": "Poslední čísl. str.",
     "Unknown": "Neznámý typ str.",
-    "Fiducial": "Výchozí typ str."
+    "Fiducial": "Výchozí typ str.",
+    "Article": "Článek"
   },
   "buttons": {
     "save": "Uložit",
@@ -66,8 +67,13 @@
     "add_subfield": "Přidat podpole",
     "add_field": "Jiné pole",
     "add": "Přidat",
-    "next_book": "Další knihu",
-    "create": "Vytvořit"
+    "next_book": "Další kniha",
+    "create": "Vytvořit",
+    "prev": "Předchozí",
+    "next": "Další",
+    "scan": "Naskenovat",
+    "upload": "Nahrát",
+    "uploading": "Nahrávám..."
   },
   "messages": {
     "success": {
@@ -160,7 +166,7 @@
   },
   "ai_cataloging": "AI Katalogizace",
   "overview": "Přehled",
-  "editing": "Editace",
+  "current_record": "Aktuální záznam",
   "context_panel": {
     "compare_results": "Porovnat rozdíly",
     "records": "Záznamy",
@@ -181,7 +187,7 @@
     "no_candidates": "Žádní kandidáti.",
     "authority_record": "Autoritní záznam",
     "show_in_nkp": "Zobrazit v NKP (AUT)",
-    "loading_authority": "Načítám autoritní záznam…",
+    "loading_authority": "Načítám autoritní záznam...",
     "no_subfield_7": "Vybraný kandidát nemá podpole |7",
     "open_in_skc": "Otevřít v souborném katalogu"
   },
@@ -722,7 +728,34 @@
     "edit": "Úprava skupiny",
     "title": "Název",
     "subtitle": "Poznámka (nepovinné)",
-    "create": "Vytvořit skupinu"
+    "create": "Vytvořit skupinu",
+    "loading": "Načítám skupiny...",
+    "no_batches": "Zatím žádné skupiny.",
+    "title_and_subtitle": "Název a poznámka",
+    "num_of_books": "Počet knih",
+    "author": "Autor",
+    "created": "Vytvořeno",
+    "edited": "Upraveno",
+    "state": "Stav",
+    "actions": "Akce",
+    "total": "Celkem",
+    "page": "Strana",
+    "all": "Vše",
+    "just_mine": "Jen moje"
+  },
+  "books": {
+    "loading": "Načítám knihy...",
+    "no_books": "Zatím žádné knihy.",
+    "book_title": "Název knihy",
+    "author": "Autor",
+    "publication_year": "Rok vydání",
+    "created": "Vytvořeno",
+    "edited": "Upraveno",
+    "process_state": "Stav zpracování",
+    "record_state": "Stav záznamu",
+    "actions": "Akce",
+    "total": "Celkem",
+    "page": "Strana"
   },
   "dialogs": {
     "authority_search": "Vyhledávání autorit",

@@ -4,6 +4,7 @@ import {
   ExtractedMarcRecord,
   FieldType,
   ID,
+  isFieldRepeatable,
   LastEditedRecord,
   MarcCandidate,
   MarcSubfield,
@@ -117,6 +118,115 @@ export class RecordStateService {
     return next;
   }
 
+  private normalizeTag(tag: string): string {
+    return (tag ?? '').trim().padStart(3, '0');
+  }
+
+  private buildTakenControlField(field: { tag: string; value?: string }) {
+    return {
+      fieldId: `manual-${crypto.randomUUID()}` as UUID,
+      tag: this.normalizeTag(field.tag),
+      value: field.value ?? '',
+    };
+  }
+
+  private buildTakenDataField(field: {
+    tag: string;
+    ind1?: string;
+    ind2?: string;
+    subfields?: MarcSubfield[];
+  }) {
+    return {
+      fieldId: `manual-${crypto.randomUUID()}` as UUID,
+      tag: this.normalizeTag(field.tag),
+      ind1: field.ind1 ?? '',
+      ind2: field.ind2 ?? '',
+      subfields: this.sortSubfields(field.subfields ?? []),
+    };
+  }
+
+  takeControlField(field: { tag: string; value?: string }) {
+    const rec = this.editableRecord();
+    if (!rec) return;
+
+    const tag = this.normalizeTag(field.tag);
+    const repeatable = isFieldRepeatable(tag);
+
+    const newField = this.buildTakenControlField({
+      tag,
+      value: field.value ?? '',
+    });
+
+    const existingIdx = rec.control_fields.findIndex((f) => f.tag === tag);
+
+    if (existingIdx < 0 || repeatable) {
+      this.editableRecord.set({
+        ...rec,
+        control_fields: this.insertSortedByTag(rec.control_fields, newField),
+      });
+
+      return;
+    }
+
+    const nextFields = [...rec.control_fields];
+    const existingField = nextFields[existingIdx];
+
+    nextFields[existingIdx] = {
+      ...existingField,
+      value: newField.value,
+    };
+
+    this.editableRecord.set({
+      ...rec,
+      control_fields: nextFields,
+    });
+  }
+
+  takeDataField(field: {
+    tag: string;
+    ind1?: string;
+    ind2?: string;
+    subfields?: MarcSubfield[];
+  }) {
+    const rec = this.editableRecord();
+    if (!rec) return;
+
+    const tag = this.normalizeTag(field.tag);
+    const repeatable = isFieldRepeatable(tag);
+    const newField = this.buildTakenDataField({
+      tag,
+      ind1: field.ind1 ?? '',
+      ind2: field.ind2 ?? '',
+      subfields: field.subfields ?? [],
+    });
+
+    const existingIdx = rec.data_fields.findIndex((f) => f.tag === tag);
+
+    if (existingIdx < 0 || repeatable) {
+      this.editableRecord.set({
+        ...rec,
+        data_fields: this.insertSortedByTag(rec.data_fields, newField),
+      });
+
+      return;
+    }
+
+    const nextFields = [...rec.data_fields];
+    const existingField = nextFields[existingIdx];
+
+    nextFields[existingIdx] = {
+      ...existingField,
+      ind1: newField.ind1,
+      ind2: newField.ind2,
+      subfields: newField.subfields,
+    };
+
+    this.editableRecord.set({
+      ...rec,
+      data_fields: nextFields,
+    });
+  }
+
   // TODO rovno predvyplnit polia
   addFieldWithTag(
     tag: number,
@@ -168,7 +278,7 @@ export class RecordStateService {
     this.focusTagFieldId.set(null);
   }
 
-  CONTROL_TAGS = new Set(['001', '003', '005', '006', '007', '008']);
+  readonly CONTROL_TAGS = new Set(['001', '003', '005', '006', '007', '008']);
   isControlTag(tag: string): boolean {
     return this.CONTROL_TAGS.has(tag);
   }

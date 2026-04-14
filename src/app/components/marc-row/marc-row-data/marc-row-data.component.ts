@@ -18,11 +18,12 @@ import {
   enumerateSubfields,
   isDiffableTag015to830,
 } from '../../../utils/marc-diff';
+import { IconComponent } from '../../icon/icon.component';
 
 @Component({
   standalone: true,
   selector: 'tr[appMarcRowData]',
-  imports: [CommonModule],
+  imports: [CommonModule, IconComponent],
   templateUrl: './marc-row-data.component.html',
 })
 export class MarcRowDataComponent {
@@ -102,6 +103,15 @@ export class MarcRowDataComponent {
     const tag = df.tag;
     const steps = this.store.provenance()[df.selectedCandidateId] ?? [];
     this.cps.showProvenance(tag, steps, df.fieldId);
+  }
+
+  onTakeField() {
+    this.recordState.takeDataField({
+      tag: this.df().tag,
+      ind1: this.df().ind1 ?? '',
+      ind2: this.df().ind2 ?? '',
+      subfields: this.df().subfields ?? [],
+    });
   }
 
   private fieldKey = computed(() => {

@@ -2,10 +2,11 @@ import {
   AddSubfieldDialogComponent,
   AddSubfieldDialogResult,
 } from '@/app/components/add-subfield-dialog/add-subfield-dialog.component';
+import { IconComponent } from '@/app/components/icon/icon.component';
 import { InputAutocompleteComponent } from '@/app/components/inputs/input-autocomplete/input-autocomplete.component';
 import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
 import {
-  FIELD_RULES,
+  DATA_FIELD_RULES,
   MarcSubfield,
   UUID,
   getIndicators,
@@ -51,6 +52,7 @@ type PendingFocusTarget = {
     TranslateModule,
     AddSubfieldDialogComponent,
     InputAutocompleteComponent,
+    IconComponent,
   ],
   templateUrl: './field-300-editor.component.html',
 })
@@ -75,7 +77,9 @@ export class Field300EditorComponent {
   readonly ind2Options = computed(() => this.indicators().ind2);
 
   readonly templateOrder = computed(() => {
-    return FIELD_RULES[this.tag]?.templateOrder ?? ['a', 'b', 'c', 'e', '3'];
+    return (
+      DATA_FIELD_RULES[this.tag]?.templateOrder ?? ['a', 'b', 'c', 'e', '3']
+    );
   });
 
   readonly templateCodes = computed(() => new Set(this.templateOrder()));
@@ -94,12 +98,12 @@ export class Field300EditorComponent {
     const templateItems: VisibleSubfield[] = [];
 
     for (const code of this.templateOrder()) {
-      const rule = FIELD_RULES[this.tag]?.subfields?.[code];
+      const repeatable = isSubfieldRepeatable(this.tag, code);
       const matching = subfields
         .map((sf, sourceIndex) => ({ sf, sourceIndex }))
         .filter(({ sf }) => sf.code === code);
 
-      if (rule?.repeatable) {
+      if (repeatable) {
         if (matching.length) {
           matching.forEach(({ sf, sourceIndex }, index) => {
             templateItems.push({
@@ -298,7 +302,7 @@ export class Field300EditorComponent {
 
     for (const code of result.subfieldCodes) {
       const isTemplateCode = templateCodes.has(code);
-      const repeatable = isSubfieldRepeatable(this.tag, code) ?? true;
+      const repeatable = isSubfieldRepeatable(this.tag, code);
       const alreadyExists = existingSubfields.some((sf) => sf.code === code);
 
       if (isTemplateCode && !repeatable) {
@@ -352,6 +356,6 @@ export class Field300EditorComponent {
   }
 
   getSubfieldLabel(code: string): string {
-    return getSubfieldRuleLabel(this.tag, code) ?? `|${code}`;
+    return getSubfieldRuleLabel(this.tag, code);
   }
 }
