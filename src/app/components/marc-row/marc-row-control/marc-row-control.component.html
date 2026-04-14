@@ -13,7 +13,7 @@
     </div>
 
     <div class="flex gap-3 px-2">
-      @if (!editable()) {
+      @if (takeable()) {
         <button
           class="group cursor-pointer"
           (click)="onTakeField(); $event.stopPropagation()"

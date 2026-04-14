@@ -24,6 +24,7 @@
           <app-extracted-marc-record-table
             [extractedRecord]="extractedRecord()!"
             [diffIndex]="diffIndex()"
+            [takeable]="true"
             diffSide="opened"
           />
         </div>
@@ -95,12 +96,14 @@
                     <app-extracted-marc-record-table
                       [extractedRecord]="rec.extracted!"
                       [diffIndex]="diffIndex()"
+                      [takeable]="true"
                       diffSide="opened"
                     />
                   } @else {
                     <app-existing-marc-record-table
                       [existingRecord]="store.openedForDiff()!"
                       [diffIndex]="diffIndex()"
+                      [takeable]="true"
                       diffSide="opened"
                     />
                   }

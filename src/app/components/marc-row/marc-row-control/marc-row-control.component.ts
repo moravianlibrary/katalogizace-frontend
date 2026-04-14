@@ -22,6 +22,7 @@ export class MarcRowControlComponent {
 
   cf = input.required<{ tag: string; value: string; fieldId?: UUID }>();
   editable = input<boolean>(false);
+  takeable = input<boolean>(false);
 
   onDeleteField(event: MouseEvent) {
     event.stopPropagation();

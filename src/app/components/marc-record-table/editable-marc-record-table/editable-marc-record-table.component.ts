@@ -36,6 +36,7 @@ export class EditableMarcRecordTableComponent {
 
   diffIndex = input<SubDiffIndex | null>(null);
   diffSide = input<'opened' | 'preview'>('opened');
+  takeable = input<boolean>(false);
 
   readonly hoveredRowId = signal<string | null>(null);
 

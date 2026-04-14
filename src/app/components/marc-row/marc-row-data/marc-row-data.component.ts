@@ -48,6 +48,7 @@ export class MarcRowDataComponent {
   diffIndex = input<SubDiffIndex | null>(null);
   diffSide = input<'opened' | 'preview'>('opened');
   editable = input<boolean>(false);
+  takeable = input<boolean>(false);
 
   onDeleteField(event: MouseEvent) {
     event.stopPropagation();

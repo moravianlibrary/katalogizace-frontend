@@ -35,4 +35,5 @@ export class ExtractedMarcRecordTableComponent {
 
   diffIndex = input<SubDiffIndex | null>(null);
   diffSide = input<'opened' | 'preview'>('opened');
+  takeable = input<boolean>(false);
 }

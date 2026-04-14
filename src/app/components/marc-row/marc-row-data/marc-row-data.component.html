@@ -60,7 +60,7 @@
         ></button>
       }
 
-      @if (!editable()) {
+      @if (takeable()) {
         <button
           class="group cursor-pointer"
           (click)="onTakeField(); $event.stopPropagation()"
