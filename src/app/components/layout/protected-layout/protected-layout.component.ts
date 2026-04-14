@@ -80,7 +80,6 @@ export class ProtectedLayoutComponent {
     this.batches.getBatch(batchId.toString()).subscribe({
       next: (batch) => {
         const ids = batch.book_ids ?? [];
-        ids.reverse();
         const currentIndex = ids.indexOf(bookId);
 
         if (currentIndex === -1) {
