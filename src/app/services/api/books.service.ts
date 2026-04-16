@@ -1,5 +1,6 @@
 import {
   BookImageUploadResponseDto,
+  BookImageUrlResponse,
   BookResultResponseDto,
   BookStatusResponseDto,
   BookUploadResponseDto,
@@ -75,6 +76,15 @@ export class BooksService {
     let params = new HttpParams();
     params = params.set('thumbnail', String(thumbnail));
     return this.http.get(url, { params, responseType: 'blob' });
+  }
+
+  getBookImageUrl(bookId: string, imageId: string, thumbnail = false) {
+    return this.http.get<BookImageUrlResponse>(
+      `${this.apiBaseUrl}/books/${bookId}/images/${imageId}/url`,
+      {
+        params: { thumbnail },
+      },
+    );
   }
 
   uploadImages(files: File[], batchId: string) {
