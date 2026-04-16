@@ -5,7 +5,7 @@ import { diffMarcRecordsSubfields } from '../utils/marc-diff';
 import { ContextPanelService } from './context-panel.service';
 import { RecordStateService } from './record-state.service';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class MarcDiffService {
   private recordState = inject(RecordStateService);
   private cps = inject(ContextPanelService);

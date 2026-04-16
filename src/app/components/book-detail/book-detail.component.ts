@@ -11,7 +11,6 @@ import {
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { BooksService } from '../../services/api/books.service';
-import { MarcDiffService } from '../../services/marc-diff.service';
 import { ToastService } from '../../services/toast.service';
 import { RecordStore } from '../../stores/record.store';
 import { ContextPanelComponent } from '../context-panel/context-panel.component';
@@ -21,7 +20,6 @@ import { MainPanelComponent } from '../main-panel/main-panel.component';
 @Component({
   standalone: true,
   selector: 'app-book-detail',
-  providers: [RecordStore, MarcDiffService],
   imports: [GalleryPanelComponent, MainPanelComponent, ContextPanelComponent],
   templateUrl: 'book-detail.component.html',
 })

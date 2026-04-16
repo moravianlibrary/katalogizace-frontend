@@ -11,7 +11,7 @@ import {
 import { computed, Injectable, signal } from '@angular/core';
 import { extractedToExistingWithMeta } from '../utils/marc-transform';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class RecordStore {
   readonly extracted = signal<ExtractedMarcRecord | null>(null);
   readonly lastEdited = signal<LastEditedRecord | null>(null);
