@@ -10,6 +10,7 @@ import {
 import { TranslateModule } from '@ngx-translate/core';
 import { filter } from 'rxjs';
 
+import { ContextPanelService } from '@/app/services/context-panel.service';
 import { AuthService } from '../../../services/api/auth.service';
 import { BatchesService } from '../../../services/api/batches.service';
 import { BreadcrumbsService } from '../../../services/breadcrumbs.service';
@@ -31,6 +32,7 @@ export class ProtectedLayoutComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private batches = inject(BatchesService);
+  private cps = inject(ContextPanelService);
 
   auth = inject(AuthService);
   breadcrumbs = inject(BreadcrumbsService);
@@ -107,6 +109,7 @@ export class ProtectedLayoutComponent {
     const nav = this.batchBookNav();
     if (!nav?.prevBookId) return;
 
+    this.cps.setMode('records');
     this.router.navigate(['/batches', nav.batchId, 'books', nav.prevBookId]);
   }
 
@@ -114,6 +117,7 @@ export class ProtectedLayoutComponent {
     const nav = this.batchBookNav();
     if (!nav?.nextBookId) return;
 
+    this.cps.setMode('records');
     this.router.navigate(['/batches', nav.batchId, 'books', nav.nextBookId]);
   }
 
