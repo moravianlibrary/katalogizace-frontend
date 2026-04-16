@@ -5,6 +5,7 @@ import {
   ProcessState,
   RecordState,
 } from '@/app/models';
+import { BookImageCacheService } from '@/app/services/book-image-cache.service';
 import { BreadcrumbsService } from '@/app/services/breadcrumbs.service';
 import { DatePipe, NgClass } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
@@ -44,6 +45,7 @@ export class BooksListComponent {
   private batchesService = inject(BatchesService);
   private breadcrumbs = inject(BreadcrumbsService);
   private translate = inject(TranslateService);
+  private bookImageCacheService = inject(BookImageCacheService);
 
   isUploading = false;
 
@@ -262,6 +264,7 @@ export class BooksListComponent {
           this.translate.instant('messages.success.books.delete'),
           'success',
         );
+        this.bookImageCacheService.clearBook(String(id));
         this.load();
       },
       error: (err) => {

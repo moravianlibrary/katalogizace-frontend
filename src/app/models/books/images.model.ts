@@ -17,10 +17,15 @@ export interface ApiImageItem {
   page_type: PageType | null;
 }
 
-export interface ImgItem {
+export type ImgItem = {
   id: ID;
-  url: string;
-  loading: boolean;
-  error: string | null;
-  pageType: string;
-}
+  pageType: string | null;
+
+  thumbUrl: string | null;
+  thumbLoading: boolean;
+  thumbError: string | null;
+
+  fullUrl: string | null;
+  fullLoading: boolean;
+  fullError: string | null;
+};

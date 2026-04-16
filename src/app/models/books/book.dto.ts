@@ -59,3 +59,8 @@ export interface BookImageUploadResponseDto {
   book_id: ID;
   image_id: ID;
 }
+
+export interface BookImageUrlResponse {
+  url: string;
+  expiration_seconds: number;
+}

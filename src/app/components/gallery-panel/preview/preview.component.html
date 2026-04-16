@@ -1,15 +1,15 @@
 <div class="bg-main-light h-full w-full rounded-lg">
-  @if (!item() || item().loading) {
+  @if (isLoading()) {
     <div class="bg-main-bright h-full w-full animate-pulse rounded-xl"></div>
-  } @else if (item().error) {
+  } @else if (errorMessage()) {
     <div class="text-md text-error grid h-full place-items-center">
-      {{ item().error }}
+      {{ errorMessage() }}
     </div>
-  } @else if (item().url) {
+  } @else if (displayUrl()) {
     <div class="relative h-full w-full overflow-hidden">
       <img
         class="mx-auto block h-full w-full object-contain select-none"
-        [src]="item().url!"
+        [src]="displayUrl()!"
         alt="Book image"
         draggable="false"
       />
