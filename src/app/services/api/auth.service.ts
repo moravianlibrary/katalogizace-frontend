@@ -4,11 +4,13 @@ import { tap } from 'rxjs/operators';
 import { EnvironmentService } from '../../services/environment.service';
 
 import { CurrentUserDto, LoginDto, RegisterDto, TokenDto } from '@/app/models';
+import { BookImageCacheService } from '../book-image-cache.service';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
   private env = inject(EnvironmentService);
+  private bookImageCacheService = inject(BookImageCacheService);
 
   private get apiBaseUrl(): string {
     return this.env.get('apiServiceBaseUrl') as string;
@@ -67,5 +69,6 @@ export class AuthService {
   logout() {
     this.setToken(null);
     this.user.set(null);
+    this.bookImageCacheService.clearAll();
   }
 }

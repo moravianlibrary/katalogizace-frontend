@@ -9,38 +9,40 @@
         @for (it of items(); track it.id) {
           <button
             class="group h-full shrink-0 hover:cursor-pointer"
-            [class.z-7]="selectedId() === it.id && !it.loading"
+            [class.z-7]="selectedId() === it.id && !it.thumbLoading"
             (click)="onPick(it.id)"
             type="button"
           >
             <div class="relative h-full rounded-lg">
               <div class="h-full">
-                @if (it.loading) {
+                @if (it.thumbLoading) {
                   <div
                     class="bg-main-bright h-full w-24 animate-pulse rounded-lg"
                   ></div>
-                } @else if (it.error) {
+                } @else if (it.thumbError) {
                   <div
                     class="text-error bg-main-light grid h-full w-24 place-items-center rounded-xl text-xs"
                   >
-                    {{ it.error }}
+                    {{ it.thumbError }}
                   </div>
-                } @else {
+                } @else if (it.thumbUrl) {
                   <img
                     class="pointer-events-none block h-full w-auto rounded-lg object-contain select-none"
-                    [src]="it.url"
+                    [src]="it.thumbUrl"
                     alt="thumbnail"
                     draggable="false"
                   />
+                } @else {
+                  <div class="bg-main-light h-full w-24 rounded-lg"></div>
                 }
               </div>
               <div
                 class="pointer-events-none absolute inset-0 rounded-lg border-2 border-transparent transition-colors"
                 [class.!border-primary-default]="
-                  selectedId() === it.id && !it.loading
+                  selectedId() === it.id && !it.thumbLoading
                 "
                 [ngClass]="
-                  !it.loading && selectedId() !== it.id
+                  !it.thumbLoading && selectedId() !== it.id
                     ? 'group-hover:border-additionally-1 group-hover:shadow-m group-hover:z-6'
                     : ''
                 "
@@ -67,35 +69,39 @@
         @for (it of items(); track it.id) {
           <button
             class="group w-full hover:cursor-pointer"
-            [class.z-7]="selectedId() === it.id && !it.loading"
+            [class.z-7]="selectedId() === it.id && !it.thumbLoading"
             (click)="onPick(it.id)"
             type="button"
           >
             <div class="relative w-full rounded-lg">
-              @if (it.loading) {
+              @if (it.thumbLoading) {
                 <div
                   class="bg-main-bright h-24 w-full animate-pulse rounded-lg"
                 ></div>
-              } @else if (it.error) {
-                <div class="text-error grid h-24 place-items-center text-xs">
+              } @else if (it.thumbError) {
+                <div
+                  class="text-error bg-main-light grid h-24 w-full place-items-center rounded-lg text-xs"
+                >
                   !
                 </div>
-              } @else {
+              } @else if (it.thumbUrl) {
                 <img
                   class="pointer-events-none block h-auto w-full rounded-lg object-contain select-none"
-                  [src]="it.url"
+                  [src]="it.thumbUrl"
                   alt="thumbnail"
                   draggable="false"
                 />
+              } @else {
+                <div class="bg-main-light h-24 w-full rounded-lg"></div>
               }
 
               <div
                 class="pointer-events-none absolute inset-0 rounded-lg border-2 border-transparent transition-colors"
                 [class.!border-primary-default]="
-                  selectedId() === it.id && !it.loading
+                  selectedId() === it.id && !it.thumbLoading
                 "
                 [ngClass]="
-                  !it.loading && selectedId() !== it.id
+                  !it.thumbLoading && selectedId() !== it.id
                     ? 'group-hover:border-additionally-1 group-hover:shadow-m group-hover:z-6'
                     : ''
                 "
