@@ -6,6 +6,7 @@ export type AppIconName =
   | 'add'
   | 'minus'
   | 'rotateRight'
+  | 'rotateLeft'
   | 'maximize'
   | 'sidebarLeft'
   | 'arrowRight'
