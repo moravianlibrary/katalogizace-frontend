@@ -10,21 +10,56 @@
   </span>
   <div class="flex gap-2">
     @if (!collapsed()) {
-      <button class="btn btn-m btn-tertiary btn-icon group" type="button">
-        <svg class="icon-tertiary" appIcon="add" width="16" height="16"></svg>
-      </button>
-      <button class="btn btn-m btn-tertiary btn-icon group" type="button">
+      <button
+        class="btn btn-m btn-tertiary btn-icon group"
+        [disabled]="!canZoomOut()"
+        (click)="onZoomOut()"
+        type="button"
+      >
         <svg class="icon-tertiary" appIcon="minus" width="16" height="16"></svg>
       </button>
-      <button class="btn btn-m btn-tertiary btn-icon group" type="button">
+
+      <button
+        class="btn btn-m btn-tertiary btn-icon group"
+        [disabled]="!canZoomIn()"
+        (click)="onZoomIn()"
+        type="button"
+      >
+        <svg class="icon-tertiary" appIcon="add" width="16" height="16"></svg>
+      </button>
+
+      <button
+        class="btn btn-m btn-tertiary btn-icon group"
+        (click)="onRotateLeft()"
+        type="button"
+      >
         <svg
           class="icon-tertiary"
-          appIcon="rotateRight"
+          appIcon="rotateLeft"
           width="16"
           height="16"
         ></svg>
       </button>
-      <button class="btn btn-m btn-tertiary btn-icon group" type="button">
+
+      <button
+        class="btn btn-m btn-tertiary btn-icon group"
+        [disabled]="!canResetView()"
+        (click)="onResetView()"
+        type="button"
+      >
+        <svg
+          class="icon-tertiary"
+          appIcon="fitToScreen"
+          width="16"
+          height="16"
+        ></svg>
+      </button>
+
+      <button
+        class="btn btn-m btn-tertiary btn-icon group"
+        (click)="onToggleFullscreen()"
+        type="button"
+      >
         <svg
           class="icon-tertiary"
           appIcon="maximize"

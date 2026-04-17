@@ -1,4 +1,14 @@
-<div class="bg-main-light h-full w-full rounded-lg">
+<div
+  class="bg-main-light relative h-full w-full overflow-hidden rounded-lg"
+  #viewportEl
+  (wheel)="onWheel($event)"
+  (dblclick)="onDoubleClick($event)"
+  (pointerdown)="onPointerDown($event)"
+  (pointermove)="onPointerMove($event)"
+  (pointerup)="onPointerUp($event)"
+  (pointercancel)="onPointerUp($event)"
+  (pointerleave)="onPointerUp()"
+>
   @if (isLoading()) {
     <div class="bg-main-bright h-full w-full animate-pulse rounded-xl"></div>
   } @else if (errorMessage()) {
@@ -6,10 +16,19 @@
       {{ errorMessage() }}
     </div>
   } @else if (displayUrl()) {
-    <div class="relative h-full w-full overflow-hidden">
+    <div
+      class="absolute top-1/2 left-1/2 h-full w-full will-change-transform"
+      [style.transform]="outerTransform()"
+      [style.transition]="outerTransitionStyle()"
+      [style.cursor]="cursor()"
+    >
       <img
-        class="mx-auto block h-full w-full object-contain select-none"
+        class="block h-full w-full object-contain will-change-transform select-none"
+        #imageEl
+        [style.transform]="innerTransform()"
+        [style.transition]="innerTransitionStyle()"
         [src]="displayUrl()!"
+        (load)="onImageLoad()"
         alt="Book image"
         draggable="false"
       />
