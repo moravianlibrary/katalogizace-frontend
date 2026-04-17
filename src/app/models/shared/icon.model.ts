@@ -8,6 +8,7 @@ export type AppIconName =
   | 'rotateRight'
   | 'rotateLeft'
   | 'maximize'
+  | 'minimize'
   | 'sidebarLeft'
   | 'arrowRight'
   | 'arrowLeft'
