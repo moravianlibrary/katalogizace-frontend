@@ -27,7 +27,8 @@ export type AppIconName =
   | 'upload'
   | 'refresh'
   | 'folderAdd'
-  | 'edit';
+  | 'edit'
+  | 'fitToScreen';
 
 export type IconDefinition = {
   paths: Array<{
