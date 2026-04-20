@@ -8,16 +8,112 @@
     [pageIndex]="pageIndex()"
     [pageCount]="pageCount()"
     [collapsed]="collapsed()"
+    [canZoomIn]="canZoomIn()"
+    [canZoomOut]="canZoomOut()"
+    [canResetView]="canResetView()"
+    (zoomIn)="zoomIn()"
+    (zoomOut)="zoomOut()"
+    (rotateLeft)="rotateLeft()"
+    (resetView)="resetView()"
+    (toggleFullscreen)="togglePreviewFullscreen()"
     (toggleCollapse)="toggleCollapsed()"
   ></app-gallery-header>
 
   @if (!collapsed()) {
-    <div class="min-h-0 flex-1 px-4 pt-4 pb-3">
-      @if (selectedItem()) {
-        <app-image-large-preview
-          class="block h-full"
-          [item]="selectedItem()!"
-        />
+    <div class="relative min-h-0 flex-1 px-4 pt-4 pb-3" #previewHost>
+      @if (isPreviewFullscreen()) {
+        <div class="pointer-events-none absolute top-4 right-4 z-20 p-3">
+          <div
+            class="bg-main-base border-bright pointer-events-auto flex gap-2 rounded-xl border p-3 shadow-lg backdrop-blur-sm"
+          >
+            <button
+              class="btn btn-m btn-tertiary btn-icon group"
+              [disabled]="!canZoomOut()"
+              (click)="zoomOut()"
+              type="button"
+            >
+              <svg
+                class="icon-tertiary"
+                appIcon="minus"
+                width="16"
+                height="16"
+              ></svg>
+            </button>
+
+            <button
+              class="btn btn-m btn-tertiary btn-icon group"
+              [disabled]="!canZoomIn()"
+              (click)="zoomIn()"
+              type="button"
+            >
+              <svg
+                class="icon-tertiary"
+                appIcon="add"
+                width="16"
+                height="16"
+              ></svg>
+            </button>
+
+            <button
+              class="btn btn-m btn-tertiary btn-icon group"
+              (click)="rotateLeft()"
+              type="button"
+            >
+              <svg
+                class="icon-tertiary"
+                appIcon="rotateLeft"
+                width="16"
+                height="16"
+              ></svg>
+            </button>
+
+            <button
+              class="btn btn-m btn-tertiary btn-icon group"
+              [disabled]="!canResetView()"
+              (click)="resetView()"
+              type="button"
+            >
+              <svg
+                class="icon-tertiary"
+                appIcon="fitToScreen"
+                width="16"
+                height="16"
+              ></svg>
+            </button>
+
+            <button
+              class="btn btn-m btn-tertiary btn-icon group"
+              (click)="togglePreviewFullscreen()"
+              type="button"
+            >
+              <svg
+                class="icon-tertiary"
+                appIcon="minimize"
+                width="16"
+                height="16"
+              ></svg>
+            </button>
+          </div>
+        </div>
+      }
+
+      @if (selectedItem(); as item) {
+        @for (previewItem of [item]; track previewItem.id) {
+          <app-image-large-preview
+            class="block h-full"
+            [item]="previewItem"
+            [scale]="selectedView().scale"
+            [rotation]="normalizeRotation(selectedView().rotation)"
+            [rawRotation]="selectedView().rotation"
+            [panX]="selectedView().x"
+            [panY]="selectedView().y"
+            [minScale]="MIN_SCALE"
+            [maxScale]="MAX_SCALE"
+            [scaleStep]="SCALE_STEP"
+            (panChange)="onPanChange($event)"
+            (viewChange)="onViewChange($event)"
+          />
+        }
       } @else {
         <p class="text-light p-2 text-sm">
           {{ "records.no_data" | translate }}

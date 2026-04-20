@@ -6,7 +6,9 @@ export type AppIconName =
   | 'add'
   | 'minus'
   | 'rotateRight'
+  | 'rotateLeft'
   | 'maximize'
+  | 'minimize'
   | 'sidebarLeft'
   | 'arrowRight'
   | 'arrowLeft'
@@ -25,7 +27,8 @@ export type AppIconName =
   | 'upload'
   | 'refresh'
   | 'folderAdd'
-  | 'edit';
+  | 'edit'
+  | 'fitToScreen';
 
 export type IconDefinition = {
   paths: Array<{

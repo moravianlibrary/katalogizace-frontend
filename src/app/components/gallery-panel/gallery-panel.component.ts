@@ -3,18 +3,29 @@ import {
   Component,
   computed,
   effect,
+  ElementRef,
+  HostListener,
   inject,
   input,
   output,
   signal,
   untracked,
+  viewChild,
 } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BooksService } from '../../services/api/books.service';
 import { BookImageCacheService } from '../../services/book-image-cache.service';
+import { IconComponent } from '../icon/icon.component';
 import { GalleryHeaderComponent } from './gallery-header/gallery-header.component';
 import { ImageLargePreviewComponent } from './preview/preview.component';
 import { ImageThumbnailsComponent } from './thumbnails/thumbnails.component';
+
+type PreviewViewState = {
+  scale: number;
+  rotation: number;
+  x: number;
+  y: number;
+};
 
 @Component({
   standalone: true,
@@ -24,6 +35,7 @@ import { ImageThumbnailsComponent } from './thumbnails/thumbnails.component';
     ImageThumbnailsComponent,
     GalleryHeaderComponent,
     TranslateModule,
+    IconComponent,
   ],
   templateUrl: './gallery-panel.component.html',
 })
@@ -31,6 +43,12 @@ export class GalleryPanelComponent {
   private bookService = inject(BooksService);
   private cache = inject(BookImageCacheService);
   private translate = inject(TranslateService);
+
+  private previewHost = viewChild<ElementRef<HTMLElement>>('previewHost');
+
+  readonly MIN_SCALE = 1;
+  readonly MAX_SCALE = 8;
+  readonly SCALE_STEP = 0.5;
 
   bookId = input<ID | null>(null);
   images = input<ApiImageItem[]>([]);
@@ -47,14 +65,32 @@ export class GalleryPanelComponent {
   private thumbInFlight = new Set<string>();
   private fullInFlight = new Set<string>();
 
-  toggleCollapsed() {
-    this.collapsed.update((v) => !v);
-    this.collapsedChange.emit(this.collapsed());
+  private viewStates = signal<Record<string, PreviewViewState>>({});
+
+  isPreviewFullscreen = signal(false);
+
+  @HostListener('document:fullscreenchange')
+  onFullscreenChange() {
+    const host = this.previewHost()?.nativeElement;
+    this.isPreviewFullscreen.set(!!host && document.fullscreenElement === host);
   }
 
   selectedItem = computed(() => {
     const id = this.selectedId();
     return this.items().find((x) => x.id === id) ?? null;
+  });
+
+  selectedView = computed<PreviewViewState>(() => {
+    const id = this.selectedId();
+    if (!id) return this.defaultViewState();
+    return this.viewStates()[String(id)] ?? this.defaultViewState();
+  });
+
+  canZoomOut = computed(() => this.selectedView().scale > this.MIN_SCALE);
+  canZoomIn = computed(() => this.selectedView().scale < this.MAX_SCALE);
+  canResetView = computed(() => {
+    const view = this.selectedView();
+    return view.scale > this.MIN_SCALE || view.x !== 0 || view.y !== 0;
   });
 
   pageIndex = computed(() => {
@@ -72,6 +108,23 @@ export class GalleryPanelComponent {
     return this.translate.instant(`pageType.${pt ?? 'Unknown'}`);
   }
 
+  toggleCollapsed() {
+    this.collapsed.update((v) => !v);
+    this.collapsedChange.emit(this.collapsed());
+  }
+
+  resetView() {
+    const id = this.selectedId();
+    if (!id) return;
+
+    this.patchView(id, (current) => ({
+      ...current,
+      scale: this.MIN_SCALE,
+      x: 0,
+      y: 0,
+    }));
+  }
+
   constructor() {
     effect(() => {
       const bookId = this.bookId();
@@ -84,10 +137,12 @@ export class GalleryPanelComponent {
       this.gallerySession++;
       this.thumbInFlight.clear();
       this.fullInFlight.clear();
+      this.viewStates.set({});
 
       if (!bookId || apiImages.length === 0) {
         this.items.set([]);
         this.selectedId.set(null);
+        this.viewStates.set({});
         return;
       }
 
@@ -132,9 +187,143 @@ export class GalleryPanelComponent {
     });
   }
 
+  onViewChange(view: { scale: number; x: number; y: number }) {
+    const id = this.selectedId();
+    if (!id) return;
+
+    this.patchView(id, (current) => ({
+      ...current,
+      scale: view.scale,
+      x: view.x,
+      y: view.y,
+    }));
+  }
+
+  private defaultViewState(): PreviewViewState {
+    return {
+      scale: 1,
+      rotation: 0,
+      x: 0,
+      y: 0,
+    };
+  }
+
+  normalizeRotation(rotation: number): 0 | 90 | 180 | 270 {
+    const normalized = ((rotation % 360) + 360) % 360;
+
+    if (normalized === 0) return 0;
+    if (normalized === 90) return 90;
+    if (normalized === 180) return 180;
+    return 270;
+  }
+
+  private ensureViewState(id: ID): PreviewViewState {
+    const key = String(id);
+    const existing = this.viewStates()[key];
+    if (existing) return existing;
+
+    const next = this.defaultViewState();
+    this.viewStates.update((map) => ({
+      ...map,
+      [key]: next,
+    }));
+    return next;
+  }
+
+  private patchView(
+    id: ID,
+    updater: (current: PreviewViewState) => PreviewViewState,
+  ) {
+    const key = String(id);
+    this.viewStates.update((map) => {
+      const current = map[key] ?? this.defaultViewState();
+      return {
+        ...map,
+        [key]: updater(current),
+      };
+    });
+  }
+
+  private clampScale(scale: number): number {
+    return Math.min(this.MAX_SCALE, Math.max(this.MIN_SCALE, scale));
+  }
+
+  private zoomAroundViewportCenter(id: ID, delta: number) {
+    this.patchView(id, (current) => {
+      const nextScale = this.clampScale(current.scale + delta);
+
+      if (nextScale <= this.MIN_SCALE) {
+        return {
+          ...current,
+          scale: this.MIN_SCALE,
+          x: 0,
+          y: 0,
+        };
+      }
+
+      const k = nextScale / current.scale;
+
+      return {
+        ...current,
+        scale: nextScale,
+        x: current.x * k,
+        y: current.y * k,
+      };
+    });
+  }
+
+  zoomIn() {
+    const id = this.selectedId();
+    if (!id) return;
+    this.zoomAroundViewportCenter(id, this.SCALE_STEP);
+  }
+
+  zoomOut() {
+    const id = this.selectedId();
+    if (!id) return;
+    this.zoomAroundViewportCenter(id, -this.SCALE_STEP);
+  }
+
+  rotateLeft() {
+    const id = this.selectedId();
+    if (!id) return;
+
+    this.patchView(id, (current) => ({
+      ...current,
+      rotation: current.rotation - 90,
+      x: 0,
+      y: 0,
+    }));
+  }
+
+  onPanChange(pan: { x: number; y: number }) {
+    const id = this.selectedId();
+    if (!id) return;
+
+    this.patchView(id, (current) => ({
+      ...current,
+      x: pan.x,
+      y: pan.y,
+    }));
+  }
+
+  async togglePreviewFullscreen() {
+    const host = this.previewHost()?.nativeElement;
+    if (!host) return;
+
+    if (document.fullscreenElement === host) {
+      await document.exitFullscreen();
+      return;
+    }
+
+    await host.requestFullscreen();
+  }
+
   private buildGalleryKey(bookId: ID | null, images: ApiImageItem[]): string {
     if (!bookId || images.length === 0) return '';
-    return `${bookId}::${images.map((x) => x.image_id).join(',')}`;
+    return `${bookId}::${images
+      .map((x) => `${x.image_id}:${x.page_type ?? 'null'}`)
+      .join(',')}`;
   }
 
   private makeRequestKey(
@@ -300,6 +489,7 @@ export class GalleryPanelComponent {
 
   onSelect(id: ID) {
     this.selectedId.set(id);
+    this.ensureViewState(id);
     this.ensureThumbnail(id);
     this.ensureFull(id);
   }

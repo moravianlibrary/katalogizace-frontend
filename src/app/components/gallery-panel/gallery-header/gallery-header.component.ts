@@ -18,6 +18,16 @@ export class GalleryHeaderComponent {
   collapsed = input<boolean>(false);
   toggleCollapse = output<void>();
 
+  canZoomOut = input<boolean>(false);
+  canZoomIn = input<boolean>(true);
+  canResetView = input<boolean>(false);
+
+  zoomIn = output<void>();
+  zoomOut = output<void>();
+  rotateLeft = output<void>();
+  resetView = output<void>();
+  toggleFullscreen = output<void>();
+
   orderLabel = computed(() => {
     const index = this.pageIndex();
     const count = this.pageCount();
@@ -32,5 +42,25 @@ export class GalleryHeaderComponent {
 
   onToggle() {
     this.toggleCollapse.emit();
+  }
+
+  onZoomIn() {
+    this.zoomIn.emit();
+  }
+
+  onZoomOut() {
+    this.zoomOut.emit();
+  }
+
+  onRotateLeft() {
+    this.rotateLeft.emit();
+  }
+
+  onResetView() {
+    this.resetView.emit();
+  }
+
+  onToggleFullscreen() {
+    this.toggleFullscreen.emit();
   }
 }
