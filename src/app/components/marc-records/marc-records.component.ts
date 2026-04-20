@@ -75,7 +75,7 @@ export class MarcRecordsComponent {
     return (extracted ? 1 : 0) + existing.length === 1;
   });
 
-  expandedIndex = signal<number | null>(0);
+  expandedIndex = signal<number | null>(null);
 
   private lastAppliedKey: string | null = null;
 
@@ -109,7 +109,7 @@ export class MarcRecordsComponent {
       const bookId = this.bookId();
       if (bookId == null) return;
 
-      this.expandedIndex.set(0);
+      this.expandedIndex.set(null);
       this.store.setOpenedExisting(null);
       this.store.setOpenedExtracted(null);
     });
