@@ -60,9 +60,7 @@ export class ContextPanelComponent {
         return 'context_panel.edit';
 
       default:
-        return this.hasSingleRecord()
-          ? 'context_panel.extracted_record'
-          : 'context_panel.records';
+        return 'context_panel.records';
     }
   });
 

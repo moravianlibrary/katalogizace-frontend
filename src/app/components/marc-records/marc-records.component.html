@@ -1,17 +1,13 @@
 <section class="flex h-full flex-col p-4">
-  @if (!isSingleRecord()) {
-    <div
-      class="text-secondary text-sm-tight bg-main-bright grid shrink-0 grid-cols-[minmax(0,1.5fr)_minmax(0,2fr)_minmax(0,2fr)_minmax(0,1fr)_auto] items-center gap-3 rounded-t-lg p-2 text-left font-medium text-nowrap"
-    >
-      <span class="min-w-0">{{ "records.source" | translate }}</span>
-      <span class="min-w-0">{{ "records.title" | translate }}</span>
-      <span class="min-w-0">{{ "records.author" | translate }}</span>
-      <span class="min-w-0">{{
-        "records.year_of_publishing" | translate
-      }}</span>
-      <span class="h-4 w-6"></span>
-    </div>
-  }
+  <div
+    class="text-secondary text-sm-tight bg-main-bright grid shrink-0 grid-cols-[minmax(0,1.5fr)_minmax(0,2fr)_minmax(0,2fr)_minmax(0,1fr)_auto] items-center gap-3 rounded-t-lg p-2 text-left font-medium text-nowrap"
+  >
+    <span class="min-w-0">{{ "records.source" | translate }}</span>
+    <span class="min-w-0">{{ "records.title" | translate }}</span>
+    <span class="min-w-0">{{ "records.author" | translate }}</span>
+    <span class="min-w-0">{{ "records.year_of_publishing" | translate }}</span>
+    <span class="h-4 w-6"></span>
+  </div>
 
   <div class="min-h-0 flex-1 overflow-auto">
     @if (!records().length) {
@@ -19,99 +15,88 @@
         {{ "records.no_records" | translate }}
       </p>
     } @else {
-      @if (isSingleRecord()) {
-        <div class="min-h-0 overflow-auto">
-          <app-extracted-marc-record-table
-            [extractedRecord]="extractedRecord()!"
-            [diffIndex]="diffIndex()"
-            [takeable]="true"
-            diffSide="opened"
-          />
-        </div>
-      } @else {
-        @for (rec of records(); track $index) {
-          <div>
-            <button
-              class="border-bright w-full border-b px-2 py-3 hover:cursor-pointer hover:bg-gray-500/5"
-              [ngClass]="
-                expandedIndex() === $index ? 'bg-gray-500/5' : 'bg-main-base'
-              "
-              (click)="toggleRow($index)"
-              type="button"
+      @for (rec of records(); track $index) {
+        <div>
+          <button
+            class="border-bright w-full border-b px-2 py-3 hover:cursor-pointer hover:bg-gray-500/5"
+            [ngClass]="
+              expandedIndex() === $index ? 'bg-gray-500/5' : 'bg-main-base'
+            "
+            (click)="toggleRow($index)"
+            type="button"
+          >
+            <div
+              class="grid grid-cols-[minmax(0,1.5fr)_minmax(0,2fr)_minmax(0,2fr)_minmax(0,1fr)_auto] items-center gap-3 text-left text-sm"
             >
               <div
-                class="grid grid-cols-[minmax(0,1.5fr)_minmax(0,2fr)_minmax(0,2fr)_minmax(0,1fr)_auto] items-center gap-3 text-left text-sm"
+                class="text-md min-w-0 truncate"
+                [ngClass]="expandedIndex() === $index ? 'font-medium' : ''"
               >
-                <div
-                  class="text-md min-w-0 truncate"
-                  [ngClass]="expandedIndex() === $index ? 'font-medium' : ''"
-                >
-                  {{
-                    rec.extracted
-                      ? ("records.source_extracted" | translate)
-                      : rec.existing!.source
-                  }}
-                </div>
-
-                <div
-                  class="text-md min-w-0 truncate"
-                  [ngClass]="expandedIndex() === $index ? 'font-medium' : ''"
-                >
-                  {{ getTitle($index, rec.existing) || "-" }}
-                </div>
-
-                <div
-                  class="text-md min-w-0 truncate"
-                  [ngClass]="expandedIndex() === $index ? 'font-medium' : ''"
-                >
-                  {{ getAuthorName($index, rec.existing) || "-" }}
-                </div>
-
-                <div
-                  class="text-md min-w-0 truncate"
-                  [ngClass]="expandedIndex() === $index ? 'font-medium' : ''"
-                >
-                  {{ getPublicationYear($index, rec.existing) || "-" }}
-                </div>
-
-                <div class="flex h-6 w-6 items-center justify-center">
-                  <svg
-                    class="icon-black transition-transform duration-150"
-                    [class.rotate-180]="expandedIndex() === $index"
-                    appIcon="chevronDown"
-                    width="20"
-                    height="20"
-                  ></svg>
-                </div>
+                {{
+                  rec.extracted
+                    ? ("records.source_extracted" | translate)
+                    : rec.existing!.source
+                }}
               </div>
-            </button>
 
-            @if (expandedIndex() === $index) {
-              <div class="border-primary-default border-b-2">
-                <div
-                  class="min-h-0 overflow-auto overscroll-contain"
-                  [style.max-height.px]="detailMaxHeightPx()"
-                >
-                  @if ($index === 0) {
-                    <app-extracted-marc-record-table
-                      [extractedRecord]="rec.extracted!"
-                      [diffIndex]="diffIndex()"
-                      [takeable]="true"
-                      diffSide="opened"
-                    />
-                  } @else {
-                    <app-existing-marc-record-table
-                      [existingRecord]="store.openedForDiff()!"
-                      [diffIndex]="diffIndex()"
-                      [takeable]="true"
-                      diffSide="opened"
-                    />
-                  }
-                </div>
+              <div
+                class="text-md min-w-0 truncate"
+                [ngClass]="expandedIndex() === $index ? 'font-medium' : ''"
+              >
+                {{ getTitle($index, rec.existing) || "-" }}
               </div>
-            }
-          </div>
-        }
+
+              <div
+                class="text-md min-w-0 truncate"
+                [ngClass]="expandedIndex() === $index ? 'font-medium' : ''"
+              >
+                {{ getAuthorName($index, rec.existing) || "-" }}
+              </div>
+
+              <div
+                class="text-md min-w-0 truncate"
+                [ngClass]="expandedIndex() === $index ? 'font-medium' : ''"
+              >
+                {{ getPublicationYear($index, rec.existing) || "-" }}
+              </div>
+
+              <div class="flex h-6 w-6 items-center justify-center">
+                <svg
+                  class="icon-black transition-transform duration-150"
+                  [class.rotate-180]="expandedIndex() === $index"
+                  appIcon="chevronDown"
+                  width="20"
+                  height="20"
+                ></svg>
+              </div>
+            </div>
+          </button>
+
+          @if (expandedIndex() === $index) {
+            <div class="border-primary-default border-b-2">
+              <div
+                class="min-h-0 overflow-auto overscroll-contain"
+                [style.max-height.px]="detailMaxHeightPx()"
+              >
+                @if ($index === 0) {
+                  <app-extracted-marc-record-table
+                    [extractedRecord]="rec.extracted!"
+                    [diffIndex]="diffIndex()"
+                    [takeable]="true"
+                    diffSide="opened"
+                  />
+                } @else {
+                  <app-existing-marc-record-table
+                    [existingRecord]="store.openedForDiff()!"
+                    [diffIndex]="diffIndex()"
+                    [takeable]="true"
+                    diffSide="opened"
+                  />
+                }
+              </div>
+            </div>
+          }
+        </div>
       }
     }
   </div>
