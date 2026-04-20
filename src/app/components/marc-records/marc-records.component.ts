@@ -1,4 +1,4 @@
-import { ExistingMarcRecord, MarcRecordsItem } from '@/app/models';
+import { ExistingMarcRecord, ID, MarcRecordsItem } from '@/app/models';
 import { CommonModule } from '@angular/common';
 import {
   Component,
@@ -6,6 +6,7 @@ import {
   effect,
   ElementRef,
   inject,
+  input,
   signal,
 } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
@@ -31,10 +32,12 @@ import { ExtractedMarcRecordTableComponent } from '../marc-record-table/extracte
   templateUrl: './marc-records.component.html',
 })
 export class MarcRecordsComponent {
-  store = inject(RecordStore);
   private recordState = inject(RecordStateService);
-
   private cps = inject(ContextPanelService);
+  diff = inject(MarcDiffService);
+  store = inject(RecordStore);
+
+  bookId = input<ID | null>(null);
 
   existingRecords = this.store.existingRecords;
   extractedRecord = this.store.extracted;
@@ -43,7 +46,6 @@ export class MarcRecordsComponent {
     return extractedToExisting(this.extractedRecord());
   });
 
-  diff = inject(MarcDiffService);
   diffIndex = this.diff.diffIndex;
 
   records = computed<MarcRecordsItem[]>(() => {
@@ -103,6 +105,15 @@ export class MarcRecordsComponent {
   }
 
   constructor() {
+    effect(() => {
+      const bookId = this.bookId();
+      if (bookId == null) return;
+
+      this.expandedIndex.set(0);
+      this.store.setOpenedExisting(null);
+      this.store.setOpenedExtracted(null);
+    });
+
     effect(() => {
       const idx = this.expandedIndex();
       const list = this.records();

@@ -1,5 +1,6 @@
+import { ID } from '@/app/models';
 import { RecordStore } from '@/app/stores/record.store';
-import { Component, computed, DestroyRef, inject } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { ContextPanelService } from '../../services/context-panel.service';
 import { CandidatesTableComponent } from '../candidates-table/candidates-table.component';
@@ -25,6 +26,8 @@ export class ContextPanelComponent {
   private cps = inject(ContextPanelService);
   private store = inject(RecordStore);
   private destroyRef = inject(DestroyRef);
+
+  bookId = input<ID | null>(null);
 
   constructor() {
     this.destroyRef.onDestroy(() => {

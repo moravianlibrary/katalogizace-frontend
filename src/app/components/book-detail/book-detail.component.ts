@@ -63,6 +63,11 @@ export class BookDetailComponent {
   }
 
   private resetBookDetail() {
+    this.contextPanel.reset();
+
+    this.store.setOpenedExisting(null);
+    this.store.setOpenedExtracted(null);
+
     this.store.setExtracted(null);
     this.store.setProvenance({});
     this.store.setLastEdited(null);

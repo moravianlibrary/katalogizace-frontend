@@ -11,5 +11,8 @@
 
   <app-main-panel class="h-full min-h-0 overflow-hidden" [book_id]="bookId()" />
 
-  <app-context-panel class="h-full min-h-0 overflow-hidden" />
+  <app-context-panel
+    class="h-full min-h-0 overflow-hidden"
+    [bookId]="bookId()"
+  />
 </section>
