@@ -165,7 +165,7 @@
           <tbody>
             @for (b of rows(); track b.book_id) {
               <tr
-                class="bg-main-base border-bright border-t transition-colors hover:bg-gray-500/5"
+                class="bg-main-base border-bright h-13 border-t transition-colors hover:bg-gray-500/5"
                 [class.cursor-pointer]="b.process_state === 'completed'"
                 [attr.tabindex]="b.process_state === 'completed' ? 0 : null"
                 [attr.role]="b.process_state === 'completed' ? 'button' : null"
