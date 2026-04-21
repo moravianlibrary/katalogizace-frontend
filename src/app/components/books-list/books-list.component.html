@@ -216,7 +216,7 @@
                 <td class="px-3 py-2">
                   <div class="flex items-center gap-2">
                     <button
-                      class="group hover:bg-main-primary-default cursor-pointer rounded px-3 py-1 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:active:bg-transparent"
+                      class="btn btn-icon btn-s btn-tertiary group enabled:hover:shadow-s"
                       [disabled]="
                         b.process_state === 'in_progress' ||
                         b.process_state === 'scheduled'
@@ -227,21 +227,24 @@
                       title="Rerun"
                     >
                       <svg
-                        class="icon-secondary-default group-hover:icon-on-color group-disabled:icon-primary-disable"
+                        class="icon-black group-disabled:icon-tertiary-disable"
                         appIcon="refresh"
-                        width="22"
-                        height="22"
+                        width="16"
+                        height="16"
                       ></svg>
                     </button>
                     <button
-                      class="group text-sm-tight text-error hover:bg-main-error hover:text-on-color cursor-pointer rounded px-3 py-1"
+                      class="btn btn-icon btn-s btn-tertiary group enabled:hover:shadow-s"
                       (click)="onDelete(b.book_id, $event)"
+                      type="button"
+                      aria-label="Smazat knihu"
+                      title="Smazat"
                     >
                       <svg
-                        class="icon-error group-hover:icon-on-color"
+                        class="icon-black group-disabled:icon-tertiary-disable"
                         appIcon="trash"
-                        width="22"
-                        height="22"
+                        width="16"
+                        height="16"
                       ></svg>
                     </button>
                   </div>
