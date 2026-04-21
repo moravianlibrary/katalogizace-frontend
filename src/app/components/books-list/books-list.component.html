@@ -79,7 +79,7 @@
     <div class="text-md">{{ "books.loading" | translate }}</div>
   } @else if (error()) {
     <div class="text-md text-error">{{ error() }}</div>
-  } @else if (!data() || data()!.books.length === 0) {
+  } @else if (!data() || rows().length === 0) {
     <div class="text-md">{{ "books.no_books" | translate }}</div>
   } @else {
     <div class="flex min-h-0 flex-1 flex-col">
@@ -97,10 +97,58 @@
                 {{ "books.publication_year" | translate }}
               </th>
               <th class="px-3 py-2 text-left font-medium">
-                {{ "books.created" | translate }}
+                <button
+                  class="group flex cursor-pointer items-center gap-1 select-none"
+                  (click)="setSort('created_at')"
+                  type="button"
+                >
+                  {{ "books.created" | translate }}
+
+                  <svg
+                    class="transition-transform duration-150"
+                    [ngClass]="
+                      sortBy() === 'created_at'
+                        ? 'icon-secondary'
+                        : 'icon-tertiary'
+                    "
+                    [class.rotate-90]="
+                      sortBy() === 'created_at' && sortDir() === 'asc'
+                    "
+                    [class.-rotate-90]="
+                      sortBy() !== 'created_at' || sortDir() === 'desc'
+                    "
+                    appIcon="arrowLeft"
+                    width="16"
+                    height="16"
+                  ></svg>
+                </button>
               </th>
               <th class="px-3 py-2 text-left font-medium">
-                {{ "books.edited" | translate }}
+                <button
+                  class="group flex cursor-pointer items-center gap-1 select-none"
+                  (click)="setSort('modified_at')"
+                  type="button"
+                >
+                  {{ "books.edited" | translate }}
+
+                  <svg
+                    class="transition-transform duration-150"
+                    [ngClass]="
+                      sortBy() === 'modified_at'
+                        ? 'icon-secondary'
+                        : 'icon-tertiary'
+                    "
+                    [class.rotate-90]="
+                      sortBy() === 'modified_at' && sortDir() === 'asc'
+                    "
+                    [class.-rotate-90]="
+                      sortBy() !== 'modified_at' || sortDir() === 'desc'
+                    "
+                    appIcon="arrowLeft"
+                    width="16"
+                    height="16"
+                  ></svg>
+                </button>
               </th>
               <th class="px-3 py-2 text-left font-medium text-nowrap">
                 {{ "books.process_state" | translate }}
@@ -115,7 +163,7 @@
           </thead>
 
           <tbody>
-            @for (b of data()!.books; track b.book_id) {
+            @for (b of rows(); track b.book_id) {
               <tr
                 class="bg-main-base border-bright border-t transition-colors hover:bg-gray-500/5"
                 [class.cursor-pointer]="b.process_state === 'completed'"

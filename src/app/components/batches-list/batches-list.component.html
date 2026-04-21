@@ -53,10 +53,58 @@
                 {{ "batches.author" | translate }}
               </th>
               <th class="px-3 py-2 text-left font-medium">
-                {{ "batches.created" | translate }}
+                <button
+                  class="group flex cursor-pointer items-center gap-1 select-none"
+                  (click)="setSort('created_at')"
+                  type="button"
+                >
+                  {{ "batches.created" | translate }}
+
+                  <svg
+                    class="transition-transform duration-150"
+                    [ngClass]="
+                      sortBy() === 'created_at'
+                        ? 'icon-secondary'
+                        : 'icon-tertiary'
+                    "
+                    [class.rotate-90]="
+                      sortBy() === 'created_at' && sortDir() === 'asc'
+                    "
+                    [class.-rotate-90]="
+                      sortBy() !== 'created_at' || sortDir() === 'desc'
+                    "
+                    appIcon="arrowLeft"
+                    width="16"
+                    height="16"
+                  ></svg>
+                </button>
               </th>
               <th class="px-3 py-2 text-left font-medium">
-                {{ "batches.edited" | translate }}
+                <button
+                  class="group flex cursor-pointer items-center gap-1 select-none"
+                  (click)="setSort('modified_at')"
+                  type="button"
+                >
+                  {{ "batches.edited" | translate }}
+
+                  <svg
+                    class="transition-transform duration-150"
+                    [ngClass]="
+                      sortBy() === 'modified_at'
+                        ? 'icon-secondary'
+                        : 'icon-tertiary'
+                    "
+                    [class.rotate-90]="
+                      sortBy() === 'modified_at' && sortDir() === 'asc'
+                    "
+                    [class.-rotate-90]="
+                      sortBy() !== 'modified_at' || sortDir() === 'desc'
+                    "
+                    appIcon="arrowLeft"
+                    width="16"
+                    height="16"
+                  ></svg>
+                </button>
               </th>
               <th class="px-3 py-2 text-left font-medium">
                 {{ "batches.state" | translate }}

@@ -59,11 +59,32 @@ export class BooksListComponent {
   page = signal<number>(1);
   pageSize = signal<number>(100);
 
+  sortBy = signal<'created_at' | 'modified_at' | null>(null);
+  sortDir = signal<'asc' | 'desc'>('desc');
+
   totalPages = computed(() =>
     this.data()
       ? Math.max(1, Math.ceil(this.data()!.total / this.data()!.page_size))
       : 1,
   );
+
+  rows = computed<PaginatedBooksResponseDto['books']>(() => {
+    const books = this.data()?.books ?? [];
+    const sortBy = this.sortBy();
+
+    if (!sortBy) {
+      return books;
+    }
+
+    const sortDir = this.sortDir();
+
+    return [...books].sort((a, b) => {
+      const aTime = a[sortBy] ? new Date(a[sortBy]).getTime() : 0;
+      const bTime = b[sortBy] ? new Date(b[sortBy]).getTime() : 0;
+
+      return sortDir === 'asc' ? aTime - bTime : bTime - aTime;
+    });
+  });
 
   constructor() {
     combineLatest([this.route.paramMap, this.route.queryParamMap])
@@ -109,6 +130,16 @@ export class BooksListComponent {
 
   ngOnDestroy() {
     this.breadcrumbs.clearBook();
+  }
+
+  setSort(column: 'created_at' | 'modified_at') {
+    if (this.sortBy() === column) {
+      this.sortDir.update((dir) => (dir === 'asc' ? 'desc' : 'asc'));
+      return;
+    }
+
+    this.sortBy.set(column);
+    this.sortDir.set('desc');
   }
 
   load() {

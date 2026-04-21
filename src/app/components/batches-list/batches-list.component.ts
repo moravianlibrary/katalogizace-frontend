@@ -51,6 +51,9 @@ export class BatchesListComponent {
   error = signal<string | null>(null);
   data = signal<PaginatedBatchesResponseDto | null>(null);
 
+  sortBy = signal<'created_at' | 'modified_at' | null>(null);
+  sortDir = signal<'asc' | 'desc'>('desc');
+
   edited = computed(() => {
     const batch = this.editingBatch();
     if (!batch) return false;
@@ -74,7 +77,33 @@ export class BatchesListComponent {
       : 1,
   );
 
-  rows = computed<BatchDto[]>(() => this.data()?.batches ?? []);
+  rows = computed<BatchDto[]>(() => {
+    const batches = this.data()?.batches ?? [];
+    const sortBy = this.sortBy();
+
+    if (!sortBy) {
+      return batches;
+    }
+
+    const sortDir = this.sortDir();
+
+    return [...batches].sort((a, b) => {
+      const aTime = a[sortBy] ? new Date(a[sortBy]).getTime() : 0;
+      const bTime = b[sortBy] ? new Date(b[sortBy]).getTime() : 0;
+
+      return sortDir === 'asc' ? aTime - bTime : bTime - aTime;
+    });
+  });
+
+  setSort(column: 'created_at' | 'modified_at') {
+    if (this.sortBy() === column) {
+      this.sortDir.update((dir) => (dir === 'asc' ? 'desc' : 'asc'));
+      return;
+    }
+
+    this.sortBy.set(column);
+    this.sortDir.set('desc');
+  }
 
   newName = signal('');
   newDescription = signal('');
