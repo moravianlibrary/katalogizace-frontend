@@ -1,121 +1,192 @@
 <section class="mx-auto flex h-full min-h-0 flex-col gap-4 p-4">
-  <div
-    class="flex flex-col items-center justify-end gap-4 min-[44rem]:flex-row"
-  >
-    <div class="flex w-full items-center justify-between gap-2">
-      <button
-        class="btn btn-m btn-primary group"
-        (click)="openCreate()"
-        type="button"
-      >
-        <svg
-          class="icon-primary"
-          appIcon="folderAdd"
-          width="18"
-          height="18"
-        ></svg>
-        {{ "batches.create" | translate }}
-      </button>
+  <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
+    <button
+      class="btn btn-l btn-primary group"
+      (click)="openCreate()"
+      type="button"
+    >
+      <svg
+        class="icon-primary"
+        appIcon="folderAdd"
+        width="20"
+        height="20"
+      ></svg>
+      {{ "batches.create" | translate }}
+    </button>
 
-      <button
-        class="btn btn-m btn-tertiary"
-        (click)="toggleMine()"
-        type="button"
-      >
-        @if (filterMine()) {
+    <div class="flex w-full flex-row gap-3 sm:w-auto sm:items-center">
+      <div class="flex items-center gap-2">
+        <button
+          class="btn btn-l group border px-3.75 py-2.75"
+          [ngClass]="
+            !filterMine()
+              ? 'border-primary-default bg-main-secondary-default hover:border-primary-hover active:border-primary-pressed'
+              : 'border-tertiary-default bg-main-base hover:border-tertiary-hover active:border-tertiary-pressed'
+          "
+          (click)="setMine(false)"
+          type="button"
+        >
+          @if (!filterMine()) {
+            <svg
+              class="icon-secondary"
+              appIcon="checkCircle"
+              width="16"
+              height="16"
+            ></svg>
+          }
+
           {{ "batches.all" | translate }}
-        } @else {
+        </button>
+
+        <button
+          class="btn btn-l group border px-3.75 py-2.75"
+          [ngClass]="
+            filterMine()
+              ? 'border-primary-default bg-main-secondary-default hover:border-primary-hover active:border-primary-pressed'
+              : 'border-tertiary-default bg-main-base hover:border-tertiary-hover active:border-tertiary-pressed'
+          "
+          (click)="setMine(true)"
+          type="button"
+        >
+          @if (filterMine()) {
+            <svg
+              class="icon-secondary-default"
+              appIcon="checkCircle"
+              width="16"
+              height="16"
+            ></svg>
+          }
+
           {{ "batches.just_mine" | translate }}
-        }
-      </button>
+        </button>
+      </div>
+
+      <div class="relative w-full">
+        <svg
+          class="icon-tertiary pointer-events-none absolute top-1/2 left-4 -translate-y-1/2"
+          appIcon="search"
+          width="16"
+          height="16"
+        ></svg>
+
+        <input
+          class="border-tertiary-default bg-main-base focus:border-primary-default text-secondary h-12 w-full rounded-lg border pr-4 pl-10 outline-none"
+          [value]="searchInput()"
+          [placeholder]="'batches.search' | translate"
+          (input)="onSearchInput($event)"
+          type="text"
+        />
+      </div>
     </div>
   </div>
 
-  @if (loading()) {
-    <div class="text-md">{{ "batches.loading" | translate }}</div>
-  } @else if (error()) {
-    <div class="text-md text-error">{{ error() }}</div>
-  } @else if (!data() || rows().length === 0) {
-    <div class="text-md">{{ "batches.no_batches" | translate }}</div>
-  } @else {
-    <div class="flex min-h-0 flex-1 flex-col">
-      <div class="min-h-0 flex-1 overflow-auto rounded-lg">
-        <table class="text-md min-w-full">
-          <thead class="bg-main-bright text-secondary sticky top-0 z-2">
+  <div class="flex min-h-0 flex-1 flex-col">
+    <div class="min-h-0 flex-1 overflow-auto rounded-lg">
+      <table class="text-md min-w-full table-fixed">
+        <colgroup>
+          <col class="w-[30%]" />
+          <col class="w-28" />
+          <col class="w-40" />
+          <col class="w-44" />
+          <col class="w-44" />
+          <col class="w-32" />
+          <col class="w-28" />
+        </colgroup>
+
+        <thead class="bg-main-bright text-secondary sticky top-0 z-2">
+          <tr>
+            <th class="px-3 py-2 text-left font-medium text-nowrap">
+              {{ "batches.title_and_subtitle" | translate }}
+            </th>
+            <th class="px-3 py-2 text-left font-medium text-nowrap">
+              {{ "batches.num_of_books" | translate }}
+            </th>
+            <th class="px-3 py-2 text-left font-medium">
+              {{ "batches.author" | translate }}
+            </th>
+            <th class="px-3 py-2 text-left font-medium">
+              <button
+                class="group flex cursor-pointer items-center gap-1 select-none"
+                (click)="setSort('created_at')"
+                type="button"
+              >
+                {{ "batches.created" | translate }}
+
+                <svg
+                  class="transition-transform duration-150"
+                  [ngClass]="
+                    sortBy() === 'created_at'
+                      ? 'icon-secondary'
+                      : 'icon-tertiary'
+                  "
+                  [class.rotate-90]="
+                    sortBy() === 'created_at' && sortDir() === 'asc'
+                  "
+                  [class.-rotate-90]="
+                    sortBy() !== 'created_at' || sortDir() === 'desc'
+                  "
+                  appIcon="arrowLeft"
+                  width="16"
+                  height="16"
+                ></svg>
+              </button>
+            </th>
+            <th class="px-3 py-2 text-left font-medium">
+              <button
+                class="group flex cursor-pointer items-center gap-1 select-none"
+                (click)="setSort('modified_at')"
+                type="button"
+              >
+                {{ "batches.edited" | translate }}
+
+                <svg
+                  class="transition-transform duration-150"
+                  [ngClass]="
+                    sortBy() === 'modified_at'
+                      ? 'icon-secondary'
+                      : 'icon-tertiary'
+                  "
+                  [class.rotate-90]="
+                    sortBy() === 'modified_at' && sortDir() === 'asc'
+                  "
+                  [class.-rotate-90]="
+                    sortBy() !== 'modified_at' || sortDir() === 'desc'
+                  "
+                  appIcon="arrowLeft"
+                  width="16"
+                  height="16"
+                ></svg>
+              </button>
+            </th>
+            <th class="px-3 py-2 text-left font-medium">
+              {{ "batches.state" | translate }}
+            </th>
+            <th class="px-3 py-2 text-left font-medium">
+              {{ "batches.actions" | translate }}
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @if (loading()) {
             <tr>
-              <th class="px-3 py-2 text-left font-medium text-nowrap">
-                {{ "batches.title_and_subtitle" | translate }}
-              </th>
-              <th class="px-3 py-2 text-left font-medium text-nowrap">
-                {{ "batches.num_of_books" | translate }}
-              </th>
-              <th class="px-3 py-2 text-left font-medium">
-                {{ "batches.author" | translate }}
-              </th>
-              <th class="px-3 py-2 text-left font-medium">
-                <button
-                  class="group flex cursor-pointer items-center gap-1 select-none"
-                  (click)="setSort('created_at')"
-                  type="button"
-                >
-                  {{ "batches.created" | translate }}
-
-                  <svg
-                    class="transition-transform duration-150"
-                    [ngClass]="
-                      sortBy() === 'created_at'
-                        ? 'icon-secondary'
-                        : 'icon-tertiary'
-                    "
-                    [class.rotate-90]="
-                      sortBy() === 'created_at' && sortDir() === 'asc'
-                    "
-                    [class.-rotate-90]="
-                      sortBy() !== 'created_at' || sortDir() === 'desc'
-                    "
-                    appIcon="arrowLeft"
-                    width="16"
-                    height="16"
-                  ></svg>
-                </button>
-              </th>
-              <th class="px-3 py-2 text-left font-medium">
-                <button
-                  class="group flex cursor-pointer items-center gap-1 select-none"
-                  (click)="setSort('modified_at')"
-                  type="button"
-                >
-                  {{ "batches.edited" | translate }}
-
-                  <svg
-                    class="transition-transform duration-150"
-                    [ngClass]="
-                      sortBy() === 'modified_at'
-                        ? 'icon-secondary'
-                        : 'icon-tertiary'
-                    "
-                    [class.rotate-90]="
-                      sortBy() === 'modified_at' && sortDir() === 'asc'
-                    "
-                    [class.-rotate-90]="
-                      sortBy() !== 'modified_at' || sortDir() === 'desc'
-                    "
-                    appIcon="arrowLeft"
-                    width="16"
-                    height="16"
-                  ></svg>
-                </button>
-              </th>
-              <th class="px-3 py-2 text-left font-medium">
-                {{ "batches.state" | translate }}
-              </th>
-              <th class="px-3 py-2 text-left font-medium">
-                {{ "batches.actions" | translate }}
-              </th>
+              <td class="px-3 py-6 text-center" colspan="7">
+                {{ "batches.loading" | translate }}
+              </td>
             </tr>
-          </thead>
-
-          <tbody>
+          } @else if (error()) {
+            <tr>
+              <td class="text-error px-3 py-6 text-center" colspan="7">
+                {{ error() }}
+              </td>
+            </tr>
+          } @else if (!data() || rows().length === 0) {
+            <tr>
+              <td class="px-3 py-6 text-center" colspan="7">
+                {{ "batches.no_batches" | translate }}
+              </td>
+            </tr>
+          } @else {
             @for (b of rows(); track b.batch_id) {
               <tr
                 class="bg-main-base border-bright cursor-pointer border-t transition-colors hover:bg-gray-500/5"
@@ -136,6 +207,7 @@
                     }
                   </div>
                 </td>
+
                 <td class="px-3 py-1">
                   <span
                     class="bg-main-light text-base-color inline-flex items-center rounded-lg px-4 py-1"
@@ -143,7 +215,9 @@
                     {{ b.num_books }}
                   </span>
                 </td>
+
                 <td class="px-3 py-1">{{ b.created_by }}</td>
+
                 <td class="px-3 py-1 text-nowrap">
                   <span>{{ b.created_at | date: "dd.MM.yyyy" }}</span>
                   <span class="text-light ml-1">
@@ -166,6 +240,7 @@
                     {{ b.state | batchStateLabel }}
                   </span>
                 </td>
+
                 <td class="px-3 py-1">
                   <div class="flex items-center gap-2">
                     <button
@@ -199,43 +274,73 @@
                   </div>
                 </td>
               </tr>
-            } @empty {
-              <tr>
-                <td class="px-3 py-4 text-center" colspan="8">
-                  {{ "batches.no_batches" | translate }}
-                </td>
-              </tr>
             }
-          </tbody>
-        </table>
-      </div>
+          }
+        </tbody>
+      </table>
     </div>
 
-    <div class="flex items-center justify-between text-sm">
-      <div class="text-light">
-        {{ "batches.total" | translate }}: {{ data()!.total }} •
-        {{ "batches.page" | translate }} {{ page() }} / {{ totalPages() }}
+    <div class="flex shrink-0 items-center justify-between gap-4 pt-4">
+      <div class="text-light text-md text-nowrap">
+        {{ from() }}-{{ to() }} / {{ data()?.total ?? 0 }}
       </div>
 
-      <div class="flex gap-2">
-        <button
-          class="cursor-pointer rounded border px-3 py-1 disabled:cursor-not-allowed disabled:opacity-40"
-          [disabled]="!data()!.has_prev"
-          (click)="goPrev()"
-        >
-          {{ "buttons.prev" | translate }}
-        </button>
+      <div class="flex items-center gap-5">
+        @if ((data()?.total ?? 0) > 0) {
+          <div class="flex items-center gap-2">
+            @for (item of visiblePages(); track $index) {
+              @if (item === "ellipsis-left" || item === "ellipsis-right") {
+                <span
+                  class="text-base-color flex h-10 min-w-8 shrink-0 items-center justify-center"
+                >
+                  ...
+                </span>
+              } @else {
+                <button
+                  class="btn btn-m shrink-0"
+                  [ngClass]="item === page() ? 'btn-primary' : 'btn-tertiary'"
+                  (click)="goToPage(item)"
+                  type="button"
+                >
+                  {{ item }}
+                </button>
+              }
+            }
+          </div>
+        }
 
-        <button
-          class="cursor-pointer rounded border px-3 py-1 disabled:cursor-not-allowed disabled:opacity-40"
-          [disabled]="!data()!.has_next"
-          (click)="goNext()"
-        >
-          {{ "buttons.next" | translate }}
-        </button>
+        <div class="flex items-center gap-2">
+          <button
+            class="btn btn-m btn-tertiary btn-icon group"
+            [disabled]="!hasPrev()"
+            (click)="goPrevPage()"
+            type="button"
+          >
+            <svg
+              class="icon-tertiary"
+              appIcon="arrowLeft"
+              width="16"
+              height="16"
+            ></svg>
+          </button>
+
+          <button
+            class="btn btn-m btn-tertiary btn-icon group"
+            [disabled]="!hasNext()"
+            (click)="goNextPage()"
+            type="button"
+          >
+            <svg
+              class="icon-tertiary"
+              appIcon="arrowRight"
+              width="16"
+              height="16"
+            ></svg>
+          </button>
+        </div>
       </div>
     </div>
-  }
+  </div>
 
   <dialog
     class="shadow-s m-auto w-full max-w-115 rounded-2xl bg-white backdrop:bg-black/40"

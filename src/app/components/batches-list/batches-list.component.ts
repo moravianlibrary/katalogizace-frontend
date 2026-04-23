@@ -8,9 +8,9 @@ import {
   signal,
   ViewChild,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { combineLatest } from 'rxjs';
+import { combineLatest, debounceTime, distinctUntilChanged } from 'rxjs';
 
 import {
   BatchDto,
@@ -24,6 +24,8 @@ import { BatchStateLabelPipe } from '../../pipes/batch-state-label.pipe';
 import { BatchesService } from '../../services/api/batches.service';
 import { ToastService } from '../../services/toast.service';
 import { IconComponent } from '../icon/icon.component';
+
+type VisiblePageItem = number | 'ellipsis-left' | 'ellipsis-right';
 
 @Component({
   standalone: true,
@@ -54,6 +56,73 @@ export class BatchesListComponent {
   sortBy = signal<'created_at' | 'modified_at' | null>(null);
   sortDir = signal<'asc' | 'desc'>('desc');
 
+  inputDisabled = signal(false);
+
+  filterMine = signal(false);
+
+  page = signal<number>(1);
+  pageSize = signal<number>(100);
+
+  searchInput = signal('');
+  searchQuery = signal('');
+
+  newName = signal('');
+  newDescription = signal('');
+  creating = signal(false);
+
+  editingBatch = signal<BatchDto | null>(null);
+  editName = signal('');
+  editDescription = signal('');
+  savingEdit = signal(false);
+
+  totalPages = computed(() =>
+    this.data()
+      ? Math.max(1, Math.ceil(this.data()!.total / this.data()!.page_size))
+      : 1,
+  );
+
+  from = computed(() => {
+    const data = this.data();
+    if (!data || data.total === 0) return 0;
+    return (data.page - 1) * data.page_size + 1;
+  });
+
+  to = computed(() => {
+    const data = this.data();
+    if (!data || data.total === 0) return 0;
+    return Math.min(data.page * data.page_size, data.total);
+  });
+
+  hasPrev = computed(() => !!this.data()?.has_prev);
+  hasNext = computed(() => !!this.data()?.has_next);
+
+  visiblePages = computed<VisiblePageItem[]>(() => {
+    const total = this.totalPages();
+    const current = this.page();
+
+    if (total <= 5) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+
+    if (current <= 3) {
+      return [1, 2, 3, 4, 'ellipsis-right', total];
+    }
+
+    if (current >= total - 2) {
+      return [1, 'ellipsis-left', total - 3, total - 2, total - 1, total];
+    }
+
+    return [
+      1,
+      'ellipsis-left',
+      current - 1,
+      current,
+      current + 1,
+      'ellipsis-right',
+      total,
+    ];
+  });
+
   edited = computed(() => {
     const batch = this.editingBatch();
     if (!batch) return false;
@@ -63,19 +132,6 @@ export class BatchesListComponent {
       this.editDescription().trim() !== (batch.description ?? '').trim()
     );
   });
-
-  inputDisabled = signal(false);
-
-  filterMine = signal(false);
-
-  page = signal<number>(1);
-  pageSize = signal<number>(100);
-
-  totalPages = computed(() =>
-    this.data()
-      ? Math.max(1, Math.ceil(this.data()!.total / this.data()!.page_size))
-      : 1,
-  );
 
   rows = computed<BatchDto[]>(() => {
     const batches = this.data()?.batches ?? [];
@@ -105,15 +161,6 @@ export class BatchesListComponent {
     this.sortDir.set('desc');
   }
 
-  newName = signal('');
-  newDescription = signal('');
-  creating = signal(false);
-
-  editingBatch = signal<BatchDto | null>(null);
-  editName = signal('');
-  editDescription = signal('');
-  savingEdit = signal(false);
-
   @ViewChild('editDialog', { static: true })
   editDialog!: ElementRef<HTMLDialogElement>;
 
@@ -130,15 +177,37 @@ export class BatchesListComponent {
       .subscribe(([_, qp]) => {
         const p = Number(qp.get('page') ?? '1');
         const ps = Number(qp.get('page_size') ?? '100');
+        const search = (qp.get('search') ?? '').trim();
 
         this.page.set(isNaN(p) || p < 1 ? 1 : p);
-        this.pageSize.set(isNaN(ps) || ps < 1 ? 100 : ps);
+        const normalizedPageSize = isNaN(ps)
+          ? 50
+          : Math.min(100, Math.max(1, ps));
+        this.pageSize.set(normalizedPageSize);
 
         const mine = qp.get('mine');
-        if (mine === '1' || mine === 'true') this.filterMine.set(true);
-        if (mine === '0' || mine === 'false') this.filterMine.set(false);
+        this.filterMine.set(mine === '1' || mine === 'true');
+
+        this.searchQuery.set(search);
+
+        if (this.searchInput() !== search) {
+          this.searchInput.set(search);
+        }
 
         this.load();
+      });
+
+    toObservable(this.searchInput)
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed())
+      .subscribe((value) => {
+        const normalized = value.trim();
+
+        if (normalized === this.searchQuery()) return;
+
+        this.navigateWithQuery({
+          page: 1,
+          search: normalized || null,
+        });
       });
   }
 
@@ -151,6 +220,7 @@ export class BatchesListComponent {
         filter_owned_by_user: this.filterMine(),
         page: this.page(),
         page_size: this.pageSize(),
+        search_query: this.searchQuery(),
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -170,41 +240,55 @@ export class BatchesListComponent {
       });
   }
 
-  goPrev() {
-    if (!this.data() || !this.data()!.has_prev) return;
-    const prevPage = Math.max(1, this.page() - 1);
-    this.page.set(prevPage);
-    this.navigateWithQuery({ page: prevPage });
+  goToPage(page: number) {
+    if (page < 1 || page > this.totalPages() || page === this.page()) return;
+    this.navigateWithQuery({ page });
   }
 
-  goNext() {
-    if (!this.data() || !this.data()!.has_next) return;
-    const nextPage = this.page() + 1;
-    this.page.set(nextPage);
-    this.navigateWithQuery({ page: nextPage });
+  goPrevPage() {
+    if (!this.hasPrev()) return;
+    this.navigateWithQuery({ page: this.page() - 1 });
+  }
+
+  goNextPage() {
+    if (!this.hasNext()) return;
+    this.navigateWithQuery({ page: this.page() + 1 });
+  }
+
+  onSearchInput(event: Event) {
+    this.searchInput.set((event.target as HTMLInputElement).value);
   }
 
   navigateWithQuery(partial: {
     page?: number;
     page_size?: number;
     mine?: string;
+    search?: string | null;
   }) {
+    const search =
+      partial.search !== undefined ? partial.search : this.searchQuery();
+
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {
-        page: this.page(),
-        page_size: this.pageSize(),
-        mine: this.filterMine() ? '1' : '0',
-        ...partial,
+        page: partial.page ?? this.page(),
+        page_size: partial.page_size ?? this.pageSize(),
+        mine: partial.mine ?? (this.filterMine() ? '1' : '0'),
+        search: search || null,
       },
       queryParamsHandling: 'merge',
     });
   }
 
-  toggleMine() {
-    this.filterMine.update((v) => !v);
-    this.page.set(1);
-    this.navigateWithQuery({ page: 1, mine: this.filterMine() ? '1' : '0' });
+  setMine(value: boolean) {
+    if (this.filterMine() === value) return;
+
+    this.filterMine.set(value);
+
+    this.navigateWithQuery({
+      page: 1,
+      mine: value ? '1' : '0',
+    });
   }
 
   open(batchId: ID) {

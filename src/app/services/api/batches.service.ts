@@ -22,9 +22,15 @@ export class BatchesService {
       filter_owned_by_user?: boolean;
       page?: number;
       page_size?: number;
+      search_query?: string;
     } = {},
   ) {
-    const { filter_owned_by_user = false, page = 1, page_size = 20 } = opts;
+    const {
+      filter_owned_by_user = false,
+      page = 1,
+      page_size = 100,
+      search_query,
+    } = opts;
 
     let params = new HttpParams()
       .set('page', String(page))
@@ -34,11 +40,14 @@ export class BatchesService {
       params = params.set('filter_owned_by_user', 'true');
     }
 
+    const normalizedQuery = search_query?.trim();
+    if (normalizedQuery) {
+      params = params.set('search_query', normalizedQuery);
+    }
+
     return this.http.get<PaginatedBatchesResponseDto>(
       `${this.apiBaseUrl}/batches/`,
-      {
-        params,
-      },
+      { params },
     );
   }
 
