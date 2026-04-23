@@ -4,6 +4,7 @@
 @utility btn {
   @apply
     inline-flex
+    items-center
     rounded-lg
     font-medium
     text-nowrap
