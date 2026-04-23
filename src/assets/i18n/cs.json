@@ -742,7 +742,8 @@
     "total": "Celkem",
     "page": "Strana",
     "all": "Vše",
-    "just_mine": "Jen moje"
+    "just_mine": "Jen moje",
+    "search": "Hledat skupinu"
   },
   "books": {
     "loading": "Načítám knihy...",
