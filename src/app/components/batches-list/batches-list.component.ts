@@ -53,7 +53,7 @@ export class BatchesListComponent {
   error = signal<string | null>(null);
   data = signal<PaginatedBatchesResponseDto | null>(null);
 
-  sortBy = signal<'created_at' | 'modified_at' | null>(null);
+  sortBy = signal<'created_at' | 'modified_at'>('modified_at');
   sortDir = signal<'asc' | 'desc'>('desc');
 
   inputDisabled = signal(false);
@@ -134,32 +134,8 @@ export class BatchesListComponent {
   });
 
   rows = computed<BatchDto[]>(() => {
-    const batches = this.data()?.batches ?? [];
-    const sortBy = this.sortBy();
-
-    if (!sortBy) {
-      return batches;
-    }
-
-    const sortDir = this.sortDir();
-
-    return [...batches].sort((a, b) => {
-      const aTime = a[sortBy] ? new Date(a[sortBy]).getTime() : 0;
-      const bTime = b[sortBy] ? new Date(b[sortBy]).getTime() : 0;
-
-      return sortDir === 'asc' ? aTime - bTime : bTime - aTime;
-    });
+    return this.data()?.batches ?? [];
   });
-
-  setSort(column: 'created_at' | 'modified_at') {
-    if (this.sortBy() === column) {
-      this.sortDir.update((dir) => (dir === 'asc' ? 'desc' : 'asc'));
-      return;
-    }
-
-    this.sortBy.set(column);
-    this.sortDir.set('desc');
-  }
 
   @ViewChild('editDialog', { static: true })
   editDialog!: ElementRef<HTMLDialogElement>;
@@ -179,16 +155,25 @@ export class BatchesListComponent {
         const ps = Number(qp.get('page_size') ?? '100');
         const search = (qp.get('search') ?? '').trim();
 
-        this.page.set(isNaN(p) || p < 1 ? 1 : p);
+        const sortByParam = qp.get('sort_by');
+        const sortOrderParam = qp.get('sort_order');
+
+        const normalizedSortBy =
+          sortByParam === 'created_at' ? 'created_at' : 'modified_at';
+        const normalizedSortOrder = sortOrderParam === 'asc' ? 'asc' : 'desc';
+
         const normalizedPageSize = isNaN(ps)
-          ? 50
+          ? 100
           : Math.min(100, Math.max(1, ps));
+
+        this.page.set(isNaN(p) || p < 1 ? 1 : p);
         this.pageSize.set(normalizedPageSize);
+        this.searchQuery.set(search);
+        this.sortBy.set(normalizedSortBy);
+        this.sortDir.set(normalizedSortOrder);
 
         const mine = qp.get('mine');
         this.filterMine.set(mine === '1' || mine === 'true');
-
-        this.searchQuery.set(search);
 
         if (this.searchInput() !== search) {
           this.searchInput.set(search);
@@ -211,6 +196,21 @@ export class BatchesListComponent {
       });
   }
 
+  setSort(column: 'created_at' | 'modified_at') {
+    const nextDir =
+      this.sortBy() === column
+        ? this.sortDir() === 'asc'
+          ? 'desc'
+          : 'asc'
+        : 'desc';
+
+    this.navigateWithQuery({
+      page: 1,
+      sort_by: column,
+      sort_order: nextDir,
+    });
+  }
+
   load() {
     this.loading.set(true);
     this.error.set(null);
@@ -221,6 +221,8 @@ export class BatchesListComponent {
         page: this.page(),
         page_size: this.pageSize(),
         search_query: this.searchQuery(),
+        sort_by: this.sortBy(),
+        sort_order: this.sortDir(),
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -264,6 +266,8 @@ export class BatchesListComponent {
     page_size?: number;
     mine?: string;
     search?: string | null;
+    sort_by?: 'created_at' | 'modified_at';
+    sort_order?: 'asc' | 'desc';
   }) {
     const search =
       partial.search !== undefined ? partial.search : this.searchQuery();
@@ -275,6 +279,8 @@ export class BatchesListComponent {
         page_size: partial.page_size ?? this.pageSize(),
         mine: partial.mine ?? (this.filterMine() ? '1' : '0'),
         search: search || null,
+        sort_by: partial.sort_by ?? this.sortBy(),
+        sort_order: partial.sort_order ?? this.sortDir(),
       },
       queryParamsHandling: 'merge',
     });

@@ -64,7 +64,7 @@ export class BooksListComponent {
   searchInput = signal('');
   searchQuery = signal('');
 
-  sortBy = signal<'created_at' | 'modified_at' | null>(null);
+  sortBy = signal<'created_at' | 'modified_at'>('created_at');
   sortDir = signal<'asc' | 'desc'>('desc');
 
   totalPages = computed(() =>
@@ -116,21 +116,7 @@ export class BooksListComponent {
   });
 
   rows = computed<PaginatedBooksResponseDto['books']>(() => {
-    const books = this.data()?.books ?? [];
-    const sortBy = this.sortBy();
-
-    if (!sortBy) {
-      return books;
-    }
-
-    const sortDir = this.sortDir();
-
-    return [...books].sort((a, b) => {
-      const aTime = a[sortBy] ? new Date(a[sortBy]).getTime() : 0;
-      const bTime = b[sortBy] ? new Date(b[sortBy]).getTime() : 0;
-
-      return sortDir === 'asc' ? aTime - bTime : bTime - aTime;
-    });
+    return this.data()?.books ?? [];
   });
 
   constructor() {
@@ -184,6 +170,13 @@ export class BooksListComponent {
         const ps = Number(qp.get('page_size') ?? '100');
         const search = (qp.get('search') ?? '').trim();
 
+        const sortByParam = qp.get('sort_by');
+        const sortOrderParam = qp.get('sort_order');
+
+        const normalizedSortBy =
+          sortByParam === 'modified_at' ? 'modified_at' : 'created_at';
+        const normalizedSortOrder = sortOrderParam === 'asc' ? 'asc' : 'desc';
+
         const normalizedPageSize = isNaN(ps)
           ? 100
           : Math.min(100, Math.max(1, ps));
@@ -191,6 +184,8 @@ export class BooksListComponent {
         this.page.set(isNaN(p) || p < 1 ? 1 : p);
         this.pageSize.set(normalizedPageSize);
         this.searchQuery.set(search);
+        this.sortBy.set(normalizedSortBy);
+        this.sortDir.set(normalizedSortOrder);
 
         if (this.searchInput() !== search) {
           this.searchInput.set(search);
@@ -218,13 +213,18 @@ export class BooksListComponent {
   }
 
   setSort(column: 'created_at' | 'modified_at') {
-    if (this.sortBy() === column) {
-      this.sortDir.update((dir) => (dir === 'asc' ? 'desc' : 'asc'));
-      return;
-    }
+    const nextDir =
+      this.sortBy() === column
+        ? this.sortDir() === 'asc'
+          ? 'desc'
+          : 'asc'
+        : 'desc';
 
-    this.sortBy.set(column);
-    this.sortDir.set('desc');
+    this.navigateWithQuery({
+      page: 1,
+      sort_by: column,
+      sort_order: nextDir,
+    });
   }
 
   load() {
@@ -245,6 +245,8 @@ export class BooksListComponent {
         page_size: this.pageSize(),
         batch_id: batchId.toString(),
         search_query: this.searchQuery(),
+        sort_by: this.sortBy(),
+        sort_order: this.sortDir(),
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -285,6 +287,8 @@ export class BooksListComponent {
     page?: number;
     page_size?: number;
     search?: string | null;
+    sort_by?: 'created_at' | 'modified_at';
+    sort_order?: 'asc' | 'desc';
   }) {
     const search =
       partial.search !== undefined ? partial.search : this.searchQuery();
@@ -295,6 +299,8 @@ export class BooksListComponent {
         page: partial.page ?? this.page(),
         page_size: partial.page_size ?? this.pageSize(),
         search: search || null,
+        sort_by: partial.sort_by ?? this.sortBy(),
+        sort_order: partial.sort_order ?? this.sortDir(),
       },
       queryParamsHandling: 'merge',
     });

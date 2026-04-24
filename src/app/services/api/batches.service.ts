@@ -23,6 +23,8 @@ export class BatchesService {
       page?: number;
       page_size?: number;
       search_query?: string;
+      sort_by?: 'created_at' | 'modified_at';
+      sort_order?: 'asc' | 'desc';
     } = {},
   ) {
     const {
@@ -30,19 +32,22 @@ export class BatchesService {
       page = 1,
       page_size = 100,
       search_query,
+      sort_by = 'modified_at',
+      sort_order = 'desc',
     } = opts;
 
     let params = new HttpParams()
       .set('page', String(page))
-      .set('page_size', String(page_size));
+      .set('page_size', String(page_size))
+      .set('sort_by', sort_by)
+      .set('sort_order', sort_order);
 
     if (filter_owned_by_user) {
       params = params.set('filter_owned_by_user', 'true');
     }
 
-    const normalizedQuery = search_query?.trim();
-    if (normalizedQuery) {
-      params = params.set('search_query', normalizedQuery);
+    if (search_query !== undefined) {
+      params = params.set('search_query', search_query.trim());
     }
 
     return this.http.get<PaginatedBatchesResponseDto>(

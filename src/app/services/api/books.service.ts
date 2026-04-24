@@ -27,6 +27,8 @@ export class BooksService {
       page?: number;
       page_size?: number;
       search_query?: string;
+      sort_by?: 'created_at' | 'modified_at';
+      sort_order?: 'asc' | 'desc';
       process_state?: ProcessState | null;
       record_state?: RecordState | null;
       batch_id?: string;
@@ -36,13 +38,18 @@ export class BooksService {
       page = 1,
       page_size = 100,
       search_query,
+      sort_by = 'created_at',
+      sort_order = 'desc',
       process_state,
       record_state,
       batch_id,
     } = opts;
+
     let params = new HttpParams()
       .set('page', String(page))
-      .set('page_size', String(page_size));
+      .set('page_size', String(page_size))
+      .set('sort_by', sort_by)
+      .set('sort_order', sort_order);
 
     if (batch_id) {
       params = params.set('batch_id', batch_id);
