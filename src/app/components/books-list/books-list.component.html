@@ -289,24 +289,24 @@
                 (keyup.enter)="b.process_state === 'completed' && open(b)"
                 (keyup.space)="b.process_state === 'completed' && open(b)"
               >
-                <td class="max-w-xs truncate px-3 py-2">{{ b.title }}</td>
-                <td class="max-w-xs truncate px-3 py-2">
+                <td class="max-w-xs truncate px-3 py-1">{{ b.title }}</td>
+                <td class="max-w-xs truncate px-3 py-1">
                   {{ b.author }}
                 </td>
-                <td class="px-3 py-2">{{ b.year_of_publishing }}</td>
-                <td class="px-3 py-2 text-nowrap">
+                <td class="px-3 py-1">{{ b.year_of_publishing }}</td>
+                <td class="px-3 py-1 text-nowrap">
                   <span>{{ b.created_at | date: "dd.MM.yyyy" }}</span>
                   <span class="text-light ml-1">
                     {{ b.created_at | date: "HH:mm:ss" }}
                   </span>
                 </td>
-                <td class="px-3 py-2 text-nowrap">
+                <td class="px-3 py-1 text-nowrap">
                   <span>{{ b.modified_at | date: "dd.MM.yyyy" }}</span>
                   <span class="text-light ml-1">
                     {{ b.modified_at | date: "HH:mm:ss" }}
                   </span>
                 </td>
-                <td class="px-3 py-2">
+                <td class="px-3 py-1">
                   <span
                     class="inline-flex items-center rounded px-2 py-0.5 text-sm font-medium"
                     [ngClass]="processStateBadgeClass(b.process_state)"
@@ -314,7 +314,7 @@
                     {{ b.process_state | processStateLabel }}
                   </span>
                 </td>
-                <td class="px-3 py-2">
+                <td class="px-3 py-1">
                   <span
                     class="inline-flex items-center rounded px-2 py-0.5 text-sm font-medium"
                     [ngClass]="
@@ -329,7 +329,7 @@
                     }}
                   </span>
                 </td>
-                <td class="px-3 py-2">
+                <td class="px-3 py-1">
                   <div class="flex items-center gap-2">
                     <button
                       class="btn btn-icon btn-s btn-tertiary group enabled:hover:shadow-s"
