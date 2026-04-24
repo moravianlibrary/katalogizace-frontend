@@ -418,16 +418,36 @@ export class BatchesListComponent {
     });
   }
 
-  batchStateBadgeClass(state?: BatchState | null) {
+  batchStateBadgeClass(state: BatchState) {
     switch (state) {
       case 'created':
-        return 'bg-slate-100 text-slate-700';
+        return 'bg-cyan-500/10 text-[#011934]';
       case 'in_progress':
-        return 'bg-blue-100 text-blue-700';
+        return 'bg-orange-500/10 text-[#362000]';
       case 'completed':
-        return 'bg-green-100 text-green-700';
-      default:
-        return 'bg-slate-100 text-slate-600';
+        return 'bg-green-500/10 text-[#00310D]';
+    }
+  }
+
+  batchStateBadgeIconClass(state: BatchState) {
+    switch (state) {
+      case 'created':
+        return 'icon-link';
+      case 'in_progress':
+        return 'icon-warning';
+      case 'completed':
+        return 'icon-success';
+    }
+  }
+
+  batchStateBadgeIconName(state: BatchState) {
+    switch (state) {
+      case 'created':
+        return 'document';
+      case 'in_progress':
+        return 'refresh';
+      case 'completed':
+        return 'checkCircleEmpty';
     }
   }
 

@@ -92,7 +92,7 @@
           <col class="w-64" />
           <col class="w-48" />
           <col class="w-48" />
-          <col class="w-40" />
+          <col class="w-46" />
           <col class="w-32" />
         </colgroup>
 
@@ -287,11 +287,17 @@
                   </span>
                 </td>
 
-                <td class="px-3 py-1">
+                <td class="px-3 py-1 text-nowrap">
                   <span
-                    class="inline-flex items-center rounded px-2 py-0.5 text-sm font-medium"
+                    class="text-sm-tight inline-flex items-center gap-1 rounded-md p-2 font-medium"
                     [ngClass]="batchStateBadgeClass(b.state)"
                   >
+                    <svg
+                      [ngClass]="batchStateBadgeIconClass(b.state)"
+                      [appIcon]="batchStateBadgeIconName(b.state)"
+                      width="16"
+                      height="16"
+                    ></svg>
                     {{ b.state | batchStateLabel }}
                   </span>
                 </td>

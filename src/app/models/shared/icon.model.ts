@@ -29,7 +29,10 @@ export type AppIconName =
   | 'folderAdd'
   | 'edit'
   | 'fitToScreen'
-  | 'filter';
+  | 'filter'
+  | 'document'
+  | 'editUnderline'
+  | 'checkCircleEmpty';
 
 export type IconDefinition = {
   paths: Array<{
