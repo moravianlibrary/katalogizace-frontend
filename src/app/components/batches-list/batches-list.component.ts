@@ -75,6 +75,9 @@ export class BatchesListComponent {
   editDescription = signal('');
   savingEdit = signal(false);
 
+  stateFilterOpen = signal(false);
+  batchState = signal<BatchState | null>(null);
+
   totalPages = computed(() =>
     this.data()
       ? Math.max(1, Math.ceil(this.data()!.total / this.data()!.page_size))
@@ -137,6 +140,15 @@ export class BatchesListComponent {
     return this.data()?.batches ?? [];
   });
 
+  readonly batchStateOptions: {
+    value: BatchState | null;
+  }[] = [
+    { value: null },
+    { value: 'created' },
+    { value: 'in_progress' },
+    { value: 'completed' },
+  ];
+
   @ViewChild('editDialog', { static: true })
   editDialog!: ElementRef<HTMLDialogElement>;
 
@@ -162,6 +174,14 @@ export class BatchesListComponent {
           sortByParam === 'created_at' ? 'created_at' : 'modified_at';
         const normalizedSortOrder = sortOrderParam === 'asc' ? 'asc' : 'desc';
 
+        const stateParam = qp.get('state');
+        const normalizedBatchState: BatchState | null =
+          stateParam === 'created' ||
+          stateParam === 'in_progress' ||
+          stateParam === 'completed'
+            ? stateParam
+            : null;
+
         const normalizedPageSize = isNaN(ps)
           ? 100
           : Math.min(100, Math.max(1, ps));
@@ -171,6 +191,7 @@ export class BatchesListComponent {
         this.searchQuery.set(search);
         this.sortBy.set(normalizedSortBy);
         this.sortDir.set(normalizedSortOrder);
+        this.batchState.set(normalizedBatchState);
 
         const mine = qp.get('mine');
         this.filterMine.set(mine === '1' || mine === 'true');
@@ -223,6 +244,7 @@ export class BatchesListComponent {
         search_query: this.searchQuery(),
         sort_by: this.sortBy(),
         sort_order: this.sortDir(),
+        batch_state: this.batchState(),
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -268,9 +290,13 @@ export class BatchesListComponent {
     search?: string | null;
     sort_by?: 'created_at' | 'modified_at';
     sort_order?: 'asc' | 'desc';
+    state?: BatchState | null;
   }) {
     const search =
       partial.search !== undefined ? partial.search : this.searchQuery();
+
+    const state =
+      partial.state !== undefined ? partial.state : this.batchState();
 
     this.router.navigate([], {
       relativeTo: this.route,
@@ -281,9 +307,29 @@ export class BatchesListComponent {
         search: search || null,
         sort_by: partial.sort_by ?? this.sortBy(),
         sort_order: partial.sort_order ?? this.sortDir(),
+        state: state || null,
       },
       queryParamsHandling: 'merge',
     });
+  }
+
+  toggleStateFilter(event?: MouseEvent) {
+    event?.stopPropagation();
+    this.stateFilterOpen.update((v) => !v);
+  }
+
+  setBatchStateFilter(state: BatchState | null) {
+    this.batchState.set(state);
+    this.stateFilterOpen.set(false);
+
+    this.navigateWithQuery({
+      page: 1,
+      state,
+    });
+  }
+
+  closeStateFilter() {
+    this.stateFilterOpen.set(false);
   }
 
   setMine(value: boolean) {

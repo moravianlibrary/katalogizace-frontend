@@ -119,6 +119,34 @@ export class BooksListComponent {
     return this.data()?.books ?? [];
   });
 
+  processStateFilterOpen = signal(false);
+  recordStateFilterOpen = signal(false);
+
+  processState = signal<ProcessState | null>(null);
+  recordState = signal<RecordState | null>(null);
+
+  readonly processStateOptions: {
+    value: ProcessState | null;
+  }[] = [
+    { value: null },
+    { value: 'created' },
+    { value: 'scheduled' },
+    { value: 'in_progress' },
+    { value: 'ready' },
+    { value: 'failed' },
+    { value: 'completed' },
+  ];
+
+  readonly recordStateOptions: {
+    value: RecordState | null;
+  }[] = [
+    { value: null },
+    { value: 'new' },
+    { value: 'edited' },
+    { value: 'reviewed' },
+    { value: 'completed' },
+  ];
+
   constructor() {
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((pm) => {
       const bidParam = pm.get('batchId');
@@ -181,11 +209,33 @@ export class BooksListComponent {
           ? 100
           : Math.min(100, Math.max(1, ps));
 
+        const processStateParam = qp.get('process_state');
+        const normalizedProcessState: ProcessState | null =
+          processStateParam === 'created' ||
+          processStateParam === 'scheduled' ||
+          processStateParam === 'in_progress' ||
+          processStateParam === 'ready' ||
+          processStateParam === 'failed' ||
+          processStateParam === 'completed'
+            ? processStateParam
+            : null;
+
+        const recordStateParam = qp.get('record_state');
+        const normalizedRecordState: RecordState | null =
+          recordStateParam === 'new' ||
+          recordStateParam === 'edited' ||
+          recordStateParam === 'reviewed' ||
+          recordStateParam === 'completed'
+            ? recordStateParam
+            : null;
+
         this.page.set(isNaN(p) || p < 1 ? 1 : p);
         this.pageSize.set(normalizedPageSize);
         this.searchQuery.set(search);
         this.sortBy.set(normalizedSortBy);
         this.sortDir.set(normalizedSortOrder);
+        this.processState.set(normalizedProcessState);
+        this.recordState.set(normalizedRecordState);
 
         if (this.searchInput() !== search) {
           this.searchInput.set(search);
@@ -247,6 +297,8 @@ export class BooksListComponent {
         search_query: this.searchQuery(),
         sort_by: this.sortBy(),
         sort_order: this.sortDir(),
+        process_state: this.processState(),
+        record_state: this.recordState(),
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -289,9 +341,21 @@ export class BooksListComponent {
     search?: string | null;
     sort_by?: 'created_at' | 'modified_at';
     sort_order?: 'asc' | 'desc';
+    process_state?: ProcessState | null;
+    record_state?: RecordState | null;
   }) {
     const search =
       partial.search !== undefined ? partial.search : this.searchQuery();
+
+    const processState =
+      partial.process_state !== undefined
+        ? partial.process_state
+        : this.processState();
+
+    const recordState =
+      partial.record_state !== undefined
+        ? partial.record_state
+        : this.recordState();
 
     this.router.navigate([], {
       relativeTo: this.route,
@@ -301,6 +365,8 @@ export class BooksListComponent {
         search: search || null,
         sort_by: partial.sort_by ?? this.sortBy(),
         sort_order: partial.sort_order ?? this.sortDir(),
+        process_state: processState || null,
+        record_state: recordState || null,
       },
       queryParamsHandling: 'merge',
     });
@@ -463,5 +529,42 @@ export class BooksListComponent {
         b.book_id === bookId ? { ...b, ...patch } : b,
       ),
     });
+  }
+
+  toggleProcessStateFilter(event?: MouseEvent) {
+    event?.stopPropagation();
+    this.recordStateFilterOpen.set(false);
+    this.processStateFilterOpen.update((v) => !v);
+  }
+
+  toggleRecordStateFilter(event?: MouseEvent) {
+    event?.stopPropagation();
+    this.processStateFilterOpen.set(false);
+    this.recordStateFilterOpen.update((v) => !v);
+  }
+
+  setProcessStateFilter(state: ProcessState | null) {
+    this.processState.set(state);
+    this.processStateFilterOpen.set(false);
+
+    this.navigateWithQuery({
+      page: 1,
+      process_state: state,
+    });
+  }
+
+  setRecordStateFilter(state: RecordState | null) {
+    this.recordState.set(state);
+    this.recordStateFilterOpen.set(false);
+
+    this.navigateWithQuery({
+      page: 1,
+      record_state: state,
+    });
+  }
+
+  closeFilters() {
+    this.processStateFilterOpen.set(false);
+    this.recordStateFilterOpen.set(false);
   }
 }

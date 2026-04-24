@@ -11,18 +11,21 @@
       "in_progress": "Probíhá zpracování",
       "ready": "Připraveno",
       "failed": "Chyba",
-      "completed": "Dokončeno"
+      "completed": "Dokončeno",
+      "all": "Vše"
     },
     "recordState": {
       "new": "Nový záznam",
       "edited": "Upraveno",
       "reviewed": "Zkontrolováno",
-      "completed": "Schváleno"
+      "completed": "Schváleno",
+      "all": "Vše"
     },
     "batchState": {
       "created": "Vytvořeno",
       "in_progress": "Probíhá zpracování",
-      "completed": "Dokončeno"
+      "completed": "Dokončeno",
+      "all": "Vše"
     },
     "stepKind": {
       "extraction": "Extrakce",

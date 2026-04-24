@@ -1,5 +1,6 @@
 import {
   BatchDto,
+  BatchState,
   BatchWithBooksDto,
   PaginatedBatchesResponseDto,
   UpdateBatchRequest,
@@ -25,6 +26,7 @@ export class BatchesService {
       search_query?: string;
       sort_by?: 'created_at' | 'modified_at';
       sort_order?: 'asc' | 'desc';
+      batch_state?: BatchState | null;
     } = {},
   ) {
     const {
@@ -34,6 +36,7 @@ export class BatchesService {
       search_query,
       sort_by = 'modified_at',
       sort_order = 'desc',
+      batch_state,
     } = opts;
 
     let params = new HttpParams()
@@ -48,6 +51,10 @@ export class BatchesService {
 
     if (search_query !== undefined) {
       params = params.set('search_query', search_query.trim());
+    }
+
+    if (batch_state) {
+      params = params.set('batch_state', batch_state);
     }
 
     return this.http.get<PaginatedBatchesResponseDto>(
