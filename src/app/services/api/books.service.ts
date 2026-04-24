@@ -26,6 +26,7 @@ export class BooksService {
     opts: {
       page?: number;
       page_size?: number;
+      search_query?: string;
       process_state?: ProcessState | null;
       record_state?: RecordState | null;
       batch_id?: string;
@@ -33,7 +34,8 @@ export class BooksService {
   ) {
     const {
       page = 1,
-      page_size = 20,
+      page_size = 100,
+      search_query,
       process_state,
       record_state,
       batch_id,
@@ -42,13 +44,25 @@ export class BooksService {
       .set('page', String(page))
       .set('page_size', String(page_size));
 
-    if (batch_id) params = params.set('batch_id', batch_id);
+    if (batch_id) {
+      params = params.set('batch_id', batch_id);
+    }
+
+    if (search_query !== undefined) {
+      params = params.set('search_query', search_query.trim());
+    }
+
+    if (process_state) {
+      params = params.set('process_state', process_state);
+    }
+
+    if (record_state) {
+      params = params.set('record_state', record_state);
+    }
 
     return this.http.get<PaginatedBooksResponseDto>(
       `${this.apiBaseUrl}/books/`,
-      {
-        params,
-      },
+      { params },
     );
   }
 

@@ -757,7 +757,8 @@
     "record_state": "Stav záznamu",
     "actions": "Akce",
     "total": "Celkem",
-    "page": "Strana"
+    "page": "Strana",
+    "search": "Hledat knihu"
   },
   "dialogs": {
     "authority_search": "Vyhledávání autorit",

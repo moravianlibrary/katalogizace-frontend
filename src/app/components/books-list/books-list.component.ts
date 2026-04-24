@@ -9,10 +9,10 @@ import { BookImageCacheService } from '@/app/services/book-image-cache.service';
 import { BreadcrumbsService } from '@/app/services/breadcrumbs.service';
 import { DatePipe, NgClass } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { combineLatest } from 'rxjs';
+import { combineLatest, debounceTime, distinctUntilChanged } from 'rxjs';
 import { ProcessStateLabelPipe } from '../../pipes/process-state-label.pipe';
 import { RecordStateLabelPipe } from '../../pipes/record-state-label.pipe';
 import { BatchesService } from '../../services/api/batches.service';
@@ -20,6 +20,8 @@ import { BooksService } from '../../services/api/books.service';
 import { ContextPanelService } from '../../services/context-panel.service';
 import { ToastService } from '../../services/toast.service';
 import { IconComponent } from '../icon/icon.component';
+
+type VisiblePageItem = number | 'ellipsis-left' | 'ellipsis-right';
 
 @Component({
   standalone: true,
@@ -59,6 +61,9 @@ export class BooksListComponent {
   page = signal<number>(1);
   pageSize = signal<number>(100);
 
+  searchInput = signal('');
+  searchQuery = signal('');
+
   sortBy = signal<'created_at' | 'modified_at' | null>(null);
   sortDir = signal<'asc' | 'desc'>('desc');
 
@@ -67,6 +72,48 @@ export class BooksListComponent {
       ? Math.max(1, Math.ceil(this.data()!.total / this.data()!.page_size))
       : 1,
   );
+
+  from = computed(() => {
+    const data = this.data();
+    if (!data || data.total === 0) return 0;
+    return (data.page - 1) * data.page_size + 1;
+  });
+
+  to = computed(() => {
+    const data = this.data();
+    if (!data || data.total === 0) return 0;
+    return Math.min(data.page * data.page_size, data.total);
+  });
+
+  hasPrev = computed(() => !!this.data()?.has_prev);
+  hasNext = computed(() => !!this.data()?.has_next);
+
+  visiblePages = computed<VisiblePageItem[]>(() => {
+    const total = this.totalPages();
+    const current = this.page();
+
+    if (total <= 5) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+
+    if (current <= 3) {
+      return [1, 2, 3, 4, 'ellipsis-right', total];
+    }
+
+    if (current >= total - 2) {
+      return [1, 'ellipsis-left', total - 3, total - 2, total - 1, total];
+    }
+
+    return [
+      1,
+      'ellipsis-left',
+      current - 1,
+      current,
+      current + 1,
+      'ellipsis-right',
+      total,
+    ];
+  });
 
   rows = computed<PaginatedBooksResponseDto['books']>(() => {
     const books = this.data()?.books ?? [];
@@ -87,44 +134,82 @@ export class BooksListComponent {
   });
 
   constructor() {
+    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((pm) => {
+      const bidParam = pm.get('batchId');
+      const bid = bidParam !== null ? Number(bidParam) : null;
+      const normalizedBatchId =
+        bid !== null && !isNaN(bid) && bid > 0 ? bid : null;
+
+      this.batchId.set(normalizedBatchId);
+
+      if (normalizedBatchId) {
+        this.batchesService.getBatch(normalizedBatchId.toString()).subscribe({
+          next: (resp) => {
+            this.batch.set(resp);
+
+            this.breadcrumbs.setBatch(resp.batch_id, resp.name);
+            this.breadcrumbs.clearBook();
+          },
+          error: (err) => {
+            this.error.set(
+              this.translate.instant(
+                'messages.error.batches.batch_detail_load',
+              ),
+            );
+            console.error(err);
+
+            this.batch.set(null);
+            this.breadcrumbs.setBatch(normalizedBatchId, null);
+            this.breadcrumbs.clearBook();
+          },
+        });
+      } else {
+        this.batch.set(null);
+        this.breadcrumbs.clearBatch();
+        this.breadcrumbs.clearBook();
+      }
+    });
+
     combineLatest([this.route.paramMap, this.route.queryParamMap])
       .pipe(takeUntilDestroyed())
       .subscribe(([pm, qp]) => {
         const bidParam = pm.get('batchId');
         const bid = bidParam !== null ? Number(bidParam) : null;
-        this.batchId.set(bid);
+        const normalizedBatchId =
+          bid !== null && !isNaN(bid) && bid > 0 ? bid : null;
+
+        this.batchId.set(normalizedBatchId);
 
         const p = Number(qp.get('page') ?? '1');
         const ps = Number(qp.get('page_size') ?? '100');
+        const search = (qp.get('search') ?? '').trim();
+
+        const normalizedPageSize = isNaN(ps)
+          ? 100
+          : Math.min(100, Math.max(1, ps));
+
         this.page.set(isNaN(p) || p < 1 ? 1 : p);
-        this.pageSize.set(isNaN(ps) || ps < 1 ? 100 : ps);
+        this.pageSize.set(normalizedPageSize);
+        this.searchQuery.set(search);
 
-        if (bid) {
-          this.batchesService.getBatch(bid.toString()).subscribe({
-            next: (resp) => {
-              this.batch.set(resp);
-
-              this.breadcrumbs.setBatch(resp.batch_id, resp.name);
-              this.breadcrumbs.clearBook();
-            },
-            error: (err) => {
-              this.error.set(
-                this.translate.instant(
-                  'messages.error.batches.batch_detail_load',
-                ),
-              );
-              console.error(err);
-
-              this.breadcrumbs.setBatch(bid, null);
-              this.breadcrumbs.clearBook();
-            },
-          });
-        } else {
-          this.batch.set(null);
-          this.breadcrumbs.clearBatch();
+        if (this.searchInput() !== search) {
+          this.searchInput.set(search);
         }
 
         this.load();
+      });
+
+    toObservable(this.searchInput)
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed())
+      .subscribe((value) => {
+        const normalized = value.trim();
+
+        if (normalized === this.searchQuery()) return;
+
+        this.navigateWithQuery({
+          page: 1,
+          search: normalized || null,
+        });
       });
   }
 
@@ -143,6 +228,14 @@ export class BooksListComponent {
   }
 
   load() {
+    const batchId = this.batchId();
+
+    if (!batchId) {
+      this.data.set(null);
+      this.loading.set(false);
+      return;
+    }
+
     this.loading.set(true);
     this.error.set(null);
 
@@ -150,7 +243,8 @@ export class BooksListComponent {
       .listBooks({
         page: this.page(),
         page_size: this.pageSize(),
-        batch_id: this.batchId()!.toString(),
+        batch_id: batchId.toString(),
+        search_query: this.searchQuery(),
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -168,27 +262,39 @@ export class BooksListComponent {
       });
   }
 
-  goPrev() {
-    if (!this.data() || !this.data()!.has_prev) return;
-    const prevPage = Math.max(1, this.page() - 1);
-    this.page.set(prevPage);
-    this.navigateWithQuery({ page: prevPage });
+  goToPage(page: number) {
+    if (page < 1 || page > this.totalPages() || page === this.page()) return;
+    this.navigateWithQuery({ page });
   }
 
-  goNext() {
-    if (!this.data() || !this.data()!.has_next) return;
-    const nextPage = this.page() + 1;
-    this.page.set(nextPage);
-    this.navigateWithQuery({ page: nextPage });
+  goPrevPage() {
+    if (!this.hasPrev()) return;
+    this.navigateWithQuery({ page: this.page() - 1 });
   }
 
-  navigateWithQuery(partial: { page?: number; page_size?: number }) {
+  goNextPage() {
+    if (!this.hasNext()) return;
+    this.navigateWithQuery({ page: this.page() + 1 });
+  }
+
+  onSearchInput(event: Event) {
+    this.searchInput.set((event.target as HTMLInputElement).value);
+  }
+
+  navigateWithQuery(partial: {
+    page?: number;
+    page_size?: number;
+    search?: string | null;
+  }) {
+    const search =
+      partial.search !== undefined ? partial.search : this.searchQuery();
+
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: {
-        page: this.page(),
-        page_size: this.pageSize(),
-        ...partial,
+        page: partial.page ?? this.page(),
+        page_size: partial.page_size ?? this.pageSize(),
+        search: search || null,
       },
       queryParamsHandling: 'merge',
     });
@@ -253,11 +359,14 @@ export class BooksListComponent {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
 
+    const batchId = this.batchId();
+    if (!batchId) return;
+
     const files = Array.from(input.files);
 
     this.isUploading = true;
 
-    this.books.uploadImages(files, this.batchId()?.toString()!).subscribe({
+    this.books.uploadImages(files, batchId.toString()).subscribe({
       next: () => {
         this.toast.show(
           this.translate.instant('messages.success.books.images_upload'),

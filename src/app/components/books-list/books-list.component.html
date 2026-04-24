@@ -1,69 +1,55 @@
 <section class="mx-auto flex h-full min-h-0 flex-col gap-4 p-4">
   <div
-    class="flex flex-col items-center justify-center gap-4 min-[20rem]:flex-row md:justify-end"
+    class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
   >
-    <!-- <button
-      class="bg-main-primary-default text-on-color hover:bg-main-primary-hover active:bg-main-primary-pressed disabled:bg-main-primary-disable disabled:text-btn-primary-disable inline-flex cursor-pointer gap-3 rounded-xl px-4 py-3 font-medium disabled:cursor-not-allowed"
-      [routerLink]="
-        batchId()
-          ? ['/batches', batchId(), 'books', 'capture-native']
-          : ['/books/capture-native']
-      "
-      type="button"
+    <div
+      class="flex w-full flex-wrap items-center justify-center gap-3 sm:w-auto"
     >
-      Naskenovat (native)
-      <svg
-        class="icon-on-color"
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 22 22"
+      <button
+        class="btn btn-l btn-primary group"
+        [routerLink]="
+          batchId()
+            ? ['/batches', batchId(), 'books', 'capture']
+            : ['/books/capture']
+        "
+        type="button"
       >
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M7.41423 0.601191C7.98928 0.244923 8.68205 0 9.36797 0H11.658C12.3401 0 13.0307 0.245717 13.6037 0.601647C14.177 0.957745 14.7016 1.46694 15.0073 2.07165L15.0097 2.07644L15.7264 3.51968C15.8818 3.81498 16.1875 4 16.508 4C19.1093 4 21.1746 6.19412 21.0064 8.78851L20.4865 17.0471C20.4145 18.1872 20.0693 19.313 19.2769 20.1599C18.47 21.0222 17.2893 21.5 15.748 21.5H5.26797C3.72696 21.5 2.54393 21.0224 1.73582 20.1605C0.941924 19.3136 0.596175 18.1876 0.529346 17.0454L0.52924 17.0436L0.0095416 8.78851C-0.158187 6.19443 1.90692 4 4.50797 4C4.82846 4 5.13415 3.81499 5.28957 3.5197L6.00861 2.07164C6.31435 1.46681 6.8392 0.957446 7.41423 0.601191ZM7.34839 2.74623L6.62389 4.20529C6.21849 4.98713 5.4057 5.5 4.50797 5.5C2.76927 5.5 1.39456 6.96588 1.5064 8.69149L1.50649 8.69288L2.02671 16.9564C2.08013 17.8736 2.34944 18.6218 2.83012 19.1345C3.29701 19.6326 4.04898 20 5.26797 20H15.748C16.9667 20 17.7159 19.6328 18.1816 19.1351C18.6616 18.622 18.9314 17.8728 18.9895 16.9529L19.5095 8.69149C19.6214 6.96588 18.2467 5.5 16.508 5.5C15.6102 5.5 14.7976 4.98707 14.3922 4.20524L14.3861 4.19361L13.6676 2.74624C13.5129 2.44158 13.208 2.12169 12.8122 1.87585C12.4153 1.62928 11.9958 1.5 11.658 1.5H9.36797C9.0239 1.5 8.60166 1.63008 8.20421 1.87631C7.80767 2.12198 7.50299 2.4417 7.34839 2.74623Z"
-        />
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M8.25781 6.75C8.25781 6.33579 8.5936 6 9.00781 6H12.0078C12.422 6 12.7578 6.33579 12.7578 6.75C12.7578 7.16421 12.422 7.5 12.0078 7.5H9.00781C8.5936 7.5 8.25781 7.16421 8.25781 6.75Z"
-        />
-        <path
-          fill-rule="evenodd"
-          clip-rule="evenodd"
-          d="M6.50781 13.5C6.50781 11.2958 8.3036 9.5 10.5078 9.5C12.712 9.5 14.5078 11.2958 14.5078 13.5C14.5078 15.7042 12.712 17.5 10.5078 17.5C8.3036 17.5 6.50781 15.7042 6.50781 13.5ZM10.5078 11C9.13203 11 8.00781 12.1242 8.00781 13.5C8.00781 14.8758 9.13203 16 10.5078 16C11.8836 16 13.0078 14.8758 13.0078 13.5C13.0078 12.1242 11.8836 11 10.5078 11Z"
-        />
-      </svg>
-    </button> -->
+        {{ "buttons.scan" | translate }}
+        <svg class="icon-primary" appIcon="camera" width="20" height="20"></svg>
+      </button>
 
-    <button
-      class="btn btn-l btn-primary group"
-      [routerLink]="
-        batchId()
-          ? ['/batches', batchId(), 'books', 'capture']
-          : ['/books/capture']
-      "
-      type="button"
-    >
-      {{ "buttons.scan" | translate }}
-      <svg class="icon-primary" appIcon="camera" width="20" height="20"></svg>
-    </button>
+      <button
+        class="btn btn-l btn-primary group"
+        [disabled]="isUploading"
+        (click)="!isUploading && fileInput.click()"
+        type="button"
+      >
+        @if (isUploading) {
+          {{ "buttons.uploading" | translate }}
+        } @else {
+          {{ "buttons.upload" | translate }}
+        }
 
-    <button
-      class="btn btn-l btn-primary group"
-      [disabled]="isUploading"
-      (click)="!isUploading && fileInput.click()"
-      type="button"
-    >
-      @if (isUploading) {
-        {{ "buttons.uploading" | translate }}
-      } @else {
-        {{ "buttons.upload" | translate }}
-      }
+        <svg class="icon-primary" appIcon="upload" width="20" height="20"></svg>
+      </button>
+    </div>
 
-      <svg class="icon-primary" appIcon="upload" width="20" height="20"></svg>
-    </button>
+    <div class="relative w-full sm:w-78">
+      <svg
+        class="icon-tertiary pointer-events-none absolute top-1/2 left-4 -translate-y-1/2"
+        appIcon="search"
+        width="16"
+        height="16"
+      ></svg>
+
+      <input
+        class="border-tertiary-default bg-main-base focus:border-primary-default text-secondary h-12 w-full rounded-lg border pr-4 pl-10 outline-none"
+        [value]="searchInput()"
+        [placeholder]="'books.search' | translate"
+        (input)="onSearchInput($event)"
+        type="text"
+      />
+    </div>
   </div>
 
   <input
@@ -75,94 +61,117 @@
     hidden
   />
 
-  @if (loading()) {
-    <div class="text-md">{{ "books.loading" | translate }}</div>
-  } @else if (error()) {
-    <div class="text-md text-error">{{ error() }}</div>
-  } @else if (!data() || rows().length === 0) {
-    <div class="text-md">{{ "books.no_books" | translate }}</div>
-  } @else {
-    <div class="flex min-h-0 flex-1 flex-col">
-      <div class="min-h-0 flex-1 overflow-auto rounded-lg">
-        <table class="text-md min-w-full">
-          <thead class="bg-main-bright text-secondary sticky top-0 z-2">
+  <div class="flex min-h-0 flex-1 flex-col">
+    <div class="min-h-0 flex-1 overflow-auto rounded-lg">
+      <table class="text-md min-w-full table-fixed">
+        <colgroup>
+          <col class="w-[25%]" />
+          <col class="w-[10%]" />
+          <col class="w-28" />
+          <col class="w-44" />
+          <col class="w-44" />
+          <col class="w-36" />
+          <col class="w-36" />
+          <col class="w-28" />
+        </colgroup>
+
+        <thead class="bg-main-bright text-secondary sticky top-0 z-2">
+          <tr>
+            <th class="px-3 py-2 text-left font-medium text-nowrap">
+              {{ "books.book_title" | translate }}
+            </th>
+            <th class="px-3 py-2 text-left font-medium">
+              {{ "books.author" | translate }}
+            </th>
+            <th class="px-3 py-2 text-left font-medium text-nowrap">
+              {{ "books.publication_year" | translate }}
+            </th>
+            <th class="px-3 py-2 text-left font-medium">
+              <button
+                class="group flex cursor-pointer items-center gap-1 select-none"
+                (click)="setSort('created_at')"
+                type="button"
+              >
+                {{ "books.created" | translate }}
+
+                <svg
+                  class="transition-transform duration-150"
+                  [ngClass]="
+                    sortBy() === 'created_at'
+                      ? 'icon-secondary'
+                      : 'icon-tertiary'
+                  "
+                  [class.rotate-90]="
+                    sortBy() === 'created_at' && sortDir() === 'asc'
+                  "
+                  [class.-rotate-90]="
+                    sortBy() !== 'created_at' || sortDir() === 'desc'
+                  "
+                  appIcon="arrowLeft"
+                  width="16"
+                  height="16"
+                ></svg>
+              </button>
+            </th>
+            <th class="px-3 py-2 text-left font-medium">
+              <button
+                class="group flex cursor-pointer items-center gap-1 select-none"
+                (click)="setSort('modified_at')"
+                type="button"
+              >
+                {{ "books.edited" | translate }}
+
+                <svg
+                  class="transition-transform duration-150"
+                  [ngClass]="
+                    sortBy() === 'modified_at'
+                      ? 'icon-secondary'
+                      : 'icon-tertiary'
+                  "
+                  [class.rotate-90]="
+                    sortBy() === 'modified_at' && sortDir() === 'asc'
+                  "
+                  [class.-rotate-90]="
+                    sortBy() !== 'modified_at' || sortDir() === 'desc'
+                  "
+                  appIcon="arrowLeft"
+                  width="16"
+                  height="16"
+                ></svg>
+              </button>
+            </th>
+            <th class="px-3 py-2 text-left font-medium text-nowrap">
+              {{ "books.process_state" | translate }}
+            </th>
+            <th class="px-3 py-2 text-left font-medium text-nowrap">
+              {{ "books.record_state" | translate }}
+            </th>
+            <th class="px-3 py-2 text-left font-medium">
+              {{ "books.actions" | translate }}
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @if (loading()) {
             <tr>
-              <th class="px-3 py-2 text-left font-medium text-nowrap">
-                {{ "books.book_title" | translate }}
-              </th>
-              <th class="px-3 py-2 text-left font-medium">
-                {{ "books.author" | translate }}
-              </th>
-              <th class="px-3 py-2 text-left font-medium text-nowrap">
-                {{ "books.publication_year" | translate }}
-              </th>
-              <th class="px-3 py-2 text-left font-medium">
-                <button
-                  class="group flex cursor-pointer items-center gap-1 select-none"
-                  (click)="setSort('created_at')"
-                  type="button"
-                >
-                  {{ "books.created" | translate }}
-
-                  <svg
-                    class="transition-transform duration-150"
-                    [ngClass]="
-                      sortBy() === 'created_at'
-                        ? 'icon-secondary'
-                        : 'icon-tertiary'
-                    "
-                    [class.rotate-90]="
-                      sortBy() === 'created_at' && sortDir() === 'asc'
-                    "
-                    [class.-rotate-90]="
-                      sortBy() !== 'created_at' || sortDir() === 'desc'
-                    "
-                    appIcon="arrowLeft"
-                    width="16"
-                    height="16"
-                  ></svg>
-                </button>
-              </th>
-              <th class="px-3 py-2 text-left font-medium">
-                <button
-                  class="group flex cursor-pointer items-center gap-1 select-none"
-                  (click)="setSort('modified_at')"
-                  type="button"
-                >
-                  {{ "books.edited" | translate }}
-
-                  <svg
-                    class="transition-transform duration-150"
-                    [ngClass]="
-                      sortBy() === 'modified_at'
-                        ? 'icon-secondary'
-                        : 'icon-tertiary'
-                    "
-                    [class.rotate-90]="
-                      sortBy() === 'modified_at' && sortDir() === 'asc'
-                    "
-                    [class.-rotate-90]="
-                      sortBy() !== 'modified_at' || sortDir() === 'desc'
-                    "
-                    appIcon="arrowLeft"
-                    width="16"
-                    height="16"
-                  ></svg>
-                </button>
-              </th>
-              <th class="px-3 py-2 text-left font-medium text-nowrap">
-                {{ "books.process_state" | translate }}
-              </th>
-              <th class="px-3 py-2 text-left font-medium text-nowrap">
-                {{ "books.record_state" | translate }}
-              </th>
-              <th class="px-3 py-2 text-left font-medium">
-                {{ "books.actions" | translate }}
-              </th>
+              <td class="px-3 py-6 text-center" colspan="8">
+                {{ "books.loading" | translate }}
+              </td>
             </tr>
-          </thead>
-
-          <tbody>
+          } @else if (error()) {
+            <tr>
+              <td class="text-error px-3 py-6 text-center" colspan="8">
+                {{ error() }}
+              </td>
+            </tr>
+          } @else if (!data() || rows().length === 0) {
+            <tr>
+              <td class="px-3 py-6 text-center" colspan="8">
+                {{ "books.no_books" | translate }}
+              </td>
+            </tr>
+          } @else {
             @for (b of rows(); track b.book_id) {
               <tr
                 class="bg-main-base border-bright h-13 border-t transition-colors hover:bg-gray-500/5"
@@ -250,39 +259,71 @@
                   </div>
                 </td>
               </tr>
-            } @empty {
-              <tr>
-                <td class="px-3 py-4 text-center" colspan="5">
-                  {{ "books.no_books" | translate }}
-                </td>
-              </tr>
             }
-          </tbody>
-        </table>
-      </div>
+          }
+        </tbody>
+      </table>
     </div>
 
-    <div class="flex items-center justify-between text-sm">
-      <div class="text-light">
-        {{ "books.total" | translate }}: {{ data()!.total }} •
-        {{ "books.page" | translate }} {{ page() }} / {{ totalPages() }}
+    <div class="flex shrink-0 items-center justify-between gap-4 pt-4">
+      <div class="text-light text-md text-nowrap">
+        {{ from() }}-{{ to() }} / {{ data()?.total ?? 0 }}
       </div>
-      <div class="flex gap-2">
-        <button
-          class="cursor-pointer rounded border px-3 py-1 disabled:cursor-not-allowed disabled:opacity-40"
-          [disabled]="!data()!.has_prev"
-          (click)="goPrev()"
-        >
-          {{ "buttons.prev" | translate }}
-        </button>
-        <button
-          class="cursor-pointer rounded border px-3 py-1 disabled:cursor-not-allowed disabled:opacity-40"
-          [disabled]="!data()!.has_next"
-          (click)="goNext()"
-        >
-          {{ "buttons.next" | translate }}
-        </button>
+
+      <div class="flex items-center gap-5">
+        @if ((data()?.total ?? 0) > 0) {
+          <div class="flex items-center gap-2">
+            @for (item of visiblePages(); track $index) {
+              @if (item === "ellipsis-left" || item === "ellipsis-right") {
+                <span
+                  class="text-base-color flex h-10 min-w-8 shrink-0 items-center justify-center"
+                >
+                  ...
+                </span>
+              } @else {
+                <button
+                  class="btn btn-m shrink-0"
+                  [ngClass]="item === page() ? 'btn-primary' : 'btn-tertiary'"
+                  (click)="goToPage(item)"
+                  type="button"
+                >
+                  {{ item }}
+                </button>
+              }
+            }
+          </div>
+        }
+
+        <div class="flex items-center gap-2">
+          <button
+            class="btn btn-m btn-tertiary btn-icon group"
+            [disabled]="!hasPrev()"
+            (click)="goPrevPage()"
+            type="button"
+          >
+            <svg
+              class="icon-tertiary"
+              appIcon="arrowLeft"
+              width="16"
+              height="16"
+            ></svg>
+          </button>
+
+          <button
+            class="btn btn-m btn-tertiary btn-icon group"
+            [disabled]="!hasNext()"
+            (click)="goNextPage()"
+            type="button"
+          >
+            <svg
+              class="icon-tertiary"
+              appIcon="arrowRight"
+              width="16"
+              height="16"
+            ></svg>
+          </button>
+        </div>
       </div>
     </div>
-  }
+  </div>
 </section>
