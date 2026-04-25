@@ -64,8 +64,8 @@
     hidden
   />
 
-  <div class="flex min-h-0 flex-1 flex-col">
-    <div class="min-h-0 flex-1 overflow-auto rounded-lg">
+  <div class="flex min-h-0 flex-1 flex-col justify-between">
+    <div class="bg-main-light overflow-auto rounded-lg">
       <table class="text-md w-full table-fixed">
         <colgroup>
           <col class="w-80" />
@@ -80,7 +80,9 @@
 
         <thead class="bg-main-bright text-secondary sticky top-0 z-2">
           <tr>
-            <th class="px-3 py-2 text-left font-medium text-nowrap">
+            <th
+              class="rounded-tl-lg px-3 py-2 text-left font-medium text-nowrap"
+            >
               {{ "books.book_title" | translate }}
             </th>
             <th class="px-3 py-2 text-left font-medium">
@@ -253,7 +255,7 @@
                 </div>
               }
             </th>
-            <th class="px-3 py-2 text-left font-medium">
+            <th class="rounded-tr-lg px-3 py-2 text-left font-medium">
               {{ "books.actions" | translate }}
             </th>
           </tr>
@@ -262,14 +264,17 @@
         <tbody>
           @if (loading()) {
             <tr>
-              <td class="bg-main-base px-3 py-3.5 text-center" colspan="8">
+              <td
+                class="bg-main-base rounded-b-lg px-3 py-3.5 text-center"
+                colspan="8"
+              >
                 {{ "books.loading" | translate }}
               </td>
             </tr>
           } @else if (error()) {
             <tr>
               <td
-                class="text-error bg-main-base px-3 py-3.5 text-center"
+                class="text-error bg-main-base rounded-b-lg px-3 py-3.5 text-center"
                 colspan="8"
               >
                 {{ error() }}
@@ -277,12 +282,15 @@
             </tr>
           } @else if (!data() || rows().length === 0) {
             <tr>
-              <td class="bg-main-base px-3 py-3.5 text-center" colspan="8">
+              <td
+                class="bg-main-base rounded-b-lg px-3 py-3.5 text-center"
+                colspan="8"
+              >
                 {{ "books.no_books" | translate }}
               </td>
             </tr>
           } @else {
-            @for (b of rows(); track b.book_id) {
+            @for (b of rows(); track b.book_id; let last = $last) {
               <tr
                 class="bg-main-base border-bright h-13 border-t transition-colors hover:bg-gray-500/5"
                 [class.cursor-pointer]="b.process_state === 'completed'"
@@ -292,7 +300,12 @@
                 (keyup.enter)="b.process_state === 'completed' && open(b)"
                 (keyup.space)="b.process_state === 'completed' && open(b)"
               >
-                <td class="max-w-xs truncate px-3 py-1">{{ b.title }}</td>
+                <td
+                  class="max-w-xs truncate px-3 py-1"
+                  [class.rounded-bl-lg]="last"
+                >
+                  {{ b.title }}
+                </td>
                 <td class="max-w-xs truncate px-3 py-1">
                   {{ b.author }}
                 </td>
@@ -347,7 +360,7 @@
                     }}
                   </span>
                 </td>
-                <td class="px-3 py-1">
+                <td class="px-3 py-1" [class.rounded-bl-lg]="last">
                   <div class="flex items-center gap-2">
                     <button
                       class="btn btn-tertiary group enabled:hover:shadow-s p-2"

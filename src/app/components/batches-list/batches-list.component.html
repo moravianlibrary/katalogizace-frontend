@@ -83,8 +83,8 @@
     </div>
   </div>
 
-  <div class="flex min-h-0 flex-1 flex-col">
-    <div class="min-h-0 flex-1 overflow-auto rounded-lg">
+  <div class="flex min-h-0 flex-1 flex-col justify-between">
+    <div class="bg-main-light overflow-auto rounded-lg">
       <table class="text-md w-full table-fixed">
         <colgroup>
           <col class="w-80" />
@@ -98,7 +98,9 @@
 
         <thead class="bg-main-bright text-secondary sticky top-0 z-2">
           <tr>
-            <th class="px-3 py-2 text-left font-medium text-nowrap">
+            <th
+              class="rounded-tl-lg px-3 py-2 text-left font-medium text-nowrap"
+            >
               {{ "batches.title_and_subtitle" | translate }}
             </th>
             <th class="px-3 py-2 text-left font-medium text-nowrap">
@@ -216,7 +218,7 @@
                 </div>
               }
             </th>
-            <th class="px-3 py-2 text-left font-medium">
+            <th class="rounded-tr-lg px-3 py-2 text-left font-medium">
               {{ "batches.actions" | translate }}
             </th>
           </tr>
@@ -225,14 +227,17 @@
         <tbody>
           @if (loading()) {
             <tr>
-              <td class="bg-main-base px-3 py-3.5 text-center" colspan="7">
+              <td
+                class="bg-main-base rounded-b-lg px-3 py-3.5 text-center"
+                colspan="7"
+              >
                 {{ "batches.loading" | translate }}
               </td>
             </tr>
           } @else if (error()) {
             <tr>
               <td
-                class="bg-main-base text-error px-3 py-3.5 text-center"
+                class="bg-main-base text-error rounded-b-lg px-3 py-3.5 text-center"
                 colspan="7"
               >
                 {{ error() }}
@@ -240,12 +245,15 @@
             </tr>
           } @else if (!data() || rows().length === 0) {
             <tr>
-              <td class="bg-main-base px-3 py-3.5 text-center" colspan="7">
+              <td
+                class="bg-main-base rounded-b-lg px-3 py-3.5 text-center"
+                colspan="7"
+              >
                 {{ "batches.no_batches" | translate }}
               </td>
             </tr>
           } @else {
-            @for (b of rows(); track b.batch_id) {
+            @for (b of rows(); track b.batch_id; let last = $last) {
               <tr
                 class="bg-main-base border-bright cursor-pointer border-t transition-colors hover:bg-gray-500/5"
                 (click)="open(b.batch_id)"
@@ -254,7 +262,10 @@
                 tabindex="0"
                 role="button"
               >
-                <td class="min-h-11 max-w-xs px-3 py-1">
+                <td
+                  class="min-h-11 max-w-xs px-3 py-1"
+                  [class.rounded-bl-lg]="last"
+                >
                   <div class="flex min-h-11 flex-col justify-center">
                     <div class="truncate">{{ b.name }}</div>
 
@@ -305,7 +316,7 @@
                   </span>
                 </td>
 
-                <td class="px-3 py-1">
+                <td class="px-3 py-1" [class.rounded-br-lg]="last">
                   <div class="flex items-center gap-2">
                     <button
                       class="btn btn-tertiary group enabled:hover:shadow-s p-2"
