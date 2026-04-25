@@ -1,7 +1,7 @@
 import { BookStatusResponseDto } from '../books/book.dto';
 import { ID } from '../shared/id.model';
 import { BatchState, ProcessState } from '../shared/states.model';
-import { UserPermission } from '../users/user.dto';
+import { BatchPermission } from '../users/user.dto';
 
 export type BatchDto = {
   batch_id: ID;
@@ -25,7 +25,7 @@ export type PaginatedBatchesResponseDto = {
   page_size: number;
   has_next: boolean;
   has_prev: boolean;
-  permissions: UserPermission[];
+  permissions: BatchPermission[];
 };
 
 export interface BatchBooksResponseDto {

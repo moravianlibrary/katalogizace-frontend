@@ -3,7 +3,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { tap } from 'rxjs/operators';
 import { EnvironmentService } from '../../services/environment.service';
 
-import { CurrentUserDto, LoginDto, RegisterDto, TokenDto } from '@/app/models';
+import { LoginDto, RegisterDto, TokenDto, UserDto } from '@/app/models';
 import { BookImageCacheService } from '../book-image-cache.service';
 
 @Injectable({ providedIn: 'root' })
@@ -19,7 +19,7 @@ export class AuthService {
   readonly token = signal<string | null>(localStorage.getItem('access_token'));
   readonly isLoggedIn = computed(() => !!this.token());
 
-  readonly user = signal<CurrentUserDto | null>(null);
+  readonly user = signal<UserDto | null>(null);
   readonly userEmail = computed(() => this.user()?.email ?? null);
   readonly userName = computed(() => this.user()?.full_name ?? null);
 
@@ -62,7 +62,7 @@ export class AuthService {
 
   loadCurrentUser() {
     return this.http
-      .get<CurrentUserDto>(`${this.apiBaseUrl}/users/current-user`)
+      .get<UserDto>(`${this.apiBaseUrl}/users/current-user`)
       .pipe(tap((u) => this.user.set(u)));
   }
 
