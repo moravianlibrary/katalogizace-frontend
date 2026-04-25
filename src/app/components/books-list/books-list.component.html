@@ -75,7 +75,7 @@
           <col class="w-48" />
           <col class="w-46" />
           <col class="w-40" />
-          <col class="w-32" />
+          <col class="w-24" />
         </colgroup>
 
         <thead class="bg-main-bright text-secondary sticky top-0 z-2">
@@ -347,7 +347,7 @@
                 <td class="px-3 py-1">
                   <div class="flex items-center gap-2">
                     <button
-                      class="btn btn-icon btn-s btn-tertiary group enabled:hover:shadow-s"
+                      class="btn btn-tertiary group enabled:hover:shadow-s p-2"
                       [disabled]="
                         b.process_state === 'in_progress' ||
                         b.process_state === 'scheduled'
@@ -365,7 +365,7 @@
                       ></svg>
                     </button>
                     <button
-                      class="btn btn-icon btn-s btn-tertiary group enabled:hover:shadow-s"
+                      class="btn btn-tertiary group enabled:hover:shadow-s p-2"
                       (click)="onDelete(b.book_id, $event)"
                       type="button"
                       aria-label="Smazat knihu"
