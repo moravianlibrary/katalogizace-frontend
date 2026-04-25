@@ -262,19 +262,22 @@
         <tbody>
           @if (loading()) {
             <tr>
-              <td class="px-3 py-6 text-center" colspan="8">
+              <td class="bg-main-base px-3 py-3.5 text-center" colspan="8">
                 {{ "books.loading" | translate }}
               </td>
             </tr>
           } @else if (error()) {
             <tr>
-              <td class="text-error px-3 py-6 text-center" colspan="8">
+              <td
+                class="text-error bg-main-base px-3 py-3.5 text-center"
+                colspan="8"
+              >
                 {{ error() }}
               </td>
             </tr>
           } @else if (!data() || rows().length === 0) {
             <tr>
-              <td class="px-3 py-6 text-center" colspan="8">
+              <td class="bg-main-base px-3 py-3.5 text-center" colspan="8">
                 {{ "books.no_books" | translate }}
               </td>
             </tr>
