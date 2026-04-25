@@ -372,37 +372,95 @@ export class BooksListComponent {
     });
   }
 
-  processStateBadgeClass(state?: ProcessState | null) {
+  processStateBadgeClass(state: ProcessState) {
     switch (state) {
       case 'created':
-        return 'bg-slate-100 text-slate-700';
+        return 'bg-cyan-500/10 text-[#011934]';
       case 'scheduled':
-        return 'bg-indigo-100 text-indigo-700';
+        return 'bg-amber-500/10 text-[#4A3200]';
       case 'in_progress':
-        return 'bg-blue-100 text-blue-700';
+        return 'bg-orange-500/10 text-[#362000]';
       case 'ready':
-        return 'bg-amber-100 text-amber-800';
+        return 'bg-indigo-500/10 text-[#1D185A]';
       case 'failed':
-        return 'bg-red-100 text-red-700';
+        return 'bg-red-500/10 text-[#390400]';
       case 'completed':
-        return 'bg-green-100 text-green-700';
-      default:
-        return 'bg-slate-100 text-slate-600';
+        return 'bg-green-500/10 text-[#00310D]';
+    }
+  }
+
+  processStateBadgeIconClass(state: ProcessState) {
+    switch (state) {
+      case 'created':
+        return 'icon-link';
+      case 'scheduled':
+        return 'fill-amber-500';
+      case 'in_progress':
+        return 'icon-warning';
+      case 'ready':
+        return 'fill-indigo-500';
+      case 'failed':
+        return 'icon-error';
+      case 'completed':
+        return 'icon-success';
+    }
+  }
+
+  processStateBadgeIconName(state: ProcessState) {
+    switch (state) {
+      case 'created':
+        return 'document';
+      case 'scheduled':
+        return 'timer';
+      case 'in_progress':
+        return 'refresh';
+      case 'ready':
+        return 'clipboardTick';
+      case 'failed':
+        return 'shieldError';
+      case 'completed':
+        return 'checkCircleEmpty';
     }
   }
 
   recordStateBadgeClass(state?: RecordState | null) {
     switch (state) {
       case 'new':
-        return 'bg-slate-100 text-slate-700';
+        return 'bg-cyan-500/10 text-[#011934]';
       case 'edited':
-        return 'bg-blue-100 text-blue-700';
+        return 'bg-orange-500/10 text-[#362000]';
       case 'reviewed':
-        return 'bg-amber-100 text-amber-800';
+        return 'bg-indigo-500/10 text-[#1D185A]';
       case 'completed':
-        return 'bg-green-100 text-green-700';
+        return 'bg-green-500/10 text-[#00310D]';
       default:
         return 'bg-slate-100 text-slate-600';
+    }
+  }
+
+  recordStateBadgeIconClass(state: RecordState) {
+    switch (state) {
+      case 'new':
+        return 'icon-link';
+      case 'edited':
+        return 'icon-warning';
+      case 'reviewed':
+        return 'fill-indigo-500';
+      case 'completed':
+        return 'icon-success';
+    }
+  }
+
+  recordStateBadgeIconName(state: RecordState) {
+    switch (state) {
+      case 'new':
+        return 'document';
+      case 'edited':
+        return 'editUnderline';
+      case 'reviewed':
+        return 'clipboardTick';
+      case 'completed':
+        return 'checkCircleEmpty';
     }
   }
 

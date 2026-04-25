@@ -73,7 +73,7 @@
           <col class="w-28" />
           <col class="w-48" />
           <col class="w-48" />
-          <col class="w-40" />
+          <col class="w-46" />
           <col class="w-40" />
           <col class="w-32" />
         </colgroup>
@@ -306,23 +306,38 @@
                     {{ b.modified_at | date: "HH:mm:ss" }}
                   </span>
                 </td>
-                <td class="px-3 py-1">
+                <td class="px-3 py-1 text-nowrap">
                   <span
-                    class="inline-flex items-center rounded px-2 py-0.5 text-sm font-medium"
+                    class="text-sm-tight inline-flex items-center gap-1 rounded-md p-2 font-medium"
                     [ngClass]="processStateBadgeClass(b.process_state)"
                   >
+                    <svg
+                      [ngClass]="processStateBadgeIconClass(b.process_state)"
+                      [appIcon]="processStateBadgeIconName(b.process_state)"
+                      width="16"
+                      height="16"
+                    ></svg>
                     {{ b.process_state | processStateLabel }}
                   </span>
                 </td>
-                <td class="px-3 py-1">
+                <td class="px-3 py-1 text-nowrap">
                   <span
-                    class="inline-flex items-center rounded px-2 py-0.5 text-sm font-medium"
+                    class="text-sm-tight inline-flex items-center gap-1 rounded-md p-2 font-medium"
                     [ngClass]="
                       recordStateBadgeClass(
                         b.process_state === 'completed' ? b.record_state : null
                       )
                     "
                   >
+                    @if (b.process_state === "completed") {
+                      <svg
+                        [ngClass]="recordStateBadgeIconClass(b.record_state)"
+                        [appIcon]="recordStateBadgeIconName(b.record_state)"
+                        width="16"
+                        height="16"
+                      ></svg>
+                    }
+
                     {{
                       (b.process_state === "completed" ? b.record_state : null)
                         | recordStateLabel
