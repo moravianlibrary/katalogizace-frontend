@@ -32,7 +32,10 @@ export type AppIconName =
   | 'filter'
   | 'document'
   | 'editUnderline'
-  | 'checkCircleEmpty';
+  | 'checkCircleEmpty'
+  | 'clipboardTick'
+  | 'shieldError'
+  | 'timer';
 
 export type IconDefinition = {
   paths: Array<{
