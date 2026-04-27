@@ -78,6 +78,8 @@ export class BatchesListComponent {
   stateFilterOpen = signal(false);
   batchState = signal<BatchState | null>(null);
 
+  filterMenuPosition = signal<{ top: number; left: number } | null>(null);
+
   totalPages = computed(() =>
     this.data()
       ? Math.max(1, Math.ceil(this.data()!.total / this.data()!.page_size))
@@ -313,9 +315,23 @@ export class BatchesListComponent {
     });
   }
 
-  toggleStateFilter(event?: MouseEvent) {
-    event?.stopPropagation();
-    this.stateFilterOpen.update((v) => !v);
+  toggleStateFilter(event: MouseEvent) {
+    event.stopPropagation();
+
+    if (this.stateFilterOpen()) {
+      this.closeStateFilter();
+      return;
+    }
+
+    const button = event.currentTarget as HTMLElement;
+    const rect = button.getBoundingClientRect();
+
+    this.filterMenuPosition.set({
+      top: rect.bottom + 8,
+      left: rect.left,
+    });
+
+    this.stateFilterOpen.set(true);
   }
 
   setBatchStateFilter(state: BatchState | null) {
@@ -330,6 +346,7 @@ export class BatchesListComponent {
 
   closeStateFilter() {
     this.stateFilterOpen.set(false);
+    this.filterMenuPosition.set(null);
   }
 
   setMine(value: boolean) {

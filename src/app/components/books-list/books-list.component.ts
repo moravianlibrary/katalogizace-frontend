@@ -67,6 +67,11 @@ export class BooksListComponent {
   sortBy = signal<'created_at' | 'modified_at'>('created_at');
   sortDir = signal<'asc' | 'desc'>('desc');
 
+  processFilterMenuPosition = signal<{ top: number; left: number } | null>(
+    null,
+  );
+  recordFilterMenuPosition = signal<{ top: number; left: number } | null>(null);
+
   totalPages = computed(() =>
     this.data()
       ? Math.max(1, Math.ceil(this.data()!.total / this.data()!.page_size))
@@ -589,16 +594,50 @@ export class BooksListComponent {
     });
   }
 
-  toggleProcessStateFilter(event?: MouseEvent) {
-    event?.stopPropagation();
+  toggleProcessStateFilter(event: MouseEvent) {
+    event.stopPropagation();
+
+    if (this.processStateFilterOpen()) {
+      this.processStateFilterOpen.set(false);
+      this.processFilterMenuPosition.set(null);
+      return;
+    }
+
     this.recordStateFilterOpen.set(false);
-    this.processStateFilterOpen.update((v) => !v);
+    this.recordFilterMenuPosition.set(null);
+
+    const button = event.currentTarget as HTMLElement;
+    const rect = button.getBoundingClientRect();
+
+    this.processFilterMenuPosition.set({
+      top: rect.bottom + 8,
+      left: rect.left,
+    });
+
+    this.processStateFilterOpen.set(true);
   }
 
-  toggleRecordStateFilter(event?: MouseEvent) {
-    event?.stopPropagation();
+  toggleRecordStateFilter(event: MouseEvent) {
+    event.stopPropagation();
+
+    if (this.recordStateFilterOpen()) {
+      this.recordStateFilterOpen.set(false);
+      this.recordFilterMenuPosition.set(null);
+      return;
+    }
+
     this.processStateFilterOpen.set(false);
-    this.recordStateFilterOpen.update((v) => !v);
+    this.processFilterMenuPosition.set(null);
+
+    const button = event.currentTarget as HTMLElement;
+    const rect = button.getBoundingClientRect();
+
+    this.recordFilterMenuPosition.set({
+      top: rect.bottom + 8,
+      left: rect.left,
+    });
+
+    this.recordStateFilterOpen.set(true);
   }
 
   setProcessStateFilter(state: ProcessState | null) {
@@ -624,5 +663,7 @@ export class BooksListComponent {
   closeFilters() {
     this.processStateFilterOpen.set(false);
     this.recordStateFilterOpen.set(false);
+    this.processFilterMenuPosition.set(null);
+    this.recordFilterMenuPosition.set(null);
   }
 }
