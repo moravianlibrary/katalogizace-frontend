@@ -8,33 +8,45 @@
     <div
       class="flex w-full flex-wrap items-center justify-center gap-3 sm:w-auto"
     >
-      <button
-        class="btn btn-l btn-primary group"
-        [routerLink]="
-          batchId()
-            ? ['/batches', batchId(), 'books', 'capture']
-            : ['/books/capture']
-        "
-        type="button"
-      >
-        {{ "buttons.scan" | translate }}
-        <svg class="icon-primary" appIcon="camera" width="20" height="20"></svg>
-      </button>
+      @if (canWrite()) {
+        <button
+          class="btn btn-l btn-primary group"
+          [routerLink]="
+            batchId()
+              ? ['/batches', batchId(), 'books', 'capture']
+              : ['/books/capture']
+          "
+          type="button"
+        >
+          {{ "buttons.scan" | translate }}
+          <svg
+            class="icon-primary"
+            appIcon="camera"
+            width="20"
+            height="20"
+          ></svg>
+        </button>
 
-      <button
-        class="btn btn-l btn-primary group"
-        [disabled]="isUploading"
-        (click)="!isUploading && fileInput.click()"
-        type="button"
-      >
-        @if (isUploading) {
-          {{ "buttons.uploading" | translate }}
-        } @else {
-          {{ "buttons.upload" | translate }}
-        }
+        <button
+          class="btn btn-l btn-primary group"
+          [disabled]="isUploading"
+          (click)="!isUploading && fileInput.click()"
+          type="button"
+        >
+          @if (isUploading) {
+            {{ "buttons.uploading" | translate }}
+          } @else {
+            {{ "buttons.upload" | translate }}
+          }
 
-        <svg class="icon-primary" appIcon="upload" width="20" height="20"></svg>
-      </button>
+          <svg
+            class="icon-primary"
+            appIcon="upload"
+            width="20"
+            height="20"
+          ></svg>
+        </button>
+      }
     </div>
 
     <div class="relative w-full sm:w-78">
@@ -226,13 +238,17 @@
           } @else {
             @for (b of rows(); track b.book_id; let last = $last) {
               <tr
-                class="bg-main-base border-bright h-13 border-t transition-colors hover:bg-gray-500/5"
-                [class.cursor-pointer]="b.process_state === 'completed'"
-                [attr.tabindex]="b.process_state === 'completed' ? 0 : null"
-                [attr.role]="b.process_state === 'completed' ? 'button' : null"
-                (click)="b.process_state === 'completed' && open(b)"
-                (keyup.enter)="b.process_state === 'completed' && open(b)"
-                (keyup.space)="b.process_state === 'completed' && open(b)"
+                class="bg-main-base border-bright h-13 border-t transition-colors"
+                [ngClass]="
+                  canOpenBook(b)
+                    ? 'cursor-pointer hover:bg-gray-500/5'
+                    : 'cursor-default'
+                "
+                [attr.tabindex]="canOpenBook(b) ? 0 : null"
+                [attr.role]="canOpenBook(b) ? 'button' : null"
+                (click)="canOpenBook(b) && open(b)"
+                (keyup.enter)="canOpenBook(b) && open(b)"
+                (keyup.space)="canOpenBook(b) && open(b)"
               >
                 <td
                   class="max-w-xs truncate px-3 py-1"
@@ -294,40 +310,48 @@
                     }}
                   </span>
                 </td>
-                <td class="px-3 py-1" [class.rounded-bl-lg]="last">
+                <td class="px-3 py-1" [class.rounded-br-lg]="last">
                   <div class="flex items-center gap-2">
-                    <button
-                      class="btn btn-tertiary group enabled:hover:shadow-s p-2"
-                      [disabled]="
-                        b.process_state === 'in_progress' ||
-                        b.process_state === 'scheduled'
-                      "
-                      (click)="onRerun(b.book_id, $event)"
-                      type="button"
-                      aria-label="Znovu spustit zpracování"
-                      title="Rerun"
-                    >
-                      <svg
-                        class="icon-black group-disabled:icon-tertiary-disable"
-                        appIcon="refresh"
-                        width="16"
-                        height="16"
-                      ></svg>
-                    </button>
-                    <button
-                      class="btn btn-tertiary group enabled:hover:shadow-s p-2"
-                      (click)="onDelete(b.book_id, $event)"
-                      type="button"
-                      aria-label="Smazat knihu"
-                      title="Smazat"
-                    >
-                      <svg
-                        class="icon-black group-disabled:icon-tertiary-disable"
-                        appIcon="trash"
-                        width="16"
-                        height="16"
-                      ></svg>
-                    </button>
+                    @if (canWrite()) {
+                      <button
+                        class="btn btn-tertiary group enabled:hover:shadow-s p-2"
+                        [disabled]="!canRerunBook(b)"
+                        (click)="onRerun(b.book_id, $event)"
+                        type="button"
+                        aria-label="Znovu spustit zpracování"
+                        title="Rerun"
+                      >
+                        <svg
+                          class="icon-black group-disabled:icon-tertiary-disable"
+                          appIcon="refresh"
+                          width="16"
+                          height="16"
+                        ></svg>
+                      </button>
+                    }
+
+                    @if (canDelete()) {
+                      <button
+                        class="btn btn-tertiary group enabled:hover:shadow-s p-2"
+                        (click)="onDelete(b.book_id, $event)"
+                        type="button"
+                        aria-label="Smazat knihu"
+                        title="Smazat"
+                      >
+                        <svg
+                          class="icon-black group-disabled:icon-tertiary-disable"
+                          appIcon="trash"
+                          width="16"
+                          height="16"
+                        ></svg>
+                      </button>
+                    }
+
+                    @if (!canWrite() && !canDelete()) {
+                      <span class="text-light text-sm italic">{{
+                        "labels.no_permissions" | translate
+                      }}</span>
+                    }
                   </div>
                 </td>
               </tr>

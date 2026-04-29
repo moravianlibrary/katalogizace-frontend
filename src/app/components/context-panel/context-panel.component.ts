@@ -28,6 +28,7 @@ export class ContextPanelComponent {
   private destroyRef = inject(DestroyRef);
 
   bookId = input<ID | null>(null);
+  canWrite = input<boolean>(false);
 
   constructor() {
     this.destroyRef.onDestroy(() => {

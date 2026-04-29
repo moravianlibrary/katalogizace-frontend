@@ -38,6 +38,7 @@ export class MarcRecordsComponent {
   store = inject(RecordStore);
 
   bookId = input<ID | null>(null);
+  canWrite = input<boolean>(false);
 
   existingRecords = this.store.existingRecords;
   extractedRecord = this.store.extracted;

@@ -18,7 +18,9 @@ import {
   ID,
   PaginatedBatchesResponseDto,
 } from '@/app/models';
+import { AuthService } from '@/app/services/api/auth.service';
 import { BreadcrumbsService } from '@/app/services/breadcrumbs.service';
+import { PermissionsService } from '@/app/services/permissions.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BatchStateLabelPipe } from '../../pipes/batch-state-label.pipe';
 import { BatchesService } from '../../services/api/batches.service';
@@ -48,6 +50,8 @@ export class BatchesListComponent {
   private toast = inject(ToastService);
   private breadcrumbs = inject(BreadcrumbsService);
   private translate = inject(TranslateService);
+  private permissions = inject(PermissionsService);
+  private auth = inject(AuthService);
 
   loading = signal(false);
   error = signal<string | null>(null);
@@ -219,6 +223,29 @@ export class BatchesListComponent {
       });
   }
 
+  protected canCreateBatch(): boolean {
+    return this.permissions.canCreateBatch();
+  }
+
+  protected canOpenBatch(batchId: ID): boolean {
+    return this.permissions.canRead(batchId);
+  }
+
+  protected canEditBatch(batchId: ID): boolean {
+    return this.permissions.canManageBatch(batchId);
+  }
+
+  protected canDeleteBatch(batchId: ID): boolean {
+    return this.permissions.canDeleteBatch(batchId);
+  }
+
+  private showForbidden() {
+    this.toast.show(
+      this.translate.instant('messages.error.forbidden'),
+      'error',
+    );
+  }
+
   setSort(column: 'created_at' | 'modified_at') {
     const nextDir =
       this.sortBy() === column
@@ -361,12 +388,22 @@ export class BatchesListComponent {
   }
 
   open(batchId: ID) {
+    if (!this.canOpenBatch(batchId)) {
+      this.router.navigateByUrl('/forbidden');
+      return;
+    }
+
     this.router.navigate(['/batches', batchId.toString(), 'books']);
   }
 
   onDelete(batchId: ID, event: MouseEvent) {
     event.stopPropagation();
     event.preventDefault();
+
+    if (!this.canDeleteBatch(batchId)) {
+      this.showForbidden();
+      return;
+    }
 
     const confirmed = confirm(
       this.translate.instant('messages.confirm.batches.delete'),
@@ -400,6 +437,11 @@ export class BatchesListComponent {
   }
 
   createBatch() {
+    if (!this.canCreateBatch()) {
+      this.showForbidden();
+      return;
+    }
+
     const name = this.newName().trim();
     const description = this.newDescription().trim();
 
@@ -422,7 +464,25 @@ export class BatchesListComponent {
 
         this.closeCreate();
 
-        this.router.navigate(['/batches', batch.batch_id.toString(), 'books']);
+        this.auth.loadCurrentUser().subscribe({
+          next: () => {
+            this.router.navigate([
+              '/batches',
+              batch.batch_id.toString(),
+              'books',
+            ]);
+          },
+          error: (err) => {
+            console.error(err);
+
+            this.toast.show(
+              this.translate.instant('messages.error.auth.user_load'),
+              'error',
+            );
+
+            this.router.navigate(['/batches']);
+          },
+        });
       },
       error: (err) => {
         console.error(err);
@@ -480,6 +540,11 @@ export class BatchesListComponent {
     event.stopPropagation();
     event.preventDefault();
 
+    if (!this.canEditBatch(b.batch_id)) {
+      this.showForbidden();
+      return;
+    }
+
     this.editingBatch.set(b);
     this.editName.set((b.name ?? '').trim());
     this.editDescription.set((b.description ?? '').trim());
@@ -501,6 +566,11 @@ export class BatchesListComponent {
   saveEdit() {
     const b = this.editingBatch();
     if (!b || this.savingEdit()) return;
+
+    if (!this.canEditBatch(b.batch_id)) {
+      this.showForbidden();
+      return;
+    }
 
     const name = this.editName().trim();
     const descRaw = this.editDescription().trim();
@@ -543,6 +613,11 @@ export class BatchesListComponent {
   }
 
   openCreate() {
+    if (!this.canCreateBatch()) {
+      this.showForbidden();
+      return;
+    }
+
     this.newName.set('');
     this.newDescription.set('');
     this.createDialog.nativeElement.showModal();

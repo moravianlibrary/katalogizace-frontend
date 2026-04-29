@@ -107,6 +107,8 @@ export class MarcRowDataComponent {
   }
 
   onTakeField() {
+    if (!this.takeable()) return;
+
     this.recordState.takeDataField({
       tag: this.df().tag,
       ind1: this.df().ind1 ?? '',

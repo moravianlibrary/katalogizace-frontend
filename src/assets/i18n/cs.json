@@ -39,7 +39,8 @@
       "dedup_match": "Spárování duplicit",
       "transliteration": "Transliterace",
       "human_edit": "Ruční úprava"
-    }
+    },
+    "no_permissions": "Nemáte oprávnění"
   },
   "pageType": {
     "TitlePage": "Titulní strana",
@@ -142,13 +143,15 @@
       },
       "auth": {
         "login": "Přihlášení se nezdařilo. Zkontrolujte prosím svůj e-mail a heslo.",
-        "register": "Registrace se nezdařila. Zkuste jiný e-mail nebo zkontrolujte údaje."
+        "register": "Registrace se nezdařila. Zkuste jiný e-mail nebo zkontrolujte údaje.",
+        "user_load": "Nepodařilo se načíst informace o uživateli."
       },
       "camera": "Nepodařilo se otevřít kameru.",
       "aut_record_load": "Nepodařilo se načíst autoritní záznam.",
       "record": {
         "save": "Uložení záznamu selhalo."
-      }
+      },
+      "forbidden": "K této akci nemáte oprávnění."
     },
     "confirm": {
       "batches": {

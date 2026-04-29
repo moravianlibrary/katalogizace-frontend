@@ -2,12 +2,13 @@ import { EditableMarcRecordDataField } from '@/app/models';
 import { ContextPanelService } from '@/app/services/context-panel.service';
 import { MarcDiffService } from '@/app/services/marc-diff.service';
 import { RecordStateService } from '@/app/services/record-state.service';
+import { ToastService } from '@/app/services/toast.service';
 import { RecordStore } from '@/app/stores/record.store';
 import { filterExistingRecord015to830 } from '@/app/utils/marc-filter';
 import { compareSubfieldCodes } from '@/app/utils/marc-subfield-sort';
 import { NgClass } from '@angular/common';
 import { Component, computed, inject, input } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { IconComponent } from '../../icon/icon.component';
 
 @Component({
@@ -21,8 +22,11 @@ export class ContextPanelHeaderComponent {
   cps = inject(ContextPanelService);
   diff = inject(MarcDiffService);
   private store = inject(RecordStore);
+  private toast = inject(ToastService);
+  private translate = inject(TranslateService);
 
   headerTitle = input.required<string>();
+  canWrite = input<boolean>(false);
 
   toggleDisabled = computed(() => false);
 
@@ -32,11 +36,16 @@ export class ContextPanelHeaderComponent {
     return this.cps.state().mode === 'records';
   });
 
-  canTakeRecord = computed(() => !!this.store.openedForDiff());
+  canTakeRecord = computed(() => {
+    return this.canWrite() && !!this.store.openedForDiff();
+  });
 
-  canResetRecord = computed(() => !!this.store.extracted());
+  canResetRecord = computed(() => {
+    return this.canWrite() && !!this.store.extracted();
+  });
 
   canResetField = computed(() => {
+    if (!this.canWrite()) return false;
     if (this.cps.state().mode !== 'edit') return false;
 
     const snapshot = this.cps.editSnapshot();
@@ -71,6 +80,13 @@ export class ContextPanelHeaderComponent {
     return false;
   });
 
+  private showForbidden() {
+    this.toast.show(
+      this.translate.instant('messages.error.forbidden'),
+      'error',
+    );
+  }
+
   private normalizeDataFieldState(field: {
     ind1?: string | null;
     ind2?: string | null;
@@ -90,6 +106,11 @@ export class ContextPanelHeaderComponent {
   }
 
   onResetField() {
+    if (!this.canWrite()) {
+      this.showForbidden();
+      return;
+    }
+
     this.cps.requestEditReset();
   }
 
@@ -105,12 +126,22 @@ export class ContextPanelHeaderComponent {
   }
 
   onCandidateConfirm() {
+    if (!this.canWrite()) {
+      this.showForbidden();
+      return;
+    }
+
     const id = this.cps.state().selectedCandidateId;
     if (!id) return;
     this.cps.confirmCandidate(id);
   }
 
   onCandidateConfirmEdit() {
+    if (!this.canWrite()) {
+      this.showForbidden();
+      return;
+    }
+
     const state = this.cps.state();
     const candidateId = state.selectedCandidateId;
     const fieldId = state.fieldId;
@@ -178,10 +209,20 @@ export class ContextPanelHeaderComponent {
   }
 
   onReset() {
+    if (!this.canWrite()) {
+      this.showForbidden();
+      return;
+    }
+
     this.recordState.loadFromExtracted(this.store.extracted());
   }
 
   onTakeRecord() {
+    if (!this.canWrite()) {
+      this.showForbidden();
+      return;
+    }
+
     const opened = this.store.openedForDiff();
     if (!opened) return;
 

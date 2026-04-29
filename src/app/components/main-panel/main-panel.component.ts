@@ -39,6 +39,7 @@ import { MainPanelHeaderComponent } from './main-panel-header/main-panel-header.
 })
 export class MainPanelComponent {
   book_id = input<ID | null>(null);
+  canWrite = input<boolean>(false);
 
   recordState = inject(RecordStateService);
   store = inject(RecordStore);
@@ -66,6 +67,10 @@ export class MainPanelComponent {
   }
 
   onQuickAdd(it: QuickAddItem) {
+    if (!this.canWrite()) {
+      return;
+    }
+
     if (it.action === 'add-field') {
       this.addField();
       return;
@@ -120,6 +125,10 @@ export class MainPanelComponent {
   }
 
   addField() {
+    if (!this.canWrite()) {
+      return;
+    }
+
     this.addFieldDialogError.set(null);
     this.addFieldDialogOpen.set(true);
   }
@@ -130,6 +139,11 @@ export class MainPanelComponent {
   }
 
   onAddFieldConfirm(result: AddFieldDialogResult) {
+    if (!this.canWrite()) {
+      this.closeAddFieldDialog();
+      return;
+    }
+
     const paddedTag = result.tag.padStart(3, '0');
     const normalizedTag = Number(paddedTag);
     const fieldType = this.resolveFieldType(paddedTag);

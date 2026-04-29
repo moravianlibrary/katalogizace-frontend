@@ -7,6 +7,7 @@ import {
 } from '@/app/models';
 import { BookImageCacheService } from '@/app/services/book-image-cache.service';
 import { BreadcrumbsService } from '@/app/services/breadcrumbs.service';
+import { PermissionsService } from '@/app/services/permissions.service';
 import { DatePipe, NgClass } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
@@ -48,6 +49,7 @@ export class BooksListComponent {
   private breadcrumbs = inject(BreadcrumbsService);
   private translate = inject(TranslateService);
   private bookImageCacheService = inject(BookImageCacheService);
+  private permissions = inject(PermissionsService);
 
   isUploading = false;
 
@@ -152,12 +154,41 @@ export class BooksListComponent {
     { value: 'completed' },
   ];
 
+  readonly canRead = computed(() => this.permissions.canRead(this.batchId()));
+  readonly canWrite = computed(() => this.permissions.canWrite(this.batchId()));
+  readonly canDelete = computed(() =>
+    this.permissions.canDelete(this.batchId()),
+  );
+
+  protected canOpenBook(
+    book: PaginatedBooksResponseDto['books'][number],
+  ): boolean {
+    return this.canRead() && book.process_state === 'completed';
+  }
+
+  protected canRerunBook(
+    book: PaginatedBooksResponseDto['books'][number],
+  ): boolean {
+    return (
+      this.canWrite() &&
+      book.process_state !== 'in_progress' &&
+      book.process_state !== 'scheduled'
+    );
+  }
+
+  private showForbidden() {
+    this.toast.show(
+      this.translate.instant('messages.error.forbidden'),
+      'error',
+    );
+  }
+
   constructor() {
     this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((pm) => {
       const bidParam = pm.get('batchId');
       const bid = bidParam !== null ? Number(bidParam) : null;
       const normalizedBatchId =
-        bid !== null && !isNaN(bid) && bid > 0 ? bid : null;
+        bid !== null && Number.isFinite(bid) && bid > 0 ? bid : null;
 
       this.batchId.set(normalizedBatchId);
 
@@ -470,6 +501,15 @@ export class BooksListComponent {
   }
 
   open(book: PaginatedBooksResponseDto['books'][number]) {
+    if (!this.canRead()) {
+      this.router.navigateByUrl('/forbidden');
+      return;
+    }
+
+    if (book.process_state !== 'completed') {
+      return;
+    }
+
     const bid = this.batchId();
 
     if (!bid) {
@@ -492,6 +532,13 @@ export class BooksListComponent {
 
   onUploadImages(event: Event) {
     const input = event.target as HTMLInputElement;
+
+    if (!this.canWrite()) {
+      this.showForbidden();
+      input.value = '';
+      return;
+    }
+
     if (!input.files?.length) return;
 
     const batchId = this.batchId();
@@ -528,6 +575,11 @@ export class BooksListComponent {
     event.stopPropagation();
     event.preventDefault();
 
+    if (!this.canDelete()) {
+      this.showForbidden();
+      return;
+    }
+
     const confirmed = confirm(
       this.translate.instant('messages.confirm.books.delete'),
     );
@@ -555,6 +607,11 @@ export class BooksListComponent {
   onRerun(id: ID, event: MouseEvent) {
     event.stopPropagation();
     event.preventDefault();
+
+    if (!this.canWrite()) {
+      this.showForbidden();
+      return;
+    }
 
     const confirmed = confirm(
       this.translate.instant('messages.confirm.books.rerun'),

@@ -1,17 +1,15 @@
-import { SubDiffIndex } from '@/app/models';
+import { MarcSubfield, SubDiffIndex } from '@/app/models';
 import { ContextPanelService } from '@/app/services/context-panel.service';
 import { FieldEditService } from '@/app/services/edit.service';
 import { MarcDiffService } from '@/app/services/marc-diff.service';
 import { RecordStateService } from '@/app/services/record-state.service';
 import { isDiffableTag015to830 } from '@/app/utils/marc-diff';
 import { CommonModule } from '@angular/common';
-import { Component, inject, input } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { MarcRowControlComponent } from '../../marc-row/marc-row-control/marc-row-control.component';
 import { MarcRowDataComponent } from '../../marc-row/marc-row-data/marc-row-data.component';
 import { MarcRowLeaderComponent } from '../../marc-row/marc-row-leader/marc-row-leader.component';
-
-import { computed, signal } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   standalone: true,
@@ -37,12 +35,11 @@ export class EditableMarcRecordTableComponent {
   diffIndex = input<SubDiffIndex | null>(null);
   diffSide = input<'opened' | 'preview'>('opened');
   takeable = input<boolean>(false);
+  editable = input<boolean>(false);
 
   readonly hoveredRowId = signal<string | null>(null);
 
-  setHoveredRow(rowId: string | null) {
-    this.hoveredRowId.set(rowId);
-  }
+  readonly rowsInteractive = computed(() => this.editable());
 
   readonly visibleRowIds = computed<string[]>(() => {
     const record = this.recordState.editableRecord();
@@ -67,13 +64,48 @@ export class EditableMarcRecordTableComponent {
     return ids;
   });
 
-  private getRowIndex(rowId: string): number {
-    return this.visibleRowIds().indexOf(rowId);
+  setHoveredRow(rowId: string | null) {
+    if (rowId !== null && !this.rowsInteractive()) return;
+
+    this.hoveredRowId.set(rowId);
   }
 
-  private isEvenVisualRow(rowId: string): boolean {
-    const index = this.getRowIndex(rowId);
-    return index % 2 === 0;
+  enterControlEdit(fieldId: string, tag: string, value: string) {
+    if (!this.editable()) return;
+
+    this.cps.enterEdit({
+      kind: 'control',
+      fieldId,
+      tag,
+      value,
+    });
+
+    this.recordState.selectField(fieldId);
+  }
+
+  enterDataEdit(
+    fieldId: string,
+    tag: string,
+    ind1: string,
+    ind2: string,
+    subfields: MarcSubfield[],
+  ) {
+    if (!this.editable()) return;
+
+    this.cps.enterEdit({
+      kind: 'data',
+      fieldId,
+      tag,
+      ind1,
+      ind2,
+      subfields,
+    });
+
+    this.recordState.selectField(fieldId);
+  }
+
+  private getRowIndex(rowId: string): number {
+    return this.visibleRowIds().indexOf(rowId);
   }
 
   private isHovered(rowId: string): boolean {
@@ -109,15 +141,13 @@ export class EditableMarcRecordTableComponent {
     ].filter((cls): cls is string => Boolean(cls));
   }
 
-  private isWhiteVisualRow(rowId: string): boolean {
-    return !this.isGrayVisualRow(rowId);
-  }
-
   isActiveRow(rowId: string): boolean {
     return this.recordState.selectedField()?.fieldId === rowId;
   }
 
   private getFocusRowId(): string | null {
+    if (!this.rowsInteractive()) return null;
+
     return (
       this.hoveredRowId() ?? this.recordState.selectedField()?.fieldId ?? null
     );
@@ -142,12 +172,22 @@ export class EditableMarcRecordTableComponent {
   }
 
   private baseRowClasses(rowId: string): string[] {
+    const interactive = this.rowsInteractive();
+
     return [
       this.isGrayVisualRow(rowId) ? 'bg-gray-500/5' : 'bg-main-base',
-      this.isHovered(rowId) ? 'marc-row-hovered relative z-10' : '',
-      this.isActiveRow(rowId) ? 'marc-row-active relative z-20' : '',
-      this.isNeighborAbove(rowId) ? 'marc-row-neighbor-above' : '',
-      this.isNeighborBelow(rowId) ? 'marc-row-neighbor-below' : '',
+      interactive && this.isHovered(rowId)
+        ? 'marc-row-hovered relative z-10'
+        : '',
+      interactive && this.isActiveRow(rowId)
+        ? 'marc-row-active relative z-20'
+        : '',
+      interactive && this.isNeighborAbove(rowId)
+        ? 'marc-row-neighbor-above'
+        : '',
+      interactive && this.isNeighborBelow(rowId)
+        ? 'marc-row-neighbor-below'
+        : '',
     ].filter((cls): cls is string => Boolean(cls));
   }
 }

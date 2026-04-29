@@ -13,6 +13,7 @@ import { BooksListComponent } from './components/books-list/books-list.component
 import { BatchesListComponent } from './components/batches-list/batches-list.component';
 import { ForbiddenComponent } from './components/forbidden/forbidden.component';
 import { ProtectedLayoutComponent } from './components/layout/protected-layout/protected-layout.component';
+import { batchPermissionGuard } from './guards/batch-permission.guard';
 import { captureExitGuard } from './guards/capture-exit.guard';
 
 export const routes: Routes = [
@@ -42,42 +43,61 @@ export const routes: Routes = [
       {
         path: 'batches/:batchId/books',
         component: BooksListComponent,
-        data: { backTo: '/batches' },
+        canActivate: [batchPermissionGuard],
+        data: {
+          backTo: '/batches',
+          permission: 'read',
+        },
       },
       {
         path: 'batches/:batchId/books/capture',
         component: BookCaptureComponent,
-        data: { backTo: '../' },
+        canActivate: [batchPermissionGuard],
         canDeactivate: [captureExitGuard],
+        data: {
+          backTo: '../',
+          permission: 'write',
+        },
       },
       {
         path: 'batches/:batchId/books/capture/:bookId',
         component: BookCaptureComponent,
-        data: { backTo: '../' },
+        canActivate: [batchPermissionGuard],
         canDeactivate: [captureExitGuard],
+        data: {
+          backTo: '../',
+          permission: 'write',
+        },
       },
       {
         path: 'batches/:batchId/books/capture-native',
         component: BookCaptureNativeComponent,
-        data: { backTo: '../' },
+        canActivate: [batchPermissionGuard],
         canDeactivate: [captureExitGuard],
+        data: {
+          backTo: '../',
+          permission: 'write',
+        },
       },
       {
         path: 'batches/:batchId/books/capture-native/:bookId',
         component: BookCaptureNativeComponent,
-        data: { backTo: '../' },
+        canActivate: [batchPermissionGuard],
         canDeactivate: [captureExitGuard],
+        data: {
+          backTo: '../',
+          permission: 'write',
+        },
       },
       {
         path: 'batches/:batchId/books/:bookId',
         component: BookDetailComponent,
-        data: { backTo: '../' },
+        canActivate: [batchPermissionGuard],
+        data: {
+          backTo: '../',
+          permission: 'read',
+        },
       },
-
-      // { path: 'books', component: BooksListComponent },
-      // { path: 'books/capture', component: BookCaptureComponent },
-      // { path: 'books/capture-native', component: BookCaptureNativeComponent },
-      // { path: 'books/:bookId', component: BookDetailComponent },
     ],
   },
 

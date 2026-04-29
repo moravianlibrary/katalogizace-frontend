@@ -21,22 +21,15 @@
       track cf.fieldId
     ) {
       <tr
-        class="group cursor-pointer"
+        class="group"
+        [class.cursor-pointer]="rowsInteractive()"
         [ngClass]="getControlRowClasses(cf.fieldId, cf.tag)"
         [cf]="cf"
-        [editable]="true"
-        [takeable]="takeable()"
+        [editable]="editable()"
+        [takeable]="takeable() && editable()"
         (mouseenter)="setHoveredRow(cf.fieldId)"
         (mouseleave)="setHoveredRow(null)"
-        (click)="
-          cps.enterEdit({
-            kind: 'control',
-            fieldId: cf.fieldId,
-            tag: cf.tag,
-            value: cf.value,
-          });
-          recordState.selectField(cf.fieldId)
-        "
+        (click)="enterControlEdit(cf.fieldId, cf.tag, cf.value)"
         appMarcRowControl
       ></tr>
     }
@@ -44,25 +37,18 @@
     @for (df of recordState.editableRecord()?.data_fields; track df.fieldId) {
       @if (df.tag != "910") {
         <tr
-          class="group cursor-pointer"
+          class="group"
+          [class.cursor-pointer]="rowsInteractive()"
           [ngClass]="getDataRowClasses(df.fieldId, df.tag)"
           [df]="df"
           [diffIndex]="diffIndex()"
           [diffSide]="diffSide()"
-          [editable]="true"
-          [takeable]="takeable()"
+          [editable]="editable()"
+          [takeable]="takeable() && editable()"
           (mouseenter)="setHoveredRow(df.fieldId)"
           (mouseleave)="setHoveredRow(null)"
           (click)="
-            cps.enterEdit({
-              kind: 'data',
-              fieldId: df.fieldId,
-              tag: df.tag,
-              ind1: df.ind1,
-              ind2: df.ind2,
-              subfields: df.subfields,
-            });
-            recordState.selectField(df.fieldId)
+            enterDataEdit(df.fieldId, df.tag, df.ind1, df.ind2, df.subfields)
           "
           appMarcRowData
         ></tr>

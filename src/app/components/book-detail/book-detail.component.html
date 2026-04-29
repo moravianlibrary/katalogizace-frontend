@@ -9,10 +9,15 @@
     (collapsedChange)="onGalleryCollapsedChange($event)"
   />
 
-  <app-main-panel class="h-full min-h-0 overflow-hidden" [book_id]="bookId()" />
+  <app-main-panel
+    class="h-full min-h-0 overflow-hidden"
+    [book_id]="bookId()"
+    [canWrite]="canWrite()"
+  />
 
   <app-context-panel
     class="h-full min-h-0 overflow-hidden"
     [bookId]="bookId()"
+    [canWrite]="canWrite()"
   />
 </section>

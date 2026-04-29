@@ -1,8 +1,10 @@
 import { ApiImageItem, ID } from '@/app/models';
 import { BreadcrumbsService } from '@/app/services/breadcrumbs.service';
 import { ContextPanelService } from '@/app/services/context-panel.service';
+import { PermissionsService } from '@/app/services/permissions.service';
 import {
   Component,
+  computed,
   HostListener,
   inject,
   signal,
@@ -31,12 +33,34 @@ export class BookDetailComponent {
   private breadcrumbs = inject(BreadcrumbsService);
   private translate = inject(TranslateService);
   private contextPanel = inject(ContextPanelService);
+  private permissions = inject(PermissionsService);
 
   readonly mainPanel = viewChild(MainPanelComponent);
+
+  batchId = signal<ID | null>(null);
 
   galleryCollapsed = signal(false);
   bookId = signal<ID | null>(null);
   images = signal<ApiImageItem[]>([]);
+
+  readonly canRead = computed(() => this.permissions.canRead(this.batchId()));
+
+  readonly canWrite = computed(() => this.permissions.canWrite(this.batchId()));
+
+  readonly canDelete = computed(() =>
+    this.permissions.canDelete(this.batchId()),
+  );
+
+  readonly canExport = computed(() =>
+    this.permissions.canExport(this.batchId()),
+  );
+
+  private showForbidden() {
+    this.toast.show(
+      this.translate.instant('messages.error.forbidden'),
+      'error',
+    );
+  }
 
   onGalleryCollapsedChange(v: boolean) {
     this.galleryCollapsed.set(v);
@@ -44,11 +68,19 @@ export class BookDetailComponent {
 
   ngOnInit() {
     this.route.paramMap.subscribe((params) => {
-      const id = params.get('bookId');
-      const n = Number(id);
-      const bookId = Number.isFinite(n) ? n : null;
+      const batchIdParam = params.get('batchId');
+      const parsedBatchId = Number(batchIdParam);
+      const batchId =
+        Number.isFinite(parsedBatchId) && parsedBatchId > 0
+          ? parsedBatchId
+          : null;
 
-      if (bookId === null) {
+      const bookIdParam = params.get('bookId');
+      const parsedBookId = Number(bookIdParam);
+      const bookId =
+        Number.isFinite(parsedBookId) && parsedBookId > 0 ? parsedBookId : null;
+
+      if (batchId === null || bookId === null) {
         this.toast.show(
           this.translate.instant('messages.error.books.incorrect_id'),
           'error',
@@ -56,6 +88,7 @@ export class BookDetailComponent {
         return;
       }
 
+      this.batchId.set(batchId);
       this.bookId.set(bookId);
       this.resetBookDetail();
       this.loadBook(bookId);
@@ -120,12 +153,24 @@ export class BookDetailComponent {
 
     if (this.isAddFieldShortcut(event)) {
       event.preventDefault();
+
+      if (!this.canWrite()) {
+        this.showForbidden();
+        return;
+      }
+
       this.openAddFieldModal();
       return;
     }
 
     if (this.isAddSubfieldShortcut(event) && this.canOpenAddSubfield()) {
       event.preventDefault();
+
+      if (!this.canWrite()) {
+        this.showForbidden();
+        return;
+      }
+
       this.openAddSubfieldModal();
     }
   }
@@ -150,7 +195,10 @@ export class BookDetailComponent {
   private canOpenAddSubfield(): boolean {
     const state = this.contextPanel.state();
     return (
-      state.mode === 'edit' && !!state.fieldId && this.isDataFieldTag(state.tag)
+      this.canWrite() &&
+      state.mode === 'edit' &&
+      !!state.fieldId &&
+      this.isDataFieldTag(state.tag)
     );
   }
 

@@ -8,7 +8,9 @@
 
     <button
       class="btn btn-m btn-primary group"
-      [disabled]="isSaving() || !canSaveRecord()"
+      [class.invisible]="!canWrite()"
+      [attr.tabindex]="canWrite() ? null : -1"
+      [disabled]="!canWrite() || isSaving() || !canSaveRecord()"
       (click)="onSave()"
       type="button"
     >
@@ -18,5 +20,7 @@
     </button>
   </div>
 
-  <app-quick-add [items]="quickAddItems()" (add)="onQuickAdd($event)" />
+  @if (canWrite()) {
+    <app-quick-add [items]="quickAddItems()" (add)="onQuickAdd($event)" />
+  }
 </div>

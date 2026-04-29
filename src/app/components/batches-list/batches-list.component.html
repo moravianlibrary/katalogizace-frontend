@@ -3,19 +3,21 @@
   (click)="closeStateFilter()"
 >
   <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
-    <button
-      class="btn btn-l btn-primary group"
-      (click)="openCreate()"
-      type="button"
-    >
-      <svg
-        class="icon-primary"
-        appIcon="folderAdd"
-        width="20"
-        height="20"
-      ></svg>
-      {{ "batches.create" | translate }}
-    </button>
+    @if (canCreateBatch()) {
+      <button
+        class="btn btn-l btn-primary group"
+        (click)="openCreate()"
+        type="button"
+      >
+        <svg
+          class="icon-primary"
+          appIcon="folderAdd"
+          width="20"
+          height="20"
+        ></svg>
+        {{ "batches.create" | translate }}
+      </button>
+    }
 
     <div class="flex w-full flex-row gap-3 sm:w-lg sm:items-center">
       <div class="flex items-center gap-2">
@@ -222,11 +224,16 @@
           } @else {
             @for (b of rows(); track b.batch_id; let last = $last) {
               <tr
-                class="bg-main-base border-bright cursor-pointer border-t transition-colors hover:bg-gray-500/5"
+                class="bg-main-base border-bright border-t transition-colors"
+                [ngClass]="
+                  canOpenBatch(b.batch_id)
+                    ? 'cursor-pointer hover:bg-gray-500/5'
+                    : 'cursor-default'
+                "
+                [tabindex]="canOpenBatch(b.batch_id) ? 0 : -1"
                 (click)="open(b.batch_id)"
                 (keyup.enter)="open(b.batch_id)"
                 (keyup.space)="open(b.batch_id)"
-                tabindex="0"
                 role="button"
               >
                 <td
@@ -285,34 +292,46 @@
 
                 <td class="px-3 py-1" [class.rounded-br-lg]="last">
                   <div class="flex items-center gap-2">
-                    <button
-                      class="btn btn-tertiary group enabled:hover:shadow-s p-2"
-                      (click)="openEdit(b, $event)"
-                      type="button"
-                      aria-label="Upravit skupinu"
-                      title="Upravit"
-                    >
-                      <svg
-                        class="icon-black group-disabled:icon-tertiary-disable"
-                        appIcon="edit"
-                        width="16"
-                        height="16"
-                      ></svg>
-                    </button>
+                    @if (canEditBatch(b.batch_id)) {
+                      <button
+                        class="btn btn-tertiary group enabled:hover:shadow-s p-2"
+                        (click)="openEdit(b, $event)"
+                        type="button"
+                        aria-label="Upravit skupinu"
+                        title="Upravit"
+                      >
+                        <svg
+                          class="icon-black group-disabled:icon-tertiary-disable"
+                          appIcon="edit"
+                          width="16"
+                          height="16"
+                        ></svg>
+                      </button>
+                    }
 
-                    <button
-                      class="btn btn-tertiary group enabled:hover:shadow-s p-2"
-                      (click)="onDelete(b.batch_id, $event)"
-                      type="button"
-                      aria-label="Smazat skupinu"
-                    >
-                      <svg
-                        class="icon-black group-disabled:icon-tertiary-disable"
-                        appIcon="trash"
-                        width="16"
-                        height="16"
-                      ></svg>
-                    </button>
+                    @if (canDeleteBatch(b.batch_id)) {
+                      <button
+                        class="btn btn-tertiary group enabled:hover:shadow-s p-2"
+                        (click)="onDelete(b.batch_id, $event)"
+                        type="button"
+                        aria-label="Smazat skupinu"
+                      >
+                        <svg
+                          class="icon-black group-disabled:icon-tertiary-disable"
+                          appIcon="trash"
+                          width="16"
+                          height="16"
+                        ></svg>
+                      </button>
+                    }
+
+                    @if (
+                      !canEditBatch(b.batch_id) && !canDeleteBatch(b.batch_id)
+                    ) {
+                      <span class="text-light text-sm italic">{{
+                        "labels.no_permissions" | translate
+                      }}</span>
+                    }
                   </div>
                 </td>
               </tr>

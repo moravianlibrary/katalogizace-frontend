@@ -6,6 +6,7 @@
           <button
             class="btn btn-m btn-icon btn-tertiary group"
             (click)="onBack()"
+            type="button"
           >
             <svg
               class="icon-tertiary"
@@ -23,27 +24,7 @@
           <button
             class="btn btn-m btn-icon btn-tertiary group"
             (click)="onBack()"
-          >
-            <svg
-              class="icon-tertiary"
-              appIcon="arrowLeft"
-              width="16"
-              height="16"
-            ></svg>
-          </button>
-
-          <span class="text-md w-full font-medium">{{ headerTitle() }}</span>
-        </div>
-
-        <button class="btn btn-m btn-primary" (click)="onCandidateConfirm()">
-          {{ "buttons.confirm_selection" | translate }}
-        </button>
-      }
-      @case ("candidates_edit") {
-        <div class="flex w-full items-center gap-4">
-          <button
-            class="btn btn-m btn-icon btn-tertiary group"
-            (click)="onBack()"
+            type="button"
           >
             <svg
               class="icon-tertiary"
@@ -58,7 +39,40 @@
 
         <button
           class="btn btn-m btn-primary"
+          [class.invisible]="!canWrite()"
+          [disabled]="!canWrite()"
+          [attr.tabindex]="canWrite() ? null : -1"
+          (click)="onCandidateConfirm()"
+          type="button"
+        >
+          {{ "buttons.confirm_selection" | translate }}
+        </button>
+      }
+      @case ("candidates_edit") {
+        <div class="flex w-full items-center gap-4">
+          <button
+            class="btn btn-m btn-icon btn-tertiary group"
+            (click)="onBack()"
+            type="button"
+          >
+            <svg
+              class="icon-tertiary"
+              appIcon="arrowLeft"
+              width="16"
+              height="16"
+            ></svg>
+          </button>
+
+          <span class="text-md w-full font-medium">{{ headerTitle() }}</span>
+        </div>
+
+        <button
+          class="btn btn-m btn-primary"
+          [class.invisible]="!canWrite()"
+          [disabled]="!canWrite()"
+          [attr.tabindex]="canWrite() ? null : -1"
           (click)="onCandidateConfirmEdit()"
+          type="button"
         >
           {{ "buttons.confirm_selection" | translate }}
         </button>
@@ -68,7 +82,9 @@
 
         <button
           class="btn btn-m btn-error group"
+          [class.invisible]="!canWrite()"
           [disabled]="!canResetField()"
+          [attr.tabindex]="canWrite() ? null : -1"
           (click)="onResetField()"
           type="button"
         >
@@ -82,12 +98,14 @@
         </button>
 
         @if (
+          canWrite() &&
           (cps.state().tag === "100" || cps.state().tag === "700") &&
           candidatesCount() > 0
         ) {
           <button
             class="btn btn-m btn-tertiary group"
             (click)="onShowCandidates()"
+            type="button"
           >
             {{ "buttons.candidate_selection" | translate }}
             <svg
@@ -99,7 +117,11 @@
           </button>
         }
 
-        <button class="btn btn-m btn-tertiary group" (click)="onBack()">
+        <button
+          class="btn btn-m btn-tertiary group"
+          (click)="onBack()"
+          type="button"
+        >
           {{ "buttons.cancel" | translate }}
           <svg class="icon-tertiary" appIcon="x" width="16" height="16"></svg>
         </button>
@@ -109,8 +131,11 @@
 
         <button
           class="btn btn-m btn-error group"
+          [class.invisible]="!canWrite()"
           [disabled]="!canResetRecord()"
+          [attr.tabindex]="canWrite() ? null : -1"
           (click)="onReset()"
+          type="button"
         >
           {{ "buttons.reset" | translate }}
           <svg
@@ -123,8 +148,11 @@
 
         <button
           class="btn btn-m btn-primary group"
+          [class.invisible]="!canWrite()"
           [disabled]="!canTakeRecord()"
+          [attr.tabindex]="canWrite() ? null : -1"
           (click)="onTakeRecord()"
+          type="button"
         >
           {{ "buttons.take_record" | translate }}
           <svg

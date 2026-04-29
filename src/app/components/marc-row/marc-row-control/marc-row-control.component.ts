@@ -39,6 +39,8 @@ export class MarcRowControlComponent {
   }
 
   onTakeField() {
+    if (!this.takeable()) return;
+
     this.recordState.takeControlField({
       tag: this.cf().tag,
       value: this.cf().value ?? '',

@@ -30,18 +30,31 @@ export class MainPanelHeaderComponent {
   recordState = inject(RecordStateService);
 
   bookId = input.required<ID>();
+  canWrite = input<boolean>(false);
   isSaving = signal(false);
 
   quickAddItems = input.required<QuickAddItem[]>();
   quickAddClick = output<QuickAddItem>();
 
-  canSaveRecord = computed(() => !!this.store.extracted());
+  canSaveRecord = computed(() => this.canWrite() && !!this.store.extracted());
 
   onQuickAdd(it: QuickAddItem) {
+    if (!this.canWrite()) {
+      return;
+    }
+
     this.quickAddClick.emit(it);
   }
 
   onSave() {
+    if (!this.canWrite()) {
+      this.toast.show(
+        this.translate.instant('messages.error.forbidden'),
+        'error',
+      );
+      return;
+    }
+
     const bookId = this.bookId();
     const record = this.recordState.buildExistingRecord(bookId);
 

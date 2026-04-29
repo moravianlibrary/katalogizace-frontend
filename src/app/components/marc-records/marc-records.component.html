@@ -82,14 +82,14 @@
                   <app-extracted-marc-record-table
                     [extractedRecord]="rec.extracted!"
                     [diffIndex]="diffIndex()"
-                    [takeable]="true"
+                    [takeable]="canWrite()"
                     diffSide="opened"
                   />
                 } @else {
                   <app-existing-marc-record-table
                     [existingRecord]="store.openedForDiff()!"
                     [diffIndex]="diffIndex()"
-                    [takeable]="true"
+                    [takeable]="canWrite()"
                     diffSide="opened"
                   />
                 }
