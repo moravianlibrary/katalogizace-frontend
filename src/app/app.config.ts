@@ -8,7 +8,6 @@ import {
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
-import { apiKeyInterceptor } from './interceptors/api-key.interceptor';
 import { authErrorInterceptor } from './interceptors/auth-error.interceptor';
 import { authInterceptor } from './interceptors/auth.interceptor';
 import { AuthService } from './services/api/auth.service';
@@ -16,6 +15,7 @@ import { EnvironmentService } from './services/environment.service';
 
 import { TranslateModule } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
+import { firstValueFrom } from 'rxjs';
 import { I18nService } from './services/i18n.service';
 
 export const appConfig: ApplicationConfig = {
@@ -23,11 +23,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(
-      withInterceptors([
-        apiKeyInterceptor,
-        authInterceptor,
-        authErrorInterceptor,
-      ]),
+      withInterceptors([authInterceptor, authErrorInterceptor]),
     ),
     importProvidersFrom(
       TranslateModule.forRoot({
@@ -51,9 +47,11 @@ export const appConfig: ApplicationConfig = {
         await envService.load();
 
         if (auth.isLoggedIn()) {
-          auth.loadCurrentUser().subscribe({
-            error: () => auth.logout(),
-          });
+          try {
+            await firstValueFrom(auth.loadCurrentUser());
+          } catch {
+            auth.logout();
+          }
         }
       })();
     }),
