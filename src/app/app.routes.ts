@@ -11,6 +11,7 @@ import { BookDetailComponent } from './components/book-detail/book-detail.compon
 import { BooksListComponent } from './components/books-list/books-list.component';
 
 import { BatchesListComponent } from './components/batches-list/batches-list.component';
+import { ForbiddenComponent } from './components/forbidden/forbidden.component';
 import { ProtectedLayoutComponent } from './components/layout/protected-layout/protected-layout.component';
 import { captureExitGuard } from './guards/capture-exit.guard';
 
@@ -20,6 +21,12 @@ export const routes: Routes = [
   // public
   { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
   { path: 'register', component: RegisterComponent, canActivate: [guestGuard] },
+
+  {
+    path: 'forbidden',
+    component: ForbiddenComponent,
+    canActivate: [authGuard],
+  },
 
   // protected
   {

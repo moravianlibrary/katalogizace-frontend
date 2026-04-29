@@ -787,5 +787,12 @@
     "loading_text": "Připravuji kameru",
     "page_count": "Počet stran: ",
     "uploading_page": "Nahrávám stranu..."
+  },
+  "forbidden": {
+    "title": "Nemáte oprávnění",
+    "description": "Bohužel nemáte dostatečná oprávnění pro zobrazení této stránky.",
+    "description_secondary": "Zkuste požádat svého administrátora o udělení přístupu nebo se přihlaste pod jiným účtem.",
+    "login_as_different_user": "Přihlásit se pod jiným účtem",
+    "back_to_batches": "Přejít na seznam skupin"
   }
 }

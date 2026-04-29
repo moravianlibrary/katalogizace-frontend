@@ -1,0 +1,33 @@
+<section
+  class="bg-main-base flex min-h-screen items-center justify-center px-4"
+>
+  <div class="flex max-w-3xl flex-col items-center gap-8 text-center">
+    <h1 class="text-base-color text-2xl font-medium">
+      {{ "forbidden.title" | translate }}
+    </h1>
+
+    <div class="space-y-2">
+      <p class="text-secondary text-md">
+        {{ "forbidden.description" | translate }}
+      </p>
+
+      <p class="text-secondary text-md">
+        {{ "forbidden.description_secondary" | translate }}
+      </p>
+    </div>
+
+    <div class="flex flex-wrap items-center justify-center gap-4">
+      <button
+        class="btn btn-m btn-tertiary"
+        (click)="loginAsDifferentUser()"
+        type="button"
+      >
+        {{ "forbidden.login_as_different_user" | translate }}
+      </button>
+
+      <a class="btn btn-m btn-primary" routerLink="/batches">
+        {{ "forbidden.back_to_batches" | translate }}
+      </a>
+    </div>
+  </div>
+</section>
