@@ -11,10 +11,20 @@ export const authErrorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((err: unknown) => {
-      if (err instanceof HttpErrorResponse && err.status === 401) {
-        if (!router.url.startsWith('/login')) {
-          auth.logout();
-          router.navigateByUrl('/login');
+      if (err instanceof HttpErrorResponse) {
+        if (err.status === 401) {
+          if (!router.url.startsWith('/login')) {
+            auth.logout();
+            router.navigate(['/login'], {
+              queryParams: { returnUrl: router.url },
+            });
+          }
+        }
+
+        if (err.status === 403) {
+          if (!router.url.startsWith('/forbidden')) {
+            router.navigateByUrl('/forbidden');
+          }
         }
       }
       return throwError(() => err);
