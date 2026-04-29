@@ -1,6 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { tap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { EnvironmentService } from '../../services/environment.service';
 
 import { LoginDto, RegisterDto, TokenDto, UserDto } from '@/app/models';
@@ -20,6 +21,8 @@ export class AuthService {
   readonly isLoggedIn = computed(() => !!this.token());
 
   readonly user = signal<UserDto | null>(null);
+  readonly currentUser = this.user;
+
   readonly userEmail = computed(() => this.user()?.email ?? null);
   readonly userName = computed(() => this.user()?.full_name ?? null);
 
@@ -41,7 +44,6 @@ export class AuthService {
 
     const headers = new HttpHeaders({
       'Content-Type': 'application/x-www-form-urlencoded',
-      Bearer: this.env.get('apiServiceKey'),
     });
 
     return this.http
@@ -50,13 +52,15 @@ export class AuthService {
       })
       .pipe(
         tap((r) => this.setToken(r.access_token)),
-        tap(() => {
-          this.loadCurrentUser().subscribe({
-            error: () => {
-              this.user.set(null);
-            },
-          });
-        }),
+        switchMap((tokenDto) =>
+          this.loadCurrentUser().pipe(
+            map(() => tokenDto),
+            catchError((err) => {
+              this.logout();
+              return throwError(() => err);
+            }),
+          ),
+        ),
       );
   }
 
