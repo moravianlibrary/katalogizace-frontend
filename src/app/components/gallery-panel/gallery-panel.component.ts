@@ -156,7 +156,7 @@ export class GalleryPanelComponent {
 
         return {
           id: img.image_id,
-          pageType: this.pageTypeLabel(img.page_type),
+          pageType: this.pageTypeLabel(img.page_categories[0] ?? 'Unknown'),
 
           thumbUrl: thumbCached?.objectUrl ?? null,
           thumbLoading: !thumbCached,
@@ -322,7 +322,7 @@ export class GalleryPanelComponent {
   private buildGalleryKey(bookId: ID | null, images: ApiImageItem[]): string {
     if (!bookId || images.length === 0) return '';
     return `${bookId}::${images
-      .map((x) => `${x.image_id}:${x.page_type ?? 'null'}`)
+      .map((x) => `${x.image_id}:${x.page_categories[0] ?? 'null'}`)
       .join(',')}`;
   }
 

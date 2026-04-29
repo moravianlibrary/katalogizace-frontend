@@ -14,7 +14,7 @@ export type PageType =
 
 export interface ApiImageItem {
   image_id: ID;
-  page_type: PageType | null;
+  page_categories: PageType[];
 }
 
 export type ImgItem = {
