@@ -797,5 +797,10 @@
     "description_secondary": "Zkuste požádat svého administrátora o udělení přístupu nebo se přihlaste pod jiným účtem.",
     "login_as_different_user": "Přihlásit se pod jiným účtem",
     "back_to_batches": "Přejít na seznam skupin"
+  },
+  "not_found": {
+    "title": "Upsík dupsík...",
+    "description": "Bohužel jsme nenašli stránku, kterou hledáte",
+    "home": "Přejít na seznam skupin"
   }
 }

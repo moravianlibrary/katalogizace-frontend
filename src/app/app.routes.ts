@@ -13,6 +13,7 @@ import { BooksListComponent } from './components/books-list/books-list.component
 import { BatchesListComponent } from './components/batches-list/batches-list.component';
 import { ForbiddenComponent } from './components/forbidden/forbidden.component';
 import { ProtectedLayoutComponent } from './components/layout/protected-layout/protected-layout.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
 import { batchPermissionGuard } from './guards/batch-permission.guard';
 import { captureExitGuard } from './guards/capture-exit.guard';
 
@@ -26,6 +27,11 @@ export const routes: Routes = [
   {
     path: 'forbidden',
     component: ForbiddenComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'not-found',
+    component: NotFoundComponent,
     canActivate: [authGuard],
   },
 
@@ -102,5 +108,5 @@ export const routes: Routes = [
   },
 
   // fallback
-  { path: '**', redirectTo: 'batches' },
+  { path: '**', component: NotFoundComponent, canActivate: [authGuard] },
 ];
