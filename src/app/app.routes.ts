@@ -14,6 +14,8 @@ import { BatchesListComponent } from './components/batches-list/batches-list.com
 import { ForbiddenComponent } from './components/forbidden/forbidden.component';
 import { ProtectedLayoutComponent } from './components/layout/protected-layout/protected-layout.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { UsersListComponent } from './components/users-list/users-list.component';
+import { adminGuard } from './guards/admin.guard';
 import { batchPermissionGuard } from './guards/batch-permission.guard';
 import { captureExitGuard } from './guards/capture-exit.guard';
 
@@ -41,6 +43,14 @@ export const routes: Routes = [
     component: ProtectedLayoutComponent,
     canActivate: [authGuard],
     children: [
+      {
+        path: 'users',
+        component: UsersListComponent,
+        canActivate: [adminGuard],
+        data: {
+          backTo: '/batches',
+        },
+      },
       {
         path: 'batches',
         component: BatchesListComponent,

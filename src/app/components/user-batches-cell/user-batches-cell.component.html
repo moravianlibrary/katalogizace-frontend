@@ -1,0 +1,52 @@
+<div
+  class="relative flex min-h-11 w-full max-w-full items-center gap-2 overflow-hidden"
+  #container
+  [title]="title()"
+>
+  @if (groupNames().length === 0) {
+    <span class="text-light text-md italic">
+      {{ emptyLabel() }}
+    </span>
+  } @else {
+    @for (groupName of visibleGroups(); track groupName) {
+      <span
+        class="bg-main-light text-base-color inline-flex max-w-64 shrink-0 items-center rounded-md px-4 py-1"
+      >
+        <span class="min-w-0 truncate">
+          {{ groupName }}
+        </span>
+      </span>
+    }
+
+    @if (hiddenCount() > 0) {
+      <span
+        class="border-tertiary-default bg-main-base text-base-color inline-flex shrink-0 rounded-md border px-2 py-0.75 font-medium"
+      >
+        +{{ hiddenCount() }}
+      </span>
+    }
+  }
+</div>
+
+<div
+  class="pointer-events-none invisible fixed top-0 left-0 -z-10 flex gap-2 overflow-hidden whitespace-nowrap"
+  aria-hidden="true"
+>
+  @for (groupName of groupNames(); track groupName) {
+    <span
+      class="bg-main-light text-base-color inline-flex max-w-64 shrink-0 items-center rounded-md px-4 py-1"
+      #groupMeasure
+    >
+      <span class="min-w-0 truncate">
+        {{ groupName }}
+      </span>
+    </span>
+  }
+
+  <span
+    class="border-tertiary-default bg-main-base text-base-color inline-flex shrink-0 rounded-md border px-2 py-0.75 font-medium"
+    #moreMeasure
+  >
+    +{{ groupNames().length }}
+  </span>
+</div>

@@ -1,0 +1,651 @@
+<section class="mx-auto flex h-full min-h-0 flex-col gap-4 p-4">
+  <div class="flex flex-row items-center justify-between gap-4">
+    @if (canManageUsers()) {
+      <button
+        class="btn btn-l btn-primary group"
+        (click)="openCreate()"
+        type="button"
+      >
+        <svg
+          class="icon-primary"
+          appIcon="userAdd"
+          width="20"
+          height="20"
+        ></svg>
+        {{ "users.create" | translate }}
+      </button>
+    }
+
+    <div class="relative w-full sm:w-96">
+      <svg
+        class="icon-tertiary pointer-events-none absolute top-1/2 left-4 -translate-y-1/2"
+        appIcon="search"
+        width="16"
+        height="16"
+      ></svg>
+
+      <input
+        class="border-tertiary-default bg-main-base focus:border-primary-default text-secondary h-12 w-full rounded-lg border pr-4 pl-10 outline-none"
+        [value]="searchInput()"
+        [placeholder]="'users.search' | translate"
+        (input)="onSearchInput($event)"
+        type="text"
+      />
+    </div>
+  </div>
+
+  <div class="flex min-h-0 flex-1 flex-col justify-between">
+    <div class="bg-main-light overflow-auto rounded-lg">
+      <table class="text-md w-full table-fixed">
+        <colgroup>
+          <col class="w-70" />
+          <col class="w-80" />
+          <col class="w-lg" />
+          <col class="w-26" />
+        </colgroup>
+
+        <thead class="bg-main-bright text-secondary sticky top-0 z-2">
+          <tr>
+            <th class="rounded-tl-lg px-3 py-2 text-left font-medium">
+              {{ "users.full_name" | translate }}
+            </th>
+
+            <th class="px-3 py-2 text-left font-medium">
+              {{ "users.email" | translate }}
+            </th>
+
+            <th class="px-3 py-2 text-left font-medium">
+              {{ "users.groups" | translate }}
+            </th>
+
+            <th class="rounded-tr-lg px-3 py-2 text-left font-medium">
+              {{ "users.actions" | translate }}
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @if (loading()) {
+            <tr>
+              <td
+                class="bg-main-base rounded-b-lg px-3 py-3.5 text-center"
+                colspan="4"
+              >
+                {{ "users.loading" | translate }}
+              </td>
+            </tr>
+          } @else if (error()) {
+            <tr>
+              <td
+                class="bg-main-base text-error rounded-b-lg px-3 py-3.5 text-center"
+                colspan="4"
+              >
+                {{ error() }}
+              </td>
+            </tr>
+          } @else if (filteredUsers().length === 0) {
+            <tr>
+              <td
+                class="bg-main-base rounded-b-lg px-3 py-3.5 text-center"
+                colspan="4"
+              >
+                {{ "users.no_users" | translate }}
+              </td>
+            </tr>
+          } @else {
+            @for (user of filteredUsers(); track user.id; let last = $last) {
+              <tr class="bg-main-base border-bright border-t">
+                <td class="px-3 py-3.5" [class.rounded-bl-lg]="last">
+                  <div class="flex min-w-0 items-center gap-2">
+                    <span class="min-w-0 truncate">
+                      {{ user.full_name }}
+                    </span>
+
+                    @if (user.role === "admin") {
+                      <svg
+                        class="icon-secondary shrink-0"
+                        appIcon="crown"
+                        width="16"
+                        height="16"
+                      ></svg>
+                    }
+                  </div>
+                </td>
+
+                <td class="px-3 py-1">
+                  <div class="truncate">
+                    {{ user.email }}
+                  </div>
+                </td>
+
+                <td class="px-3 py-1">
+                  <app-user-batches-cell
+                    [groupNames]="groupNames(user)"
+                    [emptyLabel]="'users.no_groups' | translate"
+                  />
+                </td>
+
+                <td class="px-3 py-1" [class.rounded-br-lg]="last">
+                  <div class="flex items-center gap-2">
+                    @if (canManageUsers()) {
+                      <button
+                        class="btn btn-tertiary group enabled:hover:shadow-s p-2"
+                        [attr.aria-label]="'users.edit' | translate"
+                        [title]="'users.edit' | translate"
+                        (click)="openEdit(user, $event)"
+                        type="button"
+                      >
+                        <svg
+                          class="icon-black group-disabled:icon-tertiary-disable"
+                          appIcon="edit"
+                          width="16"
+                          height="16"
+                        ></svg>
+                      </button>
+                    }
+
+                    @if (canManageUsers()) {
+                      <button
+                        class="btn btn-tertiary group enabled:hover:shadow-s p-2"
+                        [disabled]="user.id === auth.user()?.id"
+                        [attr.aria-label]="'users.delete' | translate"
+                        [title]="'users.delete' | translate"
+                        (click)="onDelete(user, $event)"
+                        type="button"
+                      >
+                        <svg
+                          class="icon-black group-disabled:icon-tertiary-disable"
+                          appIcon="trash"
+                          width="16"
+                          height="16"
+                        ></svg>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="flex shrink-0 items-center justify-between gap-4 pt-4">
+      <div class="text-light text-md text-nowrap">
+        {{ filteredUsers().length }} / {{ usersData().length }}
+      </div>
+    </div>
+  </div>
+
+  <dialog
+    class="shadow-s m-auto w-full max-w-115 rounded-2xl bg-white backdrop:bg-black/40"
+    #createDialog
+  >
+    <div class="flex justify-between gap-3 px-4 pt-4 pb-3">
+      <span class="text-md text-base-color font-medium">
+        {{ "users.create" | translate }}
+      </span>
+
+      <button class="btn group" (click)="closeCreate()" type="button">
+        <svg class="icon-tertiary" appIcon="x" width="24" height="24"></svg>
+      </button>
+    </div>
+
+    <div class="flex flex-col gap-6 px-4 pb-6">
+      <div>
+        <label class="text-light text-sm-tight mb-2 block font-medium">
+          {{ "users.full_name" | translate }}
+        </label>
+
+        <input
+          class="focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border py-3 pl-4 outline-none"
+          [ngClass]="
+            creating()
+              ? 'text-disable border-tertiary-disable cursor-not-allowed bg-gray-500/5'
+              : 'border-tertiary-default bg-main-base'
+          "
+          [value]="newFullName()"
+          [disabled]="creating()"
+          (input)="onNewFullNameInput($event)"
+          (keydown.enter)="!creating() && createUser()"
+          type="text"
+        />
+      </div>
+
+      <div>
+        <label class="text-light text-sm-tight mb-2 block font-medium">
+          {{ "users.email" | translate }}
+        </label>
+
+        <input
+          class="focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border py-3 pl-4 outline-none"
+          [ngClass]="
+            creating()
+              ? 'text-disable border-tertiary-disable cursor-not-allowed bg-gray-500/5'
+              : 'border-tertiary-default bg-main-base'
+          "
+          [value]="newEmail()"
+          [disabled]="creating()"
+          (input)="onNewEmailInput($event)"
+          (keydown.enter)="!creating() && createUser()"
+          type="email"
+        />
+      </div>
+
+      <div>
+        <label class="text-light text-sm-tight mb-2 block font-medium">
+          {{ "users.password" | translate }}
+        </label>
+
+        <input
+          class="focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border py-3 pl-4 outline-none"
+          [ngClass]="
+            creating()
+              ? 'text-disable border-tertiary-disable cursor-not-allowed bg-gray-500/5'
+              : 'border-tertiary-default bg-main-base'
+          "
+          [value]="newPassword()"
+          [disabled]="creating()"
+          (input)="onNewPasswordInput($event)"
+          (keydown.enter)="!creating() && createUser()"
+          type="password"
+        />
+      </div>
+    </div>
+
+    <div class="border-bright flex justify-center gap-3 border-t px-4 py-3">
+      <button
+        class="btn btn-m btn-tertiary"
+        [disabled]="creating()"
+        (click)="closeCreate()"
+        type="button"
+      >
+        {{ "buttons.cancel" | translate }}
+      </button>
+
+      <button
+        class="btn btn-m btn-primary"
+        [disabled]="
+          creating() ||
+          !newFullName().trim() ||
+          !newEmail().trim() ||
+          !newPassword()
+        "
+        (click)="createUser()"
+        type="button"
+      >
+        @if (creating()) {
+          {{ "buttons.creating" | translate }}
+        } @else {
+          {{ "buttons.create" | translate }}
+        }
+      </button>
+    </div>
+  </dialog>
+
+  <dialog
+    class="shadow-s m-auto h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-2xl overflow-hidden rounded-2xl bg-white backdrop:bg-black/40"
+    #editDialog
+  >
+    @if (editingUser(); as user) {
+      <div class="flex h-full min-h-0 flex-col">
+        <div
+          class="border-bright flex shrink-0 justify-between gap-3 border-b px-4 py-3"
+        >
+          <span class="text-base-color text-lg font-medium">
+            {{ "users.edit" | translate }}
+          </span>
+
+          <button class="btn group" (click)="closeEdit()" type="button">
+            <svg class="icon-tertiary" appIcon="x" width="24" height="24"></svg>
+          </button>
+        </div>
+
+        <div class="flex min-h-0 flex-1 flex-col py-3">
+          <div class="border-bright border-b px-4 pb-3">
+            <div class="grid shrink-0 gap-4 sm:grid-cols-2">
+              <div>
+                <label class="text-light text-sm-tight mb-2 block font-medium">
+                  {{ "users.full_name" | translate }}
+                </label>
+
+                <input
+                  class="border-tertiary-default bg-main-base focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border py-3 pl-4 outline-none"
+                  [value]="editFullName()"
+                  [disabled]="savingEdit()"
+                  (input)="onEditFullNameInput($event)"
+                  type="text"
+                />
+              </div>
+
+              <div>
+                <label class="text-light text-sm-tight mb-2 block font-medium">
+                  {{ "users.email" | translate }}
+                </label>
+
+                <input
+                  class="text-disable border-tertiary-disable w-full cursor-not-allowed overflow-hidden rounded-lg border bg-gray-500/5 py-3 pl-4 outline-none"
+                  [value]="user.email"
+                  disabled
+                  type="email"
+                />
+              </div>
+            </div>
+
+            <div class="mt-4 flex shrink-0 justify-between gap-3">
+              <button
+                class="btn btn-m btn-tertiary group"
+                [disabled]="true"
+                type="button"
+              >
+                <svg
+                  class="icon-tertiary"
+                  appIcon="refresh"
+                  width="16"
+                  height="16"
+                ></svg>
+
+                {{ "buttons.reset_password" | translate }}
+              </button>
+
+              <label
+                class="text-secondary flex cursor-pointer items-center gap-2 has-disabled:cursor-not-allowed"
+              >
+                <input
+                  class="peer sr-only"
+                  [checked]="editIsAdmin()"
+                  [disabled]="savingEdit() || isEditingCurrentUser()"
+                  (change)="onEditIsAdminInput($event)"
+                  type="checkbox"
+                />
+
+                <span
+                  class="border-tertiary-default bg-main-base peer-hover:border-primary-hover peer-active:border-primary-pressed peer-checked:border-primary-default peer-checked:bg-main-primary-default peer-checked:peer-hover:border-primary-hover peer-checked:peer-hover:bg-main-primary-hover peer-checked:peer-active:border-primary-pressed peer-checked:peer-active:bg-main-primary-pressed peer-disabled:border-tertiary-disable peer-disabled:peer-checked:border-tertiary-disable relative flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors peer-disabled:bg-gray-500/5 peer-disabled:peer-checked:bg-gray-300 peer-checked:[&>svg]:opacity-100"
+                >
+                  <svg
+                    class="icon-primary opacity-0 transition-opacity"
+                    aria-hidden="true"
+                    appIcon="check"
+                    width="12"
+                    height="12"
+                  ></svg>
+                </span>
+
+                <span class="text-sm-tight font-medium">
+                  {{ "users.is_admin" | translate }}
+                </span>
+
+                <svg
+                  class="icon-secondary"
+                  appIcon="crown"
+                  width="16"
+                  height="16"
+                ></svg>
+              </label>
+            </div>
+          </div>
+
+          <div class="flex min-h-0 flex-1 flex-col px-4 pt-3">
+            <div class="text-light text-sm-tight mb-3 shrink-0 font-medium">
+              {{ "users.groups_and_permissions" | translate }}
+            </div>
+
+            <div
+              class="flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center"
+            >
+              <div class="relative min-w-0 flex-1">
+                <div
+                  class="border-tertiary-default focus-within:border-primary-default bg-main-base group inline-flex h-12 w-full items-center justify-between overflow-hidden rounded-lg border px-4"
+                  [ngClass]="
+                    savingEdit()
+                      ? 'border-tertiary-disable cursor-not-allowed bg-gray-500/5'
+                      : ''
+                  "
+                >
+                  <input
+                    class="text-secondary disabled:text-disable h-full min-w-0 flex-1 bg-transparent outline-none disabled:cursor-not-allowed"
+                    [value]="batchSearchInput()"
+                    [disabled]="savingEdit()"
+                    [placeholder]="'users.search_groups' | translate"
+                    (focus)="onBatchSearchFocus()"
+                    (click)="onBatchSearchFocus()"
+                    (input)="onBatchSearchInput($event)"
+                    type="text"
+                  />
+
+                  <button
+                    class="ml-3 inline-flex shrink-0 items-center"
+                    [disabled]="savingEdit()"
+                    (click)="toggleBatchPicker()"
+                    type="button"
+                    aria-label="toggle groups"
+                  >
+                    <svg
+                      class="icon-tertiary transition-transform duration-150"
+                      [class.rotate-180]="batchPickerOpen()"
+                      appIcon="chevronDown"
+                      width="16"
+                      height="16"
+                    ></svg>
+                  </button>
+                </div>
+
+                @if (batchPickerOpen()) {
+                  <div
+                    class="border-primary-default bg-main-base absolute right-0 left-0 z-30 mt-2 overflow-hidden rounded-lg border shadow-md"
+                  >
+                    <div class="max-h-64 overflow-auto scroll-smooth p-2">
+                      @if (loadingBatchesInfo()) {
+                        <div class="text-light px-4 py-3">
+                          {{ "labels.loading" | translate }}
+                        </div>
+                      } @else if (availableBatches().length === 0) {
+                        <div class="text-light px-4 py-3">
+                          {{ "users.no_available_groups" | translate }}
+                        </div>
+                      } @else {
+                        @for (
+                          batch of availableBatches();
+                          track batch.batch_id
+                        ) {
+                          <button
+                            class="group text-secondary hover:bg-main-light active:bg-main-bright flex w-full cursor-pointer items-center justify-between rounded-lg px-4 py-3 text-left transition"
+                            [ngClass]="
+                              selectedBatchId() === batch.batch_id
+                                ? 'bg-main-light!'
+                                : ''
+                            "
+                            (mousedown)="$event.preventDefault()"
+                            (click)="selectBatch(batch)"
+                            type="button"
+                          >
+                            <span class="min-w-0">
+                              <span class="block truncate">
+                                {{ batch.name }}
+                              </span>
+                            </span>
+
+                            @if (selectedBatchId() === batch.batch_id) {
+                              <svg
+                                class="icon-secondary-default shrink-0"
+                                appIcon="checkCircle"
+                                width="16"
+                                height="16"
+                              ></svg>
+                            }
+                          </button>
+                        }
+                      }
+                    </div>
+                  </div>
+
+                  <button
+                    class="fixed inset-0 z-20 cursor-default"
+                    (click)="closeBatchPicker()"
+                    type="button"
+                    aria-label="close"
+                  ></button>
+                }
+              </div>
+
+              <div class="flex shrink-0 items-center gap-3">
+                <button
+                  class="btn btn-l btn-primary group"
+                  [disabled]="savingEdit() || !selectedBatch()"
+                  (click)="addSelectedBatch()"
+                  type="button"
+                >
+                  <svg
+                    class="icon-primary"
+                    appIcon="add"
+                    width="20"
+                    height="20"
+                  ></svg>
+
+                  {{ "buttons.add" | translate }}
+                </button>
+
+                @if (editPermissionRows().length > 0) {
+                  <button
+                    class="text-btn-secondary-default hover:text-btn-secondary-hover active:text-btn-secondary-pressed text-sm-tight inline-flex cursor-pointer items-center gap-2 font-medium"
+                    [disabled]="savingEdit()"
+                    (click)="removeAllEditBatchPermissions()"
+                    type="button"
+                  >
+                    <svg
+                      class="icon-secondary"
+                      appIcon="trash"
+                      width="16"
+                      height="16"
+                    ></svg>
+
+                    {{ "buttons.remove_all" | translate }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            <div class="mt-4 min-h-0 flex-1 overflow-y-auto">
+              <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                @if (editPermissionRows().length === 0) {
+                  <div
+                    class="bg-main-light text-light rounded-lg p-4 text-center sm:col-span-2"
+                  >
+                    {{ "users.no_groups_added" | translate }}
+                  </div>
+                } @else {
+                  @for (row of editPermissionRows(); track row.batch_id) {
+                    <div class="bg-main-light rounded-lg p-4">
+                      <div class="flex items-start justify-between gap-4">
+                        <div
+                          class="text-base-color min-w-0 truncate font-medium"
+                        >
+                          {{ row.batch_name }}
+                        </div>
+
+                        <button
+                          class="btn btn-tertiary group enabled:hover:shadow-s shrink-0 p-2"
+                          [disabled]="savingEdit()"
+                          [attr.aria-label]="'buttons.delete' | translate"
+                          [title]="'buttons.delete' | translate"
+                          (click)="removeEditBatchPermission(row.batch_id)"
+                          type="button"
+                        >
+                          <svg
+                            class="icon-black group-disabled:icon-tertiary-disable"
+                            appIcon="trash"
+                            width="16"
+                            height="16"
+                          ></svg>
+                        </button>
+                      </div>
+
+                      <div class="flex flex-col gap-2">
+                        @for (
+                          permission of permissionOptions;
+                          track permission.value
+                        ) {
+                          <label
+                            class="text-secondary flex cursor-pointer items-center gap-2 has-disabled:cursor-not-allowed"
+                          >
+                            <span class="relative flex h-4 w-4 shrink-0">
+                              <input
+                                class="peer absolute inset-0 z-10 h-4 w-4 cursor-pointer opacity-0 disabled:cursor-not-allowed"
+                                [checked]="
+                                  hasEditPermission(
+                                    row.batch_id,
+                                    permission.value
+                                  )
+                                "
+                                [disabled]="savingEdit()"
+                                (change)="
+                                  toggleEditPermission(
+                                    row.batch_id,
+                                    permission.value,
+                                    $event
+                                  )
+                                "
+                                type="checkbox"
+                              />
+
+                              <span
+                                class="border-tertiary-default bg-main-base peer-hover:border-primary-hover peer-active:border-primary-pressed peer-checked:border-primary-default peer-checked:bg-main-primary-default peer-checked:peer-hover:border-primary-hover peer-checked:peer-hover:bg-main-primary-hover peer-checked:peer-active:border-primary-pressed peer-checked:peer-active:bg-main-primary-pressed peer-disabled:border-tertiary-disable peer-disabled:peer-checked:border-tertiary-disable pointer-events-none relative flex h-4 w-4 items-center justify-center rounded border transition-colors peer-disabled:bg-gray-500/5 peer-disabled:peer-checked:bg-gray-300 peer-checked:[&>svg]:opacity-100"
+                              >
+                                <svg
+                                  class="icon-primary opacity-0 transition-opacity"
+                                  aria-hidden="true"
+                                  appIcon="check"
+                                  width="12"
+                                  height="12"
+                                ></svg>
+                              </span>
+                            </span>
+
+                            <span class="text-sm-tight font-medium">
+                              {{
+                                `permissions.${permission.value}` | translate
+                              }}
+                            </span>
+
+                            <svg
+                              class="shrink-0 fill-gray-600"
+                              [appIcon]="permission.icon"
+                              width="16"
+                              height="16"
+                            ></svg>
+                          </label>
+                        }
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="border-bright flex shrink-0 justify-center gap-3 border-t px-4 py-3"
+        >
+          <button
+            class="btn btn-m btn-tertiary"
+            [disabled]="savingEdit()"
+            (click)="closeEdit()"
+            type="button"
+          >
+            {{ "buttons.cancel" | translate }}
+          </button>
+
+          <button
+            class="btn btn-m btn-primary"
+            [disabled]="savingEdit() || !edited()"
+            (click)="saveEdit()"
+            type="button"
+          >
+            {{ "buttons.save" | translate }}
+          </button>
+        </div>
+      </div>
+    }
+  </dialog>
+</section>
