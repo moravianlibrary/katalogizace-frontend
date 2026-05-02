@@ -1,5 +1,6 @@
 import {
   BatchDto,
+  BatchInfoDto,
   BatchState,
   BatchWithBooksDto,
   PaginatedBatchesResponseDto,
@@ -85,5 +86,9 @@ export class BatchesService {
 
   deleteBatch(batch_id: string) {
     return this.http.delete(`${this.apiBaseUrl}/batches/${batch_id}`);
+  }
+
+  getBatchesInfo() {
+    return this.http.get<BatchInfoDto[]>(`${this.apiBaseUrl}/batches/info`);
   }
 }
