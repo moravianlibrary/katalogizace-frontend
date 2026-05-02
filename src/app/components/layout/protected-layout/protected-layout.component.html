@@ -9,49 +9,51 @@
           {{ "ai_cataloging" | translate }}
         </h5>
 
-        <nav class="min-w-0 flex-1 overflow-hidden">
-          <ol class="text-md flex min-w-0 items-center gap-2 overflow-hidden">
-            @for (crumb of breadcrumbs.crumbs(); track $index) {
-              <li class="flex min-w-0 shrink items-center gap-2">
-                <svg
-                  class="icon-tertiary-default shrink-0"
-                  appIcon="arrowRight"
-                  width="16"
-                  height="16"
-                ></svg>
+        @if (!isUsersRoute()) {
+          <nav class="min-w-0 flex-1 overflow-hidden">
+            <ol class="text-md flex min-w-0 items-center gap-2 overflow-hidden">
+              @for (crumb of breadcrumbs.crumbs(); track $index) {
+                <li class="flex min-w-0 shrink items-center gap-2">
+                  <svg
+                    class="icon-tertiary-default shrink-0"
+                    appIcon="arrowRight"
+                    width="16"
+                    height="16"
+                  ></svg>
 
-                @if (crumb.url) {
-                  <a
-                    class="block max-w-full min-w-0 truncate"
-                    #rla="routerLinkActive"
-                    [routerLink]="crumb.url"
-                    [routerLinkActiveOptions]="{ exact: true }"
-                    [ngClass]="
-                      !rla.isActive ? 'text-light hover:text-secondary' : ''
-                    "
-                    routerLinkActive="text-secondary font-medium"
-                  >
-                    @if (crumb.labelKey) {
-                      {{ crumb.labelKey | translate: crumb.labelParams }}
-                    } @else {
-                      {{ crumb.label }}
-                    }
-                  </a>
-                } @else {
-                  <span
-                    class="text-secondary block max-w-full min-w-0 truncate font-medium"
-                  >
-                    @if (crumb.labelKey) {
-                      {{ crumb.labelKey | translate: crumb.labelParams }}
-                    } @else {
-                      {{ crumb.label }}
-                    }
-                  </span>
-                }
-              </li>
-            }
-          </ol>
-        </nav>
+                  @if (crumb.url) {
+                    <a
+                      class="block max-w-full min-w-0 truncate"
+                      #rla="routerLinkActive"
+                      [routerLink]="crumb.url"
+                      [routerLinkActiveOptions]="{ exact: true }"
+                      [ngClass]="
+                        !rla.isActive ? 'text-light hover:text-secondary' : ''
+                      "
+                      routerLinkActive="text-secondary font-medium"
+                    >
+                      @if (crumb.labelKey) {
+                        {{ crumb.labelKey | translate: crumb.labelParams }}
+                      } @else {
+                        {{ crumb.label }}
+                      }
+                    </a>
+                  } @else {
+                    <span
+                      class="text-secondary block max-w-full min-w-0 truncate font-medium"
+                    >
+                      @if (crumb.labelKey) {
+                        {{ crumb.labelKey | translate: crumb.labelParams }}
+                      } @else {
+                        {{ crumb.label }}
+                      }
+                    </span>
+                  }
+                </li>
+              }
+            </ol>
+          </nav>
+        }
       </div>
 
       <div class="flex items-center justify-center">
@@ -92,10 +94,56 @@
         }
       </div>
 
-      <div class="flex min-w-0 items-center justify-end gap-4">
-        @if (auth.user()) {
-          <div class="text-base-color text-sm font-medium">
-            {{ auth.user()!.full_name }} · {{ auth.user()!.email }}
+      <div class="flex min-w-0 items-center justify-end gap-6">
+        @if (isAdmin()) {
+          <div class="flex gap-4">
+            <a
+              class="text-md group inline-flex items-center gap-2 text-nowrap"
+              #batchesLink="routerLinkActive"
+              [routerLink]="['/batches']"
+              [routerLinkActiveOptions]="{ exact: false }"
+              [ngClass]="
+                batchesLink.isActive
+                  ? 'text-btn-secondary-default hover:text-btn-secondary-hover active:text-btn-secondary-pressed font-medium'
+                  : 'text-btn-tertiary-default hover:text-btn-tertiary-hover active:text-btn-tertiary-pressed font-medium'
+              "
+              routerLinkActive=""
+            >
+              <svg
+                [ngClass]="
+                  batchesLink.isActive ? 'icon-secondary' : 'icon-tertiary'
+                "
+                appIcon="folderOpen"
+                width="16"
+                height="16"
+              ></svg>
+
+              {{ "buttons.manage_groups" | translate }}
+            </a>
+
+            <a
+              class="text-md group inline-flex items-center gap-2 text-nowrap"
+              #usersLink="routerLinkActive"
+              [routerLink]="['/users']"
+              [routerLinkActiveOptions]="{ exact: false }"
+              [ngClass]="
+                usersLink.isActive
+                  ? 'text-btn-secondary-default hover:text-btn-secondary-hover active:text-btn-secondary-pressed font-medium'
+                  : 'text-btn-tertiary-default hover:text-btn-tertiary-hover active:text-btn-tertiary-pressed font-medium'
+              "
+              routerLinkActive=""
+            >
+              <svg
+                [ngClass]="
+                  usersLink.isActive ? 'icon-secondary' : 'icon-tertiary'
+                "
+                appIcon="users"
+                width="16"
+                height="16"
+              ></svg>
+
+              {{ "buttons.manage_users" | translate }}
+            </a>
           </div>
         }
 
@@ -104,7 +152,22 @@
           (click)="logout()"
           type="button"
         >
-          {{ "buttons.logout" | translate }}
+          @if (auth.currentUser()?.role === "admin") {
+            <svg
+              class="icon-tertiary"
+              appIcon="crown"
+              width="16"
+              height="16"
+            ></svg>
+          } @else {
+            <svg
+              class="icon-tertiary"
+              appIcon="user"
+              width="16"
+              height="16"
+            ></svg>
+          }
+          {{ auth.user()!.full_name }}
           <svg
             class="icon-tertiary"
             appIcon="logout"
@@ -143,86 +206,92 @@
         </button>
       </div>
 
-      <div class="mt-2 flex min-w-0 items-center gap-2">
-        <nav class="min-w-0 flex-1 overflow-hidden">
-          <ol class="text-md flex min-w-0 items-center gap-2 overflow-hidden">
-            @for (crumb of breadcrumbs.crumbs(); track $index) {
-              <li class="flex min-w-0 shrink items-center gap-2">
+      @if (!isUsersRoute() || batchBookNav()) {
+        <div class="mt-2 flex min-w-0 items-center gap-2">
+          @if (!isUsersRoute()) {
+            <nav class="min-w-0 flex-1 overflow-hidden">
+              <ol
+                class="text-md flex min-w-0 items-center gap-2 overflow-hidden"
+              >
+                @for (crumb of breadcrumbs.crumbs(); track $index) {
+                  <li class="flex min-w-0 shrink items-center gap-2">
+                    <svg
+                      class="icon-tertiary-default shrink-0"
+                      appIcon="arrowRight"
+                      width="16"
+                      height="16"
+                    ></svg>
+
+                    @if (crumb.url) {
+                      <a
+                        class="block max-w-full min-w-0 truncate"
+                        #rla="routerLinkActive"
+                        [routerLink]="crumb.url"
+                        [routerLinkActiveOptions]="{ exact: true }"
+                        [ngClass]="
+                          !rla.isActive ? 'text-light hover:text-secondary' : ''
+                        "
+                        (click)="closeUserMenu()"
+                        routerLinkActive="text-secondary font-medium"
+                      >
+                        @if (crumb.labelKey) {
+                          {{ crumb.labelKey | translate: crumb.labelParams }}
+                        } @else {
+                          {{ crumb.label }}
+                        }
+                      </a>
+                    } @else {
+                      <span
+                        class="text-secondary block max-w-full min-w-0 truncate font-medium"
+                      >
+                        @if (crumb.labelKey) {
+                          {{ crumb.labelKey | translate: crumb.labelParams }}
+                        } @else {
+                          {{ crumb.label }}
+                        }
+                      </span>
+                    }
+                  </li>
+                }
+              </ol>
+            </nav>
+          }
+
+          @if (batchBookNav(); as nav) {
+            <div class="flex shrink-0 items-center gap-2">
+              <button
+                class="btn btn-s btn-tertiary btn-icon group"
+                [disabled]="!nav.prevBookId"
+                (click)="goToPrevBook()"
+                type="button"
+                title="{{ 'buttons.prev' | translate }}"
+              >
                 <svg
-                  class="icon-tertiary-default shrink-0"
+                  class="icon-tertiary"
+                  appIcon="arrowLeft"
+                  width="16"
+                  height="16"
+                ></svg>
+              </button>
+
+              <button
+                class="btn btn-s btn-tertiary btn-icon group"
+                [disabled]="!nav.nextBookId"
+                (click)="goToNextBook()"
+                type="button"
+                title="{{ 'buttons.next' | translate }}"
+              >
+                <svg
+                  class="icon-tertiary"
                   appIcon="arrowRight"
                   width="16"
                   height="16"
                 ></svg>
-
-                @if (crumb.url) {
-                  <a
-                    class="block max-w-full min-w-0 truncate"
-                    #rla="routerLinkActive"
-                    [routerLink]="crumb.url"
-                    [routerLinkActiveOptions]="{ exact: true }"
-                    [ngClass]="
-                      !rla.isActive ? 'text-light hover:text-secondary' : ''
-                    "
-                    (click)="closeUserMenu()"
-                    routerLinkActive="text-secondary font-medium"
-                  >
-                    @if (crumb.labelKey) {
-                      {{ crumb.labelKey | translate: crumb.labelParams }}
-                    } @else {
-                      {{ crumb.label }}
-                    }
-                  </a>
-                } @else {
-                  <span
-                    class="text-secondary block max-w-full min-w-0 truncate font-medium"
-                  >
-                    @if (crumb.labelKey) {
-                      {{ crumb.labelKey | translate: crumb.labelParams }}
-                    } @else {
-                      {{ crumb.label }}
-                    }
-                  </span>
-                }
-              </li>
-            }
-          </ol>
-        </nav>
-
-        @if (batchBookNav(); as nav) {
-          <div class="flex shrink-0 items-center gap-2">
-            <button
-              class="btn btn-s btn-tertiary btn-icon group"
-              [disabled]="!nav.prevBookId"
-              (click)="goToPrevBook()"
-              type="button"
-              title="{{ 'buttons.prev' | translate }}"
-            >
-              <svg
-                class="icon-tertiary"
-                appIcon="arrowLeft"
-                width="16"
-                height="16"
-              ></svg>
-            </button>
-
-            <button
-              class="btn btn-s btn-tertiary btn-icon group"
-              [disabled]="!nav.nextBookId"
-              (click)="goToNextBook()"
-              type="button"
-              title="{{ 'buttons.next' | translate }}"
-            >
-              <svg
-                class="icon-tertiary"
-                appIcon="arrowRight"
-                width="16"
-                height="16"
-              ></svg>
-            </button>
-          </div>
-        }
-      </div>
+              </button>
+            </div>
+          }
+        </div>
+      }
 
       @if (userMenuOpen()) {
         <button
@@ -246,8 +315,62 @@
             {{ auth.user()!.email }}
           </div>
 
+          @if (isAdmin()) {
+            <div class="mt-3 flex gap-4">
+              <a
+                class="text-md group inline-flex items-center gap-2"
+                #batchesLink="routerLinkActive"
+                [routerLink]="['/batches']"
+                [routerLinkActiveOptions]="{ exact: false }"
+                [ngClass]="
+                  batchesLink.isActive
+                    ? 'text-btn-secondary-default hover:text-btn-secondary-hover active:text-btn-secondary-pressed font-medium'
+                    : 'text-btn-tertiary-default hover:text-btn-tertiary-hover active:text-btn-tertiary-pressed font-medium'
+                "
+                (click)="closeUserMenu()"
+                routerLinkActive=""
+              >
+                <svg
+                  [ngClass]="
+                    batchesLink.isActive ? 'icon-secondary' : 'icon-tertiary'
+                  "
+                  appIcon="folderOpen"
+                  width="16"
+                  height="16"
+                ></svg>
+
+                {{ "buttons.manage_groups" | translate }}
+              </a>
+
+              <a
+                class="text-md group inline-flex items-center gap-2"
+                #usersLink="routerLinkActive"
+                [routerLink]="['/users']"
+                [routerLinkActiveOptions]="{ exact: false }"
+                [ngClass]="
+                  usersLink.isActive
+                    ? 'text-btn-secondary-default hover:text-btn-secondary-hover active:text-btn-secondary-pressed font-medium'
+                    : 'text-btn-tertiary-default hover:text-btn-tertiary-hover active:text-btn-tertiary-pressed font-medium'
+                "
+                (click)="closeUserMenu()"
+                routerLinkActive=""
+              >
+                <svg
+                  [ngClass]="
+                    usersLink.isActive ? 'icon-secondary' : 'icon-tertiary'
+                  "
+                  appIcon="users"
+                  width="16"
+                  height="16"
+                ></svg>
+
+                {{ "buttons.manage_users" | translate }}
+              </a>
+            </div>
+          }
+
           <button
-            class="text-btn-secondary-default hover:text-btn-secondary-hover active:text-btn-secondary-pressed disabled:text-btn-secondary-disable text-md group mt-3 inline-flex cursor-pointer items-center gap-3 font-medium disabled:cursor-not-allowed"
+            class="text-btn-secondary-default hover:text-btn-secondary-hover active:text-btn-secondary-pressed text-md group mt-3 inline-flex cursor-pointer items-center gap-3 font-medium"
             (click)="logout()"
             type="button"
           >

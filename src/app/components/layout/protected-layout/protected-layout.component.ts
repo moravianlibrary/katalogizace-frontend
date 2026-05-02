@@ -65,6 +65,13 @@ export class ProtectedLayoutComponent {
   readonly batchBookNav = signal<BatchBookNav | null>(null);
   readonly loadingBookNav = signal(false);
 
+  readonly isAdmin = computed(() => this.auth.user()?.role === 'admin');
+  readonly isUsersRoute = computed(() => {
+    this.navEnd();
+
+    return this.router.url.startsWith('/users');
+  });
+
   constructor() {
     effect(() => {
       const { bookId, batchId } = this.currentRouteParams();
