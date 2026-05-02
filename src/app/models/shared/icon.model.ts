@@ -27,6 +27,7 @@ export type AppIconName =
   | 'upload'
   | 'refresh'
   | 'folderAdd'
+  | 'folderOpen'
   | 'edit'
   | 'fitToScreen'
   | 'filter'
@@ -35,7 +36,13 @@ export type AppIconName =
   | 'checkCircleEmpty'
   | 'clipboardTick'
   | 'shieldError'
-  | 'timer';
+  | 'timer'
+  | 'users'
+  | 'userAdd'
+  | 'crown'
+  | 'settings'
+  | 'book'
+  | 'export';
 
 export type IconDefinition = {
   paths: Array<{
