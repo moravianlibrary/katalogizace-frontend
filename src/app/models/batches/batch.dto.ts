@@ -40,3 +40,9 @@ export type UpdateBatchRequest = {
   description: string | null;
   state: BatchState;
 };
+
+export type BatchInfoDto = {
+  batch_id: ID;
+  name: string;
+  description: string | null;
+};
