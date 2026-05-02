@@ -80,7 +80,12 @@
     "next": "Další",
     "scan": "Naskenovat",
     "upload": "Nahrát",
-    "uploading": "Nahrávám..."
+    "uploading": "Nahrávám...",
+    "manage_users": "Správa uživatelů",
+    "manage_groups": "Správa skupin",
+    "remove_all": "Odebrat vše",
+    "delete": "Smazat",
+    "reset_password": "Resetovat heslo"
   },
   "messages": {
     "success": {
@@ -104,6 +109,11 @@
       },
       "record": {
         "save": "Záznam byl úspěšně uložen."
+      },
+      "users": {
+        "create": "Uživatel byl úspěšně vytvořen.",
+        "edit": "Uživatel byl úspěšně upraven.",
+        "delete": "Uživatel byl úspěšně smazán."
       }
     },
     "warning": {
@@ -116,6 +126,11 @@
       "auth": {},
       "record": {
         "empty": "Není co uložit - chybí MARC záznam."
+      },
+      "users": {
+        "create_required": "Vyplňte jméno, email a heslo.",
+        "empty_name": "Jméno nesmí být prázdné.",
+        "delete_self": "Nemůžete smazat sami sebe."
       }
     },
     "error": {
@@ -152,7 +167,13 @@
       "record": {
         "save": "Uložení záznamu selhalo."
       },
-      "forbidden": "K této akci nemáte oprávnění."
+      "forbidden": "K této akci nemáte oprávnění.",
+      "users": {
+        "load": "Nepodařilo se načíst uživatele.",
+        "create": "Nepodařilo se vytvořit uživatele.",
+        "save": "Nepodařilo se uložit uživatele.",
+        "delete": "Nepodařilo se smazat uživatele."
+      }
     },
     "confirm": {
       "batches": {
@@ -164,6 +185,9 @@
       },
       "records": {
         "delete": "Opravdu chcete smazat toto pole?"
+      },
+      "users": {
+        "delete": "Opravdu chcete smazat tohoto uživatele?"
       }
     }
   },
@@ -803,5 +827,32 @@
     "title": "Upsík dupsík...",
     "description": "Bohužel jsme nenašli stránku, kterou hledáte",
     "home": "Přejít na seznam skupin"
+  },
+  "users": {
+    "create": "Vytvořit uživatele",
+    "edit": "Upravit uživatele",
+    "delete": "Smazat uživatele",
+    "search": "Hledat uživatele",
+    "full_name": "Jméno",
+    "email": "Email",
+    "password": "Heslo",
+    "actions": "Akce",
+    "loading": "Načítám uživatele...",
+    "no_users": "Žádní uživatelé k zobrazení",
+    "groups": "Skupiny",
+    "no_groups": "Bez skupin",
+    "groups_and_permissions": "Skupiny a práva",
+    "search_groups": "Napište název",
+    "no_available_groups": "Žádné dostupné skupiny",
+    "no_groups_added": "Uživatel zatím nemá přiřazenou žádnou skupinu.",
+    "permissions": "Práva",
+    "is_admin": "Admin"
+  },
+  "permissions": {
+    "edit": "Správa",
+    "write": "Úpravy",
+    "read": "Zobrazení",
+    "export": "Export",
+    "delete": "Mazání"
   }
 }
