@@ -40,7 +40,8 @@
       "transliteration": "Transliterace",
       "human_edit": "Ruční úprava"
     },
-    "no_permissions": "Nemáte oprávnění"
+    "no_permissions": "Nemáte oprávnění",
+    "loading": "Načítám..."
   },
   "pageType": {
     "TitlePage": "Titulní strana",
@@ -59,6 +60,7 @@
     "save": "Uložit",
     "save_record": "Uložit záznam",
     "take_record": "Převzít záznam",
+    "save_changes": "Uložit změny",
     "confirm_selection": "Potvrdit výběr",
     "logout": "Odhlásit",
     "add_data_field": "Přidat datové pole",
@@ -91,8 +93,8 @@
     "success": {
       "batches": {
         "delete": "Dávka byla úspěšně smazána.",
-        "create": "Dávka byla vytvořena.",
-        "edit": "Dávka byla upravena."
+        "create": "Dávka byla úspěšně vytvořena.",
+        "edit": "Dávka byla úspěšně upravena."
       },
       "books": {
         "create": "Kniha založena.",
@@ -140,7 +142,8 @@
         "delete": "Smazání dávky se nezdařilo.",
         "empty_name": "Zadejte název dávky.",
         "save": "Uložení změn se nezdařilo.",
-        "batch_detail_load": "Nepodařilo se načíst informace o dávce"
+        "batch_detail_load": "Nepodařilo se načíst informace o dávce",
+        "members_load": "Nepodařilo se načíst uživatele skupiny."
       },
       "books": {
         "create": "Nepodařilo se založit knihu.",
@@ -775,7 +778,11 @@
     "page": "Strana",
     "all": "Vše",
     "just_mine": "Jen moje",
-    "search": "Hledat skupinu"
+    "search": "Hledat skupinu",
+    "members_and_permissions": "Uživatelé a práva",
+    "search_users": "Vyhledejte uživatele",
+    "no_available_users": "Žádní dostupní uživatelé",
+    "no_members_added": "Skupina zatím nemá přiřazené žádné uživatele."
   },
   "books": {
     "loading": "Načítám knihy...",
@@ -830,7 +837,7 @@
   },
   "users": {
     "create": "Vytvořit uživatele",
-    "edit": "Upravit uživatele",
+    "edit": "Úprava uživatele",
     "delete": "Smazat uživatele",
     "search": "Hledat uživatele",
     "full_name": "Jméno",

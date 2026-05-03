@@ -441,74 +441,342 @@
   }
 
   <dialog
-    class="shadow-s m-auto w-full max-w-115 rounded-2xl bg-white backdrop:bg-black/40"
+    class="shadow-s m-auto h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-2xl overflow-hidden rounded-2xl bg-white backdrop:bg-black/40"
     #editDialog
   >
     @if (editingBatch()) {
-      <div class="flex justify-between gap-3 px-4 pt-4 pb-3">
-        <span class="text-md text-base-color font-medium">
-          {{ "batches.edit" | translate }}
-        </span>
+      <div class="flex h-full min-h-0 flex-col">
+        <div
+          class="border-bright flex shrink-0 justify-between gap-3 border-b px-4 py-3"
+        >
+          <span class="text-base-color text-xl font-medium">
+            {{ "batches.edit" | translate }}
+          </span>
 
-        <button class="btn group" (click)="closeEdit()" type="button">
-          <svg class="icon-tertiary" appIcon="x" width="24" height="24"></svg>
-        </button>
-      </div>
-
-      <div class="flex flex-col gap-6 px-4 pb-6">
-        <div>
-          <label class="text-light text-sm-tight mb-2 block font-medium">
-            {{ "batches.title" | translate }}
-          </label>
-          <input
-            class="focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border bg-transparent py-3 pl-4 outline-none"
-            [ngClass]="
-              inputDisabled()
-                ? 'text-disable border-tertiary-disable cursor-not-allowed bg-gray-500/5'
-                : 'border-tertiary-default bg-main-base'
-            "
-            [value]="editName()"
-            (input)="onEditNameInput($event)"
-            (keydown.enter)="!savingEdit() && saveEdit()"
-          />
+          <button class="btn group" (click)="closeEdit()" type="button">
+            <svg class="icon-tertiary" appIcon="x" width="24" height="24"></svg>
+          </button>
         </div>
 
-        <div>
-          <label class="text-light text-sm-tight mb-2 block font-medium">
-            {{ "batches.subtitle" | translate }}
-          </label>
-          <input
-            class="focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border bg-transparent py-3 pl-4 outline-none"
-            [ngClass]="
-              inputDisabled()
-                ? 'text-disable border-tertiary-disable cursor-not-allowed bg-gray-500/5'
-                : 'border-tertiary-default bg-main-base'
-            "
-            [value]="editDescription()"
-            (input)="onEditDescriptionInput($event)"
-            (keydown.enter)="!savingEdit() && saveEdit()"
-          />
+        <div class="flex min-h-0 flex-1 flex-col py-3">
+          <div class="border-bright border-b px-4 pb-3">
+            <div class="grid shrink-0 gap-4 sm:grid-cols-2">
+              <div>
+                <label class="text-light text-sm-tight mb-2 block font-medium">
+                  {{ "batches.title" | translate }}
+                </label>
+
+                <input
+                  class="border-tertiary-default bg-main-base focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border py-3 pl-4 outline-none"
+                  [value]="editName()"
+                  [disabled]="savingEdit()"
+                  (input)="onEditNameInput($event)"
+                  type="text"
+                />
+              </div>
+
+              <div>
+                <label class="text-light text-sm-tight mb-2 block font-medium">
+                  {{ "batches.subtitle" | translate }}
+                </label>
+
+                <input
+                  class="border-tertiary-default bg-main-base focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border py-3 pl-4 outline-none"
+                  [value]="editDescription()"
+                  [disabled]="savingEdit()"
+                  (input)="onEditDescriptionInput($event)"
+                  type="text"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="flex min-h-0 flex-1 flex-col px-4 pt-3">
+            <div class="text-light text-sm-tight mb-3 shrink-0 font-medium">
+              {{ "batches.members_and_permissions" | translate }}
+            </div>
+
+            <div
+              class="flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center"
+            >
+              <div class="relative min-w-0 flex-1">
+                <div
+                  class="border-tertiary-default focus-within:border-primary-default bg-main-base group inline-flex h-12 w-full items-center justify-between overflow-hidden rounded-lg border px-4"
+                  [ngClass]="
+                    savingEdit()
+                      ? 'border-tertiary-disable cursor-not-allowed bg-gray-500/5'
+                      : ''
+                  "
+                >
+                  <input
+                    class="text-secondary disabled:text-disable h-full min-w-0 flex-1 bg-transparent outline-none disabled:cursor-not-allowed"
+                    [value]="userSearchInput()"
+                    [disabled]="savingEdit()"
+                    [placeholder]="'batches.search_users' | translate"
+                    (focus)="onUserSearchFocus()"
+                    (click)="onUserSearchFocus()"
+                    (input)="onUserSearchInput($event)"
+                    type="text"
+                  />
+
+                  <button
+                    class="ml-3 inline-flex shrink-0 items-center"
+                    [disabled]="savingEdit()"
+                    (click)="toggleUserPicker()"
+                    type="button"
+                    aria-label="toggle users"
+                  >
+                    <svg
+                      class="icon-tertiary transition-transform duration-150"
+                      [class.rotate-180]="userPickerOpen()"
+                      appIcon="chevronDown"
+                      width="16"
+                      height="16"
+                    ></svg>
+                  </button>
+                </div>
+
+                @if (userPickerOpen()) {
+                  <div
+                    class="border-primary-default bg-main-base absolute right-0 left-0 z-30 mt-2 overflow-hidden rounded-lg border shadow-md"
+                  >
+                    <div class="max-h-64 overflow-auto scroll-smooth p-2">
+                      @if (loadingUsersInfo()) {
+                        <div class="text-light px-4 py-3">
+                          {{ "labels.loading" | translate }}
+                        </div>
+                      } @else if (availableUsers().length === 0) {
+                        <div class="text-light px-4 py-3">
+                          {{ "batches.no_available_users" | translate }}
+                        </div>
+                      } @else {
+                        @for (user of availableUsers(); track user.id) {
+                          <button
+                            class="group text-secondary hover:bg-main-light active:bg-main-bright flex w-full cursor-pointer items-center justify-between rounded-lg px-4 py-3 text-left transition"
+                            [ngClass]="
+                              selectedUserId() === user.id
+                                ? 'bg-main-light!'
+                                : ''
+                            "
+                            (mousedown)="$event.preventDefault()"
+                            (click)="selectUser(user)"
+                            type="button"
+                          >
+                            <span class="min-w-0">
+                              <span class="block truncate">
+                                {{ user.full_name }}
+                              </span>
+
+                              <span class="text-light block truncate text-sm">
+                                {{ user.email }}
+                              </span>
+                            </span>
+
+                            @if (selectedUserId() === user.id) {
+                              <svg
+                                class="icon-secondary-default shrink-0"
+                                appIcon="checkCircle"
+                                width="16"
+                                height="16"
+                              ></svg>
+                            }
+                          </button>
+                        }
+                      }
+                    </div>
+                  </div>
+
+                  <button
+                    class="fixed inset-0 z-20 cursor-default"
+                    (click)="closeUserPicker()"
+                    type="button"
+                    aria-label="close"
+                  ></button>
+                }
+              </div>
+
+              <div class="flex shrink-0 items-center gap-3">
+                <button
+                  class="btn btn-l btn-primary group"
+                  [disabled]="savingEdit() || !selectedUser()"
+                  (click)="addSelectedUser()"
+                  type="button"
+                >
+                  <svg
+                    class="icon-primary"
+                    appIcon="add"
+                    width="20"
+                    height="20"
+                  ></svg>
+
+                  {{ "buttons.add" | translate }}
+                </button>
+
+                @if (editMemberRows().length > 0) {
+                  <button
+                    class="text-btn-secondary-default hover:text-btn-secondary-hover active:text-btn-secondary-pressed text-sm-tight inline-flex cursor-pointer items-center gap-2 font-medium"
+                    [disabled]="savingEdit()"
+                    (click)="removeAllEditMembers()"
+                    type="button"
+                  >
+                    <svg
+                      class="icon-secondary"
+                      appIcon="trash"
+                      width="16"
+                      height="16"
+                    ></svg>
+
+                    {{ "buttons.remove_all" | translate }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            <div class="mt-4 min-h-0 flex-1 overflow-y-auto">
+              <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                @if (loadingBatchMembers()) {
+                  <div
+                    class="bg-main-light text-light rounded-lg p-4 text-center sm:col-span-2"
+                  >
+                    {{ "users.loading" | translate }}
+                  </div>
+                } @else if (editMemberRows().length === 0) {
+                  <div
+                    class="bg-main-light text-light rounded-lg p-4 text-center sm:col-span-2"
+                  >
+                    {{ "batches.no_members_added" | translate }}
+                  </div>
+                } @else {
+                  @for (row of editMemberRows(); track row.user_id) {
+                    <div
+                      class="bg-main-light flex flex-col gap-3 rounded-lg p-2"
+                    >
+                      <div class="flex items-start justify-between gap-2 pl-2">
+                        <div class="min-w-0">
+                          <div class="flex min-w-0 items-center gap-2">
+                            <span
+                              class="text-base-color min-w-0 truncate font-medium"
+                            >
+                              {{ row.full_name }}
+                            </span>
+
+                            @if (row.role === "admin") {
+                              <svg
+                                class="icon-secondary shrink-0"
+                                appIcon="crown"
+                                width="16"
+                                height="16"
+                              ></svg>
+                            }
+                          </div>
+
+                          <div class="text-light truncate text-sm">
+                            {{ row.email }}
+                          </div>
+                        </div>
+
+                        <button
+                          class="btn btn-tertiary group enabled:hover:shadow-s shrink-0 p-2"
+                          [disabled]="savingEdit()"
+                          [attr.aria-label]="'buttons.delete' | translate"
+                          [title]="'buttons.delete' | translate"
+                          (click)="removeEditMember(row.user_id)"
+                          type="button"
+                        >
+                          <svg
+                            class="icon-black group-disabled:icon-tertiary-disable"
+                            appIcon="trash"
+                            width="16"
+                            height="16"
+                          ></svg>
+                        </button>
+                      </div>
+
+                      <div class="flex flex-col gap-2 px-2 pb-3">
+                        @for (
+                          permission of permissionOptions;
+                          track permission.value
+                        ) {
+                          <label
+                            class="text-secondary flex cursor-pointer items-center gap-2 has-disabled:cursor-not-allowed"
+                          >
+                            <span class="relative flex h-4 w-4 shrink-0">
+                              <input
+                                class="peer absolute inset-0 z-10 h-4 w-4 cursor-pointer opacity-0 disabled:cursor-not-allowed"
+                                [checked]="
+                                  hasEditMemberPermission(
+                                    row.user_id,
+                                    permission.value
+                                  )
+                                "
+                                [disabled]="savingEdit()"
+                                (change)="
+                                  toggleEditMemberPermission(
+                                    row.user_id,
+                                    permission.value,
+                                    $event
+                                  )
+                                "
+                                type="checkbox"
+                              />
+
+                              <span
+                                class="border-tertiary-default bg-main-base peer-hover:border-primary-hover peer-active:border-primary-pressed peer-checked:border-primary-default peer-checked:bg-main-primary-default peer-checked:peer-hover:border-primary-hover peer-checked:peer-hover:bg-main-primary-hover peer-checked:peer-active:border-primary-pressed peer-disabled:border-tertiary-disable peer-disabled:peer-checked:border-tertiary-disable pointer-events-none relative flex h-4 w-4 items-center justify-center rounded border transition-colors peer-disabled:bg-gray-500/5 peer-disabled:peer-checked:bg-gray-300 peer-checked:[&>svg]:opacity-100"
+                              >
+                                <svg
+                                  class="icon-primary opacity-0 transition-opacity"
+                                  aria-hidden="true"
+                                  appIcon="check"
+                                  width="12"
+                                  height="12"
+                                ></svg>
+                              </span>
+                            </span>
+
+                            <span class="text-sm-tight font-medium">
+                              {{
+                                `permissions.${permission.value}` | translate
+                              }}
+                            </span>
+
+                            <svg
+                              class="shrink-0 fill-gray-600"
+                              [appIcon]="permission.icon"
+                              width="16"
+                              height="16"
+                            ></svg>
+                          </label>
+                        }
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="border-bright flex justify-center gap-3 border-t px-4 py-3">
-        <button
-          class="btn btn-m btn-tertiary"
-          [disabled]="savingEdit()"
-          (click)="closeEdit()"
-          type="button"
+        <div
+          class="border-bright flex shrink-0 justify-center gap-3 border-t px-4 py-3"
         >
-          {{ "buttons.cancel" | translate }}
-        </button>
+          <button
+            class="btn btn-m btn-tertiary"
+            [disabled]="savingEdit()"
+            (click)="closeEdit()"
+            type="button"
+          >
+            {{ "buttons.cancel" | translate }}
+          </button>
 
-        <button
-          class="btn btn-m btn-primary"
-          [disabled]="savingEdit() || !edited()"
-          (click)="saveEdit()"
-          type="button"
-        >
-          {{ "buttons.save" | translate }}
-        </button>
+          <button
+            class="btn btn-m btn-primary"
+            [disabled]="savingEdit() || !edited()"
+            (click)="saveEdit()"
+            type="button"
+          >
+            {{ "buttons.save_changes" | translate }}
+          </button>
+        </div>
       </div>
     }
   </dialog>

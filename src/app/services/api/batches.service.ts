@@ -1,6 +1,8 @@
 import {
   BatchDto,
   BatchInfoDto,
+  BatchMemberDto,
+  BatchMemberPermissionRequest,
   BatchState,
   BatchWithBooksDto,
   PaginatedBatchesResponseDto,
@@ -90,5 +92,31 @@ export class BatchesService {
 
   getBatchesInfo() {
     return this.http.get<BatchInfoDto[]>(`${this.apiBaseUrl}/batches/info`);
+  }
+
+  getBatchMembers(batchId: number) {
+    return this.http.get<BatchMemberDto[]>(
+      `${this.apiBaseUrl}/batches/${batchId}/members`,
+    );
+  }
+
+  addBatchMembers(batchId: number, members: BatchMemberPermissionRequest[]) {
+    return this.http.post(
+      `${this.apiBaseUrl}/batches/${batchId}/members`,
+      members,
+    );
+  }
+
+  updateBatchMembers(batchId: number, members: BatchMemberPermissionRequest[]) {
+    return this.http.patch(
+      `${this.apiBaseUrl}/batches/${batchId}/members`,
+      members,
+    );
+  }
+
+  deleteBatchMembers(batchId: number, userIds: number[]) {
+    return this.http.delete(`${this.apiBaseUrl}/batches/${batchId}/members`, {
+      body: userIds,
+    });
   }
 }

@@ -40,3 +40,22 @@ export interface UserUpdateDto {
   role?: UserRole | null;
   batch_permissions?: BatchPermissionUpdateDto[] | null;
 }
+
+export type BatchMemberPermissionRequest = {
+  user_id: number;
+  permissions: Permission[];
+};
+
+export type BatchMemberDto = {
+  id: number;
+  email: string;
+  full_name: string;
+  role: UserRole;
+  permissions: Permission[];
+};
+
+export type EditableBatchMember = BatchMemberPermissionRequest & {
+  full_name: string;
+  email: string;
+  role: UserRole;
+};
