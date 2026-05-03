@@ -292,7 +292,7 @@
         <div
           class="border-bright flex shrink-0 justify-between gap-3 border-b px-4 py-3"
         >
-          <span class="text-base-color text-lg font-medium">
+          <span class="text-base-color text-xl font-medium">
             {{ "users.edit" | translate }}
           </span>
 
@@ -535,8 +535,10 @@
                   </div>
                 } @else {
                   @for (row of editPermissionRows(); track row.batch_id) {
-                    <div class="bg-main-light rounded-lg p-4">
-                      <div class="flex items-start justify-between gap-4">
+                    <div
+                      class="bg-main-light flex flex-col gap-2 rounded-lg p-2"
+                    >
+                      <div class="flex items-center justify-between gap-2 pl-2">
                         <div
                           class="text-base-color min-w-0 truncate font-medium"
                         >
@@ -560,7 +562,7 @@
                         </button>
                       </div>
 
-                      <div class="flex flex-col gap-2">
+                      <div class="flex flex-col gap-2 px-2 pb-3">
                         @for (
                           permission of permissionOptions;
                           track permission.value
@@ -642,7 +644,7 @@
             (click)="saveEdit()"
             type="button"
           >
-            {{ "buttons.save" | translate }}
+            {{ "buttons.save_changes" | translate }}
           </button>
         </div>
       </div>
