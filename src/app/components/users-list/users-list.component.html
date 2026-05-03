@@ -68,7 +68,7 @@
           @if (loading()) {
             <tr>
               <td
-                class="bg-main-base rounded-b-lg px-3 py-3.5 text-center"
+                class="bg-main-base text-secondary rounded-b-lg px-3 py-3.5 text-center"
                 colspan="4"
               >
                 {{ "users.loading" | translate }}
@@ -86,7 +86,7 @@
           } @else if (filteredUsers().length === 0) {
             <tr>
               <td
-                class="bg-main-base rounded-b-lg px-3 py-3.5 text-center"
+                class="bg-main-base text-secondary rounded-b-lg px-3 py-3.5 text-center"
                 colspan="4"
               >
                 {{ "users.no_users" | translate }}

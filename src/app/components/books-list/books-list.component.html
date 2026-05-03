@@ -211,7 +211,7 @@
           @if (loading()) {
             <tr>
               <td
-                class="bg-main-base rounded-b-lg px-3 py-3.5 text-center"
+                class="bg-main-base text-secondary rounded-b-lg px-3 py-3.5 text-center"
                 colspan="8"
               >
                 {{ "books.loading" | translate }}
@@ -229,7 +229,7 @@
           } @else if (!data() || rows().length === 0) {
             <tr>
               <td
-                class="bg-main-base rounded-b-lg px-3 py-3.5 text-center"
+                class="bg-main-base text-secondary rounded-b-lg px-3 py-3.5 text-center"
                 colspan="8"
               >
                 {{ "books.no_books" | translate }}
