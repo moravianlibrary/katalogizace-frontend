@@ -1,13 +1,20 @@
-import { Component, inject, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  inject,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { IconComponent } from '../../components/icon/icon.component';
 import { AuthService } from '../../services/api/auth.service';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
   standalone: true,
-  imports: [ReactiveFormsModule, RouterModule],
+  imports: [ReactiveFormsModule, RouterModule, TranslateModule, IconComponent],
   templateUrl: './login.component.html',
 })
 export class LoginComponent {
@@ -18,7 +25,14 @@ export class LoginComponent {
   private toast = inject(ToastService);
   private translate = inject(TranslateService);
 
+  @ViewChild('emailInput')
+  private emailInput?: ElementRef<HTMLInputElement>;
+
   loading = signal(false);
+
+  ngAfterViewInit() {
+    this.emailInput?.nativeElement.focus();
+  }
 
   form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -28,14 +42,6 @@ export class LoginComponent {
   emailInvalid() {
     const c = this.form.controls.email;
     return c.touched && c.invalid;
-  }
-
-  get emailCtrl() {
-    return this.form.controls.email;
-  }
-
-  emailDisabled() {
-    return this.emailCtrl.disabled || this.loading();
   }
 
   passwordInvalid() {

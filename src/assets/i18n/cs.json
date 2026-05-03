@@ -41,7 +41,11 @@
       "human_edit": "Ruční úprava"
     },
     "no_permissions": "Nemáte oprávnění",
-    "loading": "Načítám..."
+    "loading": "Načítám...",
+    "password": "Heslo",
+    "password_required": "Heslo je povinné.",
+    "email": "E-mail",
+    "email_invalid": "Zadejte platnou e-mailovou adresu."
   },
   "pageType": {
     "TitlePage": "Titulní strana",
@@ -91,7 +95,9 @@
     "export": "Export",
     "copy": "Kopírovat",
     "close": "Zavřít",
-    "download": "Stáhnout"
+    "download": "Stáhnout",
+    "login": "Přihlásit se",
+    "logging_in": "Přihlašuji..."
   },
   "messages": {
     "success": {
@@ -870,5 +876,8 @@
     "title": "Export záznamu",
     "description": "Níže je aktuální záznam ve formátu MARCXML.",
     "copied": "Zkopírováno"
+  },
+  "login": {
+    "title": "AI Katalogizace - Přihlášení"
   }
 }

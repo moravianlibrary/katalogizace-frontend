@@ -44,7 +44,8 @@ export type AppIconName =
   | 'book'
   | 'export'
   | 'copy'
-  | 'download';
+  | 'download'
+  | 'envelope';
 
 export type IconDefinition = {
   paths: Array<{

@@ -1,58 +1,90 @@
-<div class="flex min-h-[calc(100vh-2rem)] items-center justify-center p-4">
-  <div
-    class="border-tertiary-default w-full max-w-md rounded-2xl border bg-white p-6 shadow-sm sm:p-8"
-  >
-    <div class="mb-6">
-      <h2>Přihlášení</h2>
-      <p class="text-light mt-1 text-sm">
-        Přihlaste se, abyste mohli pokračovat v katalogizaci.
-      </p>
-    </div>
+<div class="bg-main-base flex min-h-dvh items-center justify-center p-4">
+  <div class="flex w-full max-w-xs flex-col items-center gap-6">
+    <h1 class="text-center text-2xl font-medium">
+      {{ "login.title" | translate }}
+    </h1>
 
-    <form class="space-y-4" [formGroup]="form" (ngSubmit)="submit()">
-      <div>
-        <label class="text-light mb-1 block text-sm font-medium">
-          E-mail
+    <form
+      class="flex w-full flex-col items-center gap-5"
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+    >
+      <div class="flex w-full flex-col">
+        <label class="text-light text-sm-tight mb-2 block font-medium">
+          {{ "labels.email" | translate }}
         </label>
-        <input
-          class="border-bright placeholder:text-disable hover:border-tertiary-hover focus:border-tertiary-pressed w-full rounded-xl border px-3 py-2 outline-none"
+
+        <span
+          class="bg-main-base focus-within:border-primary-default inline-flex w-full items-center overflow-hidden rounded-lg border px-4"
           [class.border-error]="emailInvalid()"
-          type="email"
-          formControlName="email"
-          autocomplete="username"
-          placeholder="name@example.com"
-        />
+          [class.border-tertiary-default]="!emailInvalid()"
+        >
+          <svg
+            class="icon-tertiary-default shrink-0"
+            appIcon="envelope"
+            width="16"
+            height="16"
+          ></svg>
+
+          <input
+            class="placeholder:text-disable text-secondary w-full bg-transparent py-3 pl-3 outline-none"
+            #emailInput
+            type="email"
+            formControlName="email"
+            autocomplete="username"
+            placeholder="name@example.com"
+          />
+        </span>
+
         @if (emailInvalid()) {
-          <p class="text-error mt-1 text-sm">
-            Zadejte platnou e-mailovou adresu.
+          <p class="text-error mt-2 text-sm">
+            {{ "labels.email_invalid" | translate }}
           </p>
         }
       </div>
 
-      <div>
-        <label class="text-light mb-1 block text-sm font-medium"> Heslo </label>
-        <input
-          class="border-bright placeholder:text-disable hover:border-tertiary-hover focus:border-tertiary-pressed w-full rounded-xl border px-3 py-2 outline-none"
+      <div class="flex w-full flex-col gap-2">
+        <label class="text-base-color text-sm font-medium">
+          {{ "labels.password" | translate }}
+        </label>
+
+        <span
+          class="bg-main-base focus-within:border-primary-default inline-flex w-full items-center overflow-hidden rounded-lg border px-4"
           [class.border-error]="passwordInvalid()"
-          type="password"
-          formControlName="password"
-          autocomplete="current-password"
-          placeholder="••••••••"
-        />
+          [class.border-tertiary-default]="!passwordInvalid()"
+        >
+          <svg
+            class="icon-tertiary-default shrink-0"
+            appIcon="lock"
+            width="16"
+            height="16"
+          ></svg>
+
+          <input
+            class="placeholder:text-disable text-secondary w-full bg-transparent py-3 pl-3 outline-none"
+            type="password"
+            formControlName="password"
+            autocomplete="current-password"
+            placeholder="••••••••"
+          />
+        </span>
+
         @if (passwordInvalid()) {
-          <p class="text-error mt-1 text-sm">Heslo je povinné.</p>
+          <p class="text-error mt-2 text-sm">
+            {{ "labels.password_required" | translate }}
+          </p>
         }
       </div>
 
       <button
-        class="bg-main-primary-default text-on-color hover:bg-main-primary-hover disabled:bg-main-primary-disable disabled:text-btn-primary-disable w-full cursor-pointer rounded-xl px-4 py-2 font-medium disabled:cursor-not-allowed"
+        class="btn btn-l btn-primary w-full justify-center"
         [disabled]="loading() || form.invalid"
         type="submit"
       >
         @if (loading()) {
-          <span>Přihlašuji…</span>
+          {{ "buttons.logging_in" | translate }}
         } @else {
-          <span>Přihlásit se</span>
+          {{ "buttons.login" | translate }}
         }
       </button>
     </form>
