@@ -3,7 +3,6 @@ import { authGuard } from './guards/auth.guard';
 import { guestGuard } from './guards/guest.guard';
 
 import { LoginComponent } from './components/login/login.component';
-import { RegisterComponent } from './components/register/register.component';
 
 import { BookCaptureNativeComponent } from './components/book-capture-native/book-capture-native.component';
 import { BookCaptureComponent } from './components/book-capture/book-capture.component';
@@ -24,7 +23,6 @@ export const routes: Routes = [
 
   // public
   { path: 'login', component: LoginComponent, canActivate: [guestGuard] },
-  { path: 'register', component: RegisterComponent, canActivate: [guestGuard] },
 
   {
     path: 'forbidden',

@@ -4,7 +4,7 @@ import { throwError } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { EnvironmentService } from '../../services/environment.service';
 
-import { LoginDto, RegisterDto, TokenDto, UserDto } from '@/app/models';
+import { LoginDto, TokenDto, UserDto } from '@/app/models';
 import { BookImageCacheService } from '../book-image-cache.service';
 
 @Injectable({ providedIn: 'root' })
@@ -31,10 +31,6 @@ export class AuthService {
     token
       ? localStorage.setItem('access_token', token)
       : localStorage.removeItem('access_token');
-  }
-
-  register(dto: RegisterDto) {
-    return this.http.post(`${this.apiBaseUrl}/users/register`, dto);
   }
 
   login(dto: LoginDto) {
