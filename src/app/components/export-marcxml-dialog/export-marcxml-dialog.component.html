@@ -1,0 +1,95 @@
+@if (open()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+    (click)="close()"
+  >
+    <div
+      class="bg-main-base flex h-[calc(100dvh-2rem)] min-h-0 w-full max-w-3xl flex-col rounded-2xl shadow-xl"
+      (click)="$event.stopPropagation()"
+    >
+      <div
+        class="border-bright flex shrink-0 justify-between gap-3 border-b px-4 py-3"
+      >
+        <span class="text-base-color text-xl font-medium">
+          {{ "export_marcxml.title" | translate }}
+        </span>
+
+        <button class="btn group" (click)="close()" type="button">
+          <svg class="icon-tertiary" appIcon="x" width="24" height="24"></svg>
+        </button>
+      </div>
+
+      <div class="flex min-h-0 flex-1 flex-col gap-3 px-4 py-3">
+        <p class="text-secondary shrink-0">
+          {{ "export_marcxml.description" | translate }}
+        </p>
+
+        <div
+          class="border-tertiary-default bg-main-light relative min-h-0 flex-1 overflow-hidden rounded-lg border"
+        >
+          <div class="absolute top-3 right-3 z-10 flex items-center gap-2">
+            @if (copied()) {
+              <span
+                class="bg-main-base text-secondary rounded-md px-2 py-1 text-xs shadow-sm"
+              >
+                {{ "export_marcxml.copied" | translate }}
+              </span>
+            }
+
+            <button
+              class="group flex h-7 w-7 cursor-pointer items-center justify-center disabled:cursor-not-allowed"
+              [disabled]="!marcxml()"
+              [attr.aria-label]="'buttons.copy' | translate"
+              (click)="copy()"
+              type="button"
+            >
+              @if (copied()) {
+                <svg
+                  class="icon-tertiary"
+                  appIcon="check"
+                  width="28"
+                  height="28"
+                ></svg>
+              } @else {
+                <svg
+                  class="icon-tertiary"
+                  appIcon="copy"
+                  width="22"
+                  height="22"
+                ></svg>
+              }
+            </button>
+          </div>
+
+          <textarea
+            class="text-base-color h-full w-full resize-none overflow-auto overscroll-contain bg-transparent p-3 pr-10 font-mono text-xs outline-none"
+            [value]="marcxml()"
+            readonly
+          ></textarea>
+        </div>
+      </div>
+
+      <div
+        class="border-bright flex shrink-0 items-center justify-center gap-3 border-t px-4 py-3"
+      >
+        <button class="btn btn-m btn-tertiary" (click)="close()" type="button">
+          {{ "buttons.cancel" | translate }}
+        </button>
+        <button
+          class="btn btn-m btn-primary"
+          [disabled]="!marcxml()"
+          (click)="save()"
+          type="button"
+        >
+          <svg
+            class="icon-primary"
+            appIcon="download"
+            width="16"
+            height="16"
+          ></svg>
+          {{ "buttons.save" | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

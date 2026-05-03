@@ -2,8 +2,10 @@
   <app-main-panel-header
     [bookId]="book_id()!"
     [canWrite]="canWrite()"
+    [canExport]="canExport()"
     [quickAddItems]="recordState.visibleQuickAdd()"
     (quickAddClick)="onQuickAdd($event)"
+    (exportClick)="openExportDialog()"
   ></app-main-panel-header>
 
   <div class="min-h-0 flex-1 overflow-auto">
@@ -28,5 +30,12 @@
     (closed)="closeAddFieldDialog()"
     (confirmed)="onAddFieldConfirm($event)"
     (clearedError)="addFieldDialogError.set(null)"
+  />
+
+  <app-export-marcxml-dialog
+    [open]="exportDialogOpen()"
+    [marcxml]="exportMarcxml()"
+    [filename]="exportFilename()"
+    (closed)="closeExportDialog()"
   />
 </section>

@@ -87,7 +87,11 @@
     "manage_groups": "Správa skupin",
     "remove_all": "Odebrat vše",
     "delete": "Smazat",
-    "reset_password": "Resetovat heslo"
+    "reset_password": "Resetovat heslo",
+    "export": "Export",
+    "copy": "Kopírovat",
+    "close": "Zavřít",
+    "download": "Stáhnout"
   },
   "messages": {
     "success": {
@@ -861,5 +865,10 @@
     "read": "Zobrazení",
     "export": "Export",
     "delete": "Mazání"
+  },
+  "export_marcxml": {
+    "title": "Export záznamu",
+    "description": "Níže je aktuální záznam ve formátu MARCXML.",
+    "copied": "Zkopírováno"
   }
 }

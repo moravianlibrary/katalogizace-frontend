@@ -38,6 +38,7 @@ export class BookDetailComponent {
   readonly mainPanel = viewChild(MainPanelComponent);
 
   batchId = signal<ID | null>(null);
+  batchName = signal<string | null>(null);
 
   galleryCollapsed = signal(false);
   bookId = signal<ID | null>(null);
@@ -98,6 +99,8 @@ export class BookDetailComponent {
   private resetBookDetail() {
     this.contextPanel.reset();
 
+    this.batchName.set(null);
+
     this.store.setOpenedExisting(null);
     this.store.setOpenedExtracted(null);
 
@@ -126,6 +129,7 @@ export class BookDetailComponent {
         this.store.setYearOfPublication(data.year_of_publishing);
 
         if (data.batch_id != null) {
+          this.batchName.set(data.batch_name ?? null);
           this.breadcrumbs.setBatch(data.batch_id, data.batch_name ?? null);
         }
 

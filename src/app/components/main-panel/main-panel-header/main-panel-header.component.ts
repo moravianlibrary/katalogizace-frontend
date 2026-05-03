@@ -33,6 +33,9 @@ export class MainPanelHeaderComponent {
   canWrite = input<boolean>(false);
   isSaving = signal(false);
 
+  canExport = input<boolean>(false);
+  exportClick = output<void>();
+
   quickAddItems = input.required<QuickAddItem[]>();
   quickAddClick = output<QuickAddItem>();
 
@@ -85,5 +88,17 @@ export class MainPanelHeaderComponent {
         );
       },
     });
+  }
+
+  onExport() {
+    if (!this.canExport()) {
+      this.toast.show(
+        this.translate.instant('messages.error.forbidden'),
+        'error',
+      );
+      return;
+    }
+
+    this.exportClick.emit();
   }
 }

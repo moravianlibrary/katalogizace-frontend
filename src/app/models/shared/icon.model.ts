@@ -42,7 +42,9 @@ export type AppIconName =
   | 'crown'
   | 'settings'
   | 'book'
-  | 'export';
+  | 'export'
+  | 'copy'
+  | 'download';
 
 export type IconDefinition = {
   paths: Array<{

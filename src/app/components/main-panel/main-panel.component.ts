@@ -26,6 +26,9 @@ import {
 import { EditableMarcRecordTableComponent } from '../marc-record-table/editable-marc-record-table/editable-marc-record-table.component';
 import { MainPanelHeaderComponent } from './main-panel-header/main-panel-header.component';
 
+import { toMarcxml } from '@/app/utils/marcxml-export';
+import { ExportMarcxmlDialogComponent } from '../export-marcxml-dialog/export-marcxml-dialog.component';
+
 @Component({
   standalone: true,
   selector: 'app-main-panel',
@@ -34,12 +37,18 @@ import { MainPanelHeaderComponent } from './main-panel-header/main-panel-header.
     EditableMarcRecordTableComponent,
     TranslateModule,
     AddFieldDialogComponent,
+    ExportMarcxmlDialogComponent,
   ],
   templateUrl: './main-panel.component.html',
 })
 export class MainPanelComponent {
   book_id = input<ID | null>(null);
+  batchName = input<string | null>(null);
   canWrite = input<boolean>(false);
+  canExport = input<boolean>(false);
+
+  readonly exportDialogOpen = signal(false);
+  readonly exportMarcxml = signal('');
 
   recordState = inject(RecordStateService);
   store = inject(RecordStore);
@@ -52,6 +61,8 @@ export class MainPanelComponent {
 
   readonly addFieldDialogOpen = signal(false);
   readonly addFieldDialogError = signal<string | null>(null);
+
+  readonly exportFilename = signal('marc-record.xml');
 
   constructor() {
     effect(() => {
@@ -210,5 +221,55 @@ export class MainPanelComponent {
     const fallback = result.length ? result : ['a'];
 
     return fallback.sort(compareSubfieldCodes);
+  }
+
+  private buildExportFilename(): string {
+    const parts = [this.batchName(), this.store.title()]
+      .map((part) => this.sanitizeFilenamePart(part))
+      .filter(Boolean);
+
+    const base = parts.length ? parts.join('_') : 'marcxml-export';
+
+    return `${base}.xml`;
+  }
+
+  private sanitizeFilenamePart(value: string | null | undefined): string {
+    if (!value) return '';
+
+    return value
+      .replace(/[<>:"/\\|?*\x00-\x1F]/g, '')
+      .replace(/\s+/g, '_')
+      .replace(/_+/g, '_')
+      .replace(/[. ]+$/g, '')
+      .trim()
+      .slice(0, 100);
+  }
+
+  openExportDialog() {
+    if (!this.canExport()) {
+      return;
+    }
+
+    const bookId = this.book_id();
+    if (!bookId) {
+      return;
+    }
+
+    const record = this.recordState.buildExistingRecord(bookId);
+
+    this.exportFilename.set(this.buildExportFilename());
+
+    if (!record) {
+      this.exportMarcxml.set('');
+      this.exportDialogOpen.set(true);
+      return;
+    }
+
+    this.exportMarcxml.set(toMarcxml(record));
+    this.exportDialogOpen.set(true);
+  }
+
+  closeExportDialog() {
+    this.exportDialogOpen.set(false);
   }
 }
