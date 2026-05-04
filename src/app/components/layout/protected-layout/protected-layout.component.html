@@ -6,7 +6,9 @@
     >
       <div class="flex min-w-0 items-center gap-4">
         <h5 class="text-light shrink-0 font-bold whitespace-nowrap">
-          {{ "ai_cataloging" | translate }}
+          <a [routerLink]="['/batches']">
+            {{ "ai_cataloging" | translate }}
+          </a>
         </h5>
 
         @if (!isUsersRoute()) {
@@ -184,7 +186,9 @@
         <h5
           class="text-light min-w-0 text-xl leading-none font-bold whitespace-nowrap"
         >
-          {{ "ai_cataloging" | translate }}
+          <a [routerLink]="['/batches']">
+            {{ "ai_cataloging" | translate }}
+          </a>
         </h5>
 
         <button
