@@ -182,6 +182,9 @@ export class BooksService {
     presign: PresignedPostUploadResponse,
     file: Blob | File,
   ): Promise<void> {
+    const uploadOrigin = this.getUrlOrigin(presign.upload_url);
+    const pageOrigin = window.location.origin;
+
     const formData = new FormData();
 
     Object.entries(presign.fields).forEach(([key, value]) => {
@@ -190,15 +193,74 @@ export class BooksService {
 
     formData.append('file', file, this.getUploadFilename(file));
 
-    const response = await fetch(presign.upload_url, {
-      method: presign.method,
-      body: formData,
-    });
+    try {
+      const response = await fetch(presign.upload_url, {
+        method: presign.method,
+        body: formData,
+      });
 
-    if (!response.ok) {
+      if (!response.ok) {
+        const responseText = await response.text().catch(() => '');
+
+        throw new Error(
+          [
+            `Storage upload failed: ${response.status}`,
+            `Page: ${pageOrigin}`,
+            `Upload: ${uploadOrigin}`,
+            responseText ? `Response: ${responseText.slice(0, 300)}` : '',
+          ]
+            .filter(Boolean)
+            .join('\n'),
+        );
+      }
+    } catch (err) {
+      if (
+        err instanceof Error &&
+        err.message.startsWith('Storage upload failed')
+      ) {
+        throw err;
+      }
+
       throw new Error(
-        `Presigned image upload failed with status ${response.status}`,
+        [
+          'Fetch to storage failed.',
+          `Page: ${pageOrigin}`,
+          `Upload: ${uploadOrigin}`,
+          `File: ${file.type || 'unknown'} / ${file.size} B`,
+          this.getLikelyUploadProblem(presign.upload_url),
+        ].join('\n'),
       );
+    }
+  }
+
+  private getUrlOrigin(urlValue: string): string {
+    try {
+      const url = new URL(urlValue);
+      return `${url.protocol}//${url.host}`;
+    } catch {
+      return urlValue;
+    }
+  }
+
+  private getLikelyUploadProblem(uploadUrl: string): string {
+    try {
+      const url = new URL(uploadUrl);
+
+      if (
+        url.hostname === 'localhost' ||
+        url.hostname === '127.0.0.1' ||
+        url.hostname === '0.0.0.0'
+      ) {
+        return 'Likely reason: upload URL points to localhost.';
+      }
+
+      if (window.location.protocol === 'https:' && url.protocol === 'http:') {
+        return 'Likely reason: HTTPS frontend is calling HTTP upload URL.';
+      }
+
+      return 'Likely reason: CORS, TLS certificate, DNS, or mobile network access to storage.';
+    } catch {
+      return 'Likely reason: upload URL could not be parsed.';
     }
   }
 
