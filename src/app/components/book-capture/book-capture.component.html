@@ -15,7 +15,9 @@
 
       <button
         class="btn btn-m btn-tertiary group"
-        [disabled]="isCancelling() || isUploading() || isFinishing()"
+        [disabled]="
+          isCancelling() || isCapturing() || isUploading() || isFinishing()
+        "
         (click)="cancel()"
         type="button"
       >
@@ -79,6 +81,7 @@
         class="btn btn-m btn-tertiary"
         [disabled]="
           photoCount() === 0 ||
+          isCapturing() ||
           isUploading() ||
           isFinishing() ||
           isPreparingNext() ||
@@ -94,6 +97,7 @@
       <button
         class="btn btn-xl btn-primary group absolute left-1/2 -translate-x-1/2 rounded-full p-3.5"
         [disabled]="
+          isCapturing() ||
           isUploading() ||
           isFinishing() ||
           isPreparingNext() ||
@@ -104,13 +108,14 @@
         (click)="takePhoto()"
         type="button"
       >
-        <svg class="icon-primary" appIcon="camera" width="20" height="2O"></svg>
+        <svg class="icon-primary" appIcon="camera" width="20" height="20"></svg>
       </button>
 
       <button
         class="btn btn-m btn-tertiary ml-auto"
         [disabled]="
           photoCount() === 0 ||
+          isCapturing() ||
           isUploading() ||
           isFinishing() ||
           isPreparingNext() ||

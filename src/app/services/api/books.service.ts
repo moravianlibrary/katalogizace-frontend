@@ -11,7 +11,17 @@ import {
 } from '@/app/models/';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { catchError, from, map, of, switchMap, throwError } from 'rxjs';
 import { EnvironmentService } from '../environment.service';
+
+type PresignedPostUploadResponse = {
+  method: 'POST';
+  upload_url: string;
+  fields: Record<string, string>;
+  image_id: number;
+  object_key: string;
+  expires_in_seconds: number;
+};
 
 @Injectable({ providedIn: 'root' })
 export class BooksService {
@@ -133,14 +143,87 @@ export class BooksService {
     );
   }
 
-  uploadBookImage(bookId: string, file: Blob | File) {
-    const formData = new FormData();
-    formData.append('image_file', file);
+  // uploadBookImage(bookId: string, file: Blob | File) {
+  //   const formData = new FormData();
+  //   formData.append('image_file', file);
 
-    return this.http.post<BookImageUploadResponseDto>(
-      `${this.apiBaseUrl}/books/${bookId}/image`,
-      formData,
+  //   return this.http.post<BookImageUploadResponseDto>(
+  //     `${this.apiBaseUrl}/books/${bookId}/image`,
+  //     formData,
+  //   );
+  // }
+
+  uploadBookImage(bookId: string, file: Blob | File) {
+    return this.http
+      .post<PresignedPostUploadResponse>(
+        `${this.apiBaseUrl}/books/${bookId}/image/presign-upload`,
+        null,
+      )
+      .pipe(
+        switchMap((presign) =>
+          from(this.uploadToPresignedPost(presign, file)).pipe(
+            map(
+              (): BookImageUploadResponseDto => ({
+                book_id: Number(bookId),
+                image_id: presign.image_id,
+              }),
+            ),
+            catchError((uploadErr) =>
+              this.cleanupFailedPresignedImage(bookId, presign.image_id).pipe(
+                switchMap(() => throwError(() => uploadErr)),
+              ),
+            ),
+          ),
+        ),
+      );
+  }
+
+  private async uploadToPresignedPost(
+    presign: PresignedPostUploadResponse,
+    file: Blob | File,
+  ): Promise<void> {
+    const formData = new FormData();
+
+    Object.entries(presign.fields).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
+    formData.append('file', file, this.getUploadFilename(file));
+
+    const response = await fetch(presign.upload_url, {
+      method: presign.method,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `Presigned image upload failed with status ${response.status}`,
+      );
+    }
+  }
+
+  private cleanupFailedPresignedImage(
+    bookId: string,
+    imageId: string | number,
+  ) {
+    return this.deleteBookImage(bookId, imageId).pipe(
+      catchError((err) => {
+        console.warn('Failed to clean up presigned image record', err);
+        return of(null);
+      }),
     );
+  }
+
+  deleteBookImage(bookId: string, imageId: string | number) {
+    return this.http.delete(`${this.apiBaseUrl}/books/${bookId}/${imageId}`);
+  }
+
+  private getUploadFilename(file: Blob | File): string {
+    if (file instanceof File && file.name) {
+      return file.name;
+    }
+
+    return `capture-${Date.now()}.jpg`;
   }
 
   startBookWorkflow(bookId: string) {

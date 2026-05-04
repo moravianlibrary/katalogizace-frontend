@@ -60,6 +60,21 @@ export interface BookImageUploadResponseDto {
   image_id: ID;
 }
 
+export interface BookImageDeleteResponseDto {
+  book_id: ID;
+  image_id: ID;
+  deleted: boolean;
+}
+
+export interface PresignedPostUploadResponse {
+  method: 'POST';
+  upload_url: string;
+  fields: Record<string, string>;
+  image_id: ID;
+  object_key: string;
+  expires_in_seconds: number;
+}
+
 export interface BookImageUrlResponse {
   url: string;
   expiration_seconds: number;

@@ -46,6 +46,7 @@ export class BookCaptureComponent implements AfterViewInit, OnDestroy {
   bookId = signal<string | null>(null);
 
   isCreating = signal(false);
+  isCapturing = signal(false);
   isUploading = signal(false);
   isFinishing = signal(false);
   isOpeningCamera = signal(false);
@@ -85,7 +86,7 @@ export class BookCaptureComponent implements AfterViewInit, OnDestroy {
   ngOnDestroy() {
     this.stopCamera();
 
-    if (!this.leavingExplicitly()) {
+    if (!this.leavingExplicitly() && !this.cleanupDone()) {
       void this.cleanupIfNeededOnDestroy();
     }
   }
@@ -94,6 +95,7 @@ export class BookCaptureComponent implements AfterViewInit, OnDestroy {
     if (
       !this.bookId() ||
       !this.stream ||
+      this.isCapturing() ||
       this.isUploading() ||
       this.isFinishing() ||
       this.isPreparingNext() ||
@@ -102,10 +104,13 @@ export class BookCaptureComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    this.isUploading.set(true);
+    this.isCapturing.set(true);
 
     try {
       const blob = await this.captureBestPhoto();
+
+      this.isCapturing.set(false);
+      this.isUploading.set(true);
 
       await firstValueFrom(this.books.uploadBookImage(this.bookId()!, blob));
 
@@ -123,12 +128,18 @@ export class BookCaptureComponent implements AfterViewInit, OnDestroy {
         'error',
       );
     } finally {
+      this.isCapturing.set(false);
       this.isUploading.set(false);
     }
   }
 
   async finish() {
-    if (this.isFinishing() || this.isUploading() || this.isPreparingNext()) {
+    if (
+      this.isFinishing() ||
+      this.isCapturing() ||
+      this.isUploading() ||
+      this.isPreparingNext()
+    ) {
       return;
     }
 
@@ -166,7 +177,12 @@ export class BookCaptureComponent implements AfterViewInit, OnDestroy {
   }
 
   async nextBook() {
-    if (this.isPreparingNext() || this.isUploading() || this.isFinishing()) {
+    if (
+      this.isPreparingNext() ||
+      this.isCapturing() ||
+      this.isUploading() ||
+      this.isFinishing()
+    ) {
       return;
     }
 
@@ -205,7 +221,14 @@ export class BookCaptureComponent implements AfterViewInit, OnDestroy {
   }
 
   async cancel() {
-    if (this.isCancelling() || this.isUploading() || this.isFinishing()) return;
+    if (
+      this.isCancelling() ||
+      this.isCapturing() ||
+      this.isUploading() ||
+      this.isFinishing()
+    ) {
+      return;
+    }
 
     this.isCancelling.set(true);
     this.stopCamera();
@@ -238,7 +261,13 @@ export class BookCaptureComponent implements AfterViewInit, OnDestroy {
     if (this.cleanupDone()) return true;
     this.cleanupDone.set(true);
 
-    if (this.leavingExplicitly() || this.isFinishing() || this.didFinish()) {
+    if (
+      this.leavingExplicitly() ||
+      this.isFinishing() ||
+      this.didFinish() ||
+      this.isCapturing() ||
+      this.isUploading()
+    ) {
       return true;
     }
 
@@ -297,6 +326,8 @@ export class BookCaptureComponent implements AfterViewInit, OnDestroy {
       video.playsInline = true;
       video.muted = true;
       await video.play();
+
+      await this.waitForVideoReady();
     } catch (e) {
       console.error('Camera error', e);
       this.toast.show(this.translate.instant('messages.error.camera'), 'error');
@@ -430,41 +461,65 @@ export class BookCaptureComponent implements AfterViewInit, OnDestroy {
 
   private async captureBestPhoto(): Promise<Blob> {
     const track = this.stream?.getVideoTracks?.()[0];
-    if (!track) {
-      throw new Error('No video track available');
+    if (!track || track.readyState !== 'live') {
+      throw new Error('No live video track available');
     }
 
-    const ImageCaptureCtor = (
-      window as Window & {
-        ImageCapture?: new (track: MediaStreamTrack) => {
-          takePhoto?: () => Promise<Blob>;
-        };
-      }
-    ).ImageCapture;
-
-    if (ImageCaptureCtor) {
-      try {
-        const imageCapture = new ImageCaptureCtor(track);
-        if (imageCapture.takePhoto) {
-          const blob = await imageCapture.takePhoto();
-          if (blob) {
-            return blob;
-          }
-        }
-      } catch (err) {
-        console.warn(
-          'ImageCapture.takePhoto failed, falling back to canvas',
-          err,
-        );
-      }
-    }
+    await this.waitForVideoReady();
 
     return this.captureFromCanvas();
+  }
+
+  private async waitForVideoReady(): Promise<void> {
+    const video = this.videoRef.nativeElement;
+
+    if (
+      video.readyState >= 2 &&
+      video.videoWidth > 0 &&
+      video.videoHeight > 0
+    ) {
+      return;
+    }
+
+    await new Promise<void>((resolve, reject) => {
+      const timeoutId = window.setTimeout(() => {
+        cleanup();
+        reject(new Error('Video was not ready for capture in time'));
+      }, 3000);
+
+      const cleanup = () => {
+        window.clearTimeout(timeoutId);
+        video.removeEventListener('loadedmetadata', onReady);
+        video.removeEventListener('canplay', onReady);
+        video.removeEventListener('playing', onReady);
+      };
+
+      const onReady = () => {
+        if (
+          video.readyState >= 2 &&
+          video.videoWidth > 0 &&
+          video.videoHeight > 0
+        ) {
+          cleanup();
+          resolve();
+        }
+      };
+
+      video.addEventListener('loadedmetadata', onReady);
+      video.addEventListener('canplay', onReady);
+      video.addEventListener('playing', onReady);
+
+      onReady();
+    });
   }
 
   private captureFromCanvas(): Promise<Blob> {
     const video = this.videoRef.nativeElement;
     const canvas = this.canvasRef.nativeElement;
+
+    if (!video.videoWidth || !video.videoHeight) {
+      throw new Error('Video dimensions unavailable');
+    }
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
