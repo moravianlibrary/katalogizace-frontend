@@ -123,10 +123,13 @@ export class BookCaptureComponent implements AfterViewInit, OnDestroy {
       );
     } catch (err) {
       console.error(err);
-      this.toast.show(
-        this.translate.instant('messages.error.books.photo_upload'),
-        'error',
-      );
+
+      const message =
+        err instanceof Error
+          ? err.message
+          : this.translate.instant('messages.error.books.photo_upload');
+
+      this.toast.show(message, 'error');
     } finally {
       this.isCapturing.set(false);
       this.isUploading.set(false);
