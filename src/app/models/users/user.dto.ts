@@ -24,12 +24,6 @@ export interface UserInfoDto {
   role: UserRole;
 }
 
-export interface UserCreateDto {
-  email: string;
-  password: string;
-  full_name: string;
-}
-
 export type BatchPermissionUpdateDto = {
   batch_id: number;
   permissions: Permission[];

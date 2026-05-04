@@ -31,7 +31,7 @@ export class UsersService {
   }
 
   createUser(dto: UserCreateDto) {
-    return this.http.post<UserInfoDto>(
+    return this.http.post<UserInfoWithPasswdDto>(
       `${this.apiBaseUrl}/users/register`,
       dto,
     );

@@ -870,7 +870,8 @@
     "permissions": "Práva",
     "is_admin": "Admin",
     "new_password": "Nové heslo",
-    "one_time_password_warning": "Zkopírujte jednorázové heslo a pošlete uživateli. Podruhé se nezobrazí."
+    "one_time_password_warning": "Zkopírujte jednorázové heslo a pošlete uživateli. Podruhé se nezobrazí.",
+    "new_user": "Nový uživatel"
   },
   "permissions": {
     "edit": "Správa",

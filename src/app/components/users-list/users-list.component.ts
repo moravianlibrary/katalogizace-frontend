@@ -56,7 +56,8 @@ export class UsersListComponent {
   creating = signal(false);
   newFullName = signal('');
   newEmail = signal('');
-  newPassword = signal('');
+  newIsAdmin = signal(false);
+  createPermissions = signal<BatchPermissionUpdateDto[]>([]);
 
   editFullName = signal('');
   savingEdit = signal(false);
@@ -76,6 +77,7 @@ export class UsersListComponent {
   resettingPassword = signal(false);
   generatedPassword = signal('');
   resetPasswordDialogLocked = signal(false);
+  readonly passwordDialogTitleKey = signal('users.new_password');
 
   private resetPasswordCloseTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -134,9 +136,17 @@ export class UsersListComponent {
     );
   });
 
+  readonly activePermissions = computed(() => {
+    return this.editingUser()
+      ? this.editPermissions()
+      : this.createPermissions();
+  });
+
   readonly availableBatches = computed(() => {
     const q = this.batchSearchInput().trim().toLowerCase();
-    const selectedIds = new Set(this.editPermissions().map((p) => p.batch_id));
+    const selectedIds = new Set(
+      this.activePermissions().map((p) => p.batch_id),
+    );
 
     return this.allBatches()
       .filter((batch) => !selectedIds.has(batch.batch_id))
@@ -173,8 +183,12 @@ export class UsersListComponent {
     }
   }
 
+  private readonly batchPickerDisabled = computed(() => {
+    return this.savingEdit() || this.creating();
+  });
+
   toggleBatchPicker() {
-    if (this.savingEdit()) return;
+    if (this.batchPickerDisabled()) return;
 
     if (this.batchPickerOpen()) {
       this.closeBatchPicker();
@@ -207,6 +221,15 @@ export class UsersListComponent {
     const names = this.batchNameById();
 
     return this.editPermissions().map((item) => ({
+      ...item,
+      batch_name: names.get(item.batch_id) ?? `#${item.batch_id}`,
+    }));
+  });
+
+  readonly createPermissionRows = computed(() => {
+    const names = this.batchNameById();
+
+    return this.createPermissions().map((item) => ({
       ...item,
       batch_name: names.get(item.batch_id) ?? `#${item.batch_id}`,
     }));
@@ -255,8 +278,8 @@ export class UsersListComponent {
     this.newEmail.set((event.target as HTMLInputElement).value);
   }
 
-  onNewPasswordInput(event: Event) {
-    this.newPassword.set((event.target as HTMLInputElement).value);
+  onNewIsAdminInput(event: Event) {
+    this.newIsAdmin.set((event.target as HTMLInputElement).checked);
   }
 
   onEditFullNameInput(event: Event) {
@@ -271,7 +294,15 @@ export class UsersListComponent {
 
     this.newFullName.set('');
     this.newEmail.set('');
-    this.newPassword.set('');
+    this.newIsAdmin.set(false);
+    this.createPermissions.set([]);
+
+    this.batchSearchInput.set('');
+    this.selectedBatchId.set(null);
+    this.batchPickerOpen.set(false);
+    this.batchActiveIndex.set(0);
+
+    this.loadBatchesInfo(true);
     this.createDialog.nativeElement.showModal();
   }
 
@@ -282,7 +313,14 @@ export class UsersListComponent {
 
     this.newFullName.set('');
     this.newEmail.set('');
-    this.newPassword.set('');
+    this.newIsAdmin.set(false);
+    this.createPermissions.set([]);
+
+    this.batchSearchInput.set('');
+    this.selectedBatchId.set(null);
+    this.batchPickerOpen.set(false);
+    this.batchActiveIndex.set(0);
+
     this.creating.set(false);
   }
 
@@ -296,9 +334,8 @@ export class UsersListComponent {
 
     const full_name = this.newFullName().trim();
     const email = this.newEmail().trim();
-    const password = this.newPassword();
 
-    if (!full_name || !email || !password) {
+    if (!full_name || !email) {
       this.toast.show(
         this.translate.instant('messages.warning.users.create_required'),
         'warning',
@@ -308,20 +345,68 @@ export class UsersListComponent {
 
     this.creating.set(true);
 
+    const batch_permissions = this.effectiveCreatePermissions();
+
     this.users
       .createUser({
         full_name,
         email,
-        password,
+        permissions: batch_permissions,
       })
       .subscribe({
-        next: () => {
-          this.toast.show(
-            this.translate.instant('messages.success.users.create'),
-            'success',
-          );
-          this.closeCreate();
-          this.load();
+        next: (createdUser) => {
+          const shouldUpdateAfterCreate =
+            this.newIsAdmin() || batch_permissions.length > 0;
+
+          if (!shouldUpdateAfterCreate) {
+            this.toast.show(
+              this.translate.instant('messages.success.users.create'),
+              'success',
+            );
+
+            this.closeCreate();
+            this.load();
+
+            if ('password' in createdUser && createdUser.password) {
+              this.generatedPassword.set(createdUser.password);
+              this.passwordDialogTitleKey.set('users.new_user');
+              this.openResetPasswordDialog();
+            }
+
+            return;
+          }
+
+          this.users
+            .updateUser(createdUser.id, {
+              full_name,
+              role: this.newIsAdmin() ? 'admin' : 'user',
+              batch_permissions,
+            })
+            .subscribe({
+              next: () => {
+                this.toast.show(
+                  this.translate.instant('messages.success.users.create'),
+                  'success',
+                );
+
+                this.closeCreate();
+                this.load();
+
+                if ('password' in createdUser && createdUser.password) {
+                  this.generatedPassword.set(createdUser.password);
+                  this.passwordDialogTitleKey.set('users.new_user');
+                  this.openResetPasswordDialog();
+                }
+              },
+              error: (err) => {
+                console.error(err);
+                this.toast.show(
+                  this.translate.instant('messages.error.users.save'),
+                  'error',
+                );
+                this.creating.set(false);
+              },
+            });
         },
         error: (err) => {
           console.error(err);
@@ -332,6 +417,15 @@ export class UsersListComponent {
           this.creating.set(false);
         },
       });
+  }
+
+  private effectiveCreatePermissions(): BatchPermissionUpdateDto[] {
+    return this.createPermissions()
+      .filter((item) => item.permissions.length > 0)
+      .map((item) => ({
+        batch_id: item.batch_id,
+        permissions: this.normalizePermissions(item.permissions),
+      }));
   }
 
   openEdit(user: UserDto, event: MouseEvent) {
@@ -514,7 +608,7 @@ export class UsersListComponent {
   }
 
   openBatchPicker() {
-    if (this.savingEdit()) return;
+    if (this.batchPickerDisabled()) return;
 
     this.loadBatchesInfo();
     this.batchPickerOpen.set(true);
@@ -531,23 +625,75 @@ export class UsersListComponent {
     const batch = this.selectedBatch();
     if (!batch) return;
 
-    this.editPermissions.update((items) => {
+    const addTo = (
+      items: BatchPermissionUpdateDto[],
+    ): BatchPermissionUpdateDto[] => {
       if (items.some((item) => item.batch_id === batch.batch_id)) {
         return items;
       }
 
-      return [
-        {
-          batch_id: batch.batch_id,
-          permissions: ['read'],
-        },
-        ...items,
-      ];
-    });
+      const newItem: BatchPermissionUpdateDto = {
+        batch_id: batch.batch_id,
+        permissions: ['read'],
+      };
+
+      return [newItem, ...items];
+    };
+
+    if (this.editingUser()) {
+      this.editPermissions.update(addTo);
+    } else {
+      this.createPermissions.update(addTo);
+    }
 
     this.batchSearchInput.set('');
     this.selectedBatchId.set(null);
     this.batchPickerOpen.set(false);
+  }
+
+  removeCreateBatchPermission(batchId: number) {
+    this.createPermissions.update((items) =>
+      items.filter((item) => item.batch_id !== batchId),
+    );
+  }
+
+  removeAllCreateBatchPermissions() {
+    this.createPermissions.set([]);
+
+    this.batchSearchInput.set('');
+    this.selectedBatchId.set(null);
+    this.batchPickerOpen.set(false);
+  }
+
+  hasCreatePermission(batchId: number, permission: Permission): boolean {
+    return (
+      this.createPermissions()
+        .find((item) => item.batch_id === batchId)
+        ?.permissions.includes(permission) ?? false
+    );
+  }
+
+  toggleCreatePermission(
+    batchId: number,
+    permission: Permission,
+    event: Event,
+  ) {
+    const checked = (event.target as HTMLInputElement).checked;
+
+    this.createPermissions.update((items) =>
+      items.map((item) => {
+        if (item.batch_id !== batchId) return item;
+
+        const permissions = checked
+          ? Array.from(new Set([...item.permissions, permission]))
+          : item.permissions.filter((p) => p !== permission);
+
+        return {
+          ...item,
+          permissions,
+        };
+      }),
+    );
   }
 
   removeEditBatchPermission(batchId: number) {
@@ -673,7 +819,7 @@ export class UsersListComponent {
   });
 
   onBatchPickerKeydown(event: KeyboardEvent) {
-    if (this.savingEdit()) return;
+    if (this.batchPickerDisabled()) return;
 
     if (event.key === 'ArrowDown') {
       event.preventDefault();
@@ -776,6 +922,7 @@ export class UsersListComponent {
           this.generatedPassword.set(response.password);
           this.resettingPassword.set(false);
 
+          this.passwordDialogTitleKey.set('users.new_password');
           this.openResetPasswordDialog();
         },
         error: (err) => {
