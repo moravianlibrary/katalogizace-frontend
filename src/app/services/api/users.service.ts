@@ -38,7 +38,7 @@ export class UsersService {
   }
 
   updateUser(userId: number, dto: UserUpdateDto) {
-    return this.http.patch(`${this.apiBaseUrl}/users/${userId}`, dto);
+    return this.http.put(`${this.apiBaseUrl}/users/${userId}`, dto);
   }
 
   deleteUser(userId: number) {
