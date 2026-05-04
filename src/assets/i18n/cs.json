@@ -45,7 +45,8 @@
     "password": "Heslo",
     "password_required": "Heslo je povinné.",
     "email": "E-mail",
-    "email_invalid": "Zadejte platnou e-mailovou adresu."
+    "email_invalid": "Zadejte platnou e-mailovou adresu.",
+    "copied": "Zkopírováno"
   },
   "pageType": {
     "TitlePage": "Titulní strana",
@@ -97,7 +98,9 @@
     "close": "Zavřít",
     "download": "Stáhnout",
     "login": "Přihlásit se",
-    "logging_in": "Přihlašuji..."
+    "logging_in": "Přihlašuji...",
+    "understand": "Rozumím",
+    "resetting_password": "Resetuji heslo"
   },
   "messages": {
     "success": {
@@ -125,7 +128,8 @@
       "users": {
         "create": "Uživatel byl úspěšně vytvořen.",
         "edit": "Uživatel byl úspěšně upraven.",
-        "delete": "Uživatel byl úspěšně smazán."
+        "delete": "Uživatel byl úspěšně smazán.",
+        "password_copied": "Heslo bylo zkopírováno."
       }
     },
     "warning": {
@@ -185,7 +189,8 @@
         "load": "Nepodařilo se načíst uživatele.",
         "create": "Nepodařilo se vytvořit uživatele.",
         "save": "Nepodařilo se uložit uživatele.",
-        "delete": "Nepodařilo se smazat uživatele."
+        "delete": "Nepodařilo se smazat uživatele.",
+        "reset_password": "Reset hesla se nezdařil."
       }
     },
     "confirm": {
@@ -863,7 +868,9 @@
     "no_available_groups": "Žádné dostupné skupiny",
     "no_groups_added": "Uživatel zatím nemá přiřazenou žádnou skupinu.",
     "permissions": "Práva",
-    "is_admin": "Admin"
+    "is_admin": "Admin",
+    "new_password": "Nové heslo",
+    "one_time_password_warning": "Zkopírujte jednorázové heslo a pošlete uživateli. Podruhé se nezobrazí."
   },
   "permissions": {
     "edit": "Správa",

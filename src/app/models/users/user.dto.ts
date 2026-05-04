@@ -59,3 +59,7 @@ export type EditableBatchMember = BatchMemberPermissionRequest & {
   email: string;
   role: UserRole;
 };
+
+export type UserInfoWithPasswdDto = UserInfoDto & {
+  password: string;
+};

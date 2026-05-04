@@ -17,6 +17,7 @@ export type AppIconName =
   | 'chevronDown'
   | 'lock'
   | 'unlock'
+  | 'lockPassword'
   | 'swapHorizontal'
   | 'trash'
   | 'task'
@@ -45,7 +46,8 @@ export type AppIconName =
   | 'export'
   | 'copy'
   | 'download'
-  | 'envelope';
+  | 'envelope'
+  | 'warningCircle';
 
 export type IconDefinition = {
   paths: Array<{

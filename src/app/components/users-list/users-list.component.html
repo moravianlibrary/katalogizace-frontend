@@ -335,7 +335,8 @@
             <div class="mt-4 flex shrink-0 justify-between gap-3">
               <button
                 class="btn btn-m btn-tertiary group"
-                [disabled]="true"
+                [disabled]="savingEdit() || resettingPassword()"
+                (click)="resetPassword()"
                 type="button"
               >
                 <svg
@@ -345,7 +346,11 @@
                   height="16"
                 ></svg>
 
-                {{ "buttons.reset_password" | translate }}
+                @if (resettingPassword()) {
+                  {{ "buttons.resetting_password" | translate }}
+                } @else {
+                  {{ "buttons.reset_password" | translate }}
+                }
               </button>
 
               <label
@@ -652,5 +657,119 @@
         </div>
       </div>
     }
+  </dialog>
+
+  <dialog
+    class="shadow-s m-auto w-[calc(100vw-2rem)] max-w-xl overflow-hidden rounded-2xl bg-white backdrop:bg-black/40"
+    #resetPasswordDialog
+    (cancel)="onResetPasswordDialogCancel($event)"
+  >
+    <div class="flex max-h-[calc(100dvh-2rem)] flex-col">
+      <div
+        class="border-bright flex shrink-0 justify-between gap-3 border-b px-4 py-3"
+      >
+        <span class="text-base-color text-xl font-medium">
+          {{ "users.new_password" | translate }}
+        </span>
+
+        <button
+          class="btn group"
+          [disabled]="resetPasswordDialogLocked()"
+          (click)="closeResetPasswordDialog()"
+          type="button"
+        >
+          <svg
+            class="icon-tertiary group-disabled:icon-tertiary-disable"
+            appIcon="x"
+            width="24"
+            height="24"
+          ></svg>
+        </button>
+      </div>
+
+      <div class="px-4 py-4">
+        <div class="text-error text-sm-tight flex items-center gap-2">
+          <svg
+            class="icon-error"
+            appIcon="warningCircle"
+            width="20"
+            height="20"
+          ></svg>
+
+          <span>
+            {{ "users.one_time_password_warning" | translate }}
+          </span>
+        </div>
+
+        <div
+          class="border-tertiary-default focus-within:border-primary-default bg-main-base relative mt-4 flex h-12 items-center gap-3 rounded-lg border px-3 pr-12"
+        >
+          <span
+            class="bg-main-light flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+          >
+            <svg
+              class="icon-tertiary"
+              appIcon="lockPassword"
+              width="16"
+              height="16"
+            ></svg>
+          </span>
+
+          <input
+            class="text-base-color min-w-0 flex-1 bg-transparent outline-none"
+            [value]="generatedPassword()"
+            readonly
+            type="text"
+          />
+
+          <div class="absolute top-3 right-3 z-10 flex items-center gap-2">
+            @if (passwordCopied()) {
+              <span
+                class="bg-main-base text-secondary rounded-md px-2 py-1 text-xs shadow-sm"
+              >
+                {{ "labels.copied" | translate }}
+              </span>
+            }
+
+            <button
+              class="group flex cursor-pointer items-center justify-center disabled:cursor-not-allowed"
+              [disabled]="!generatedPassword()"
+              [attr.aria-label]="'buttons.copy' | translate"
+              (click)="copyGeneratedPassword()"
+              type="button"
+            >
+              @if (passwordCopied()) {
+                <svg
+                  class="icon-tertiary"
+                  appIcon="check"
+                  width="24"
+                  height="24"
+                ></svg>
+              } @else {
+                <svg
+                  class="icon-tertiary"
+                  appIcon="copy"
+                  width="20"
+                  height="20"
+                ></svg>
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="border-bright flex shrink-0 justify-center gap-3 border-t px-4 py-3"
+      >
+        <button
+          class="btn btn-m btn-primary"
+          [disabled]="resetPasswordDialogLocked()"
+          (click)="closeResetPasswordDialog()"
+          type="button"
+        >
+          {{ "buttons.understand" | translate }}
+        </button>
+      </div>
+    </div>
   </dialog>
 </section>

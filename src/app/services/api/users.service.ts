@@ -2,6 +2,7 @@ import {
   UserCreateDto,
   UserDto,
   UserInfoDto,
+  UserInfoWithPasswdDto,
   UserUpdateDto,
 } from '@/app/models';
 import { HttpClient, HttpParams } from '@angular/common/http';
@@ -42,5 +43,12 @@ export class UsersService {
 
   deleteUser(userId: number) {
     return this.http.delete(`${this.apiBaseUrl}/users/${userId}`);
+  }
+
+  resetUserPassword(userId: number) {
+    return this.http.patch<UserInfoWithPasswdDto>(
+      `${this.apiBaseUrl}/users/${userId}/reset-password`,
+      null,
+    );
   }
 }

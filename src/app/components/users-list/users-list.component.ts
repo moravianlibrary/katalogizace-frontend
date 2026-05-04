@@ -73,6 +73,18 @@ export class UsersListComponent {
 
   batchActiveIndex = signal(0);
 
+  resettingPassword = signal(false);
+  generatedPassword = signal('');
+  resetPasswordDialogLocked = signal(false);
+
+  private resetPasswordCloseTimer: ReturnType<typeof setTimeout> | null = null;
+
+  @ViewChild('resetPasswordDialog', { static: true })
+  resetPasswordDialog!: ElementRef<HTMLDialogElement>;
+
+  readonly passwordCopied = signal(false);
+  private passwordCopiedTimeout: ReturnType<typeof setTimeout> | null = null;
+
   readonly permissionOptions: {
     value: Permission;
     icon: AppIconName;
@@ -363,6 +375,8 @@ export class UsersListComponent {
     this.batchSearchInput.set('');
     this.selectedBatchId.set(null);
     this.batchPickerOpen.set(false);
+
+    this.resettingPassword.set(false);
 
     this.savingEdit.set(false);
   }
@@ -741,5 +755,105 @@ export class UsersListComponent {
     if (!batch) return;
 
     this.selectBatch(batch);
+  }
+
+  resetPassword() {
+    const user = this.editingUser();
+    if (!user || this.resettingPassword()) return;
+
+    if (!this.canManageUsers()) {
+      this.showForbidden();
+      return;
+    }
+
+    this.resettingPassword.set(true);
+
+    this.users
+      .resetUserPassword(user.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.generatedPassword.set(response.password);
+          this.resettingPassword.set(false);
+
+          this.openResetPasswordDialog();
+        },
+        error: (err) => {
+          console.error(err);
+          this.resettingPassword.set(false);
+
+          this.toast.show(
+            this.translate.instant('messages.error.users.reset_password'),
+            'error',
+          );
+        },
+      });
+  }
+
+  private openResetPasswordDialog() {
+    this.clearResetPasswordCloseTimer();
+
+    this.resetPasswordDialogLocked.set(true);
+    this.resetPasswordDialog.nativeElement.showModal();
+
+    this.resetPasswordCloseTimer = setTimeout(() => {
+      this.resetPasswordDialogLocked.set(false);
+      this.resetPasswordCloseTimer = null;
+    }, 3000);
+  }
+
+  closeResetPasswordDialog() {
+    if (this.resetPasswordDialogLocked()) return;
+
+    if (this.resetPasswordDialog?.nativeElement.open) {
+      this.resetPasswordDialog.nativeElement.close();
+    }
+
+    this.clearPasswordCopiedState();
+    this.generatedPassword.set('');
+    this.clearResetPasswordCloseTimer();
+  }
+
+  onResetPasswordDialogCancel(event: Event) {
+    if (this.resetPasswordDialogLocked()) {
+      event.preventDefault();
+    }
+  }
+
+  async copyGeneratedPassword() {
+    try {
+      await navigator.clipboard.writeText(this.generatedPassword());
+
+      this.passwordCopied.set(true);
+
+      if (this.passwordCopiedTimeout) {
+        clearTimeout(this.passwordCopiedTimeout);
+      }
+
+      this.passwordCopiedTimeout = setTimeout(() => {
+        this.passwordCopied.set(false);
+        this.passwordCopiedTimeout = null;
+      }, 5000);
+    } catch {
+      this.clearPasswordCopiedState();
+    }
+  }
+
+  private clearPasswordCopiedState() {
+    if (this.passwordCopiedTimeout) {
+      clearTimeout(this.passwordCopiedTimeout);
+      this.passwordCopiedTimeout = null;
+    }
+
+    this.passwordCopied.set(false);
+  }
+
+  private clearResetPasswordCloseTimer() {
+    if (this.resetPasswordCloseTimer) {
+      clearTimeout(this.resetPasswordCloseTimer);
+      this.resetPasswordCloseTimer = null;
+    }
+
+    this.resetPasswordDialogLocked.set(false);
   }
 }
