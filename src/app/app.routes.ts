@@ -4,7 +4,6 @@ import { guestGuard } from './guards/guest.guard';
 
 import { LoginComponent } from './components/login/login.component';
 
-import { BookCaptureNativeComponent } from './components/book-capture-native/book-capture-native.component';
 import { BookCaptureComponent } from './components/book-capture/book-capture.component';
 import { BookDetailComponent } from './components/book-detail/book-detail.component';
 import { BooksListComponent } from './components/books-list/books-list.component';
@@ -83,26 +82,7 @@ export const routes: Routes = [
           permission: 'write',
         },
       },
-      {
-        path: 'batches/:batchId/books/capture-native',
-        component: BookCaptureNativeComponent,
-        canActivate: [batchPermissionGuard],
-        canDeactivate: [captureExitGuard],
-        data: {
-          backTo: '../',
-          permission: 'write',
-        },
-      },
-      {
-        path: 'batches/:batchId/books/capture-native/:bookId',
-        component: BookCaptureNativeComponent,
-        canActivate: [batchPermissionGuard],
-        canDeactivate: [captureExitGuard],
-        data: {
-          backTo: '../',
-          permission: 'write',
-        },
-      },
+
       {
         path: 'batches/:batchId/books/:bookId',
         component: BookDetailComponent,
