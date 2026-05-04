@@ -516,6 +516,7 @@
                     (focus)="onUserSearchFocus()"
                     (click)="onUserSearchFocus()"
                     (input)="onUserSearchInput($event)"
+                    (keydown)="onUserPickerKeydown($event)"
                     type="text"
                   />
 
@@ -553,8 +554,10 @@
                         @for (user of availableUsers(); track user.id) {
                           <button
                             class="group text-secondary hover:bg-main-light active:bg-main-bright flex w-full cursor-pointer items-center justify-between rounded-lg px-4 py-3 text-left transition"
+                            #userOption
                             [ngClass]="
-                              selectedUserId() === user.id
+                              selectedUserId() === user.id ||
+                              userActiveIndex() === $index
                                 ? 'bg-main-light!'
                                 : ''
                             "

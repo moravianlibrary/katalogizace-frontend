@@ -5,8 +5,10 @@ import {
   DestroyRef,
   ElementRef,
   inject,
+  QueryList,
   signal,
   ViewChild,
+  ViewChildren,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -69,6 +71,8 @@ export class UsersListComponent {
   batchPickerOpen = signal(false);
   selectedBatchId = signal<number | null>(null);
 
+  batchActiveIndex = signal(0);
+
   readonly permissionOptions: {
     value: Permission;
     icon: AppIconName;
@@ -85,6 +89,9 @@ export class UsersListComponent {
 
   @ViewChild('editDialog', { static: true })
   editDialog!: ElementRef<HTMLDialogElement>;
+
+  @ViewChildren('batchOption')
+  batchOptions!: QueryList<ElementRef<HTMLButtonElement>>;
 
   readonly edited = computed(() => {
     const user = this.editingUser();
@@ -488,6 +495,7 @@ export class UsersListComponent {
   onBatchSearchInput(event: Event) {
     this.batchSearchInput.set((event.target as HTMLInputElement).value);
     this.selectedBatchId.set(null);
+    this.batchActiveIndex.set(0);
     this.batchPickerOpen.set(true);
   }
 
@@ -501,6 +509,7 @@ export class UsersListComponent {
   selectBatch(batch: BatchInfoDto) {
     this.selectedBatchId.set(batch.batch_id);
     this.batchSearchInput.set(batch.name);
+    this.batchActiveIndex.set(0);
     this.batchPickerOpen.set(false);
   }
 
@@ -648,4 +657,89 @@ export class UsersListComponent {
       );
     });
   });
+
+  onBatchPickerKeydown(event: KeyboardEvent) {
+    if (this.savingEdit()) return;
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+
+      const wasOpen = this.batchPickerOpen();
+      this.openBatchPicker();
+
+      if (wasOpen) {
+        this.moveBatchActiveIndex(1);
+      } else {
+        this.batchActiveIndex.set(0);
+      }
+
+      return;
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+
+      const wasOpen = this.batchPickerOpen();
+      this.openBatchPicker();
+
+      if (wasOpen) {
+        this.moveBatchActiveIndex(-1);
+      } else {
+        this.batchActiveIndex.set(
+          Math.max(0, this.availableBatches().length - 1),
+        );
+      }
+
+      return;
+    }
+
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (this.batchPickerOpen()) {
+        this.selectActiveBatch();
+        return;
+      }
+
+      if (this.selectedBatch()) {
+        this.addSelectedBatch();
+      }
+
+      return;
+    }
+
+    if (event.key === 'Escape' && this.batchPickerOpen()) {
+      event.preventDefault();
+      this.closeBatchPicker();
+    }
+  }
+
+  private moveBatchActiveIndex(direction: 1 | -1) {
+    const count = this.availableBatches().length;
+    if (count === 0) return;
+
+    this.batchActiveIndex.update((index) => {
+      return (index + direction + count) % count;
+    });
+
+    this.scrollActiveBatchIntoView();
+  }
+
+  private scrollActiveBatchIntoView() {
+    requestAnimationFrame(() => {
+      this.batchOptions
+        ?.get(this.batchActiveIndex())
+        ?.nativeElement.scrollIntoView({
+          block: 'nearest',
+        });
+    });
+  }
+
+  private selectActiveBatch() {
+    const batch = this.availableBatches()[this.batchActiveIndex()];
+    if (!batch) return;
+
+    this.selectBatch(batch);
+  }
 }

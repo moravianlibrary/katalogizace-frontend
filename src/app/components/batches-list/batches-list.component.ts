@@ -5,8 +5,10 @@ import {
   DestroyRef,
   ElementRef,
   inject,
+  QueryList,
   signal,
   ViewChild,
+  ViewChildren,
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -102,6 +104,11 @@ export class BatchesListComponent {
   userSearchInput = signal('');
   userPickerOpen = signal(false);
   selectedUserId = signal<number | null>(null);
+
+  userActiveIndex = signal(0);
+
+  @ViewChildren('userOption')
+  userOptions!: QueryList<ElementRef<HTMLButtonElement>>;
 
   readonly permissionOptions: {
     value: Permission;
@@ -821,6 +828,7 @@ export class BatchesListComponent {
   onUserSearchInput(event: Event) {
     this.userSearchInput.set((event.target as HTMLInputElement).value);
     this.selectedUserId.set(null);
+    this.userActiveIndex.set(0);
     this.userPickerOpen.set(true);
   }
 
@@ -849,6 +857,7 @@ export class BatchesListComponent {
   selectUser(user: UserInfoDto) {
     this.selectedUserId.set(user.id);
     this.userSearchInput.set(user.full_name);
+    this.userActiveIndex.set(0);
     this.userPickerOpen.set(false);
   }
 
@@ -875,6 +884,7 @@ export class BatchesListComponent {
 
     this.userSearchInput.set('');
     this.selectedUserId.set(null);
+    this.userActiveIndex.set(0);
     this.userPickerOpen.set(false);
   }
 
@@ -1009,5 +1019,88 @@ export class BatchesListComponent {
         this.permissionsEqual(item.permissions, other.permissions)
       );
     });
+  }
+
+  onUserPickerKeydown(event: KeyboardEvent) {
+    if (this.savingEdit()) return;
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+
+      const wasOpen = this.userPickerOpen();
+      this.openUserPicker();
+
+      if (wasOpen) {
+        this.moveUserActiveIndex(1);
+      } else {
+        this.userActiveIndex.set(0);
+      }
+
+      return;
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+
+      const wasOpen = this.userPickerOpen();
+      this.openUserPicker();
+
+      if (wasOpen) {
+        this.moveUserActiveIndex(-1);
+      } else {
+        this.userActiveIndex.set(Math.max(0, this.availableUsers().length - 1));
+      }
+
+      return;
+    }
+
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (this.userPickerOpen()) {
+        this.selectActiveUser();
+        return;
+      }
+
+      if (this.selectedUser()) {
+        this.addSelectedUser();
+      }
+
+      return;
+    }
+
+    if (event.key === 'Escape' && this.userPickerOpen()) {
+      event.preventDefault();
+      this.closeUserPicker();
+    }
+  }
+
+  private moveUserActiveIndex(direction: 1 | -1) {
+    const count = this.availableUsers().length;
+    if (count === 0) return;
+
+    this.userActiveIndex.update((index) => {
+      return (index + direction + count) % count;
+    });
+
+    this.scrollActiveUserIntoView();
+  }
+
+  private scrollActiveUserIntoView() {
+    requestAnimationFrame(() => {
+      this.userOptions
+        ?.get(this.userActiveIndex())
+        ?.nativeElement.scrollIntoView({
+          block: 'nearest',
+        });
+    });
+  }
+
+  private selectActiveUser() {
+    const user = this.availableUsers()[this.userActiveIndex()];
+    if (!user) return;
+
+    this.selectUser(user);
   }
 }
