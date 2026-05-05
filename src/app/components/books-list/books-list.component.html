@@ -18,13 +18,13 @@
           "
           type="button"
         >
-          {{ "buttons.scan" | translate }}
           <svg
             class="icon-primary"
             appIcon="camera"
             width="20"
             height="20"
           ></svg>
+          {{ "buttons.scan" | translate }}
         </button>
 
         <button
@@ -33,18 +33,17 @@
           (click)="!isUploading && fileInput.click()"
           type="button"
         >
-          @if (isUploading) {
-            {{ "buttons.uploading" | translate }}
-          } @else {
-            {{ "buttons.upload" | translate }}
-          }
-
           <svg
             class="icon-primary"
             appIcon="upload"
             width="20"
             height="20"
           ></svg>
+          @if (isUploading) {
+            {{ "buttons.uploading" | translate }}
+          } @else {
+            {{ "buttons.upload" | translate }}
+          }
         </button>
       }
     </div>
