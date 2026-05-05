@@ -541,7 +541,7 @@ export class BookCaptureComponent implements AfterViewInit, OnDestroy {
           resolve(blob);
         },
         'image/jpeg',
-        0.9,
+        0.95,
       );
     });
   }
