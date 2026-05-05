@@ -162,8 +162,8 @@
       "books": {
         "create": "Nepodařilo se založit knihu.",
         "cancel": "Nepodařilo se zrušit naskenování knihy.",
-        "workflow": "Spuštění workflow zlyhalo.",
-        "photo_upload": "Upload fotky zlyhal.",
+        "workflow": "Spuštění workflow selhalo.",
+        "photo_upload": "Upload fotky selhal.",
         "photo_capture": "Nepodařilo se spracovat fotku.",
         "incorrect_id": "Neplatné ID knihy",
         "detail_load": "Nepodařilo se načíst detaily knihy. Zkuste to prosím později.",
