@@ -1,1 +1,1 @@
-export type ToastKind = 'success' | 'error' | 'warning';
+export type ToastKind = 'success' | 'error' | 'warning' | 'info';

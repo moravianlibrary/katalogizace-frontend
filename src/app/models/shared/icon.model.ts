@@ -47,7 +47,9 @@ export type AppIconName =
   | 'copy'
   | 'download'
   | 'envelope'
-  | 'warningCircle';
+  | 'warningCircle'
+  | 'danger'
+  | 'info';
 
 export type IconDefinition = {
   paths: Array<{

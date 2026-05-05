@@ -1,10 +1,23 @@
-@if (toast.message()) {
+@if (toast.message(); as message) {
   <div
-    class="fixed top-2 left-1/2 z-9999 -translate-x-1/2 rounded-lg px-4 py-3 text-sm text-white shadow-md"
-    [class.bg-main-success]="toast.kind() === 'success'"
-    [class.bg-main-error]="toast.kind() === 'error'"
-    [class.bg-main-warning]="toast.kind() === 'warning'"
+    class="fixed top-4 left-1/2 z-9999 flex w-max max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-3 rounded-lg px-4 py-2 font-medium shadow-sm"
+    [ngClass]="ui().containerClass"
+    role="status"
+    aria-live="polite"
   >
-    {{ toast.message() }}
+    <svg
+      [ngClass]="[ui().iconClass, 'shrink-0']"
+      [appIcon]="ui().icon"
+      width="24"
+      height="24"
+    ></svg>
+
+    <span class="text-secondary">
+      {{ message }}
+    </span>
+
+    <button class="btn btn-m btn-tertiary" (click)="toast.hide()" type="button">
+      OK
+    </button>
   </div>
 }
