@@ -100,14 +100,16 @@
     "login": "Přihlásit se",
     "logging_in": "Přihlašuji...",
     "understand": "Rozumím",
-    "resetting_password": "Resetuji heslo"
+    "resetting_password": "Resetuji heslo",
+    "delete_permanently": "Trvale smazat",
+    "rerun": "Spustit znovu"
   },
   "messages": {
     "success": {
       "batches": {
-        "delete": "Dávka byla úspěšně smazána.",
-        "create": "Dávka byla úspěšně vytvořena.",
-        "edit": "Dávka byla úspěšně upravena."
+        "delete": "Skupina byla úspěšně smazána.",
+        "create": "Skupina byla úspěšně vytvořena.",
+        "edit": "Skupina byla úspěšně upravena."
       },
       "books": {
         "create": "Kniha založena.",
@@ -135,7 +137,7 @@
     },
     "warning": {
       "batches": {
-        "edit_empty_name": "Název dávky je povinný"
+        "edit_empty_name": "Název skupiny je povinný"
       },
       "books": {
         "no_photo": "Nejprve vyfoťte alespoň jednu stránku."
@@ -152,12 +154,12 @@
     },
     "error": {
       "batches": {
-        "create": "Vytvoření dávky se nezdařilo.",
-        "load": "Nepodařilo se načíst seznam dávek.",
-        "delete": "Smazání dávky se nezdařilo.",
-        "empty_name": "Zadejte název dávky.",
+        "create": "Vytvoření skupiny se nezdařilo.",
+        "load": "Nepodařilo se načíst seznam skupin.",
+        "delete": "Smazání skupiny se nezdařilo.",
+        "empty_name": "Zadejte název skupiny.",
         "save": "Uložení změn se nezdařilo.",
-        "batch_detail_load": "Nepodařilo se načíst informace o dávce",
+        "batch_detail_load": "Nepodařilo se načíst informace o skupině",
         "members_load": "Nepodařilo se načíst uživatele skupiny."
       },
       "books": {
@@ -196,17 +198,22 @@
     },
     "confirm": {
       "batches": {
-        "delete": "Opravdu chcete smazat tuto dávku?"
+        "delete_title": "Opravdu chcete smazat tuto skupinu?",
+        "delete_note": "Tuto akci nelze vrátit zpět."
       },
       "books": {
-        "delete": "Opravdu chcete smazat tuto knihu?",
-        "rerun": "Opravdu chcete znovu spustit zpracování této knihy?"
+        "delete_title": "Opravdu chcete smazat knihu?",
+        "delete_note": "Tuto akci nelze vrátit zpět.",
+        "rerun_title": "Opravdu chcete znovu spustit zpracování?",
+        "rerun_note": "Aktuální výsledek bude nahrazen novým zpracováním."
       },
       "records": {
-        "delete": "Opravdu chcete smazat toto pole?"
+        "delete": "Opravdu chcete smazat toto pole?",
+        "delete_title": "Opravdu chcete smazat toto pole?"
       },
       "users": {
-        "delete": "Opravdu chcete smazat tohoto uživatele?"
+        "delete_title": "Opravdu chcete smazat uživatele?",
+        "delete_note": "Tuto akci nelze vrátit zpět."
       }
     }
   },

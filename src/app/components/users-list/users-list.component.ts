@@ -24,6 +24,7 @@ import { AuthService } from '@/app/services/api/auth.service';
 import { BatchesService } from '@/app/services/api/batches.service';
 import { UsersService } from '@/app/services/api/users.service';
 import { BreadcrumbsService } from '@/app/services/breadcrumbs.service';
+import { ConfirmDialogService } from '@/app/services/confirm-dialog.service';
 import { PermissionsService } from '@/app/services/permissions.service';
 import { ToastService } from '@/app/services/toast.service';
 import { IconComponent } from '../icon/icon.component';
@@ -43,6 +44,7 @@ export class UsersListComponent {
   private breadcrumbs = inject(BreadcrumbsService);
   private permissions = inject(PermissionsService);
   private batches = inject(BatchesService);
+  private confirmDialog = inject(ConfirmDialogService);
   auth = inject(AuthService);
 
   loading = signal(false);
@@ -530,7 +532,7 @@ export class UsersListComponent {
       });
   }
 
-  onDelete(user: UserDto, event: MouseEvent) {
+  async onDelete(user: UserDto, event: MouseEvent) {
     event.stopPropagation();
     event.preventDefault();
 
@@ -547,9 +549,12 @@ export class UsersListComponent {
       return;
     }
 
-    const confirmed = confirm(
-      this.translate.instant('messages.confirm.users.delete'),
-    );
+    const confirmed = await this.confirmDialog.confirm({
+      title: this.translate.instant('messages.confirm.users.delete_title'),
+      note: this.translate.instant('messages.confirm.users.delete_note'),
+      confirmLabel: this.translate.instant('buttons.delete_permanently'),
+      confirmKind: 'error',
+    });
 
     if (!confirmed) return;
 

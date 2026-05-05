@@ -1,0 +1,56 @@
+@if (confirmDialog.open()) {
+  <div
+    class="fixed inset-0 z-100 flex items-center justify-center bg-black/40 p-4"
+    (click)="confirmDialog.cancel()"
+    (window:keydown.escape)="confirmDialog.cancel()"
+  >
+    <section
+      class="shadow-s w-[calc(100vw-2rem)] max-w-xl overflow-hidden rounded-2xl bg-white"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="confirm-dialog-title"
+    >
+      <div class="flex flex-col">
+        <div class="flex shrink-0 justify-between gap-4 px-4 pt-4">
+          <span class="text-xl font-medium" id="confirm-dialog-title">
+            {{ confirmDialog.title() }}
+          </span>
+
+          <button
+            class="btn group shrink-0"
+            (click)="confirmDialog.cancel()"
+            type="button"
+          >
+            <svg class="icon-tertiary" appIcon="x" width="24" height="24"></svg>
+          </button>
+        </div>
+
+        @if (confirmDialog.note(); as note) {
+          <div class="px-4 pt-2">
+            {{ note }}
+          </div>
+        }
+
+        <div class="flex justify-center gap-3 px-4 pt-6 pb-4">
+          <button
+            class="btn btn-m btn-tertiary"
+            (click)="confirmDialog.cancel()"
+            type="button"
+          >
+            {{ "buttons.cancel" | translate }}
+          </button>
+
+          <button
+            class="btn btn-m"
+            [ngClass]="confirmButtonClass()"
+            (click)="confirmDialog.accept()"
+            type="button"
+          >
+            {{ confirmDialog.confirmLabel() }}
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+}

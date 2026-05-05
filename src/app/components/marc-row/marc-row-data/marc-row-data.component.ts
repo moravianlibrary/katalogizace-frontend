@@ -11,6 +11,7 @@ import { ContextPanelService } from '../../../services/context-panel.service';
 import { RecordStateService } from '../../../services/record-state.service';
 import { RecordStore } from '../../../stores/record.store';
 
+import { ConfirmDialogService } from '@/app/services/confirm-dialog.service';
 import { FieldEditService } from '@/app/services/edit.service';
 import { TranslateService } from '@ngx-translate/core';
 import {
@@ -32,6 +33,7 @@ export class MarcRowDataComponent {
   private recordState = inject(RecordStateService);
   private edit = inject(FieldEditService);
   private translate = inject(TranslateService);
+  private confirmDialog = inject(ConfirmDialogService);
 
   rowClass = input<string>('');
   df = input.required<{
@@ -50,13 +52,16 @@ export class MarcRowDataComponent {
   editable = input<boolean>(false);
   takeable = input<boolean>(false);
 
-  onDeleteField(event: MouseEvent) {
+  async onDeleteField(event: MouseEvent) {
     event.stopPropagation();
     event.preventDefault();
 
-    const confirmed = confirm(
-      this.translate.instant('messages.confirm.records.delete'),
-    );
+    const confirmed = await this.confirmDialog.confirm({
+      title: this.translate.instant('messages.confirm.records.delete_title'),
+      confirmLabel: this.translate.instant('buttons.delete'),
+      confirmKind: 'error',
+    });
+
     if (!confirmed) return;
 
     this.recordState.removeField(this.df().fieldId!);

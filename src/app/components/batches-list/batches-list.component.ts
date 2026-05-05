@@ -36,6 +36,7 @@ import { AppIconName } from '@/app/models/shared/icon.model';
 import { AuthService } from '@/app/services/api/auth.service';
 import { UsersService } from '@/app/services/api/users.service';
 import { BreadcrumbsService } from '@/app/services/breadcrumbs.service';
+import { ConfirmDialogService } from '@/app/services/confirm-dialog.service';
 import { PermissionsService } from '@/app/services/permissions.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BatchStateLabelPipe } from '../../pipes/batch-state-label.pipe';
@@ -69,6 +70,7 @@ export class BatchesListComponent {
   private permissions = inject(PermissionsService);
   private auth = inject(AuthService);
   private users = inject(UsersService);
+  private confirmDialog = inject(ConfirmDialogService);
 
   loading = signal(false);
   error = signal<string | null>(null);
@@ -472,7 +474,7 @@ export class BatchesListComponent {
     this.router.navigate(['/batches', batchId.toString(), 'books']);
   }
 
-  onDelete(batchId: ID, event: MouseEvent) {
+  async onDelete(batchId: ID, event: MouseEvent) {
     event.stopPropagation();
     event.preventDefault();
 
@@ -481,9 +483,13 @@ export class BatchesListComponent {
       return;
     }
 
-    const confirmed = confirm(
-      this.translate.instant('messages.confirm.batches.delete'),
-    );
+    const confirmed = await this.confirmDialog.confirm({
+      title: this.translate.instant('messages.confirm.batches.delete_title'),
+      note: this.translate.instant('messages.confirm.batches.delete_note'),
+      confirmLabel: this.translate.instant('buttons.delete_permanently'),
+      confirmKind: 'error',
+    });
+
     if (!confirmed) return;
 
     this.batches.deleteBatch(batchId.toString()).subscribe({

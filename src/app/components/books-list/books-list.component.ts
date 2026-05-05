@@ -7,6 +7,7 @@ import {
 } from '@/app/models';
 import { BookImageCacheService } from '@/app/services/book-image-cache.service';
 import { BreadcrumbsService } from '@/app/services/breadcrumbs.service';
+import { ConfirmDialogService } from '@/app/services/confirm-dialog.service';
 import { PermissionsService } from '@/app/services/permissions.service';
 import { DatePipe, NgClass } from '@angular/common';
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
@@ -50,6 +51,7 @@ export class BooksListComponent {
   private translate = inject(TranslateService);
   private bookImageCacheService = inject(BookImageCacheService);
   private permissions = inject(PermissionsService);
+  private confirmDialog = inject(ConfirmDialogService);
 
   isUploading = false;
 
@@ -571,7 +573,7 @@ export class BooksListComponent {
     });
   }
 
-  onDelete(id: ID, event: MouseEvent) {
+  async onDelete(id: ID, event: MouseEvent) {
     event.stopPropagation();
     event.preventDefault();
 
@@ -580,9 +582,13 @@ export class BooksListComponent {
       return;
     }
 
-    const confirmed = confirm(
-      this.translate.instant('messages.confirm.books.delete'),
-    );
+    const confirmed = await this.confirmDialog.confirm({
+      title: this.translate.instant('messages.confirm.books.delete_title'),
+      note: this.translate.instant('messages.confirm.books.delete_note'),
+      confirmLabel: this.translate.instant('buttons.delete_permanently'),
+      confirmKind: 'error',
+    });
+
     if (!confirmed) return;
 
     this.books.deleteBookRecord(id.toString()).subscribe({
@@ -604,7 +610,7 @@ export class BooksListComponent {
     });
   }
 
-  onRerun(id: ID, event: MouseEvent) {
+  async onRerun(id: ID, event: MouseEvent) {
     event.stopPropagation();
     event.preventDefault();
 
@@ -613,9 +619,13 @@ export class BooksListComponent {
       return;
     }
 
-    const confirmed = confirm(
-      this.translate.instant('messages.confirm.books.rerun'),
-    );
+    const confirmed = await this.confirmDialog.confirm({
+      title: this.translate.instant('messages.confirm.books.rerun_title'),
+      note: this.translate.instant('messages.confirm.books.rerun_note'),
+      confirmLabel: this.translate.instant('buttons.rerun'),
+      confirmKind: 'primary',
+    });
+
     if (!confirmed) return;
 
     this.books.rerunBookWorkflow(id.toString()).subscribe({

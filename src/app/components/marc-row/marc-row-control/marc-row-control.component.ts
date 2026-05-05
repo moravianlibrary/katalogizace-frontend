@@ -1,4 +1,5 @@
 import { UUID } from '@/app/models';
+import { ConfirmDialogService } from '@/app/services/confirm-dialog.service';
 import { ContextPanelService } from '@/app/services/context-panel.service';
 import { FieldEditService } from '@/app/services/edit.service';
 import { RecordStateService } from '@/app/services/record-state.service';
@@ -17,6 +18,7 @@ export class MarcRowControlComponent {
   private translate = inject(TranslateService);
   private edit = inject(FieldEditService);
   private cps = inject(ContextPanelService);
+  private confirmDialog = inject(ConfirmDialogService);
 
   rowClass = input<string>('');
 
@@ -24,13 +26,16 @@ export class MarcRowControlComponent {
   editable = input<boolean>(false);
   takeable = input<boolean>(false);
 
-  onDeleteField(event: MouseEvent) {
+  async onDeleteField(event: MouseEvent) {
     event.stopPropagation();
     event.preventDefault();
 
-    const confirmed = confirm(
-      this.translate.instant('messages.confirm.records.delete'),
-    );
+    const confirmed = await this.confirmDialog.confirm({
+      title: this.translate.instant('messages.confirm.records.delete_title'),
+      confirmLabel: this.translate.instant('buttons.delete_permanently'),
+      confirmKind: 'error',
+    });
+
     if (!confirmed) return;
 
     this.recordState.removeField(this.cf().fieldId!);
