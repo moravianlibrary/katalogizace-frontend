@@ -88,11 +88,13 @@ export class BatchesListComponent {
   newName = signal('');
   newDescription = signal('');
   creating = signal(false);
+  createDialogOpen = signal(false);
 
   editingBatch = signal<BatchDto | null>(null);
   editName = signal('');
   editDescription = signal('');
   savingEdit = signal(false);
+  editDialogOpen = signal(false);
 
   editMembers = signal<EditableBatchMember[]>([]);
   originalEditMembers = signal<BatchMemberPermissionRequest[]>([]);
@@ -229,11 +231,11 @@ export class BatchesListComponent {
     { value: 'completed' },
   ];
 
-  @ViewChild('editDialog', { static: true })
-  editDialog!: ElementRef<HTMLDialogElement>;
+  @ViewChild('editNameInput')
+  editNameInput?: ElementRef<HTMLInputElement>;
 
-  @ViewChild('createDialog', { static: true })
-  createDialog!: ElementRef<HTMLDialogElement>;
+  @ViewChild('createNameInput')
+  createNameInput?: ElementRef<HTMLInputElement>;
 
   ngOnInit() {
     this.breadcrumbs.clearBatch();
@@ -635,13 +637,15 @@ export class BatchesListComponent {
     this.loadUsersInfo(true);
     this.loadBatchMembers(b.batch_id);
 
-    this.editDialog.nativeElement.showModal();
+    this.editDialogOpen.set(true);
+
+    setTimeout(() => {
+      this.editNameInput?.nativeElement.focus();
+    });
   }
 
   closeEdit() {
-    if (this.editDialog?.nativeElement.open) {
-      this.editDialog.nativeElement.close();
-    }
+    this.editDialogOpen.set(false);
 
     this.editingBatch.set(null);
     this.editName.set('');
@@ -654,6 +658,17 @@ export class BatchesListComponent {
     this.userPickerOpen.set(false);
 
     this.savingEdit.set(false);
+  }
+
+  onEditEscape() {
+    if (!this.editDialogOpen()) return;
+
+    if (this.userPickerOpen()) {
+      this.closeUserPicker();
+      return;
+    }
+
+    this.closeEdit();
   }
 
   saveEdit() {
@@ -724,13 +739,16 @@ export class BatchesListComponent {
 
     this.newName.set('');
     this.newDescription.set('');
-    this.createDialog.nativeElement.showModal();
+    this.creating.set(false);
+    this.createDialogOpen.set(true);
+
+    setTimeout(() => {
+      this.createNameInput?.nativeElement.focus();
+    });
   }
 
   closeCreate() {
-    if (this.createDialog?.nativeElement.open) {
-      this.createDialog.nativeElement.close();
-    }
+    this.createDialogOpen.set(false);
 
     this.newName.set('');
     this.newDescription.set('');
@@ -1072,6 +1090,7 @@ export class BatchesListComponent {
 
     if (event.key === 'Escape' && this.userPickerOpen()) {
       event.preventDefault();
+      event.stopPropagation();
       this.closeUserPicker();
     }
   }

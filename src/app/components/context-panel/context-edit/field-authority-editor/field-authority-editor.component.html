@@ -211,370 +211,402 @@
   />
 </section>
 
-<dialog
-  class="shadow-s m-auto h-[calc(100vh-80px)] w-[calc(100vw-80px)] max-w-360 overflow-hidden rounded-2xl bg-white backdrop:bg-black/40"
-  #authorityDialog
->
-  <div class="flex h-full min-h-0 flex-col">
-    <!-- top -->
-    <div
-      class="items center border-bright flex shrink-0 justify-between gap-3 border-b p-4"
+@if (authorityDialogOpen()) {
+  <div
+    class="fixed inset-0 z-100 flex items-center justify-center bg-black/40 p-4 sm:p-10"
+    (click)="closeAuthorityDialog()"
+    (window:keydown.escape)="closeAuthorityDialog()"
+  >
+    <section
+      class="shadow-s h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-360 overflow-hidden rounded-2xl bg-white sm:h-[calc(100dvh-80px)] sm:w-[calc(100vw-80px)]"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="authority-dialog-title"
     >
-      <span class="text-base-color text-lg font-medium">
-        {{ "dialogs.authority_search" | translate }}
-      </span>
+      <div class="flex h-full min-h-0 flex-col">
+        <!-- top -->
+        <div
+          class="items center border-bright flex shrink-0 justify-between gap-3 border-b p-4"
+        >
+          <span
+            class="text-base-color text-lg font-medium"
+            id="authority-dialog-title"
+          >
+            {{ "dialogs.authority_search" | translate }}
+          </span>
 
-      <button class="btn group" (click)="closeAuthorityDialog()" type="button">
-        <svg class="icon-tertiary" appIcon="x" width="24" height="24"></svg>
-      </button>
-    </div>
+          <button
+            class="btn group"
+            (click)="closeAuthorityDialog()"
+            type="button"
+          >
+            <svg class="icon-tertiary" appIcon="x" width="24" height="24"></svg>
+          </button>
+        </div>
 
-    <!-- center -->
-    <div class="grid min-h-0 flex-1 grid-cols-[1fr_1fr] overflow-hidden">
-      <div class="border-bright flex min-h-0 overflow-hidden border-r p-4">
-        <div class="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden">
-          <div class="flex shrink-0 gap-2">
-            <span
-              class="focus-within:border-primary-default border-tertiary-default bg-main-base inline-flex w-full items-center justify-between overflow-hidden rounded-lg border"
-            >
-              <input
-                class="w-full bg-transparent py-3 pl-4 outline-none"
-                #q
-                [value]="searchQuery()"
-                (input)="searchQuery.set(q.value)"
-                (keydown.enter)="search(1)"
-              />
-              @if (searchQuery().length && !loading()) {
+        <!-- center -->
+        <div class="grid min-h-0 flex-1 grid-cols-[1fr_1fr] overflow-hidden">
+          <div class="border-bright flex min-h-0 overflow-hidden border-r p-4">
+            <div class="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden">
+              <div class="flex shrink-0 gap-2">
+                <span
+                  class="focus-within:border-primary-default border-tertiary-default bg-main-base inline-flex w-full items-center justify-between overflow-hidden rounded-lg border"
+                >
+                  <input
+                    class="w-full bg-transparent py-3 pl-4 outline-none"
+                    #q
+                    [value]="searchQuery()"
+                    (input)="searchQuery.set(q.value)"
+                    (keydown.enter)="search(1)"
+                  />
+
+                  @if (searchQuery().length && !loading()) {
+                    <button
+                      class="group flex items-center px-3"
+                      (click)="clear()"
+                      (mousedown)="$event.preventDefault()"
+                      tabindex="-1"
+                      type="button"
+                    >
+                      <svg
+                        class="icon-tertiary"
+                        appIcon="x"
+                        width="16"
+                        height="16"
+                      ></svg>
+                    </button>
+                  }
+                </span>
+
                 <button
-                  class="group flex items-center px-3"
-                  (click)="clear()"
-                  (mousedown)="$event.preventDefault()"
-                  tabindex="-1"
+                  class="btn btn-l btn-primary group shrink-0"
+                  [disabled]="loading()"
+                  (click)="search(1)"
+                  type="button"
+                >
+                  {{ "buttons.search" | translate }}
+                  <svg
+                    class="icon-primary"
+                    appIcon="search"
+                    width="20"
+                    height="20"
+                  ></svg>
+                </button>
+              </div>
+
+              <div class="min-h-0 flex-1 overflow-hidden">
+                <div class="h-full overflow-auto">
+                  <table class="w-full border-collapse text-sm">
+                    <colgroup>
+                      <col class="w-12" />
+                      <col class="w-12" />
+                      <col class="w-12" />
+                      <col />
+                    </colgroup>
+
+                    <thead class="bg-main-bright sticky top-0 z-10">
+                      <tr class="border-light border-b">
+                        <th
+                          class="text-sm-tight rounded-tl-lg p-2 text-left font-medium"
+                        >
+                          {{ "candidates.select" | translate }}
+                        </th>
+                        <th class="text-sm-tight p-2 text-left font-medium">
+                          {{ "candidates.first_indicator" | translate }}
+                        </th>
+                        <th class="text-sm-tight p-2 text-left font-medium">
+                          {{ "candidates.second_indicator" | translate }}
+                        </th>
+                        <th
+                          class="text-sm-tight rounded-tr-lg p-2 text-left font-medium"
+                        >
+                          {{ "candidates.subfields" | translate }}
+                        </th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      @if (loading()) {
+                        @for (row of skeletonRows; track $index) {
+                          <tr
+                            class="border-light border-b"
+                            [ngClass]="
+                              $index % 2 === 1
+                                ? 'bg-main-base'
+                                : 'bg-gray-500/5'
+                            "
+                          >
+                            <td class="px-4 py-2 text-center align-middle">
+                              <div
+                                class="mx-auto h-4 w-4 animate-pulse rounded-full bg-gray-200"
+                              ></div>
+                            </td>
+
+                            <td class="p-2 align-text-top">
+                              <div
+                                class="h-4 w-6 animate-pulse rounded bg-gray-200"
+                              ></div>
+                            </td>
+
+                            <td class="p-2 align-text-top">
+                              <div
+                                class="h-4 w-6 animate-pulse rounded bg-gray-200"
+                              ></div>
+                            </td>
+
+                            <td class="p-2 align-text-top">
+                              <div class="flex gap-2">
+                                <div
+                                  class="h-4 w-full animate-pulse rounded bg-gray-200"
+                                ></div>
+                              </div>
+                            </td>
+                          </tr>
+                        }
+                      } @else if (errorMessage()) {
+                        <tr>
+                          <td class="text-md text-error p-4" colspan="4">
+                            {{ errorMessage() }}
+                          </td>
+                        </tr>
+                      } @else if (!searchResults().length) {
+                        <tr>
+                          <td
+                            class="text-light text-md bg-gray-500/5 p-4"
+                            colspan="4"
+                          >
+                            {{ "dialogs.no_authorities" | translate }}
+                          </td>
+                        </tr>
+                      } @else {
+                        @for (
+                          rec of searchResults();
+                          track rec.record_id;
+                          let i = $index
+                        ) {
+                          <tr
+                            class="border-light cursor-pointer border-b"
+                            [ngClass]="
+                              i % 2 === 1 ? 'bg-main-base' : 'bg-gray-500/5'
+                            "
+                            (click)="selectRecord(rec)"
+                          >
+                            <td class="align-center px-4 py-2 text-center">
+                              <label
+                                class="flex h-full cursor-pointer items-center justify-center"
+                              >
+                                <input
+                                  class="peer sr-only"
+                                  [checked]="
+                                    selectedRecordId() === rec.record_id
+                                  "
+                                  (click)="
+                                    $event.stopPropagation(); selectRecord(rec)
+                                  "
+                                  type="radio"
+                                  name="authority-record"
+                                />
+
+                                <span
+                                  class="border-contrast peer-hover:border-primary-hover peer-active:border-primary-pressed peer-disabled:border-tertiary-disable after:bg-main-contrast peer-hover:after:bg-primary-hover peer-active:after:bg-primary-pressed peer-disabled:after:bg-tertiary-disable peer-checked:border-primary-default peer-checked:after:bg-main-primary-default peer-checked:peer-hover:border-primary-hover peer-checked:peer-hover:after:bg-main-primary-hover peer-checked:peer-active:border-primary-pressed peer-checked:peer-active:after:bg-main-primary-pressed peer-checked:peer-disabled:border-tertiary-disable peer-checked:peer-disabled:after:bg-main-tertiary-disable disabled:bg-main-light relative flex h-4 w-4 items-center justify-center rounded-full border transition-colors after:absolute after:h-2.5 after:w-2.5 after:scale-0 after:rounded-full after:transition-transform after:content-[''] peer-checked:after:scale-100"
+                                ></span>
+                              </label>
+                            </td>
+
+                            <td
+                              class="text-secondary text-md p-2 text-left align-text-top"
+                            >
+                              {{ getAuthority100(rec)?.ind1 ?? "" }}
+                            </td>
+
+                            <td
+                              class="text-secondary text-md p-2 text-left align-text-top"
+                            >
+                              {{ getAuthority100(rec)?.ind2 ?? "" }}
+                            </td>
+
+                            <td class="p-2 align-text-top">
+                              @if (getAuthority100(rec)?.subfields?.length) {
+                                <div class="flex flex-wrap gap-x-2 gap-y-1">
+                                  @for (
+                                    sf of getAuthority100(rec)!.subfields;
+                                    track $index
+                                  ) {
+                                    <span>
+                                      <span
+                                        class="text-secondary text-md font-bold"
+                                      >
+                                        |{{ sf.code }}
+                                      </span>
+                                      <span class="text-secondary text-md ml-2">
+                                        {{ sf.value }}
+                                      </span>
+                                    </span>
+                                  }
+                                </div>
+                              } @else {
+                                <span class="text-light">—</span>
+                              }
+                            </td>
+                          </tr>
+                        }
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="min-h-0 overflow-hidden p-4">
+            <div class="flex h-full min-h-0 flex-col overflow-hidden">
+              <div
+                class="bg-main-bright border-light flex w-full items-center justify-between rounded-t-lg border-b p-2"
+              >
+                <span class="text-sm-tight font-medium">
+                  {{ "candidates.authority_record" | translate }}
+                </span>
+
+                @if (selectedRecordDetail() && catalogueUrl()) {
+                  <a
+                    class="text-base-color text-sm-tight font-medium underline hover:no-underline"
+                    [href]="catalogueUrl()"
+                    (click)="$event.stopPropagation()"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="{{ 'candidates.open_in_skc' | translate }}"
+                  >
+                    <span class="flex items-center gap-1">
+                      {{ "candidates.show_in_nkp" | translate }}
+                      <svg
+                        class="icon-black"
+                        appIcon="externalLink"
+                        width="16"
+                        height="16"
+                      ></svg>
+                    </span>
+                  </a>
+                }
+              </div>
+
+              @if (detailLoading()) {
+                <div class="p-2">
+                  <div class="space-y-3">
+                    @for (row of skeletonRows; track $index) {
+                      <div class="grid grid-cols-[90px_1fr] gap-4">
+                        <div
+                          class="h-5 animate-pulse rounded bg-gray-200"
+                        ></div>
+                        <div
+                          class="h-5 animate-pulse rounded bg-gray-200"
+                        ></div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              } @else if (selectedRecordDetail()) {
+                <div class="min-h-0 flex-1 overflow-auto">
+                  <app-existing-marc-record-table
+                    [existingRecord]="selectedRecordDetail()!"
+                  />
+                </div>
+              } @else if (detailError()) {
+                <div class="text-error text-md p-2">{{ detailError() }}</div>
+              } @else if (!loading()) {
+                <div class="text-light text-md bg-gray-500/5 p-4">
+                  {{ "dialogs.choose_authority" | translate }}
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- bottom -->
+        <div
+          class="border-bright flex shrink-0 justify-between gap-3 border-t p-4"
+        >
+          <div class="flex items-center justify-between gap-6">
+            <div class="text-light text-md text-nowrap">
+              {{ from() }}-{{ to() }} / {{ total() }}
+            </div>
+
+            <div class="flex items-center gap-5">
+              <div class="flex items-center gap-2">
+                @for (item of visiblePages(); track $index) {
+                  @if (item === "ellipsis-left" || item === "ellipsis-right") {
+                    <span
+                      class="text-base-color flex h-10 min-w-8 shrink-0 items-center justify-center"
+                    >
+                      ...
+                    </span>
+                  } @else {
+                    <button
+                      class="btn btn-m shrink-0"
+                      [ngClass]="
+                        item === page() ? 'btn-primary' : 'btn-tertiary'
+                      "
+                      (click)="goToPage(item)"
+                      type="button"
+                    >
+                      {{ item }}
+                    </button>
+                  }
+                }
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button
+                  class="btn btn-m btn-tertiary btn-icon group"
+                  [disabled]="!hasPrev()"
+                  (click)="goPrevPage()"
                   type="button"
                 >
                   <svg
                     class="icon-tertiary"
-                    appIcon="x"
+                    appIcon="arrowLeft"
                     width="16"
                     height="16"
                   ></svg>
                 </button>
-              }
-            </span>
 
-            <button
-              class="btn btn-l btn-primary group shrink-0"
-              [disabled]="loading()"
-              (click)="search(1)"
-              type="button"
-            >
-              {{ "buttons.search" | translate }}
-              <svg
-                class="icon-primary"
-                appIcon="search"
-                width="20"
-                height="20"
-              ></svg>
-            </button>
-          </div>
-
-          <div class="min-h-0 flex-1 overflow-hidden">
-            <div class="h-full overflow-auto">
-              <table class="w-full border-collapse text-sm">
-                <colgroup>
-                  <col class="w-12" />
-                  <col class="w-12" />
-                  <col class="w-12" />
-                  <col />
-                </colgroup>
-
-                <thead class="bg-main-bright sticky top-0 z-10">
-                  <tr class="border-light border-b">
-                    <th
-                      class="text-sm-tight rounded-tl-lg p-2 text-left font-medium"
-                    >
-                      {{ "candidates.select" | translate }}
-                    </th>
-                    <th class="text-sm-tight p-2 text-left font-medium">
-                      {{ "candidates.first_indicator" | translate }}
-                    </th>
-                    <th class="text-sm-tight p-2 text-left font-medium">
-                      {{ "candidates.second_indicator" | translate }}
-                    </th>
-                    <th
-                      class="text-sm-tight rounded-tr-lg p-2 text-left font-medium"
-                    >
-                      {{ "candidates.subfields" | translate }}
-                    </th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  @if (loading()) {
-                    @for (row of skeletonRows; track $index) {
-                      <tr
-                        class="border-light border-b"
-                        [ngClass]="
-                          $index % 2 === 1 ? 'bg-main-base' : 'bg-gray-500/5'
-                        "
-                      >
-                        <td class="px-4 py-2 text-center align-middle">
-                          <div
-                            class="mx-auto h-4 w-4 animate-pulse rounded-full bg-gray-200"
-                          ></div>
-                        </td>
-
-                        <td class="p-2 align-text-top">
-                          <div
-                            class="h-4 w-6 animate-pulse rounded bg-gray-200"
-                          ></div>
-                        </td>
-
-                        <td class="p-2 align-text-top">
-                          <div
-                            class="h-4 w-6 animate-pulse rounded bg-gray-200"
-                          ></div>
-                        </td>
-
-                        <td class="p-2 align-text-top">
-                          <div class="flex gap-2">
-                            <div
-                              class="h-4 w-full animate-pulse rounded bg-gray-200"
-                            ></div>
-                          </div>
-                        </td>
-                      </tr>
-                    }
-                  } @else if (errorMessage()) {
-                    <tr>
-                      <td class="text-md text-error p-4" colspan="4">
-                        {{ errorMessage() }}
-                      </td>
-                    </tr>
-                  } @else if (!searchResults().length) {
-                    <tr>
-                      <td
-                        class="text-light text-md bg-gray-500/5 p-4"
-                        colspan="4"
-                      >
-                        {{ "dialogs.no_authorities" | translate }}
-                      </td>
-                    </tr>
-                  } @else {
-                    @for (
-                      rec of searchResults();
-                      track rec.record_id;
-                      let i = $index
-                    ) {
-                      <tr
-                        class="border-light cursor-pointer border-b"
-                        [ngClass]="
-                          i % 2 === 1 ? 'bg-main-base' : 'bg-gray-500/5'
-                        "
-                        (click)="selectRecord(rec)"
-                      >
-                        <td class="align-center px-4 py-2 text-center">
-                          <label
-                            class="flex h-full cursor-pointer items-center justify-center"
-                          >
-                            <input
-                              class="peer sr-only"
-                              [checked]="selectedRecordId() === rec.record_id"
-                              (click)="
-                                $event.stopPropagation(); selectRecord(rec)
-                              "
-                              type="radio"
-                              name="authority-record"
-                            />
-
-                            <span
-                              class="border-contrast peer-hover:border-primary-hover peer-active:border-primary-pressed peer-disabled:border-tertiary-disable after:bg-main-contrast peer-hover:after:bg-primary-hover peer-active:after:bg-primary-pressed peer-disabled:after:bg-tertiary-disable peer-checked:border-primary-default peer-checked:after:bg-main-primary-default peer-checked:peer-hover:border-primary-hover peer-checked:peer-hover:after:bg-main-primary-hover peer-checked:peer-active:border-primary-pressed peer-checked:peer-active:after:bg-main-primary-pressed peer-checked:peer-disabled:border-tertiary-disable peer-checked:peer-disabled:after:bg-main-tertiary-disable disabled:bg-main-light relative flex h-4 w-4 items-center justify-center rounded-full border transition-colors after:absolute after:h-2.5 after:w-2.5 after:scale-0 after:rounded-full after:transition-transform after:content-[''] peer-checked:after:scale-100"
-                            ></span>
-                          </label>
-                        </td>
-
-                        <td
-                          class="text-secondary text-md p-2 text-left align-text-top"
-                        >
-                          {{ getAuthority100(rec)?.ind1 ?? "" }}
-                        </td>
-
-                        <td
-                          class="text-secondary text-md p-2 text-left align-text-top"
-                        >
-                          {{ getAuthority100(rec)?.ind2 ?? "" }}
-                        </td>
-
-                        <td class="p-2 align-text-top">
-                          @if (getAuthority100(rec)?.subfields?.length) {
-                            <div class="flex flex-wrap gap-x-2 gap-y-1">
-                              @for (
-                                sf of getAuthority100(rec)!.subfields;
-                                track $index
-                              ) {
-                                <span>
-                                  <span
-                                    class="text-secondary text-md font-bold"
-                                  >
-                                    |{{ sf.code }}
-                                  </span>
-                                  <span class="text-secondary text-md ml-2">
-                                    {{ sf.value }}
-                                  </span>
-                                </span>
-                              }
-                            </div>
-                          } @else {
-                            <span class="text-light">—</span>
-                          }
-                        </td>
-                      </tr>
-                    }
-                  }
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="min-h-0 overflow-hidden p-4">
-        <div class="flex h-full min-h-0 flex-col overflow-hidden">
-          <div
-            class="bg-main-bright border-light flex w-full items-center justify-between rounded-t-lg border-b p-2"
-          >
-            <span class="text-sm-tight font-medium">
-              {{ "candidates.authority_record" | translate }}
-            </span>
-
-            @if (selectedRecordDetail() && catalogueUrl()) {
-              <a
-                class="text-base-color text-sm-tight font-medium underline hover:no-underline"
-                [href]="catalogueUrl()"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="{{ 'candidates.open_in_skc' | translate }}"
-              >
-                <span class="flex items-center gap-1">
-                  {{ "candidates.show_in_nkp" | translate }}
-                  <svg
-                    class="icon-black"
-                    appIcon="externalLink"
-                    width="16"
-                    height="16"
-                  ></svg>
-                </span>
-              </a>
-            }
-          </div>
-
-          @if (detailLoading()) {
-            <div class="p-2">
-              <div class="space-y-3">
-                @for (row of skeletonRows; track $index) {
-                  <div class="grid grid-cols-[90px_1fr] gap-4">
-                    <div class="h-5 animate-pulse rounded bg-gray-200"></div>
-                    <div class="h-5 animate-pulse rounded bg-gray-200"></div>
-                  </div>
-                }
-              </div>
-            </div>
-          } @else if (selectedRecordDetail()) {
-            <div class="min-h-0 flex-1 overflow-auto">
-              <app-existing-marc-record-table
-                [existingRecord]="selectedRecordDetail()!"
-              />
-            </div>
-          } @else if (detailError()) {
-            <div class="text-error text-md p-2">{{ detailError() }}</div>
-          } @else if (!loading()) {
-            <div class="text-light text-md bg-gray-500/5 p-4">
-              {{ "dialogs.choose_authority" | translate }}
-            </div>
-          }
-        </div>
-      </div>
-    </div>
-
-    <!-- bottom -->
-    <div class="border-bright flex shrink-0 justify-between gap-3 border-t p-4">
-      <div class="flex items-center justify-between gap-6">
-        <div class="text-light text-md text-nowrap">
-          {{ from() }}-{{ to() }} / {{ total() }}
-        </div>
-
-        <div class="flex items-center gap-5">
-          <div class="flex items-center gap-2">
-            @for (item of visiblePages(); track $index) {
-              @if (item === "ellipsis-left" || item === "ellipsis-right") {
-                <span
-                  class="text-base-color flex h-10 min-w-8 shrink-0 items-center justify-center"
-                >
-                  ...
-                </span>
-              } @else {
                 <button
-                  class="btn btn-m shrink-0"
-                  [ngClass]="item === page() ? 'btn-primary' : 'btn-tertiary'"
-                  (click)="goToPage(item)"
+                  class="btn btn-m btn-tertiary btn-icon group"
+                  [disabled]="!hasNext()"
+                  (click)="goNextPage()"
                   type="button"
                 >
-                  {{ item }}
+                  <svg
+                    class="icon-tertiary"
+                    appIcon="arrowRight"
+                    width="16"
+                    height="16"
+                  ></svg>
                 </button>
-              }
-            }
+              </div>
+            </div>
           </div>
 
-          <div class="flex items-center gap-2">
+          <div class="flex gap-3">
             <button
-              class="btn btn-m btn-tertiary btn-icon group"
-              [disabled]="!hasPrev()"
-              (click)="goPrevPage()"
+              class="btn btn-m btn-tertiary"
+              (click)="closeAuthorityDialog()"
               type="button"
             >
-              <svg
-                class="icon-tertiary"
-                appIcon="arrowLeft"
-                width="16"
-                height="16"
-              ></svg>
+              {{ "buttons.cancel" | translate }}
             </button>
 
             <button
-              class="btn btn-m btn-tertiary btn-icon group"
-              [disabled]="!hasNext()"
-              (click)="goNextPage()"
+              class="btn btn-m btn-primary"
+              [disabled]="!selectedRecordDetail()"
+              (click)="applyAuthority()"
               type="button"
             >
-              <svg
-                class="icon-tertiary"
-                appIcon="arrowRight"
-                width="16"
-                height="16"
-              ></svg>
+              {{ "buttons.take_authority" | translate }}
             </button>
           </div>
         </div>
       </div>
-
-      <div class="flex gap-3">
-        <button
-          class="btn btn-m btn-tertiary"
-          (click)="closeAuthorityDialog()"
-          type="button"
-        >
-          {{ "buttons.cancel" | translate }}
-        </button>
-
-        <button
-          class="btn btn-m btn-primary"
-          [disabled]="!selectedRecordDetail()"
-          (click)="applyAuthority()"
-          type="button"
-        >
-          {{ "buttons.take_authority" | translate }}
-        </button>
-      </div>
-    </div>
+    </section>
   </div>
-</dialog>
+}

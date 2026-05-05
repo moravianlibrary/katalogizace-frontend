@@ -58,10 +58,12 @@ export class UsersListComponent {
   newEmail = signal('');
   newIsAdmin = signal(false);
   createPermissions = signal<BatchPermissionUpdateDto[]>([]);
+  createDialogOpen = signal(false);
 
   editFullName = signal('');
   savingEdit = signal(false);
   editIsAdmin = signal(false);
+  editDialogOpen = signal(false);
 
   editPermissions = signal<BatchPermissionUpdateDto[]>([]);
 
@@ -77,12 +79,10 @@ export class UsersListComponent {
   resettingPassword = signal(false);
   generatedPassword = signal('');
   resetPasswordDialogLocked = signal(false);
+  resetPasswordDialogOpen = signal(false);
   readonly passwordDialogTitleKey = signal('users.new_password');
 
   private resetPasswordCloseTimer: ReturnType<typeof setTimeout> | null = null;
-
-  @ViewChild('resetPasswordDialog', { static: true })
-  resetPasswordDialog!: ElementRef<HTMLDialogElement>;
 
   readonly passwordCopied = signal(false);
   private passwordCopiedTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -98,11 +98,11 @@ export class UsersListComponent {
     { value: 'edit', icon: 'settings' },
   ];
 
-  @ViewChild('createDialog', { static: true })
-  createDialog!: ElementRef<HTMLDialogElement>;
+  @ViewChild('createFullNameInput')
+  createFullNameInput?: ElementRef<HTMLInputElement>;
 
-  @ViewChild('editDialog', { static: true })
-  editDialog!: ElementRef<HTMLDialogElement>;
+  @ViewChild('editFullNameInput')
+  editFullNameInput?: ElementRef<HTMLInputElement>;
 
   @ViewChildren('batchOption')
   batchOptions!: QueryList<ElementRef<HTMLButtonElement>>;
@@ -302,14 +302,18 @@ export class UsersListComponent {
     this.batchPickerOpen.set(false);
     this.batchActiveIndex.set(0);
 
+    this.creating.set(false);
+
     this.loadBatchesInfo(true);
-    this.createDialog.nativeElement.showModal();
+    this.createDialogOpen.set(true);
+
+    setTimeout(() => {
+      this.createFullNameInput?.nativeElement.focus();
+    });
   }
 
   closeCreate() {
-    if (this.createDialog?.nativeElement.open) {
-      this.createDialog.nativeElement.close();
-    }
+    this.createDialogOpen.set(false);
 
     this.newFullName.set('');
     this.newEmail.set('');
@@ -451,15 +455,18 @@ export class UsersListComponent {
     this.batchSearchInput.set('');
     this.selectedBatchId.set(null);
     this.batchPickerOpen.set(false);
+    this.batchActiveIndex.set(0);
 
     this.loadBatchesInfo(true);
-    this.editDialog.nativeElement.showModal();
+    this.editDialogOpen.set(true);
+
+    setTimeout(() => {
+      this.editFullNameInput?.nativeElement.focus();
+    });
   }
 
   closeEdit() {
-    if (this.editDialog?.nativeElement.open) {
-      this.editDialog.nativeElement.close();
-    }
+    this.editDialogOpen.set(false);
 
     this.editingUser.set(null);
     this.editFullName.set('');
@@ -469,6 +476,7 @@ export class UsersListComponent {
     this.batchSearchInput.set('');
     this.selectedBatchId.set(null);
     this.batchPickerOpen.set(false);
+    this.batchActiveIndex.set(0);
 
     this.resettingPassword.set(false);
 
@@ -871,6 +879,7 @@ export class UsersListComponent {
 
     if (event.key === 'Escape' && this.batchPickerOpen()) {
       event.preventDefault();
+      event.stopPropagation();
       this.closeBatchPicker();
     }
   }
@@ -924,6 +933,11 @@ export class UsersListComponent {
 
           this.passwordDialogTitleKey.set('users.new_password');
           this.openResetPasswordDialog();
+
+          this.toast.show(
+            this.translate.instant('messages.success.users.reset_password'),
+            'success',
+          );
         },
         error: (err) => {
           console.error(err);
@@ -941,7 +955,7 @@ export class UsersListComponent {
     this.clearResetPasswordCloseTimer();
 
     this.resetPasswordDialogLocked.set(true);
-    this.resetPasswordDialog.nativeElement.showModal();
+    this.resetPasswordDialogOpen.set(true);
 
     this.resetPasswordCloseTimer = setTimeout(() => {
       this.resetPasswordDialogLocked.set(false);
@@ -952,19 +966,11 @@ export class UsersListComponent {
   closeResetPasswordDialog() {
     if (this.resetPasswordDialogLocked()) return;
 
-    if (this.resetPasswordDialog?.nativeElement.open) {
-      this.resetPasswordDialog.nativeElement.close();
-    }
+    this.resetPasswordDialogOpen.set(false);
 
     this.clearPasswordCopiedState();
     this.generatedPassword.set('');
     this.clearResetPasswordCloseTimer();
-  }
-
-  onResetPasswordDialogCancel(event: Event) {
-    if (this.resetPasswordDialogLocked()) {
-      event.preventDefault();
-    }
   }
 
   async copyGeneratedPassword() {
@@ -1002,5 +1008,36 @@ export class UsersListComponent {
     }
 
     this.resetPasswordDialogLocked.set(false);
+  }
+
+  onCreateEscape() {
+    if (this.resetPasswordDialogOpen()) return;
+    if (!this.createDialogOpen()) return;
+
+    if (this.batchPickerOpen()) {
+      this.closeBatchPicker();
+      return;
+    }
+
+    this.closeCreate();
+  }
+
+  onEditEscape() {
+    if (this.resetPasswordDialogOpen()) return;
+    if (!this.editDialogOpen()) return;
+
+    if (this.batchPickerOpen()) {
+      this.closeBatchPicker();
+      return;
+    }
+
+    this.closeEdit();
+  }
+
+  onResetPasswordEscape() {
+    if (!this.resetPasswordDialogOpen()) return;
+    if (this.resetPasswordDialogLocked()) return;
+
+    this.closeResetPasswordDialog();
   }
 }

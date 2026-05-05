@@ -30,7 +30,6 @@ import {
   Component,
   computed,
   effect,
-  ElementRef,
   inject,
   input,
   signal,
@@ -86,6 +85,7 @@ export class FieldAuthorityEditorComponent {
 
   readonly addSubfieldDialogOpen = signal(false);
   readonly addSubfieldDialogError = signal<string | null>(null);
+  readonly authorityDialogOpen = signal(false);
 
   private readonly firstAutocomplete = viewChild(
     InputAutocompleteAuthorityComponent,
@@ -226,9 +226,6 @@ export class FieldAuthorityEditorComponent {
 
   readonly dDraft = signal<string>('');
   private readonly hasAutoFocused = signal(false);
-
-  private readonly authorityDialog =
-    viewChild<ElementRef<HTMLDialogElement>>('authorityDialog');
 
   constructor() {
     effect(() => {
@@ -843,9 +840,6 @@ export class FieldAuthorityEditorComponent {
   }
 
   onAuthoritySearch() {
-    const dialog = this.authorityDialog()?.nativeElement;
-    if (!dialog) return;
-
     this.searchQuery.set(this.getFirstSubValue('a') ?? '');
     this.errorMessage.set(null);
     this.searchResults.set([]);
@@ -854,7 +848,7 @@ export class FieldAuthorityEditorComponent {
     this.total.set(0);
     this.page.set(1);
 
-    dialog.showModal();
+    this.authorityDialogOpen.set(true);
 
     if (this.searchQuery().trim()) {
       this.search(1);
@@ -862,6 +856,6 @@ export class FieldAuthorityEditorComponent {
   }
 
   closeAuthorityDialog() {
-    this.authorityDialog()?.nativeElement.close();
+    this.authorityDialogOpen.set(false);
   }
 }

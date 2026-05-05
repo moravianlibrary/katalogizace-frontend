@@ -129,7 +129,8 @@
         "create": "Uživatel byl úspěšně vytvořen.",
         "edit": "Uživatel byl úspěšně upraven.",
         "delete": "Uživatel byl úspěšně smazán.",
-        "password_copied": "Heslo bylo zkopírováno."
+        "password_copied": "Heslo bylo zkopírováno.",
+        "reset_password": "Heslo bylo úspěšně resetováno."
       }
     },
     "warning": {
