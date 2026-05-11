@@ -5,7 +5,7 @@ import { FieldEditService } from '@/app/services/edit.service';
 import { RecordStateService } from '@/app/services/record-state.service';
 import { Component, inject, input } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { IconComponent } from '../../icon/icon.component';
+import { IconComponent } from '../../shared/icon/icon.component';
 
 @Component({
   standalone: true,

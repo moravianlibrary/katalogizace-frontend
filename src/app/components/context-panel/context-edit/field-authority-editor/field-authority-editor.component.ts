@@ -2,12 +2,12 @@ import {
   AddSubfieldDialogComponent,
   AddSubfieldDialogResult,
 } from '@/app/components/dialogs/add-subfield-dialog/add-subfield-dialog.component';
-import { IconComponent } from '@/app/components/icon/icon.component';
-import { InputAutocompleteAuthorityComponent } from '@/app/components/inputs/input-autocomplete-authority/input-autocomplete-authority.component';
-import { InputAutocompleteComponent } from '@/app/components/inputs/input-autocomplete/input-autocomplete.component';
-import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/input-dropdown.component';
-import { InputStaticAutocompleteComponent } from '@/app/components/inputs/input-static-autocomplete/input-static-autocomplete.component';
 import { ExistingMarcRecordTableComponent } from '@/app/components/marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
+import { IconComponent } from '@/app/components/shared/icon/icon.component';
+import { InputAutocompleteAuthorityComponent } from '@/app/components/shared/inputs/input-autocomplete-authority/input-autocomplete-authority.component';
+import { InputAutocompleteComponent } from '@/app/components/shared/inputs/input-autocomplete/input-autocomplete.component';
+import { InputDropdownComponent } from '@/app/components/shared/inputs/input-dropdown/input-dropdown.component';
+import { InputStaticAutocompleteComponent } from '@/app/components/shared/inputs/input-static-autocomplete/input-static-autocomplete.component';
 import { LockHoverIconComponent } from '@/app/components/shared/lock-hover-icon/lock-hover-icon.component';
 import { TablePaginationComponent } from '@/app/components/shared/table/table-pagination/table-pagination.component';
 import {

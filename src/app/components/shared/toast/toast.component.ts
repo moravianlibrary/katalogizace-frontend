@@ -2,7 +2,7 @@ import { ToastKind } from '@/app/models';
 import { AppIconName } from '@/app/models/shared/icon.model';
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
-import { ToastService } from '../../services/toast.service';
+import { ToastService } from '../../../services/toast.service';
 import { IconComponent } from '../icon/icon.component';
 
 type ToastUiConfig = {

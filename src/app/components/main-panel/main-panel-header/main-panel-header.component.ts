@@ -13,7 +13,7 @@ import {
   signal,
 } from '@angular/core';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { IconComponent } from '../../icon/icon.component';
+import { IconComponent } from '../../shared/icon/icon.component';
 import { QuickAddComponent } from '../quick-add/quick-add.component';
 
 @Component({

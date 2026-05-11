@@ -1,6 +1,6 @@
 import { Component, OnDestroy, input, output, signal } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
-import { IconComponent } from '../../icon/icon.component';
+import { IconComponent } from '../../shared/icon/icon.component';
 
 @Component({
   standalone: true,

@@ -12,10 +12,10 @@ import { filter } from 'rxjs';
 
 import { ContextPanelService } from '@/app/services/context-panel.service';
 import { MarcDiffService } from '@/app/services/marc-diff.service';
-import { AuthService } from '../../../services/api/auth.service';
-import { BatchesService } from '../../../services/api/batches.service';
-import { BreadcrumbsService } from '../../../services/breadcrumbs.service';
-import { IconComponent } from '../../icon/icon.component';
+import { IconComponent } from '../../components/shared/icon/icon.component';
+import { AuthService } from '../../services/api/auth.service';
+import { BatchesService } from '../../services/api/batches.service';
+import { BreadcrumbsService } from '../../services/breadcrumbs.service';
 
 type BatchBookNav = {
   batchId: number;

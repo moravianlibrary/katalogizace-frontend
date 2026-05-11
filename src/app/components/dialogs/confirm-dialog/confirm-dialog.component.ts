@@ -2,7 +2,7 @@ import { ConfirmDialogService } from '@/app/services/confirm-dialog.service';
 import { NgClass } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
-import { IconComponent } from '../../icon/icon.component';
+import { IconComponent } from '../../shared/icon/icon.component';
 
 export type ConfirmDialogKind = 'primary' | 'error';
 

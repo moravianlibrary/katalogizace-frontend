@@ -19,7 +19,7 @@ import {
   enumerateSubfields,
   isDiffableTag015to830,
 } from '../../../utils/marc-diff';
-import { IconComponent } from '../../icon/icon.component';
+import { IconComponent } from '../../shared/icon/icon.component';
 
 @Component({
   standalone: true,

@@ -13,8 +13,8 @@ import {
 } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 
-import { IconComponent } from '@/app/components/icon/icon.component';
-import { InputStaticAutocompleteComponent } from '@/app/components/inputs/input-static-autocomplete/input-static-autocomplete.component';
+import { IconComponent } from '@/app/components/shared/icon/icon.component';
+import { InputStaticAutocompleteComponent } from '@/app/components/shared/inputs/input-static-autocomplete/input-static-autocomplete.component';
 import { MarcTranslateService } from '@/app/services/marc-translate.service';
 
 type SliceDef = {

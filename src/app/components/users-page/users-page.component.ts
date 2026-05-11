@@ -14,7 +14,7 @@ import {
   UserDialogComponent,
   type UserDialogPasswordGenerated,
 } from '../dialogs/user-dialog/user-dialog.component';
-import { IconComponent } from '../icon/icon.component';
+import { IconComponent } from '../shared/icon/icon.component';
 import { TableSearchInputComponent } from '../shared/table/table-search-input/table-search-input.component';
 import { UserBatchesCellComponent } from '../user-batches-cell/user-batches-cell.component';
 

@@ -3,7 +3,7 @@ import { Component, input, output } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { TableSortDirection } from '@/app/utils/table-query-state.util';
-import { IconComponent } from '../../../icon/icon.component';
+import { IconComponent } from '../../../shared/icon/icon.component';
 
 @Component({
   standalone: true,

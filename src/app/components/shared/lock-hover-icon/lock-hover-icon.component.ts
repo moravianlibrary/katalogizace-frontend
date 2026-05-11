@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IconComponent } from '../../icon/icon.component';
+import { IconComponent } from '../../shared/icon/icon.component';
 
 @Component({
   standalone: true,

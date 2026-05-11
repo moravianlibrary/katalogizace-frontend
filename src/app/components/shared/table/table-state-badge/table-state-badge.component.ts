@@ -2,7 +2,7 @@ import { NgClass } from '@angular/common';
 import { Component, input } from '@angular/core';
 
 import { AppIconName } from '@/app/models/shared/icon.model';
-import { IconComponent } from '../../../icon/icon.component';
+import { IconComponent } from '../../../shared/icon/icon.component';
 
 export type TableStateBadgeAppearance = Readonly<{
   containerClass: string;

@@ -8,7 +8,7 @@ import {
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { IconComponent } from '../../components/icon/icon.component';
+import { IconComponent } from '../../components/shared/icon/icon.component';
 import { AuthService } from '../../services/api/auth.service';
 import { ToastService } from '../../services/toast.service';
 

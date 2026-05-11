@@ -2,20 +2,20 @@ import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 import { guestGuard } from './guards/guest.guard';
 
-import { LoginComponent } from './components/login/login.component';
+import { LoginComponent } from './pages/login/login.component';
 
 import { BookCaptureComponent } from './components/book-capture/book-capture.component';
 import { BookDetailComponent } from './components/book-detail/book-detail.component';
 import { BooksPageComponent } from './components/books-page/books-page.component';
 
 import { BatchesPageComponent } from './components/batches-page/batches-page.component';
-import { ForbiddenComponent } from './components/forbidden/forbidden.component';
-import { ProtectedLayoutComponent } from './components/layout/protected-layout/protected-layout.component';
-import { NotFoundComponent } from './components/not-found/not-found.component';
 import { UsersPageComponent } from './components/users-page/users-page.component';
 import { adminGuard } from './guards/admin.guard';
 import { batchPermissionGuard } from './guards/batch-permission.guard';
 import { captureExitGuard } from './guards/capture-exit.guard';
+import { ProtectedLayoutComponent } from './layouts/protected-layout/protected-layout.component';
+import { ForbiddenComponent } from './pages/forbidden/forbidden.component';
+import { NotFoundComponent } from './pages/not-found/not-found.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'batches', pathMatch: 'full' },

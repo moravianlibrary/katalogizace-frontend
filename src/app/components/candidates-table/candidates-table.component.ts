@@ -17,8 +17,8 @@ import {
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CatalogueService } from '../../services/api/catalogue.service';
 import { ContextPanelService } from '../../services/context-panel.service';
-import { IconComponent } from '../icon/icon.component';
 import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
+import { IconComponent } from '../shared/icon/icon.component';
 
 @Component({
   standalone: true,

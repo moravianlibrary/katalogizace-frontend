@@ -2,7 +2,7 @@ import { NgClass } from '@angular/common';
 import { Component, computed, input, output, signal } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 
-import { IconComponent } from '../../../icon/icon.component';
+import { IconComponent } from '../../../shared/icon/icon.component';
 
 export type TableFilterOption = Readonly<{
   value: string | null;

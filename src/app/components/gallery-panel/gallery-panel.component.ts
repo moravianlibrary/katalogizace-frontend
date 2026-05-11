@@ -15,7 +15,7 @@ import {
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BooksService } from '../../services/api/books.service';
 import { BookImageCacheService } from '../../services/book-image-cache.service';
-import { IconComponent } from '../icon/icon.component';
+import { IconComponent } from '../shared/icon/icon.component';
 import { GalleryHeaderComponent } from './gallery-header/gallery-header.component';
 import { ImageLargePreviewComponent } from './preview/preview.component';
 import { ImageThumbnailsComponent } from './thumbnails/thumbnails.component';
