@@ -100,58 +100,20 @@
               {{ "batches.author" | translate }}
             </th>
             <th class="px-3 py-2 text-left font-medium">
-              <button
-                class="group flex cursor-pointer items-center gap-1 select-none"
-                (click)="setSort('created_at')"
-                type="button"
-              >
-                {{ "batches.created" | translate }}
-
-                <svg
-                  class="transition-transform duration-150"
-                  [ngClass]="
-                    sortBy() === 'created_at'
-                      ? 'icon-secondary'
-                      : 'icon-tertiary'
-                  "
-                  [class.rotate-90]="
-                    sortBy() === 'created_at' && sortDir() === 'asc'
-                  "
-                  [class.-rotate-90]="
-                    sortBy() !== 'created_at' || sortDir() === 'desc'
-                  "
-                  appIcon="arrowLeft"
-                  width="16"
-                  height="16"
-                ></svg>
-              </button>
+              <app-sortable-table-header
+                [active]="sortBy() === 'created_at'"
+                [direction]="sortDir()"
+                (sort)="setSort('created_at')"
+                labelKey="batches.created"
+              />
             </th>
             <th class="px-3 py-2 text-left font-medium">
-              <button
-                class="group flex cursor-pointer items-center gap-1 select-none"
-                (click)="setSort('modified_at')"
-                type="button"
-              >
-                {{ "batches.edited" | translate }}
-
-                <svg
-                  class="transition-transform duration-150"
-                  [ngClass]="
-                    sortBy() === 'modified_at'
-                      ? 'icon-secondary'
-                      : 'icon-tertiary'
-                  "
-                  [class.rotate-90]="
-                    sortBy() === 'modified_at' && sortDir() === 'asc'
-                  "
-                  [class.-rotate-90]="
-                    sortBy() !== 'modified_at' || sortDir() === 'desc'
-                  "
-                  appIcon="arrowLeft"
-                  width="16"
-                  height="16"
-                ></svg>
-              </button>
+              <app-sortable-table-header
+                [active]="sortBy() === 'modified_at'"
+                [direction]="sortDir()"
+                (sort)="setSort('modified_at')"
+                labelKey="batches.edited"
+              />
             </th>
             <th class="px-3 py-2 text-left font-medium">
               <app-table-filter-menu
@@ -251,18 +213,10 @@
                 </td>
 
                 <td class="px-3 py-1 text-nowrap">
-                  <span
-                    class="text-sm-tight inline-flex items-center gap-1 rounded-lg p-2 font-medium"
-                    [ngClass]="batchStateBadgeClass(b.state)"
-                  >
-                    <svg
-                      [ngClass]="batchStateBadgeIconClass(b.state)"
-                      [appIcon]="batchStateBadgeIconName(b.state)"
-                      width="16"
-                      height="16"
-                    ></svg>
-                    {{ b.state | batchStateLabel }}
-                  </span>
+                  <app-table-state-badge
+                    [appearance]="batchStateBadgeAppearances[b.state]"
+                    [label]="b.state | batchStateLabel"
+                  />
                 </td>
 
                 <td class="px-3 py-1" [class.rounded-br-lg]="last">

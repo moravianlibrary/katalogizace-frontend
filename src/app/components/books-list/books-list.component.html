@@ -91,58 +91,20 @@
               {{ "books.publication_year" | translate }}
             </th>
             <th class="px-3 py-2 text-left font-medium">
-              <button
-                class="group flex cursor-pointer items-center gap-1 select-none"
-                (click)="setSort('created_at')"
-                type="button"
-              >
-                {{ "books.created" | translate }}
-
-                <svg
-                  class="transition-transform duration-150"
-                  [ngClass]="
-                    sortBy() === 'created_at'
-                      ? 'icon-secondary'
-                      : 'icon-tertiary'
-                  "
-                  [class.rotate-90]="
-                    sortBy() === 'created_at' && sortDir() === 'asc'
-                  "
-                  [class.-rotate-90]="
-                    sortBy() !== 'created_at' || sortDir() === 'desc'
-                  "
-                  appIcon="arrowLeft"
-                  width="16"
-                  height="16"
-                ></svg>
-              </button>
+              <app-sortable-table-header
+                [active]="sortBy() === 'created_at'"
+                [direction]="sortDir()"
+                (sort)="setSort('created_at')"
+                labelKey="books.created"
+              />
             </th>
             <th class="px-3 py-2 text-left font-medium">
-              <button
-                class="group flex cursor-pointer items-center gap-1 select-none"
-                (click)="setSort('modified_at')"
-                type="button"
-              >
-                {{ "books.edited" | translate }}
-
-                <svg
-                  class="transition-transform duration-150"
-                  [ngClass]="
-                    sortBy() === 'modified_at'
-                      ? 'icon-secondary'
-                      : 'icon-tertiary'
-                  "
-                  [class.rotate-90]="
-                    sortBy() === 'modified_at' && sortDir() === 'asc'
-                  "
-                  [class.-rotate-90]="
-                    sortBy() !== 'modified_at' || sortDir() === 'desc'
-                  "
-                  appIcon="arrowLeft"
-                  width="16"
-                  height="16"
-                ></svg>
-              </button>
+              <app-sortable-table-header
+                [active]="sortBy() === 'modified_at'"
+                [direction]="sortDir()"
+                (sort)="setSort('modified_at')"
+                labelKey="books.edited"
+              />
             </th>
             <th class="relative px-3 py-2 text-left font-medium text-nowrap">
               <app-table-filter-menu
@@ -235,42 +197,19 @@
                   </span>
                 </td>
                 <td class="px-3 py-1 text-nowrap">
-                  <span
-                    class="text-sm-tight inline-flex items-center gap-1 rounded-lg p-2 font-medium"
-                    [ngClass]="processStateBadgeClass(b.process_state)"
-                  >
-                    <svg
-                      [ngClass]="processStateBadgeIconClass(b.process_state)"
-                      [appIcon]="processStateBadgeIconName(b.process_state)"
-                      width="16"
-                      height="16"
-                    ></svg>
-                    {{ b.process_state | processStateLabel }}
-                  </span>
+                  <app-table-state-badge
+                    [appearance]="processStateBadgeAppearances[b.process_state]"
+                    [label]="b.process_state | processStateLabel"
+                  />
                 </td>
                 <td class="px-3 py-1 text-nowrap">
-                  <span
-                    class="text-sm-tight inline-flex items-center gap-1 rounded-lg p-2 font-medium"
-                    [ngClass]="
-                      recordStateBadgeClass(
-                        b.process_state === 'completed' ? b.record_state : null
-                      )
-                    "
-                  >
-                    @if (b.process_state === "completed") {
-                      <svg
-                        [ngClass]="recordStateBadgeIconClass(b.record_state)"
-                        [appIcon]="recordStateBadgeIconName(b.record_state)"
-                        width="16"
-                        height="16"
-                      ></svg>
-                    }
-
-                    {{
-                      (b.process_state === "completed" ? b.record_state : null)
+                  <app-table-state-badge
+                    [appearance]="recordStateBadgeAppearance(b)"
+                    [label]="
+                      (b.process_state === 'completed' ? b.record_state : null)
                         | recordStateLabel
-                    }}
-                  </span>
+                    "
+                  />
                 </td>
                 <td class="px-3 py-1" [class.rounded-br-lg]="last">
                   <div class="flex items-center gap-2">

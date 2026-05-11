@@ -5,12 +5,12 @@ import {
   DestroyRef,
   ElementRef,
   inject,
+  Injector,
   signal,
   ViewChild,
 } from '@angular/core';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { combineLatest, debounceTime, distinctUntilChanged } from 'rxjs';
 
 import {
   BatchDto,
@@ -26,16 +26,41 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BatchStateLabelPipe } from '../../pipes/batch-state-label.pipe';
 import { BatchesService } from '../../services/api/batches.service';
 import { ToastService } from '../../services/toast.service';
+import {
+  createQuerySyncedTableState,
+  type TableSortDirection,
+} from '../../utils/table-query-state.util';
 import { BatchEditDialogComponent } from '../dialogs/batch-edit-dialog/batch-edit-dialog.component';
 import { IconComponent } from '../icon/icon.component';
+import { SortableTableHeaderComponent } from '../shared/sortable-table-header/sortable-table-header.component';
 import {
   TableFilterMenuComponent,
   type TableFilterOption,
 } from '../shared/table-filter-menu/table-filter-menu.component';
 import { TablePaginationComponent } from '../shared/table-pagination/table-pagination.component';
 import { TableSearchInputComponent } from '../shared/table-search-input/table-search-input.component';
+import {
+  type TableStateBadgeAppearance,
+  TableStateBadgeComponent,
+} from '../shared/table-state-badge/table-state-badge.component';
 
-type VisiblePageItem = number | 'ellipsis-left' | 'ellipsis-right';
+const BATCH_STATE_BADGE_APPEARANCES = {
+  created: {
+    containerClass: 'bg-cyan-500/10 text-[#011934]',
+    iconClass: 'icon-link',
+    iconName: 'document',
+  },
+  in_progress: {
+    containerClass: 'bg-orange-500/10 text-[#362000]',
+    iconClass: 'icon-warning',
+    iconName: 'refresh',
+  },
+  completed: {
+    containerClass: 'bg-green-500/10 text-[#00310D]',
+    iconClass: 'icon-success',
+    iconName: 'checkCircleEmpty',
+  },
+} as const satisfies Record<BatchState, TableStateBadgeAppearance>;
 
 @Component({
   standalone: true,
@@ -50,7 +75,9 @@ type VisiblePageItem = number | 'ellipsis-left' | 'ellipsis-right';
     BatchEditDialogComponent,
     TableFilterMenuComponent,
     TablePaginationComponent,
+    TableStateBadgeComponent,
     TableSearchInputComponent,
+    SortableTableHeaderComponent,
   ],
   templateUrl: './batches-list.component.html',
 })
@@ -59,6 +86,7 @@ export class BatchesListComponent {
   private router = inject(Router);
   private batches = inject(BatchesService);
   private destroyRef = inject(DestroyRef);
+  private injector = inject(Injector);
   private toast = inject(ToastService);
   private breadcrumbs = inject(BreadcrumbsService);
   private translate = inject(TranslateService);
@@ -70,16 +98,15 @@ export class BatchesListComponent {
   error = signal<string | null>(null);
   data = signal<PaginatedBatchesResponseDto | null>(null);
 
-  sortBy = signal<'created_at' | 'modified_at'>('modified_at');
-  sortDir = signal<'asc' | 'desc'>('desc');
-
   filterMine = signal(false);
+  batchState = signal<BatchState | null>(null);
 
-  page = signal<number>(1);
-  pageSize = signal<number>(100);
-
+  page = signal(1);
+  pageSize = signal(100);
   searchInput = signal('');
   searchQuery = signal('');
+  sortBy = signal<'created_at' | 'modified_at'>('modified_at');
+  sortDir = signal<TableSortDirection>('desc');
 
   newName = signal('');
   newDescription = signal('');
@@ -88,56 +115,6 @@ export class BatchesListComponent {
 
   editingBatch = signal<BatchDto | null>(null);
   editDialogOpen = signal(false);
-
-  batchState = signal<BatchState | null>(null);
-
-  totalPages = computed(() =>
-    this.data()
-      ? Math.max(1, Math.ceil(this.data()!.total / this.data()!.page_size))
-      : 1,
-  );
-
-  from = computed(() => {
-    const data = this.data();
-    if (!data || data.total === 0) return 0;
-    return (data.page - 1) * data.page_size + 1;
-  });
-
-  to = computed(() => {
-    const data = this.data();
-    if (!data || data.total === 0) return 0;
-    return Math.min(data.page * data.page_size, data.total);
-  });
-
-  hasPrev = computed(() => !!this.data()?.has_prev);
-  hasNext = computed(() => !!this.data()?.has_next);
-
-  visiblePages = computed<VisiblePageItem[]>(() => {
-    const total = this.totalPages();
-    const current = this.page();
-
-    if (total <= 5) {
-      return Array.from({ length: total }, (_, i) => i + 1);
-    }
-
-    if (current <= 3) {
-      return [1, 2, 3, 4, 'ellipsis-right', total];
-    }
-
-    if (current >= total - 2) {
-      return [1, 'ellipsis-left', total - 3, total - 2, total - 1, total];
-    }
-
-    return [
-      1,
-      'ellipsis-left',
-      current - 1,
-      current,
-      current + 1,
-      'ellipsis-right',
-      total,
-    ];
-  });
 
   rows = computed<BatchDto[]>(() => {
     return this.data()?.batches ?? [];
@@ -149,6 +126,64 @@ export class BatchesListComponent {
     { value: 'in_progress', labelKey: 'labels.batchState.in_progress' },
     { value: 'completed', labelKey: 'labels.batchState.completed' },
   ];
+  readonly batchStateBadgeAppearances = BATCH_STATE_BADGE_APPEARANCES;
+
+  private readonly tableState = createQuerySyncedTableState({
+    route: this.route,
+    router: this.router,
+    destroyRef: this.destroyRef,
+    injector: this.injector,
+    data: this.data,
+    page: this.page,
+    pageSize: this.pageSize,
+    searchInput: this.searchInput,
+    searchQuery: this.searchQuery,
+    sortBy: this.sortBy,
+    sortDir: this.sortDir,
+    parseRouteState: (_, queryParamMap) => {
+      const page = Number(queryParamMap.get('page') ?? '1');
+      const pageSize = Number(queryParamMap.get('page_size') ?? '100');
+      const search = (queryParamMap.get('search') ?? '').trim();
+
+      const sortByParam = queryParamMap.get('sort_by');
+      const sortOrderParam = queryParamMap.get('sort_order');
+      const stateParam = queryParamMap.get('state');
+      const mine = queryParamMap.get('mine');
+
+      return {
+        page: isNaN(page) || page < 1 ? 1 : page,
+        pageSize: isNaN(pageSize) ? 100 : Math.min(100, Math.max(1, pageSize)),
+        search,
+        sortBy: sortByParam === 'created_at' ? 'created_at' : 'modified_at',
+        sortDir: sortOrderParam === 'asc' ? 'asc' : 'desc',
+        extraState: {
+          batchState:
+            stateParam === 'created' ||
+            stateParam === 'in_progress' ||
+            stateParam === 'completed'
+              ? (stateParam as BatchState)
+              : null,
+          filterMine: mine === '1' || mine === 'true',
+        },
+      };
+    },
+    applyExtraState: ({ batchState, filterMine }) => {
+      this.batchState.set(batchState);
+      this.filterMine.set(filterMine);
+    },
+    currentExtraQueryParams: () => ({
+      mine: this.filterMine() ? '1' : '0',
+      state: this.batchState(),
+    }),
+    load: () => this.load(),
+  });
+
+  totalPages = this.tableState.totalPages;
+  from = this.tableState.from;
+  to = this.tableState.to;
+  hasPrev = this.tableState.hasPrev;
+  hasNext = this.tableState.hasNext;
+  visiblePages = this.tableState.visiblePages;
 
   @ViewChild('createNameInput')
   createNameInput?: ElementRef<HTMLInputElement>;
@@ -158,61 +193,7 @@ export class BatchesListComponent {
   }
 
   constructor() {
-    combineLatest([this.route.paramMap, this.route.queryParamMap])
-      .pipe(takeUntilDestroyed())
-      .subscribe(([_, qp]) => {
-        const p = Number(qp.get('page') ?? '1');
-        const ps = Number(qp.get('page_size') ?? '100');
-        const search = (qp.get('search') ?? '').trim();
-
-        const sortByParam = qp.get('sort_by');
-        const sortOrderParam = qp.get('sort_order');
-
-        const normalizedSortBy =
-          sortByParam === 'created_at' ? 'created_at' : 'modified_at';
-        const normalizedSortOrder = sortOrderParam === 'asc' ? 'asc' : 'desc';
-
-        const stateParam = qp.get('state');
-        const normalizedBatchState: BatchState | null =
-          stateParam === 'created' ||
-          stateParam === 'in_progress' ||
-          stateParam === 'completed'
-            ? stateParam
-            : null;
-
-        const normalizedPageSize = isNaN(ps)
-          ? 100
-          : Math.min(100, Math.max(1, ps));
-
-        this.page.set(isNaN(p) || p < 1 ? 1 : p);
-        this.pageSize.set(normalizedPageSize);
-        this.searchQuery.set(search);
-        this.sortBy.set(normalizedSortBy);
-        this.sortDir.set(normalizedSortOrder);
-        this.batchState.set(normalizedBatchState);
-
-        const mine = qp.get('mine');
-        this.filterMine.set(mine === '1' || mine === 'true');
-
-        if (this.searchInput() !== search) {
-          this.searchInput.set(search);
-        }
-
-        this.load();
-      });
-
-    toObservable(this.searchInput)
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed())
-      .subscribe((value) => {
-        const normalized = value.trim();
-
-        if (normalized === this.searchQuery()) return;
-
-        this.navigateWithQuery({
-          page: 1,
-          search: normalized || null,
-        });
-      });
+    this.tableState.connect();
   }
 
   protected canCreateBatch(): boolean {
@@ -239,18 +220,7 @@ export class BatchesListComponent {
   }
 
   setSort(column: 'created_at' | 'modified_at') {
-    const nextDir =
-      this.sortBy() === column
-        ? this.sortDir() === 'asc'
-          ? 'desc'
-          : 'asc'
-        : 'desc';
-
-    this.navigateWithQuery({
-      page: 1,
-      sort_by: column,
-      sort_order: nextDir,
-    });
+    this.tableState.setSort(column);
   }
 
   load() {
@@ -286,18 +256,15 @@ export class BatchesListComponent {
   }
 
   goToPage(page: number) {
-    if (page < 1 || page > this.totalPages() || page === this.page()) return;
-    this.navigateWithQuery({ page });
+    this.tableState.goToPage(page);
   }
 
   goPrevPage() {
-    if (!this.hasPrev()) return;
-    this.navigateWithQuery({ page: this.page() - 1 });
+    this.tableState.goPrevPage();
   }
 
   goNextPage() {
-    if (!this.hasNext()) return;
-    this.navigateWithQuery({ page: this.page() + 1 });
+    this.tableState.goNextPage();
   }
 
   navigateWithQuery(partial: {
@@ -309,25 +276,7 @@ export class BatchesListComponent {
     sort_order?: 'asc' | 'desc';
     state?: BatchState | null;
   }) {
-    const search =
-      partial.search !== undefined ? partial.search : this.searchQuery();
-
-    const state =
-      partial.state !== undefined ? partial.state : this.batchState();
-
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: {
-        page: partial.page ?? this.page(),
-        page_size: partial.page_size ?? this.pageSize(),
-        mine: partial.mine ?? (this.filterMine() ? '1' : '0'),
-        search: search || null,
-        sort_by: partial.sort_by ?? this.sortBy(),
-        sort_order: partial.sort_order ?? this.sortDir(),
-        state: state || null,
-      },
-      queryParamsHandling: 'merge',
-    });
+    this.tableState.navigateWithQuery(partial);
   }
 
   setBatchStateFilter(state: string | null) {
@@ -462,39 +411,6 @@ export class BatchesListComponent {
         this.creating.set(false);
       },
     });
-  }
-
-  batchStateBadgeClass(state: BatchState) {
-    switch (state) {
-      case 'created':
-        return 'bg-cyan-500/10 text-[#011934]';
-      case 'in_progress':
-        return 'bg-orange-500/10 text-[#362000]';
-      case 'completed':
-        return 'bg-green-500/10 text-[#00310D]';
-    }
-  }
-
-  batchStateBadgeIconClass(state: BatchState) {
-    switch (state) {
-      case 'created':
-        return 'icon-link';
-      case 'in_progress':
-        return 'icon-warning';
-      case 'completed':
-        return 'icon-success';
-    }
-  }
-
-  batchStateBadgeIconName(state: BatchState) {
-    switch (state) {
-      case 'created':
-        return 'document';
-      case 'in_progress':
-        return 'refresh';
-      case 'completed':
-        return 'checkCircleEmpty';
-    }
   }
 
   openEdit(b: BatchDto, event: MouseEvent) {

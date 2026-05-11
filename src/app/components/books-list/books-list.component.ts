@@ -10,26 +10,99 @@ import { BreadcrumbsService } from '@/app/services/breadcrumbs.service';
 import { ConfirmDialogService } from '@/app/services/confirm-dialog.service';
 import { PermissionsService } from '@/app/services/permissions.service';
 import { DatePipe, NgClass } from '@angular/common';
-import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
-import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
+import {
+  Component,
+  computed,
+  DestroyRef,
+  inject,
+  Injector,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { combineLatest, debounceTime, distinctUntilChanged } from 'rxjs';
 import { ProcessStateLabelPipe } from '../../pipes/process-state-label.pipe';
 import { RecordStateLabelPipe } from '../../pipes/record-state-label.pipe';
 import { BatchesService } from '../../services/api/batches.service';
 import { BooksService } from '../../services/api/books.service';
 import { ContextPanelService } from '../../services/context-panel.service';
 import { ToastService } from '../../services/toast.service';
+import {
+  createQuerySyncedTableState,
+  type TableSortDirection,
+} from '../../utils/table-query-state.util';
 import { IconComponent } from '../icon/icon.component';
+import { SortableTableHeaderComponent } from '../shared/sortable-table-header/sortable-table-header.component';
 import {
   TableFilterMenuComponent,
   type TableFilterOption,
 } from '../shared/table-filter-menu/table-filter-menu.component';
 import { TablePaginationComponent } from '../shared/table-pagination/table-pagination.component';
 import { TableSearchInputComponent } from '../shared/table-search-input/table-search-input.component';
+import {
+  type TableStateBadgeAppearance,
+  TableStateBadgeComponent,
+} from '../shared/table-state-badge/table-state-badge.component';
 
-type VisiblePageItem = number | 'ellipsis-left' | 'ellipsis-right';
+const PROCESS_STATE_BADGE_APPEARANCES = {
+  created: {
+    containerClass: 'bg-cyan-500/10 text-[#011934]',
+    iconClass: 'icon-link',
+    iconName: 'document',
+  },
+  scheduled: {
+    containerClass: 'bg-amber-500/10 text-[#4A3200]',
+    iconClass: 'fill-amber-500',
+    iconName: 'timer',
+  },
+  in_progress: {
+    containerClass: 'bg-orange-500/10 text-[#362000]',
+    iconClass: 'icon-warning',
+    iconName: 'refresh',
+  },
+  ready: {
+    containerClass: 'bg-indigo-500/10 text-[#1D185A]',
+    iconClass: 'fill-indigo-500',
+    iconName: 'clipboardTick',
+  },
+  failed: {
+    containerClass: 'bg-red-500/10 text-[#390400]',
+    iconClass: 'icon-error',
+    iconName: 'shieldError',
+  },
+  completed: {
+    containerClass: 'bg-green-500/10 text-[#00310D]',
+    iconClass: 'icon-success',
+    iconName: 'checkCircleEmpty',
+  },
+} as const satisfies Record<ProcessState, TableStateBadgeAppearance>;
+
+const RECORD_STATE_BADGE_APPEARANCES = {
+  new: {
+    containerClass: 'bg-cyan-500/10 text-[#011934]',
+    iconClass: 'icon-link',
+    iconName: 'document',
+  },
+  edited: {
+    containerClass: 'bg-orange-500/10 text-[#362000]',
+    iconClass: 'icon-warning',
+    iconName: 'editUnderline',
+  },
+  reviewed: {
+    containerClass: 'bg-indigo-500/10 text-[#1D185A]',
+    iconClass: 'fill-indigo-500',
+    iconName: 'clipboardTick',
+  },
+  completed: {
+    containerClass: 'bg-green-500/10 text-[#00310D]',
+    iconClass: 'icon-success',
+    iconName: 'checkCircleEmpty',
+  },
+} as const satisfies Record<RecordState, TableStateBadgeAppearance>;
+
+const DEFAULT_RECORD_STATE_BADGE_APPEARANCE = {
+  containerClass: 'bg-slate-100 text-slate-600',
+} as const satisfies TableStateBadgeAppearance;
 
 @Component({
   standalone: true,
@@ -44,7 +117,9 @@ type VisiblePageItem = number | 'ellipsis-left' | 'ellipsis-right';
     IconComponent,
     TableFilterMenuComponent,
     TablePaginationComponent,
+    TableStateBadgeComponent,
     TableSearchInputComponent,
+    SortableTableHeaderComponent,
   ],
   templateUrl: 'books-list.component.html',
 })
@@ -53,6 +128,7 @@ export class BooksListComponent {
   private router = inject(Router);
   private books = inject(BooksService);
   private destroyRef = inject(DestroyRef);
+  private injector = inject(Injector);
   private toast = inject(ToastService);
   private cps = inject(ContextPanelService);
   private batchesService = inject(BatchesService);
@@ -71,62 +147,14 @@ export class BooksListComponent {
   batchId = signal<ID | null>(null);
   batch = signal<BatchDto | null>(null);
 
-  page = signal<number>(1);
-  pageSize = signal<number>(100);
+  page = signal(1);
+  pageSize = signal(100);
 
   searchInput = signal('');
   searchQuery = signal('');
 
   sortBy = signal<'created_at' | 'modified_at'>('created_at');
-  sortDir = signal<'asc' | 'desc'>('desc');
-
-  totalPages = computed(() =>
-    this.data()
-      ? Math.max(1, Math.ceil(this.data()!.total / this.data()!.page_size))
-      : 1,
-  );
-
-  from = computed(() => {
-    const data = this.data();
-    if (!data || data.total === 0) return 0;
-    return (data.page - 1) * data.page_size + 1;
-  });
-
-  to = computed(() => {
-    const data = this.data();
-    if (!data || data.total === 0) return 0;
-    return Math.min(data.page * data.page_size, data.total);
-  });
-
-  hasPrev = computed(() => !!this.data()?.has_prev);
-  hasNext = computed(() => !!this.data()?.has_next);
-
-  visiblePages = computed<VisiblePageItem[]>(() => {
-    const total = this.totalPages();
-    const current = this.page();
-
-    if (total <= 5) {
-      return Array.from({ length: total }, (_, i) => i + 1);
-    }
-
-    if (current <= 3) {
-      return [1, 2, 3, 4, 'ellipsis-right', total];
-    }
-
-    if (current >= total - 2) {
-      return [1, 'ellipsis-left', total - 3, total - 2, total - 1, total];
-    }
-
-    return [
-      1,
-      'ellipsis-left',
-      current - 1,
-      current,
-      current + 1,
-      'ellipsis-right',
-      total,
-    ];
-  });
+  sortDir = signal<TableSortDirection>('desc');
 
   rows = computed<PaginatedBooksResponseDto['books']>(() => {
     return this.data()?.books ?? [];
@@ -152,6 +180,82 @@ export class BooksListComponent {
     { value: 'reviewed', labelKey: 'labels.recordState.reviewed' },
     { value: 'completed', labelKey: 'labels.recordState.completed' },
   ];
+  readonly processStateBadgeAppearances = PROCESS_STATE_BADGE_APPEARANCES;
+  readonly recordStateBadgeAppearances = RECORD_STATE_BADGE_APPEARANCES;
+  readonly defaultRecordStateBadgeAppearance =
+    DEFAULT_RECORD_STATE_BADGE_APPEARANCE;
+
+  private readonly tableState = createQuerySyncedTableState({
+    route: this.route,
+    router: this.router,
+    destroyRef: this.destroyRef,
+    injector: this.injector,
+    data: this.data,
+    page: this.page,
+    pageSize: this.pageSize,
+    searchInput: this.searchInput,
+    searchQuery: this.searchQuery,
+    sortBy: this.sortBy,
+    sortDir: this.sortDir,
+    parseRouteState: (paramMap, queryParamMap) => {
+      const batchIdParam = paramMap.get('batchId');
+      const batchId = batchIdParam !== null ? Number(batchIdParam) : null;
+
+      const page = Number(queryParamMap.get('page') ?? '1');
+      const pageSize = Number(queryParamMap.get('page_size') ?? '100');
+      const search = (queryParamMap.get('search') ?? '').trim();
+
+      const sortByParam = queryParamMap.get('sort_by');
+      const sortOrderParam = queryParamMap.get('sort_order');
+      const processStateParam = queryParamMap.get('process_state');
+      const recordStateParam = queryParamMap.get('record_state');
+
+      return {
+        page: isNaN(page) || page < 1 ? 1 : page,
+        pageSize: isNaN(pageSize) ? 100 : Math.min(100, Math.max(1, pageSize)),
+        search,
+        sortBy: sortByParam === 'modified_at' ? 'modified_at' : 'created_at',
+        sortDir: sortOrderParam === 'asc' ? 'asc' : 'desc',
+        extraState: {
+          batchId:
+            batchId !== null && !isNaN(batchId) && batchId > 0 ? batchId : null,
+          processState:
+            processStateParam === 'created' ||
+            processStateParam === 'scheduled' ||
+            processStateParam === 'in_progress' ||
+            processStateParam === 'ready' ||
+            processStateParam === 'failed' ||
+            processStateParam === 'completed'
+              ? (processStateParam as ProcessState)
+              : null,
+          recordState:
+            recordStateParam === 'new' ||
+            recordStateParam === 'edited' ||
+            recordStateParam === 'reviewed' ||
+            recordStateParam === 'completed'
+              ? (recordStateParam as RecordState)
+              : null,
+        },
+      };
+    },
+    applyExtraState: ({ batchId, processState, recordState }) => {
+      this.batchId.set(batchId);
+      this.processState.set(processState);
+      this.recordState.set(recordState);
+    },
+    currentExtraQueryParams: () => ({
+      process_state: this.processState(),
+      record_state: this.recordState(),
+    }),
+    load: () => this.load(),
+  });
+
+  totalPages = this.tableState.totalPages;
+  from = this.tableState.from;
+  to = this.tableState.to;
+  hasPrev = this.tableState.hasPrev;
+  hasNext = this.tableState.hasNext;
+  visiblePages = this.tableState.visiblePages;
 
   readonly canRead = computed(() => this.permissions.canRead(this.batchId()));
   readonly canWrite = computed(() => this.permissions.canWrite(this.batchId()));
@@ -219,78 +323,7 @@ export class BooksListComponent {
       }
     });
 
-    combineLatest([this.route.paramMap, this.route.queryParamMap])
-      .pipe(takeUntilDestroyed())
-      .subscribe(([pm, qp]) => {
-        const bidParam = pm.get('batchId');
-        const bid = bidParam !== null ? Number(bidParam) : null;
-        const normalizedBatchId =
-          bid !== null && !isNaN(bid) && bid > 0 ? bid : null;
-
-        this.batchId.set(normalizedBatchId);
-
-        const p = Number(qp.get('page') ?? '1');
-        const ps = Number(qp.get('page_size') ?? '100');
-        const search = (qp.get('search') ?? '').trim();
-
-        const sortByParam = qp.get('sort_by');
-        const sortOrderParam = qp.get('sort_order');
-
-        const normalizedSortBy =
-          sortByParam === 'modified_at' ? 'modified_at' : 'created_at';
-        const normalizedSortOrder = sortOrderParam === 'asc' ? 'asc' : 'desc';
-
-        const normalizedPageSize = isNaN(ps)
-          ? 100
-          : Math.min(100, Math.max(1, ps));
-
-        const processStateParam = qp.get('process_state');
-        const normalizedProcessState: ProcessState | null =
-          processStateParam === 'created' ||
-          processStateParam === 'scheduled' ||
-          processStateParam === 'in_progress' ||
-          processStateParam === 'ready' ||
-          processStateParam === 'failed' ||
-          processStateParam === 'completed'
-            ? processStateParam
-            : null;
-
-        const recordStateParam = qp.get('record_state');
-        const normalizedRecordState: RecordState | null =
-          recordStateParam === 'new' ||
-          recordStateParam === 'edited' ||
-          recordStateParam === 'reviewed' ||
-          recordStateParam === 'completed'
-            ? recordStateParam
-            : null;
-
-        this.page.set(isNaN(p) || p < 1 ? 1 : p);
-        this.pageSize.set(normalizedPageSize);
-        this.searchQuery.set(search);
-        this.sortBy.set(normalizedSortBy);
-        this.sortDir.set(normalizedSortOrder);
-        this.processState.set(normalizedProcessState);
-        this.recordState.set(normalizedRecordState);
-
-        if (this.searchInput() !== search) {
-          this.searchInput.set(search);
-        }
-
-        this.load();
-      });
-
-    toObservable(this.searchInput)
-      .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed())
-      .subscribe((value) => {
-        const normalized = value.trim();
-
-        if (normalized === this.searchQuery()) return;
-
-        this.navigateWithQuery({
-          page: 1,
-          search: normalized || null,
-        });
-      });
+    this.tableState.connect();
   }
 
   ngOnDestroy() {
@@ -298,18 +331,7 @@ export class BooksListComponent {
   }
 
   setSort(column: 'created_at' | 'modified_at') {
-    const nextDir =
-      this.sortBy() === column
-        ? this.sortDir() === 'asc'
-          ? 'desc'
-          : 'asc'
-        : 'desc';
-
-    this.navigateWithQuery({
-      page: 1,
-      sort_by: column,
-      sort_order: nextDir,
-    });
+    this.tableState.setSort(column);
   }
 
   load() {
@@ -352,18 +374,15 @@ export class BooksListComponent {
   }
 
   goToPage(page: number) {
-    if (page < 1 || page > this.totalPages() || page === this.page()) return;
-    this.navigateWithQuery({ page });
+    this.tableState.goToPage(page);
   }
 
   goPrevPage() {
-    if (!this.hasPrev()) return;
-    this.navigateWithQuery({ page: this.page() - 1 });
+    this.tableState.goPrevPage();
   }
 
   goNextPage() {
-    if (!this.hasNext()) return;
-    this.navigateWithQuery({ page: this.page() + 1 });
+    this.tableState.goNextPage();
   }
 
   navigateWithQuery(partial: {
@@ -375,124 +394,7 @@ export class BooksListComponent {
     process_state?: ProcessState | null;
     record_state?: RecordState | null;
   }) {
-    const search =
-      partial.search !== undefined ? partial.search : this.searchQuery();
-
-    const processState =
-      partial.process_state !== undefined
-        ? partial.process_state
-        : this.processState();
-
-    const recordState =
-      partial.record_state !== undefined
-        ? partial.record_state
-        : this.recordState();
-
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: {
-        page: partial.page ?? this.page(),
-        page_size: partial.page_size ?? this.pageSize(),
-        search: search || null,
-        sort_by: partial.sort_by ?? this.sortBy(),
-        sort_order: partial.sort_order ?? this.sortDir(),
-        process_state: processState || null,
-        record_state: recordState || null,
-      },
-      queryParamsHandling: 'merge',
-    });
-  }
-
-  processStateBadgeClass(state: ProcessState) {
-    switch (state) {
-      case 'created':
-        return 'bg-cyan-500/10 text-[#011934]';
-      case 'scheduled':
-        return 'bg-amber-500/10 text-[#4A3200]';
-      case 'in_progress':
-        return 'bg-orange-500/10 text-[#362000]';
-      case 'ready':
-        return 'bg-indigo-500/10 text-[#1D185A]';
-      case 'failed':
-        return 'bg-red-500/10 text-[#390400]';
-      case 'completed':
-        return 'bg-green-500/10 text-[#00310D]';
-    }
-  }
-
-  processStateBadgeIconClass(state: ProcessState) {
-    switch (state) {
-      case 'created':
-        return 'icon-link';
-      case 'scheduled':
-        return 'fill-amber-500';
-      case 'in_progress':
-        return 'icon-warning';
-      case 'ready':
-        return 'fill-indigo-500';
-      case 'failed':
-        return 'icon-error';
-      case 'completed':
-        return 'icon-success';
-    }
-  }
-
-  processStateBadgeIconName(state: ProcessState) {
-    switch (state) {
-      case 'created':
-        return 'document';
-      case 'scheduled':
-        return 'timer';
-      case 'in_progress':
-        return 'refresh';
-      case 'ready':
-        return 'clipboardTick';
-      case 'failed':
-        return 'shieldError';
-      case 'completed':
-        return 'checkCircleEmpty';
-    }
-  }
-
-  recordStateBadgeClass(state?: RecordState | null) {
-    switch (state) {
-      case 'new':
-        return 'bg-cyan-500/10 text-[#011934]';
-      case 'edited':
-        return 'bg-orange-500/10 text-[#362000]';
-      case 'reviewed':
-        return 'bg-indigo-500/10 text-[#1D185A]';
-      case 'completed':
-        return 'bg-green-500/10 text-[#00310D]';
-      default:
-        return 'bg-slate-100 text-slate-600';
-    }
-  }
-
-  recordStateBadgeIconClass(state: RecordState) {
-    switch (state) {
-      case 'new':
-        return 'icon-link';
-      case 'edited':
-        return 'icon-warning';
-      case 'reviewed':
-        return 'fill-indigo-500';
-      case 'completed':
-        return 'icon-success';
-    }
-  }
-
-  recordStateBadgeIconName(state: RecordState) {
-    switch (state) {
-      case 'new':
-        return 'document';
-      case 'edited':
-        return 'editUnderline';
-      case 'reviewed':
-        return 'clipboardTick';
-      case 'completed':
-        return 'checkCircleEmpty';
-    }
+    this.tableState.navigateWithQuery(partial);
   }
 
   open(book: PaginatedBooksResponseDto['books'][number]) {
@@ -652,6 +554,16 @@ export class BooksListComponent {
         b.book_id === bookId ? { ...b, ...patch } : b,
       ),
     });
+  }
+
+  recordStateBadgeAppearance(
+    book: PaginatedBooksResponseDto['books'][number],
+  ): TableStateBadgeAppearance {
+    if (book.process_state !== 'completed') {
+      return this.defaultRecordStateBadgeAppearance;
+    }
+
+    return this.recordStateBadgeAppearances[book.record_state];
   }
 
   setProcessStateFilter(state: string | null) {
