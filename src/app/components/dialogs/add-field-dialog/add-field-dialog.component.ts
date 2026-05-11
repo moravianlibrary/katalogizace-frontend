@@ -9,7 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
-import { IconComponent } from '../icon/icon.component';
+import { IconComponent } from '../../icon/icon.component';
 
 export type AddFieldDialogResult = {
   tag: string;

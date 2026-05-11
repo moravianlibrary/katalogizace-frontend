@@ -22,7 +22,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import {
   AddFieldDialogComponent,
   AddFieldDialogResult,
-} from '../add-field-dialog/add-field-dialog.component';
+} from '../dialogs/add-field-dialog/add-field-dialog.component';
 import { EditableMarcRecordTableComponent } from '../marc-record-table/editable-marc-record-table/editable-marc-record-table.component';
 import { MainPanelHeaderComponent } from './main-panel-header/main-panel-header.component';
 
