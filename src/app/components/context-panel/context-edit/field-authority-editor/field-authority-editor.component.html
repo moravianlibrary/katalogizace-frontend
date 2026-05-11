@@ -526,66 +526,19 @@
         <div
           class="border-bright flex shrink-0 justify-between gap-3 border-t p-4"
         >
-          <div class="flex items-center justify-between gap-6">
-            <div class="text-light text-md text-nowrap">
-              {{ from() }}-{{ to() }} / {{ total() }}
-            </div>
-
-            <div class="flex items-center gap-5">
-              <div class="flex items-center gap-2">
-                @for (item of visiblePages(); track $index) {
-                  @if (item === "ellipsis-left" || item === "ellipsis-right") {
-                    <span
-                      class="text-base-color flex h-10 min-w-8 shrink-0 items-center justify-center"
-                    >
-                      ...
-                    </span>
-                  } @else {
-                    <button
-                      class="btn btn-m shrink-0"
-                      [ngClass]="
-                        item === page() ? 'btn-primary' : 'btn-tertiary'
-                      "
-                      (click)="goToPage(item)"
-                      type="button"
-                    >
-                      {{ item }}
-                    </button>
-                  }
-                }
-              </div>
-
-              <div class="flex items-center gap-2">
-                <button
-                  class="btn btn-m btn-tertiary btn-icon group"
-                  [disabled]="!hasPrev()"
-                  (click)="goPrevPage()"
-                  type="button"
-                >
-                  <svg
-                    class="icon-tertiary"
-                    appIcon="arrowLeft"
-                    width="16"
-                    height="16"
-                  ></svg>
-                </button>
-
-                <button
-                  class="btn btn-m btn-tertiary btn-icon group"
-                  [disabled]="!hasNext()"
-                  (click)="goNextPage()"
-                  type="button"
-                >
-                  <svg
-                    class="icon-tertiary"
-                    appIcon="arrowRight"
-                    width="16"
-                    height="16"
-                  ></svg>
-                </button>
-              </div>
-            </div>
-          </div>
+          <app-table-pagination
+            [containerClass]="'flex items-center gap-6'"
+            [from]="from()"
+            [hasNext]="hasNext()"
+            [hasPrev]="hasPrev()"
+            [page]="page()"
+            [to]="to()"
+            [total]="total()"
+            [visiblePages]="visiblePages()"
+            (next)="goNextPage()"
+            (pageChange)="goToPage($event)"
+            (prev)="goPrevPage()"
+          />
 
           <div class="flex gap-3">
             <button

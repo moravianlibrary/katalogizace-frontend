@@ -15,6 +15,7 @@ import {
   type UserDialogPasswordGenerated,
 } from '../dialogs/user-dialog/user-dialog.component';
 import { IconComponent } from '../icon/icon.component';
+import { TableSearchInputComponent } from '../shared/table-search-input/table-search-input.component';
 import { UserBatchesCellComponent } from '../user-batches-cell/user-batches-cell.component';
 
 @Component({
@@ -23,6 +24,7 @@ import { UserBatchesCellComponent } from '../user-batches-cell/user-batches-cell
   imports: [
     TranslateModule,
     IconComponent,
+    TableSearchInputComponent,
     UserBatchesCellComponent,
     GeneratedPasswordDialogComponent,
     UserDialogComponent,
@@ -84,10 +86,6 @@ export class UsersListComponent {
           );
         },
       });
-  }
-
-  onSearchInput(event: Event) {
-    this.searchInput.set((event.target as HTMLInputElement).value);
   }
 
   openCreate() {

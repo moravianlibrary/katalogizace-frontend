@@ -26,6 +26,8 @@ import {
   TableFilterMenuComponent,
   type TableFilterOption,
 } from '../shared/table-filter-menu/table-filter-menu.component';
+import { TablePaginationComponent } from '../shared/table-pagination/table-pagination.component';
+import { TableSearchInputComponent } from '../shared/table-search-input/table-search-input.component';
 
 type VisiblePageItem = number | 'ellipsis-left' | 'ellipsis-right';
 
@@ -41,6 +43,8 @@ type VisiblePageItem = number | 'ellipsis-left' | 'ellipsis-right';
     TranslateModule,
     IconComponent,
     TableFilterMenuComponent,
+    TablePaginationComponent,
+    TableSearchInputComponent,
   ],
   templateUrl: 'books-list.component.html',
 })
@@ -360,10 +364,6 @@ export class BooksListComponent {
   goNextPage() {
     if (!this.hasNext()) return;
     this.navigateWithQuery({ page: this.page() + 1 });
-  }
-
-  onSearchInput(event: Event) {
-    this.searchInput.set((event.target as HTMLInputElement).value);
   }
 
   navigateWithQuery(partial: {

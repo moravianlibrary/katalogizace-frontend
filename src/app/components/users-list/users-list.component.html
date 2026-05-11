@@ -16,20 +16,11 @@
       </button>
     }
 
-    <div class="relative w-full sm:w-96">
-      <svg
-        class="icon-tertiary pointer-events-none absolute top-1/2 left-4 -translate-y-1/2"
-        appIcon="search"
-        width="16"
-        height="16"
-      ></svg>
-
-      <input
-        class="border-tertiary-default bg-main-base focus:border-primary-default text-secondary h-12 w-full rounded-lg border pr-4 pl-10 outline-none"
+    <div class="w-full sm:w-96">
+      <app-table-search-input
         [value]="searchInput()"
-        [placeholder]="'users.search' | translate"
-        (input)="onSearchInput($event)"
-        type="text"
+        (valueChange)="searchInput.set($event)"
+        placeholderKey="users.search"
       />
     </div>
   </div>

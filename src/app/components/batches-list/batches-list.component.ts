@@ -32,6 +32,8 @@ import {
   TableFilterMenuComponent,
   type TableFilterOption,
 } from '../shared/table-filter-menu/table-filter-menu.component';
+import { TablePaginationComponent } from '../shared/table-pagination/table-pagination.component';
+import { TableSearchInputComponent } from '../shared/table-search-input/table-search-input.component';
 
 type VisiblePageItem = number | 'ellipsis-left' | 'ellipsis-right';
 
@@ -47,6 +49,8 @@ type VisiblePageItem = number | 'ellipsis-left' | 'ellipsis-right';
     IconComponent,
     BatchEditDialogComponent,
     TableFilterMenuComponent,
+    TablePaginationComponent,
+    TableSearchInputComponent,
   ],
   templateUrl: './batches-list.component.html',
 })
@@ -294,10 +298,6 @@ export class BatchesListComponent {
   goNextPage() {
     if (!this.hasNext()) return;
     this.navigateWithQuery({ page: this.page() + 1 });
-  }
-
-  onSearchInput(event: Event) {
-    this.searchInput.set((event.target as HTMLInputElement).value);
   }
 
   navigateWithQuery(partial: {

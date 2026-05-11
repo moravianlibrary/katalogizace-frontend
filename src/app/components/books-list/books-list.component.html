@@ -45,20 +45,11 @@
       }
     </div>
 
-    <div class="relative w-full sm:w-78">
-      <svg
-        class="icon-tertiary pointer-events-none absolute top-1/2 left-4 -translate-y-1/2"
-        appIcon="search"
-        width="16"
-        height="16"
-      ></svg>
-
-      <input
-        class="border-tertiary-default bg-main-base focus:border-primary-default text-secondary h-12 w-full rounded-lg border pr-4 pl-10 outline-none"
+    <div class="w-full sm:w-78">
+      <app-table-search-input
         [value]="searchInput()"
-        [placeholder]="'books.search' | translate"
-        (input)="onSearchInput($event)"
-        type="text"
+        (valueChange)="searchInput.set($event)"
+        placeholderKey="books.search"
       />
     </div>
   </div>
@@ -332,65 +323,19 @@
       </table>
     </div>
 
-    <div class="flex shrink-0 items-center justify-between gap-4 pt-4">
-      <div class="text-light text-md text-nowrap">
-        {{ from() }}-{{ to() }} / {{ data()?.total ?? 0 }}
-      </div>
-
-      <div class="flex items-center gap-5">
-        @if ((data()?.total ?? 0) > 0) {
-          <div class="flex items-center gap-2">
-            @for (item of visiblePages(); track $index) {
-              @if (item === "ellipsis-left" || item === "ellipsis-right") {
-                <span
-                  class="text-base-color flex h-10 min-w-8 shrink-0 items-center justify-center"
-                >
-                  ...
-                </span>
-              } @else {
-                <button
-                  class="btn btn-m shrink-0"
-                  [ngClass]="item === page() ? 'btn-primary' : 'btn-tertiary'"
-                  (click)="goToPage(item)"
-                  type="button"
-                >
-                  {{ item }}
-                </button>
-              }
-            }
-          </div>
-        }
-
-        <div class="flex items-center gap-2">
-          <button
-            class="btn btn-m btn-tertiary btn-icon group"
-            [disabled]="!hasPrev()"
-            (click)="goPrevPage()"
-            type="button"
-          >
-            <svg
-              class="icon-tertiary"
-              appIcon="arrowLeft"
-              width="16"
-              height="16"
-            ></svg>
-          </button>
-
-          <button
-            class="btn btn-m btn-tertiary btn-icon group"
-            [disabled]="!hasNext()"
-            (click)="goNextPage()"
-            type="button"
-          >
-            <svg
-              class="icon-tertiary"
-              appIcon="arrowRight"
-              width="16"
-              height="16"
-            ></svg>
-          </button>
-        </div>
-      </div>
+    <div class="shrink-0 pt-4">
+      <app-table-pagination
+        [from]="from()"
+        [hasNext]="hasNext()"
+        [hasPrev]="hasPrev()"
+        [page]="page()"
+        [to]="to()"
+        [total]="data()?.total ?? 0"
+        [visiblePages]="visiblePages()"
+        (next)="goNextPage()"
+        (pageChange)="goToPage($event)"
+        (prev)="goPrevPage()"
+      />
     </div>
   </div>
 </section>
