@@ -9,6 +9,7 @@ import { BreadcrumbsService } from '@/app/services/breadcrumbs.service';
 import { ConfirmDialogService } from '@/app/services/confirm-dialog.service';
 import { PermissionsService } from '@/app/services/permissions.service';
 import { ToastService } from '@/app/services/toast.service';
+import { GeneratedPasswordDialogComponent } from '../dialogs/generated-password-dialog/generated-password-dialog.component';
 import {
   UserDialogComponent,
   type UserDialogPasswordGenerated,
@@ -23,6 +24,7 @@ import { UserBatchesCellComponent } from '../user-batches-cell/user-batches-cell
     TranslateModule,
     IconComponent,
     UserBatchesCellComponent,
+    GeneratedPasswordDialogComponent,
     UserDialogComponent,
   ],
   templateUrl: './users-list.component.html',
@@ -50,14 +52,8 @@ export class UsersListComponent {
   editDialogOpen = signal(false);
 
   generatedPassword = signal('');
-  resetPasswordDialogLocked = signal(false);
   resetPasswordDialogOpen = signal(false);
   readonly passwordDialogTitleKey = signal('users.new_password');
-
-  private resetPasswordCloseTimer: ReturnType<typeof setTimeout> | null = null;
-
-  readonly passwordCopied = signal(false);
-  private passwordCopiedTimeout: ReturnType<typeof setTimeout> | null = null;
 
   readonly canManageUsers = computed(() => this.permissions.canManageUsers());
 
@@ -209,75 +205,14 @@ export class UsersListComponent {
     });
   });
 
-  private openResetPasswordDialog() {
-    this.clearResetPasswordCloseTimer();
-
-    this.resetPasswordDialogLocked.set(true);
-    this.resetPasswordDialogOpen.set(true);
-
-    this.resetPasswordCloseTimer = setTimeout(() => {
-      this.resetPasswordDialogLocked.set(false);
-      this.resetPasswordCloseTimer = null;
-    }, 3000);
-  }
-
   closeResetPasswordDialog() {
-    if (this.resetPasswordDialogLocked()) return;
-
     this.resetPasswordDialogOpen.set(false);
-
-    this.clearPasswordCopiedState();
     this.generatedPassword.set('');
-    this.clearResetPasswordCloseTimer();
-  }
-
-  async copyGeneratedPassword() {
-    try {
-      await navigator.clipboard.writeText(this.generatedPassword());
-
-      this.passwordCopied.set(true);
-
-      if (this.passwordCopiedTimeout) {
-        clearTimeout(this.passwordCopiedTimeout);
-      }
-
-      this.passwordCopiedTimeout = setTimeout(() => {
-        this.passwordCopied.set(false);
-        this.passwordCopiedTimeout = null;
-      }, 5000);
-    } catch {
-      this.clearPasswordCopiedState();
-    }
-  }
-
-  private clearPasswordCopiedState() {
-    if (this.passwordCopiedTimeout) {
-      clearTimeout(this.passwordCopiedTimeout);
-      this.passwordCopiedTimeout = null;
-    }
-
-    this.passwordCopied.set(false);
-  }
-
-  private clearResetPasswordCloseTimer() {
-    if (this.resetPasswordCloseTimer) {
-      clearTimeout(this.resetPasswordCloseTimer);
-      this.resetPasswordCloseTimer = null;
-    }
-
-    this.resetPasswordDialogLocked.set(false);
   }
 
   onPasswordGenerated(event: UserDialogPasswordGenerated) {
     this.generatedPassword.set(event.password);
     this.passwordDialogTitleKey.set(event.titleKey);
-    this.openResetPasswordDialog();
-  }
-
-  onResetPasswordEscape() {
-    if (!this.resetPasswordDialogOpen()) return;
-    if (this.resetPasswordDialogLocked()) return;
-
-    this.closeResetPasswordDialog();
+    this.resetPasswordDialogOpen.set(true);
   }
 }
