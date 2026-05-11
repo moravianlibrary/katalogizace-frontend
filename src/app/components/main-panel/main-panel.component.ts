@@ -27,7 +27,7 @@ import { EditableMarcRecordTableComponent } from '../marc-record-table/editable-
 import { MainPanelHeaderComponent } from './main-panel-header/main-panel-header.component';
 
 import { toMarcxml } from '@/app/utils/marcxml-export';
-import { ExportMarcxmlDialogComponent } from '../export-marcxml-dialog/export-marcxml-dialog.component';
+import { ExportMarcxmlDialogComponent } from '../dialogs/export-marcxml-dialog/export-marcxml-dialog.component';
 
 @Component({
   standalone: true,
