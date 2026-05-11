@@ -28,7 +28,12 @@
                       class="block max-w-full min-w-0 truncate"
                       #rla="routerLinkActive"
                       [routerLink]="crumb.url"
-                      [routerLinkActiveOptions]="{ exact: true }"
+                      [routerLinkActiveOptions]="{
+                        paths: 'exact',
+                        queryParams: 'ignored',
+                        fragment: 'ignored',
+                        matrixParams: 'ignored',
+                      }"
                       [ngClass]="
                         !rla.isActive ? 'text-light hover:text-secondary' : ''
                       "
@@ -231,7 +236,12 @@
                         class="block max-w-full min-w-0 truncate"
                         #rla="routerLinkActive"
                         [routerLink]="crumb.url"
-                        [routerLinkActiveOptions]="{ exact: true }"
+                        [routerLinkActiveOptions]="{
+                          paths: 'exact',
+                          queryParams: 'ignored',
+                          fragment: 'ignored',
+                          matrixParams: 'ignored',
+                        }"
                         [ngClass]="
                           !rla.isActive ? 'text-light hover:text-secondary' : ''
                         "
