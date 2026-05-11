@@ -32,17 +32,17 @@ import {
 } from '../../utils/table-query-state.util';
 import { BatchEditDialogComponent } from '../dialogs/batch-edit-dialog/batch-edit-dialog.component';
 import { IconComponent } from '../icon/icon.component';
-import { SortableTableHeaderComponent } from '../shared/sortable-table-header/sortable-table-header.component';
+import { SortableTableHeaderComponent } from '../shared/table/sortable-table-header/sortable-table-header.component';
 import {
   TableFilterMenuComponent,
   type TableFilterOption,
-} from '../shared/table-filter-menu/table-filter-menu.component';
-import { TablePaginationComponent } from '../shared/table-pagination/table-pagination.component';
-import { TableSearchInputComponent } from '../shared/table-search-input/table-search-input.component';
+} from '../shared/table/table-filter-menu/table-filter-menu.component';
+import { TablePaginationComponent } from '../shared/table/table-pagination/table-pagination.component';
+import { TableSearchInputComponent } from '../shared/table/table-search-input/table-search-input.component';
 import {
   type TableStateBadgeAppearance,
   TableStateBadgeComponent,
-} from '../shared/table-state-badge/table-state-badge.component';
+} from '../shared/table/table-state-badge/table-state-badge.component';
 
 const BATCH_STATE_BADGE_APPEARANCES = {
   created: {
@@ -64,7 +64,7 @@ const BATCH_STATE_BADGE_APPEARANCES = {
 
 @Component({
   standalone: true,
-  selector: 'app-batches-list',
+  selector: 'app-batches-page',
   imports: [
     DatePipe,
     RouterModule,
@@ -79,9 +79,9 @@ const BATCH_STATE_BADGE_APPEARANCES = {
     TableSearchInputComponent,
     SortableTableHeaderComponent,
   ],
-  templateUrl: './batches-list.component.html',
+  templateUrl: './batches-page.component.html',
 })
-export class BatchesListComponent {
+export class BatchesPageComponent {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private batches = inject(BatchesService);

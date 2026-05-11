@@ -15,12 +15,12 @@ import {
   type UserDialogPasswordGenerated,
 } from '../dialogs/user-dialog/user-dialog.component';
 import { IconComponent } from '../icon/icon.component';
-import { TableSearchInputComponent } from '../shared/table-search-input/table-search-input.component';
+import { TableSearchInputComponent } from '../shared/table/table-search-input/table-search-input.component';
 import { UserBatchesCellComponent } from '../user-batches-cell/user-batches-cell.component';
 
 @Component({
   standalone: true,
-  selector: 'app-users-list',
+  selector: 'app-users-page',
   imports: [
     TranslateModule,
     IconComponent,
@@ -29,9 +29,9 @@ import { UserBatchesCellComponent } from '../user-batches-cell/user-batches-cell
     GeneratedPasswordDialogComponent,
     UserDialogComponent,
   ],
-  templateUrl: './users-list.component.html',
+  templateUrl: './users-page.component.html',
 })
-export class UsersListComponent {
+export class UsersPageComponent {
   private users = inject(UsersService);
   private destroyRef = inject(DestroyRef);
   private toast = inject(ToastService);

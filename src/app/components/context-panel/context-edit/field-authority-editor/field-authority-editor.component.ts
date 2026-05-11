@@ -9,7 +9,7 @@ import { InputDropdownComponent } from '@/app/components/inputs/input-dropdown/i
 import { InputStaticAutocompleteComponent } from '@/app/components/inputs/input-static-autocomplete/input-static-autocomplete.component';
 import { ExistingMarcRecordTableComponent } from '@/app/components/marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
 import { LockHoverIconComponent } from '@/app/components/shared/lock-hover-icon/lock-hover-icon.component';
-import { TablePaginationComponent } from '@/app/components/shared/table-pagination/table-pagination.component';
+import { TablePaginationComponent } from '@/app/components/shared/table/table-pagination/table-pagination.component';
 import {
   AutocompletAuthorityResponse,
   DATA_FIELD_RULES,

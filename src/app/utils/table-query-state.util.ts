@@ -9,7 +9,7 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { combineLatest, debounceTime, distinctUntilChanged } from 'rxjs';
 
-import { TablePaginationItem } from '../components/shared/table-pagination/table-pagination.component';
+import { TablePaginationItem } from '../components/shared/table/table-pagination/table-pagination.component';
 
 type QueryParamValue = string | number | boolean | null | undefined;
 

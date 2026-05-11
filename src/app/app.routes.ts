@@ -6,13 +6,13 @@ import { LoginComponent } from './components/login/login.component';
 
 import { BookCaptureComponent } from './components/book-capture/book-capture.component';
 import { BookDetailComponent } from './components/book-detail/book-detail.component';
-import { BooksListComponent } from './components/books-list/books-list.component';
+import { BooksPageComponent } from './components/books-page/books-page.component';
 
-import { BatchesListComponent } from './components/batches-list/batches-list.component';
+import { BatchesPageComponent } from './components/batches-page/batches-page.component';
 import { ForbiddenComponent } from './components/forbidden/forbidden.component';
 import { ProtectedLayoutComponent } from './components/layout/protected-layout/protected-layout.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
-import { UsersListComponent } from './components/users-list/users-list.component';
+import { UsersPageComponent } from './components/users-page/users-page.component';
 import { adminGuard } from './guards/admin.guard';
 import { batchPermissionGuard } from './guards/batch-permission.guard';
 import { captureExitGuard } from './guards/capture-exit.guard';
@@ -42,7 +42,7 @@ export const routes: Routes = [
     children: [
       {
         path: 'users',
-        component: UsersListComponent,
+        component: UsersPageComponent,
         canActivate: [adminGuard],
         data: {
           backTo: '/batches',
@@ -50,12 +50,12 @@ export const routes: Routes = [
       },
       {
         path: 'batches',
-        component: BatchesListComponent,
+        component: BatchesPageComponent,
         data: { backTo: null },
       },
       {
         path: 'batches/:batchId/books',
-        component: BooksListComponent,
+        component: BooksPageComponent,
         canActivate: [batchPermissionGuard],
         data: {
           backTo: '/batches',

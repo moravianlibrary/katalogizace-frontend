@@ -32,17 +32,17 @@ import {
   type TableSortDirection,
 } from '../../utils/table-query-state.util';
 import { IconComponent } from '../icon/icon.component';
-import { SortableTableHeaderComponent } from '../shared/sortable-table-header/sortable-table-header.component';
+import { SortableTableHeaderComponent } from '../shared/table/sortable-table-header/sortable-table-header.component';
 import {
   TableFilterMenuComponent,
   type TableFilterOption,
-} from '../shared/table-filter-menu/table-filter-menu.component';
-import { TablePaginationComponent } from '../shared/table-pagination/table-pagination.component';
-import { TableSearchInputComponent } from '../shared/table-search-input/table-search-input.component';
+} from '../shared/table/table-filter-menu/table-filter-menu.component';
+import { TablePaginationComponent } from '../shared/table/table-pagination/table-pagination.component';
+import { TableSearchInputComponent } from '../shared/table/table-search-input/table-search-input.component';
 import {
   type TableStateBadgeAppearance,
   TableStateBadgeComponent,
-} from '../shared/table-state-badge/table-state-badge.component';
+} from '../shared/table/table-state-badge/table-state-badge.component';
 
 const PROCESS_STATE_BADGE_APPEARANCES = {
   created: {
@@ -106,7 +106,7 @@ const DEFAULT_RECORD_STATE_BADGE_APPEARANCE = {
 
 @Component({
   standalone: true,
-  selector: 'app-books-list',
+  selector: 'app-books-page',
   imports: [
     NgClass,
     DatePipe,
@@ -121,9 +121,9 @@ const DEFAULT_RECORD_STATE_BADGE_APPEARANCE = {
     TableSearchInputComponent,
     SortableTableHeaderComponent,
   ],
-  templateUrl: 'books-list.component.html',
+  templateUrl: 'books-page.component.html',
 })
-export class BooksListComponent {
+export class BooksPageComponent {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private books = inject(BooksService);

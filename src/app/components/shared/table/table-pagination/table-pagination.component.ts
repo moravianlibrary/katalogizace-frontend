@@ -1,7 +1,7 @@
 import { NgClass } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 
-import { IconComponent } from '../../icon/icon.component';
+import { IconComponent } from '../../../icon/icon.component';
 
 export type TablePaginationItem = number | 'ellipsis-left' | 'ellipsis-right';
 

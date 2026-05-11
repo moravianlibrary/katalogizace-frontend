@@ -2,8 +2,8 @@ import { NgClass } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
 
-import { TableSortDirection } from '../../../utils/table-query-state.util';
-import { IconComponent } from '../../icon/icon.component';
+import { TableSortDirection } from '@/app/utils/table-query-state.util';
+import { IconComponent } from '../../../icon/icon.component';
 
 @Component({
   standalone: true,
