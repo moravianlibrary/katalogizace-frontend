@@ -22,7 +22,7 @@
   @apply
     px-3
     py-2
-    text-sm
+    text-sm-tight
     gap-2;
   line-height: var(--text-sm-tight--line-height);
 }
