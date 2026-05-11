@@ -5,36 +5,20 @@ import {
   DestroyRef,
   ElementRef,
   inject,
-  QueryList,
   signal,
   ViewChild,
-  ViewChildren,
 } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import {
-  combineLatest,
-  debounceTime,
-  distinctUntilChanged,
-  forkJoin,
-  Observable,
-  of,
-  switchMap,
-} from 'rxjs';
+import { combineLatest, debounceTime, distinctUntilChanged } from 'rxjs';
 
 import {
   BatchDto,
-  BatchMemberPermissionRequest,
   BatchState,
-  EditableBatchMember,
   ID,
   PaginatedBatchesResponseDto,
-  Permission,
-  UserInfoDto,
 } from '@/app/models';
-import { AppIconName } from '@/app/models/shared/icon.model';
 import { AuthService } from '@/app/services/api/auth.service';
-import { UsersService } from '@/app/services/api/users.service';
 import { BreadcrumbsService } from '@/app/services/breadcrumbs.service';
 import { ConfirmDialogService } from '@/app/services/confirm-dialog.service';
 import { PermissionsService } from '@/app/services/permissions.service';
@@ -42,6 +26,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BatchStateLabelPipe } from '../../pipes/batch-state-label.pipe';
 import { BatchesService } from '../../services/api/batches.service';
 import { ToastService } from '../../services/toast.service';
+import { BatchEditDialogComponent } from '../dialogs/batch-edit-dialog/batch-edit-dialog.component';
 import { IconComponent } from '../icon/icon.component';
 import {
   TableFilterMenuComponent,
@@ -60,6 +45,7 @@ type VisiblePageItem = number | 'ellipsis-left' | 'ellipsis-right';
     BatchStateLabelPipe,
     TranslateModule,
     IconComponent,
+    BatchEditDialogComponent,
     TableFilterMenuComponent,
   ],
   templateUrl: './batches-list.component.html',
@@ -74,7 +60,6 @@ export class BatchesListComponent {
   private translate = inject(TranslateService);
   private permissions = inject(PermissionsService);
   private auth = inject(AuthService);
-  private users = inject(UsersService);
   private confirmDialog = inject(ConfirmDialogService);
 
   loading = signal(false);
@@ -98,37 +83,7 @@ export class BatchesListComponent {
   createDialogOpen = signal(false);
 
   editingBatch = signal<BatchDto | null>(null);
-  editName = signal('');
-  editDescription = signal('');
-  savingEdit = signal(false);
   editDialogOpen = signal(false);
-
-  editMembers = signal<EditableBatchMember[]>([]);
-  originalEditMembers = signal<BatchMemberPermissionRequest[]>([]);
-
-  allUsers = signal<UserInfoDto[]>([]);
-  loadingUsersInfo = signal(false);
-  loadingBatchMembers = signal(false);
-
-  userSearchInput = signal('');
-  userPickerOpen = signal(false);
-  selectedUserId = signal<number | null>(null);
-
-  userActiveIndex = signal(0);
-
-  @ViewChildren('userOption')
-  userOptions!: QueryList<ElementRef<HTMLButtonElement>>;
-
-  readonly permissionOptions: {
-    value: Permission;
-    icon: AppIconName;
-  }[] = [
-    { value: 'read', icon: 'book' },
-    { value: 'write', icon: 'edit' },
-    { value: 'delete', icon: 'trash' },
-    { value: 'export', icon: 'export' },
-    { value: 'edit', icon: 'settings' },
-  ];
 
   batchState = signal<BatchState | null>(null);
 
@@ -180,48 +135,6 @@ export class BatchesListComponent {
     ];
   });
 
-  edited = computed(() => {
-    const batch = this.editingBatch();
-    if (!batch) return false;
-
-    const metadataChanged =
-      this.editName().trim() !== (batch.name ?? '').trim() ||
-      this.editDescription().trim() !== (batch.description ?? '').trim();
-
-    const membersChanged = !this.memberPermissionListsEqual(
-      this.effectiveEditMembers(),
-      this.originalEditMembers(),
-    );
-
-    return metadataChanged || membersChanged;
-  });
-
-  readonly selectedUser = computed(() => {
-    const selectedId = this.selectedUserId();
-    if (selectedId == null) return null;
-
-    return this.allUsers().find((user) => user.id === selectedId) ?? null;
-  });
-
-  readonly availableUsers = computed(() => {
-    const q = this.userSearchInput().trim().toLowerCase();
-    const selectedIds = new Set(this.editMembers().map((m) => m.user_id));
-
-    return this.allUsers()
-      .filter((user) => !selectedIds.has(user.id))
-      .filter((user) => {
-        if (!q) return true;
-
-        return (
-          user.full_name.toLowerCase().includes(q) ||
-          user.email.toLowerCase().includes(q)
-        );
-      })
-      .slice(0, 20);
-  });
-
-  readonly editMemberRows = computed(() => this.editMembers());
-
   rows = computed<BatchDto[]>(() => {
     return this.data()?.batches ?? [];
   });
@@ -232,9 +145,6 @@ export class BatchesListComponent {
     { value: 'in_progress', labelKey: 'labels.batchState.in_progress' },
     { value: 'completed', labelKey: 'labels.batchState.completed' },
   ];
-
-  @ViewChild('editNameInput')
-  editNameInput?: ElementRef<HTMLInputElement>;
 
   @ViewChild('createNameInput')
   createNameInput?: ElementRef<HTMLInputElement>;
@@ -587,14 +497,6 @@ export class BatchesListComponent {
     }
   }
 
-  onEditNameInput(event: Event) {
-    this.editName.set((event.target as HTMLInputElement).value);
-  }
-
-  onEditDescriptionInput(event: Event) {
-    this.editDescription.set((event.target as HTMLInputElement).value);
-  }
-
   openEdit(b: BatchDto, event: MouseEvent) {
     event.stopPropagation();
     event.preventDefault();
@@ -605,111 +507,12 @@ export class BatchesListComponent {
     }
 
     this.editingBatch.set(b);
-    this.editName.set((b.name ?? '').trim());
-    this.editDescription.set((b.description ?? '').trim());
-
-    this.editMembers.set([]);
-    this.originalEditMembers.set([]);
-
-    this.userSearchInput.set('');
-    this.selectedUserId.set(null);
-    this.userPickerOpen.set(false);
-
-    this.loadUsersInfo(true);
-    this.loadBatchMembers(b.batch_id);
-
     this.editDialogOpen.set(true);
-
-    setTimeout(() => {
-      this.editNameInput?.nativeElement.focus();
-    });
   }
 
   closeEdit() {
     this.editDialogOpen.set(false);
-
     this.editingBatch.set(null);
-    this.editName.set('');
-    this.editDescription.set('');
-    this.editMembers.set([]);
-    this.originalEditMembers.set([]);
-
-    this.userSearchInput.set('');
-    this.selectedUserId.set(null);
-    this.userPickerOpen.set(false);
-
-    this.savingEdit.set(false);
-  }
-
-  onEditEscape() {
-    if (!this.editDialogOpen()) return;
-
-    if (this.userPickerOpen()) {
-      this.closeUserPicker();
-      return;
-    }
-
-    this.closeEdit();
-  }
-
-  saveEdit() {
-    const b = this.editingBatch();
-    if (!b || this.savingEdit()) return;
-
-    if (!this.canEditBatch(b.batch_id)) {
-      this.showForbidden();
-      return;
-    }
-
-    const name = this.editName().trim();
-    const descRaw = this.editDescription().trim();
-    const description: string | null = descRaw ? descRaw : null;
-
-    if (!name) {
-      this.toast.show(
-        this.translate.instant('messages.warning.batches.edit_empty_name'),
-        'warning',
-      );
-      return;
-    }
-
-    this.savingEdit.set(true);
-
-    this.batches
-      .updateBatch(b.batch_id.toString(), {
-        name,
-        description,
-        state: b.state,
-      })
-      .pipe(switchMap(() => this.syncBatchMembers(b.batch_id)))
-      .subscribe({
-        next: () => {
-          this.toast.show(
-            this.translate.instant('messages.success.batches.edit'),
-            'success',
-          );
-
-          this.closeEdit();
-          this.load();
-          this.auth.loadCurrentUser().subscribe({
-            error: (err) => {
-              console.error(err);
-              this.toast.show(
-                this.translate.instant('messages.error.auth.user_load'),
-                'error',
-              );
-            },
-          });
-        },
-        error: (err) => {
-          console.error(err);
-          this.toast.show(
-            this.translate.instant('messages.error.batches.save'),
-            'error',
-          );
-          this.savingEdit.set(false);
-        },
-      });
   }
 
   openCreate() {
@@ -734,373 +537,5 @@ export class BatchesListComponent {
     this.newName.set('');
     this.newDescription.set('');
     this.creating.set(false);
-  }
-
-  private loadUsersInfo(force = false) {
-    if (!force && (this.allUsers().length > 0 || this.loadingUsersInfo())) {
-      return;
-    }
-
-    this.loadingUsersInfo.set(true);
-
-    this.users
-      .listUsers('basic')
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (users) => {
-          this.allUsers.set(users);
-          this.loadingUsersInfo.set(false);
-        },
-        error: (err) => {
-          console.error(err);
-          this.loadingUsersInfo.set(false);
-          this.toast.show(
-            this.translate.instant('messages.error.users.load'),
-            'error',
-          );
-        },
-      });
-  }
-
-  private loadBatchMembers(batchId: number) {
-    this.loadingBatchMembers.set(true);
-
-    this.batches
-      .getBatchMembers(batchId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (members) => {
-          const editMembers: EditableBatchMember[] = members
-            .filter((member) => member.permissions.length > 0)
-            .map((member) => ({
-              user_id: member.id,
-              full_name: member.full_name,
-              email: member.email,
-              role: member.role,
-              permissions: [...member.permissions],
-            }));
-
-          this.editMembers.set(editMembers);
-
-          this.originalEditMembers.set(
-            editMembers.map((member) => ({
-              user_id: member.user_id,
-              permissions: [...member.permissions],
-            })),
-          );
-
-          this.loadingBatchMembers.set(false);
-        },
-        error: (err) => {
-          console.error(err);
-          this.loadingBatchMembers.set(false);
-          this.toast.show(
-            this.translate.instant('messages.error.batches.members_load'),
-            'error',
-          );
-        },
-      });
-  }
-
-  closeUserPicker() {
-    this.userPickerOpen.set(false);
-    this.restoreSelectedUserInput();
-  }
-
-  private restoreSelectedUserInput() {
-    const user = this.selectedUser();
-    if (!user) return;
-
-    if (!this.userSearchInput().trim()) {
-      this.userSearchInput.set(user.full_name);
-    }
-  }
-
-  onUserSearchFocus() {
-    this.openUserPicker();
-
-    if (this.selectedUser()) {
-      this.userSearchInput.set('');
-    }
-  }
-
-  onUserSearchInput(event: Event) {
-    this.userSearchInput.set((event.target as HTMLInputElement).value);
-    this.selectedUserId.set(null);
-    this.userActiveIndex.set(0);
-    this.userPickerOpen.set(true);
-  }
-
-  toggleUserPicker() {
-    if (this.savingEdit()) return;
-
-    if (this.userPickerOpen()) {
-      this.closeUserPicker();
-      return;
-    }
-
-    this.openUserPicker();
-
-    if (this.selectedUser()) {
-      this.userSearchInput.set('');
-    }
-  }
-
-  openUserPicker() {
-    if (this.savingEdit()) return;
-
-    this.loadUsersInfo();
-    this.userPickerOpen.set(true);
-  }
-
-  selectUser(user: UserInfoDto) {
-    this.selectedUserId.set(user.id);
-    this.userSearchInput.set(user.full_name);
-    this.userActiveIndex.set(0);
-    this.userPickerOpen.set(false);
-  }
-
-  addSelectedUser() {
-    const user = this.selectedUser();
-    if (!user) return;
-
-    this.editMembers.update((items) => {
-      if (items.some((item) => item.user_id === user.id)) {
-        return items;
-      }
-
-      return [
-        {
-          user_id: user.id,
-          full_name: user.full_name,
-          email: user.email,
-          role: user.role,
-          permissions: ['read'],
-        },
-        ...items,
-      ];
-    });
-
-    this.userSearchInput.set('');
-    this.selectedUserId.set(null);
-    this.userActiveIndex.set(0);
-    this.userPickerOpen.set(false);
-  }
-
-  removeEditMember(userId: number) {
-    this.editMembers.update((items) =>
-      items.filter((item) => item.user_id !== userId),
-    );
-  }
-
-  removeAllEditMembers() {
-    this.editMembers.set([]);
-
-    this.userSearchInput.set('');
-    this.selectedUserId.set(null);
-    this.userPickerOpen.set(false);
-  }
-
-  hasEditMemberPermission(userId: number, permission: Permission): boolean {
-    return (
-      this.editMembers()
-        .find((item) => item.user_id === userId)
-        ?.permissions.includes(permission) ?? false
-    );
-  }
-
-  toggleEditMemberPermission(
-    userId: number,
-    permission: Permission,
-    event: Event,
-  ) {
-    const checked = (event.target as HTMLInputElement).checked;
-
-    this.editMembers.update((items) =>
-      items.map((item) => {
-        if (item.user_id !== userId) return item;
-
-        const permissions = checked
-          ? Array.from(new Set([...item.permissions, permission]))
-          : item.permissions.filter((p) => p !== permission);
-
-        return {
-          ...item,
-          permissions,
-        };
-      }),
-    );
-  }
-
-  private effectiveEditMembers(): BatchMemberPermissionRequest[] {
-    return this.editMembers()
-      .filter((item) => item.permissions.length > 0)
-      .map((item) => ({
-        user_id: item.user_id,
-        permissions: this.normalizePermissions(item.permissions),
-      }));
-  }
-
-  private syncBatchMembers(batchId: number): Observable<unknown> {
-    const original = this.originalEditMembers();
-    const current = this.effectiveEditMembers();
-
-    const originalMap = new Map(original.map((item) => [item.user_id, item]));
-    const currentMap = new Map(current.map((item) => [item.user_id, item]));
-
-    const toAdd = current.filter((item) => !originalMap.has(item.user_id));
-
-    const toUpdate = current.filter((item) => {
-      const originalItem = originalMap.get(item.user_id);
-      if (!originalItem) return false;
-
-      return !this.permissionsEqual(item.permissions, originalItem.permissions);
-    });
-
-    const toDelete = original
-      .filter((item) => !currentMap.has(item.user_id))
-      .map((item) => item.user_id);
-
-    const requests: Observable<unknown>[] = [];
-
-    if (toAdd.length > 0) {
-      requests.push(this.batches.addBatchMembers(batchId, toAdd));
-    }
-
-    if (toUpdate.length > 0) {
-      requests.push(this.batches.updateBatchMembers(batchId, toUpdate));
-    }
-
-    if (toDelete.length > 0) {
-      requests.push(this.batches.deleteBatchMembers(batchId, toDelete));
-    }
-
-    return requests.length > 0 ? forkJoin(requests) : of(null);
-  }
-
-  private normalizePermissions(permissions: Permission[]): Permission[] {
-    return Array.from(new Set(permissions)).sort() as Permission[];
-  }
-
-  private permissionsEqual(a: Permission[], b: Permission[]): boolean {
-    const left = this.normalizePermissions(a);
-    const right = this.normalizePermissions(b);
-
-    return (
-      left.length === right.length &&
-      left.every((permission, index) => permission === right[index])
-    );
-  }
-
-  private memberPermissionListsEqual(
-    a: BatchMemberPermissionRequest[],
-    b: BatchMemberPermissionRequest[],
-  ): boolean {
-    const normalize = (items: BatchMemberPermissionRequest[]) =>
-      items
-        .filter((item) => item.permissions.length > 0)
-        .map((item) => ({
-          user_id: item.user_id,
-          permissions: this.normalizePermissions(item.permissions),
-        }))
-        .sort((x, y) => x.user_id - y.user_id);
-
-    const left = normalize(a);
-    const right = normalize(b);
-
-    if (left.length !== right.length) return false;
-
-    return left.every((item, index) => {
-      const other = right[index];
-
-      return (
-        item.user_id === other.user_id &&
-        this.permissionsEqual(item.permissions, other.permissions)
-      );
-    });
-  }
-
-  onUserPickerKeydown(event: KeyboardEvent) {
-    if (this.savingEdit()) return;
-
-    if (event.key === 'ArrowDown') {
-      event.preventDefault();
-
-      const wasOpen = this.userPickerOpen();
-      this.openUserPicker();
-
-      if (wasOpen) {
-        this.moveUserActiveIndex(1);
-      } else {
-        this.userActiveIndex.set(0);
-      }
-
-      return;
-    }
-
-    if (event.key === 'ArrowUp') {
-      event.preventDefault();
-
-      const wasOpen = this.userPickerOpen();
-      this.openUserPicker();
-
-      if (wasOpen) {
-        this.moveUserActiveIndex(-1);
-      } else {
-        this.userActiveIndex.set(Math.max(0, this.availableUsers().length - 1));
-      }
-
-      return;
-    }
-
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      event.stopPropagation();
-
-      if (this.userPickerOpen()) {
-        this.selectActiveUser();
-        return;
-      }
-
-      if (this.selectedUser()) {
-        this.addSelectedUser();
-      }
-
-      return;
-    }
-
-    if (event.key === 'Escape' && this.userPickerOpen()) {
-      event.preventDefault();
-      event.stopPropagation();
-      this.closeUserPicker();
-    }
-  }
-
-  private moveUserActiveIndex(direction: 1 | -1) {
-    const count = this.availableUsers().length;
-    if (count === 0) return;
-
-    this.userActiveIndex.update((index) => {
-      return (index + direction + count) % count;
-    });
-
-    this.scrollActiveUserIntoView();
-  }
-
-  private scrollActiveUserIntoView() {
-    requestAnimationFrame(() => {
-      this.userOptions
-        ?.get(this.userActiveIndex())
-        ?.nativeElement.scrollIntoView({
-          block: 'nearest',
-        });
-    });
-  }
-
-  private selectActiveUser() {
-    const user = this.availableUsers()[this.userActiveIndex()];
-    if (!user) return;
-
-    this.selectUser(user);
   }
 }

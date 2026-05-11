@@ -1,0 +1,43 @@
+@if (open()) {
+  <div
+    class="fixed inset-0 flex items-center justify-center bg-black/40 p-4"
+    [ngClass]="overlayClass()"
+    (click)="backdropClick.emit()"
+    (window:keydown.escape)="escapePressed.emit()"
+  >
+    <section
+      class="shadow-s overflow-hidden rounded-2xl bg-white"
+      [ngClass]="panelClass()"
+      [attr.aria-labelledby]="titleId()"
+      (click)="onPanelClick($event)"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="flex max-h-[calc(100dvh-2rem)] flex-col">
+        <div
+          class="border-bright flex shrink-0 justify-between gap-3 border-b px-4 py-3"
+        >
+          <span class="text-base-color text-xl font-medium" [id]="titleId()">
+            {{ title() }}
+          </span>
+
+          <button
+            class="btn group"
+            [disabled]="closeDisabled()"
+            (click)="closeRequested.emit()"
+            type="button"
+          >
+            <svg
+              class="icon-tertiary group-disabled:icon-tertiary-disable"
+              appIcon="x"
+              width="24"
+              height="24"
+            ></svg>
+          </button>
+        </div>
+
+        <ng-content />
+      </div>
+    </section>
+  </div>
+}

@@ -1,0 +1,168 @@
+<app-dialog-shell
+  [open]="open() && (isCreate() || !!user())"
+  [title]="dialogTitle()"
+  [titleId]="isCreate() ? 'create-user-dialog-title' : 'edit-user-dialog-title'"
+  (backdropClick)="close()"
+  (closeRequested)="close()"
+  (escapePressed)="onEscape(editor)"
+  (panelClick)="editor.closePicker()"
+  panelClass="max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-2xl"
+>
+  <div class="flex min-h-0 flex-col overflow-hidden py-3">
+    <div class="border-bright border-b px-4 pb-3">
+      <div class="grid shrink-0 gap-4 sm:grid-cols-2">
+        <div>
+          <label class="text-light text-sm-tight mb-2 block font-medium">
+            {{ "users.full_name" | translate }}
+          </label>
+
+          <input
+            class="border-tertiary-default bg-main-base focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border py-3 pl-4 outline-none"
+            #fullNameInput
+            [value]="fullName()"
+            [disabled]="submitting()"
+            (input)="onFullNameInput($event)"
+            type="text"
+          />
+        </div>
+
+        <div>
+          <label class="text-light text-sm-tight mb-2 block font-medium">
+            {{ "users.email" | translate }}
+          </label>
+
+          @if (isCreate()) {
+            <input
+              class="border-tertiary-default bg-main-base focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border py-3 pl-4 outline-none"
+              [value]="email()"
+              [disabled]="submitting()"
+              (input)="onEmailInput($event)"
+              type="email"
+            />
+          } @else {
+            <input
+              class="text-disable border-tertiary-disable w-full cursor-not-allowed overflow-hidden rounded-lg border bg-gray-500/5 py-3 pl-4 outline-none"
+              [value]="email()"
+              disabled
+              type="email"
+            />
+          }
+        </div>
+      </div>
+
+      <div
+        class="mt-4 flex shrink-0 gap-3"
+        [class.justify-between]="!isCreate()"
+        [class.justify-end]="isCreate()"
+      >
+        @if (!isCreate()) {
+          <button
+            class="btn btn-m btn-tertiary group"
+            [disabled]="submitting() || resettingPassword()"
+            (click)="resetPassword()"
+            type="button"
+          >
+            <svg
+              class="icon-tertiary"
+              appIcon="refresh"
+              width="16"
+              height="16"
+            ></svg>
+
+            @if (resettingPassword()) {
+              {{ "buttons.resetting_password" | translate }}
+            } @else {
+              {{ "buttons.reset_password" | translate }}
+            }
+          </button>
+        }
+
+        <label
+          class="text-secondary flex cursor-pointer items-center gap-2 has-disabled:cursor-not-allowed"
+        >
+          <input
+            class="peer sr-only"
+            [checked]="isAdmin()"
+            [disabled]="submitting() || (!isCreate() && isEditingCurrentUser())"
+            (change)="onIsAdminInput($event)"
+            type="checkbox"
+          />
+
+          <span
+            class="border-tertiary-default bg-main-base peer-hover:border-primary-hover peer-active:border-primary-pressed peer-checked:border-primary-default peer-checked:bg-main-primary-default peer-checked:peer-hover:border-primary-hover peer-checked:peer-hover:bg-main-primary-hover peer-checked:peer-active:border-primary-pressed peer-checked:peer-active:bg-main-primary-pressed peer-disabled:border-tertiary-disable peer-disabled:peer-checked:border-tertiary-disable relative flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors peer-disabled:bg-gray-500/5 peer-disabled:peer-checked:bg-gray-300 peer-checked:[&>svg]:opacity-100"
+          >
+            <svg
+              class="icon-primary opacity-0 transition-opacity"
+              aria-hidden="true"
+              appIcon="check"
+              width="12"
+              height="12"
+            ></svg>
+          </span>
+
+          <span class="text-sm-tight font-medium">
+            {{ "users.is_admin" | translate }}
+          </span>
+
+          <svg
+            class="icon-secondary"
+            appIcon="crown"
+            width="16"
+            height="16"
+          ></svg>
+        </label>
+      </div>
+    </div>
+
+    <app-permission-assignment-editor
+      #editor
+      [disabled]="submitting()"
+      [loadingOptions]="loadingBatchesInfo()"
+      [options]="batchOptions()"
+      [rows]="permissionRows()"
+      (pickerOpened)="(null)"
+      (addRequested)="addBatch($event)"
+      (removeRequested)="removeBatch($event)"
+      (removeAllRequested)="removeAllBatches()"
+      (permissionToggled)="togglePermission($event)"
+      sectionLabelKey="users.groups_and_permissions"
+      searchPlaceholderKey="users.search_groups"
+      noAvailableLabelKey="users.no_available_groups"
+      emptyRowsLabelKey="users.no_groups_added"
+      toggleButtonAriaLabel="toggle groups"
+    />
+  </div>
+
+  <div
+    class="border-bright flex shrink-0 justify-center gap-3 border-t px-4 py-3"
+  >
+    <button
+      class="btn btn-m btn-tertiary"
+      [disabled]="submitting()"
+      (click)="close()"
+      type="button"
+    >
+      {{ "buttons.cancel" | translate }}
+    </button>
+
+    <button
+      class="btn btn-m btn-primary"
+      [disabled]="
+        submitting() ||
+        (isCreate() ? !fullName().trim() || !email().trim() : !edited())
+      "
+      (click)="submit()"
+      type="button"
+    >
+      @if (isCreate()) {
+        @if (submitting()) {
+          {{ "buttons.creating" | translate }}
+        } @else {
+          {{ "buttons.create" | translate }}
+        }
+      } @else {
+        {{ "buttons.save_changes" | translate }}
+      }
+    </button>
+  </div>
+</app-dialog-shell>

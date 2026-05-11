@@ -1,0 +1,87 @@
+<app-dialog-shell
+  [open]="open() && !!batch()"
+  [title]="'batches.edit' | translate"
+  (backdropClick)="close()"
+  (closeRequested)="close()"
+  (escapePressed)="onEscape(editor)"
+  (panelClick)="editor.closePicker()"
+  titleId="edit-batch-dialog-title"
+  panelClass="max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-3xl"
+>
+  <div class="flex min-h-0 flex-col overflow-hidden py-3">
+    <div class="border-bright border-b px-4 pb-3">
+      <div class="grid shrink-0 gap-4 sm:grid-cols-2">
+        <div>
+          <label class="text-light text-sm-tight mb-2 block font-medium">
+            {{ "batches.title" | translate }}
+          </label>
+
+          <input
+            class="border-tertiary-default bg-main-base focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border py-3 pl-4 outline-none"
+            #nameInput
+            [value]="name()"
+            [disabled]="saving()"
+            (input)="onNameInput($event)"
+            type="text"
+          />
+        </div>
+
+        <div>
+          <label class="text-light text-sm-tight mb-2 block font-medium">
+            {{ "batches.subtitle" | translate }}
+          </label>
+
+          <input
+            class="border-tertiary-default bg-main-base focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border py-3 pl-4 outline-none"
+            [value]="description()"
+            [disabled]="saving()"
+            (input)="onDescriptionInput($event)"
+            type="text"
+          />
+        </div>
+      </div>
+    </div>
+
+    <app-permission-assignment-editor
+      #editor
+      [disabled]="saving()"
+      [loadingOptions]="loadingUsersInfo()"
+      [loadingRows]="loadingBatchMembers()"
+      [options]="userOptions()"
+      [rows]="memberRows()"
+      (pickerOpened)="(null)"
+      (addRequested)="addMember($event)"
+      (removeRequested)="removeMember($event)"
+      (removeAllRequested)="removeAllMembers()"
+      (permissionToggled)="toggleMemberPermission($event)"
+      sectionLabelKey="batches.members_and_permissions"
+      searchPlaceholderKey="batches.search_users"
+      noAvailableLabelKey="batches.no_available_users"
+      emptyRowsLabelKey="batches.no_members_added"
+      loadingRowsLabelKey="users.loading"
+      toggleButtonAriaLabel="toggle users"
+    />
+  </div>
+
+  <div
+    class="border-bright flex shrink-0 justify-center gap-3 border-t px-4 py-3"
+  >
+    <button
+      class="btn btn-m btn-tertiary"
+      [disabled]="saving()"
+      (click)="close()"
+      type="button"
+    >
+      {{ "buttons.cancel" | translate }}
+    </button>
+
+    <button
+      class="btn btn-m btn-primary"
+      [disabled]="saving() || !edited()"
+      (click)="saveEdit()"
+      type="button"
+    >
+      {{ "buttons.save_changes" | translate }}
+    </button>
+  </div>
+</app-dialog-shell>
