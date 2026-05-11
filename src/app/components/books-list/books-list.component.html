@@ -1,7 +1,4 @@
-<section
-  class="mx-auto flex h-full min-h-0 flex-col gap-4 p-4"
-  (click)="closeFilters()"
->
+<section class="mx-auto flex h-full min-h-0 flex-col gap-4 p-4">
   <div
     class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
   >
@@ -157,48 +154,23 @@
               </button>
             </th>
             <th class="relative px-3 py-2 text-left font-medium text-nowrap">
-              <button
-                class="group relative flex cursor-pointer items-center gap-1 select-none"
-                (click)="toggleProcessStateFilter($event)"
-                type="button"
-              >
-                <span>{{ "books.process_state" | translate }}</span>
-
-                <svg
-                  class="icon-secondary"
-                  appIcon="filter"
-                  width="16"
-                  height="16"
-                ></svg>
-
-                @if (processState() !== null) {
-                  <span
-                    class="absolute top-0.5 -right-0.5 h-2 w-2 rounded-full border border-white bg-green-600"
-                  ></span>
-                }
-              </button>
+              <app-table-filter-menu
+                [options]="processStateOptions"
+                [value]="processState()"
+                (valueChange)="setProcessStateFilter($event)"
+                labelKey="books.process_state"
+                radioName="process-state-filter"
+              />
             </th>
             <th class="relative px-3 py-2 text-left font-medium text-nowrap">
-              <button
-                class="group relative flex cursor-pointer items-center gap-1 select-none"
-                (click)="toggleRecordStateFilter($event)"
-                type="button"
-              >
-                <span>{{ "books.record_state" | translate }}</span>
-
-                <svg
-                  class="icon-secondary"
-                  appIcon="filter"
-                  width="16"
-                  height="16"
-                ></svg>
-
-                @if (recordState() !== null) {
-                  <span
-                    class="absolute top-0.5 -right-0.5 h-2 w-2 rounded-full border border-white bg-green-600"
-                  ></span>
-                }
-              </button>
+              <app-table-filter-menu
+                [options]="recordStateOptions"
+                [value]="recordState()"
+                (valueChange)="setRecordStateFilter($event)"
+                labelKey="books.record_state"
+                panelWidthClass="w-48"
+                radioName="record-state-filter"
+              />
             </th>
             <th class="rounded-tr-lg px-3 py-2 text-left font-medium">
               {{ "books.actions" | translate }}
@@ -421,78 +393,4 @@
       </div>
     </div>
   </div>
-
-  @if (processStateFilterOpen() && processFilterMenuPosition()) {
-    <div class="fixed inset-0 z-50" (click)="closeFilters()">
-      <div
-        class="border-primary-default bg-main-base shadow-s absolute w-54 rounded-lg border p-4"
-        [style.top.px]="processFilterMenuPosition()!.top"
-        [style.left.px]="processFilterMenuPosition()!.left"
-        (click)="$event.stopPropagation()"
-      >
-        <div class="flex flex-col gap-4">
-          @for (option of processStateOptions; track option.value) {
-            <label class="flex cursor-pointer items-center gap-3">
-              <input
-                class="peer sr-only"
-                [checked]="processState() === option.value"
-                (change)="setProcessStateFilter(option.value)"
-                type="radio"
-                name="process-state-filter"
-              />
-
-              <span
-                class="border-contrast peer-hover:border-primary-hover peer-active:border-primary-pressed after:bg-main-contrast peer-hover:after:bg-primary-hover peer-active:after:bg-primary-pressed peer-checked:border-primary-default peer-checked:after:bg-main-primary-default peer-checked:peer-hover:border-primary-hover peer-checked:peer-hover:after:bg-main-primary-hover peer-checked:peer-active:border-primary-pressed peer-checked:peer-active:after:bg-main-primary-pressed relative flex h-4 w-4 items-center justify-center rounded-full border transition-colors after:absolute after:h-2.5 after:w-2.5 after:scale-0 after:rounded-full after:transition-transform after:content-[''] peer-checked:after:scale-100"
-              ></span>
-
-              <span>
-                @if (option.value === null) {
-                  {{ "labels.batchState.all" | translate }}
-                } @else {
-                  {{ option.value | processStateLabel }}
-                }
-              </span>
-            </label>
-          }
-        </div>
-      </div>
-    </div>
-  }
-
-  @if (recordStateFilterOpen() && recordFilterMenuPosition()) {
-    <div class="fixed inset-0 z-50" (click)="closeFilters()">
-      <div
-        class="border-primary-default bg-main-base shadow-s absolute w-48 rounded-lg border p-4"
-        [style.top.px]="recordFilterMenuPosition()!.top"
-        [style.left.px]="recordFilterMenuPosition()!.left"
-        (click)="$event.stopPropagation()"
-      >
-        <div class="flex flex-col gap-4">
-          @for (option of recordStateOptions; track option.value) {
-            <label class="flex cursor-pointer items-center gap-3">
-              <input
-                class="peer sr-only"
-                [checked]="recordState() === option.value"
-                (change)="setRecordStateFilter(option.value)"
-                type="radio"
-                name="record-state-filter"
-              />
-
-              <span
-                class="border-contrast peer-hover:border-primary-hover peer-active:border-primary-pressed after:bg-main-contrast peer-hover:after:bg-primary-hover peer-active:after:bg-primary-pressed peer-checked:border-primary-default peer-checked:after:bg-main-primary-default peer-checked:peer-hover:border-primary-hover peer-checked:peer-hover:after:bg-main-primary-hover peer-checked:peer-active:border-primary-pressed peer-checked:peer-active:after:bg-main-primary-pressed relative flex h-4 w-4 items-center justify-center rounded-full border transition-colors after:absolute after:h-2.5 after:w-2.5 after:scale-0 after:rounded-full after:transition-transform after:content-[''] peer-checked:after:scale-100"
-              ></span>
-
-              <span>
-                @if (option.value === null) {
-                  {{ "labels.recordState.all" | translate }}
-                } @else {
-                  {{ option.value | recordStateLabel }}
-                }
-              </span>
-            </label>
-          }
-        </div>
-      </div>
-    </div>
-  }
 </section>

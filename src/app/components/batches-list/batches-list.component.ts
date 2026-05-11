@@ -43,6 +43,10 @@ import { BatchStateLabelPipe } from '../../pipes/batch-state-label.pipe';
 import { BatchesService } from '../../services/api/batches.service';
 import { ToastService } from '../../services/toast.service';
 import { IconComponent } from '../icon/icon.component';
+import {
+  TableFilterMenuComponent,
+  type TableFilterOption,
+} from '../shared/table-filter-menu/table-filter-menu.component';
 
 type VisiblePageItem = number | 'ellipsis-left' | 'ellipsis-right';
 
@@ -56,6 +60,7 @@ type VisiblePageItem = number | 'ellipsis-left' | 'ellipsis-right';
     BatchStateLabelPipe,
     TranslateModule,
     IconComponent,
+    TableFilterMenuComponent,
   ],
   templateUrl: './batches-list.component.html',
 })
@@ -125,10 +130,7 @@ export class BatchesListComponent {
     { value: 'edit', icon: 'settings' },
   ];
 
-  stateFilterOpen = signal(false);
   batchState = signal<BatchState | null>(null);
-
-  filterMenuPosition = signal<{ top: number; left: number } | null>(null);
 
   totalPages = computed(() =>
     this.data()
@@ -224,13 +226,11 @@ export class BatchesListComponent {
     return this.data()?.batches ?? [];
   });
 
-  readonly batchStateOptions: {
-    value: BatchState | null;
-  }[] = [
-    { value: null },
-    { value: 'created' },
-    { value: 'in_progress' },
-    { value: 'completed' },
+  readonly batchStateOptions: TableFilterOption[] = [
+    { value: null, labelKey: 'labels.batchState.all' },
+    { value: 'created', labelKey: 'labels.batchState.created' },
+    { value: 'in_progress', labelKey: 'labels.batchState.in_progress' },
+    { value: 'completed', labelKey: 'labels.batchState.completed' },
   ];
 
   @ViewChild('editNameInput')
@@ -420,38 +420,13 @@ export class BatchesListComponent {
     });
   }
 
-  toggleStateFilter(event: MouseEvent) {
-    event.stopPropagation();
-
-    if (this.stateFilterOpen()) {
-      this.closeStateFilter();
-      return;
-    }
-
-    const button = event.currentTarget as HTMLElement;
-    const rect = button.getBoundingClientRect();
-
-    this.filterMenuPosition.set({
-      top: rect.bottom + 8,
-      left: rect.left,
-    });
-
-    this.stateFilterOpen.set(true);
-  }
-
-  setBatchStateFilter(state: BatchState | null) {
-    this.batchState.set(state);
-    this.stateFilterOpen.set(false);
+  setBatchStateFilter(state: string | null) {
+    this.batchState.set(state as BatchState | null);
 
     this.navigateWithQuery({
       page: 1,
-      state,
+      state: state as BatchState | null,
     });
-  }
-
-  closeStateFilter() {
-    this.stateFilterOpen.set(false);
-    this.filterMenuPosition.set(null);
   }
 
   setMine(value: boolean) {

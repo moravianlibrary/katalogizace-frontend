@@ -22,6 +22,10 @@ import { BooksService } from '../../services/api/books.service';
 import { ContextPanelService } from '../../services/context-panel.service';
 import { ToastService } from '../../services/toast.service';
 import { IconComponent } from '../icon/icon.component';
+import {
+  TableFilterMenuComponent,
+  type TableFilterOption,
+} from '../shared/table-filter-menu/table-filter-menu.component';
 
 type VisiblePageItem = number | 'ellipsis-left' | 'ellipsis-right';
 
@@ -36,6 +40,7 @@ type VisiblePageItem = number | 'ellipsis-left' | 'ellipsis-right';
     ProcessStateLabelPipe,
     TranslateModule,
     IconComponent,
+    TableFilterMenuComponent,
   ],
   templateUrl: 'books-list.component.html',
 })
@@ -70,11 +75,6 @@ export class BooksListComponent {
 
   sortBy = signal<'created_at' | 'modified_at'>('created_at');
   sortDir = signal<'asc' | 'desc'>('desc');
-
-  processFilterMenuPosition = signal<{ top: number; left: number } | null>(
-    null,
-  );
-  recordFilterMenuPosition = signal<{ top: number; left: number } | null>(null);
 
   totalPages = computed(() =>
     this.data()
@@ -128,32 +128,25 @@ export class BooksListComponent {
     return this.data()?.books ?? [];
   });
 
-  processStateFilterOpen = signal(false);
-  recordStateFilterOpen = signal(false);
-
   processState = signal<ProcessState | null>(null);
   recordState = signal<RecordState | null>(null);
 
-  readonly processStateOptions: {
-    value: ProcessState | null;
-  }[] = [
-    { value: null },
-    { value: 'created' },
-    { value: 'scheduled' },
-    { value: 'in_progress' },
-    { value: 'ready' },
-    { value: 'failed' },
-    { value: 'completed' },
+  readonly processStateOptions: TableFilterOption[] = [
+    { value: null, labelKey: 'labels.processState.all' },
+    { value: 'created', labelKey: 'labels.processState.created' },
+    { value: 'scheduled', labelKey: 'labels.processState.scheduled' },
+    { value: 'in_progress', labelKey: 'labels.processState.in_progress' },
+    { value: 'ready', labelKey: 'labels.processState.ready' },
+    { value: 'failed', labelKey: 'labels.processState.failed' },
+    { value: 'completed', labelKey: 'labels.processState.completed' },
   ];
 
-  readonly recordStateOptions: {
-    value: RecordState | null;
-  }[] = [
-    { value: null },
-    { value: 'new' },
-    { value: 'edited' },
-    { value: 'reviewed' },
-    { value: 'completed' },
+  readonly recordStateOptions: TableFilterOption[] = [
+    { value: null, labelKey: 'labels.recordState.all' },
+    { value: 'new', labelKey: 'labels.recordState.new' },
+    { value: 'edited', labelKey: 'labels.recordState.edited' },
+    { value: 'reviewed', labelKey: 'labels.recordState.reviewed' },
+    { value: 'completed', labelKey: 'labels.recordState.completed' },
   ];
 
   readonly canRead = computed(() => this.permissions.canRead(this.batchId()));
@@ -661,76 +654,21 @@ export class BooksListComponent {
     });
   }
 
-  toggleProcessStateFilter(event: MouseEvent) {
-    event.stopPropagation();
-
-    if (this.processStateFilterOpen()) {
-      this.processStateFilterOpen.set(false);
-      this.processFilterMenuPosition.set(null);
-      return;
-    }
-
-    this.recordStateFilterOpen.set(false);
-    this.recordFilterMenuPosition.set(null);
-
-    const button = event.currentTarget as HTMLElement;
-    const rect = button.getBoundingClientRect();
-
-    this.processFilterMenuPosition.set({
-      top: rect.bottom + 8,
-      left: rect.left,
-    });
-
-    this.processStateFilterOpen.set(true);
-  }
-
-  toggleRecordStateFilter(event: MouseEvent) {
-    event.stopPropagation();
-
-    if (this.recordStateFilterOpen()) {
-      this.recordStateFilterOpen.set(false);
-      this.recordFilterMenuPosition.set(null);
-      return;
-    }
-
-    this.processStateFilterOpen.set(false);
-    this.processFilterMenuPosition.set(null);
-
-    const button = event.currentTarget as HTMLElement;
-    const rect = button.getBoundingClientRect();
-
-    this.recordFilterMenuPosition.set({
-      top: rect.bottom + 8,
-      left: rect.left,
-    });
-
-    this.recordStateFilterOpen.set(true);
-  }
-
-  setProcessStateFilter(state: ProcessState | null) {
-    this.processState.set(state);
-    this.processStateFilterOpen.set(false);
+  setProcessStateFilter(state: string | null) {
+    this.processState.set(state as ProcessState | null);
 
     this.navigateWithQuery({
       page: 1,
-      process_state: state,
+      process_state: state as ProcessState | null,
     });
   }
 
-  setRecordStateFilter(state: RecordState | null) {
-    this.recordState.set(state);
-    this.recordStateFilterOpen.set(false);
+  setRecordStateFilter(state: string | null) {
+    this.recordState.set(state as RecordState | null);
 
     this.navigateWithQuery({
       page: 1,
-      record_state: state,
+      record_state: state as RecordState | null,
     });
-  }
-
-  closeFilters() {
-    this.processStateFilterOpen.set(false);
-    this.recordStateFilterOpen.set(false);
-    this.processFilterMenuPosition.set(null);
-    this.recordFilterMenuPosition.set(null);
   }
 }
