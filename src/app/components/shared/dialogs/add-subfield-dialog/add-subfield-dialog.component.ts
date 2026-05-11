@@ -9,33 +9,32 @@ import {
   viewChild,
 } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
-import { IconComponent } from '../../shared/icon/icon.component';
+import { IconComponent } from '../../../shared/icon/icon.component';
 
-export type AddFieldDialogResult = {
-  tag: string;
+export type AddSubfieldDialogResult = {
   subfieldCodes: string[];
 };
 
 @Component({
   standalone: true,
-  selector: 'app-add-field-dialog',
+  selector: 'app-add-subfield-dialog',
   imports: [CommonModule, TranslateModule, IconComponent],
-  templateUrl: './add-field-dialog.component.html',
+  templateUrl: './add-subfield-dialog.component.html',
 })
-export class AddFieldDialogComponent {
+export class AddSubfieldDialogComponent {
   open = input<boolean>(false);
   error = input<string | null>(null);
 
   closed = output<void>();
-  confirmed = output<AddFieldDialogResult>();
+  confirmed = output<AddSubfieldDialogResult>();
   clearedError = output<void>();
 
   readonly value = signal('');
   readonly touched = signal(false);
 
-  readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('tagInput');
+  readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('subfieldInput');
 
-  readonly isValid = () => /^[0-9]{3}[a-z0-9]*$/.test(this.value());
+  readonly isValid = () => /^[a-z0-9]+$/.test(this.value());
 
   constructor() {
     effect(() => {
@@ -60,11 +59,7 @@ export class AddFieldDialogComponent {
     this.touched.set(true);
     if (!this.isValid()) return;
 
-    const raw = this.value();
-    const tag = raw.slice(0, 3);
-
-    const subfieldCodes = raw
-      .slice(3)
+    const subfieldCodes = this.value()
       .split('')
       .map((x) => x.trim())
       .filter((x) => /^[a-zA-Z0-9]$/.test(x))
@@ -90,7 +85,6 @@ export class AddFieldDialogComponent {
       });
 
     this.confirmed.emit({
-      tag,
       subfieldCodes,
     });
   }

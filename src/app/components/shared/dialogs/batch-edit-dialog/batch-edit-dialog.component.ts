@@ -33,7 +33,7 @@ import {
   type PermissionAssignmentOption,
   type PermissionAssignmentRow,
   type PermissionAssignmentToggle,
-} from '../../shared/permission-assignment-editor/permission-assignment-editor.component';
+} from '../../../shared/permission-assignment-editor/permission-assignment-editor.component';
 import { DialogShellComponent } from '../dialog-shell/dialog-shell.component';
 
 @Component({

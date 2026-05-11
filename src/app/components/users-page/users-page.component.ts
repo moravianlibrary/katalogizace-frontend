@@ -9,11 +9,11 @@ import { BreadcrumbsService } from '@/app/services/breadcrumbs.service';
 import { ConfirmDialogService } from '@/app/services/confirm-dialog.service';
 import { PermissionsService } from '@/app/services/permissions.service';
 import { ToastService } from '@/app/services/toast.service';
-import { GeneratedPasswordDialogComponent } from '../dialogs/generated-password-dialog/generated-password-dialog.component';
+import { GeneratedPasswordDialogComponent } from '../shared/dialogs/generated-password-dialog/generated-password-dialog.component';
 import {
   UserDialogComponent,
   type UserDialogPasswordGenerated,
-} from '../dialogs/user-dialog/user-dialog.component';
+} from '../shared/dialogs/user-dialog/user-dialog.component';
 import { IconComponent } from '../shared/icon/icon.component';
 import { TableSearchInputComponent } from '../shared/table/table-search-input/table-search-input.component';
 import { UserBatchesCellComponent } from '../user-batches-cell/user-batches-cell.component';

@@ -19,15 +19,15 @@ import {
   extractedToEditableWithMeta,
 } from '@/app/utils/marc-transform';
 import { TranslateModule } from '@ngx-translate/core';
+import { EditableMarcRecordTableComponent } from '../marc-record-table/editable-marc-record-table/editable-marc-record-table.component';
 import {
   AddFieldDialogComponent,
   AddFieldDialogResult,
-} from '../dialogs/add-field-dialog/add-field-dialog.component';
-import { EditableMarcRecordTableComponent } from '../marc-record-table/editable-marc-record-table/editable-marc-record-table.component';
+} from '../shared/dialogs/add-field-dialog/add-field-dialog.component';
 import { MainPanelHeaderComponent } from './main-panel-header/main-panel-header.component';
 
 import { toMarcxml } from '@/app/utils/marcxml-export';
-import { ExportMarcxmlDialogComponent } from '../dialogs/export-marcxml-dialog/export-marcxml-dialog.component';
+import { ExportMarcxmlDialogComponent } from '../shared/dialogs/export-marcxml-dialog/export-marcxml-dialog.component';
 
 @Component({
   standalone: true,

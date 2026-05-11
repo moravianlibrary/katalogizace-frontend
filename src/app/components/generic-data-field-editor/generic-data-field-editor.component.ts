@@ -1,7 +1,7 @@
 import {
   AddSubfieldDialogComponent,
   AddSubfieldDialogResult,
-} from '@/app/components/dialogs/add-subfield-dialog/add-subfield-dialog.component';
+} from '@/app/components/shared/dialogs/add-subfield-dialog/add-subfield-dialog.component';
 import {
   getSubfieldRuleLabel,
   INDICATOR_OPTIONS,

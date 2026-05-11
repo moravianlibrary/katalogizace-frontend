@@ -1,7 +1,7 @@
 import {
   AddSubfieldDialogComponent,
   AddSubfieldDialogResult,
-} from '@/app/components/dialogs/add-subfield-dialog/add-subfield-dialog.component';
+} from '@/app/components/shared/dialogs/add-subfield-dialog/add-subfield-dialog.component';
 import { IconComponent } from '@/app/components/shared/icon/icon.component';
 import { InputAutocompleteDictionaryComponent } from '@/app/components/shared/inputs/input-autocomplete-dictionary/input-autocomplete-dictionary.component';
 import { InputAutocompleteComponent } from '@/app/components/shared/inputs/input-autocomplete/input-autocomplete.component';

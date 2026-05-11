@@ -1,8 +1,8 @@
+import { ExistingMarcRecordTableComponent } from '@/app/components/marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
 import {
   AddSubfieldDialogComponent,
   AddSubfieldDialogResult,
-} from '@/app/components/dialogs/add-subfield-dialog/add-subfield-dialog.component';
-import { ExistingMarcRecordTableComponent } from '@/app/components/marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
+} from '@/app/components/shared/dialogs/add-subfield-dialog/add-subfield-dialog.component';
 import { IconComponent } from '@/app/components/shared/icon/icon.component';
 import { InputAutocompleteAuthorityComponent } from '@/app/components/shared/inputs/input-autocomplete-authority/input-autocomplete-authority.component';
 import { InputAutocompleteComponent } from '@/app/components/shared/inputs/input-autocomplete/input-autocomplete.component';

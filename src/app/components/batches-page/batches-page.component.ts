@@ -30,7 +30,7 @@ import {
   createQuerySyncedTableState,
   type TableSortDirection,
 } from '../../utils/table-query-state.util';
-import { BatchEditDialogComponent } from '../dialogs/batch-edit-dialog/batch-edit-dialog.component';
+import { BatchEditDialogComponent } from '../shared/dialogs/batch-edit-dialog/batch-edit-dialog.component';
 import { IconComponent } from '../shared/icon/icon.component';
 import { SortableTableHeaderComponent } from '../shared/table/sortable-table-header/sortable-table-header.component';
 import {

@@ -22,13 +22,13 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { IconComponent } from '../../shared/icon/icon.component';
+import { IconComponent } from '../../../shared/icon/icon.component';
 import {
   PermissionAssignmentEditorComponent,
   type PermissionAssignmentOption,
   type PermissionAssignmentRow,
   type PermissionAssignmentToggle,
-} from '../../shared/permission-assignment-editor/permission-assignment-editor.component';
+} from '../../../shared/permission-assignment-editor/permission-assignment-editor.component';
 import { DialogShellComponent } from '../dialog-shell/dialog-shell.component';
 
 export type UserDialogMode = 'create' | 'edit';
