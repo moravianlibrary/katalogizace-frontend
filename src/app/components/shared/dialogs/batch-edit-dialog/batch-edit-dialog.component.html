@@ -8,7 +8,10 @@
   titleId="edit-batch-dialog-title"
   panelClass="max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-3xl"
 >
-  <div class="flex min-h-0 flex-col overflow-hidden py-3">
+  <div
+    class="flex min-h-0 flex-col overflow-hidden py-3"
+    data-testid="edit-batch-dialog"
+  >
     <div class="border-bright border-b px-4 pb-3">
       <div class="grid shrink-0 gap-4 sm:grid-cols-2">
         <div>
@@ -19,6 +22,7 @@
           <input
             class="border-tertiary-default bg-main-base focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border py-3 pl-4 outline-none"
             #nameInput
+            data-testid="edit-batch-name"
             [value]="name()"
             [disabled]="saving()"
             (input)="onNameInput($event)"
@@ -33,6 +37,7 @@
 
           <input
             class="border-tertiary-default bg-main-base focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border py-3 pl-4 outline-none"
+            data-testid="edit-batch-description"
             [value]="description()"
             [disabled]="saving()"
             (input)="onDescriptionInput($event)"
@@ -68,6 +73,7 @@
   >
     <button
       class="btn btn-m btn-tertiary"
+      data-testid="edit-batch-cancel"
       [disabled]="saving()"
       (click)="close()"
       type="button"
@@ -77,6 +83,7 @@
 
     <button
       class="btn btn-m btn-primary"
+      data-testid="edit-batch-submit"
       [disabled]="saving() || !edited()"
       (click)="saveEdit()"
       type="button"

@@ -1,4 +1,4 @@
-<div class="flex h-full min-h-0 flex-col gap-6 p-4">
+<div class="flex h-full min-h-0 flex-col gap-6 p-4" data-testid="candidates-table">
   <div
     class="min-h-0 shrink-0 overflow-auto"
     [style.max-height]="showAutPreview() ? '40%' : '100%'"
@@ -36,6 +36,7 @@
         @for (candidate of sortedCandidates(); track $index) {
           <tr
             class="border-light cursor-pointer border-b"
+            [attr.data-testid]="'candidate-row-' + $index"
             [ngClass]="$index % 2 === 1 ? 'bg-main-base' : 'bg-gray-500/5'"
             (click)="onRowClick(candidate.id)"
           >
@@ -88,6 +89,7 @@
             <td class="p-2 text-center align-text-top">
               <button
                 class="border-base h-5 w-5 rounded-full border shadow hover:cursor-pointer"
+                data-testid="candidate-provenance-button"
                 [ngClass]="scoreClass(candidate.score)"
                 (click)="onShowProvenance(candidate)"
                 type="button"

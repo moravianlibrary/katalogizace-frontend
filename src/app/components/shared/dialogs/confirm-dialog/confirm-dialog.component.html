@@ -1,6 +1,7 @@
 @if (confirmDialog.open()) {
   <div
     class="fixed inset-0 z-100 flex items-center justify-center bg-black/40 p-4"
+    data-testid="confirm-dialog"
     (click)="confirmDialog.cancel()"
     (window:keydown.escape)="confirmDialog.cancel()"
   >
@@ -35,6 +36,7 @@
         <div class="flex justify-center gap-3 px-4 pt-6 pb-4">
           <button
             class="btn btn-m btn-tertiary"
+            data-testid="confirm-dialog-cancel"
             (click)="confirmDialog.cancel()"
             type="button"
           >
@@ -43,6 +45,7 @@
 
           <button
             class="btn btn-m"
+            data-testid="confirm-dialog-confirm"
             [ngClass]="confirmButtonClass()"
             (click)="confirmDialog.accept()"
             type="button"

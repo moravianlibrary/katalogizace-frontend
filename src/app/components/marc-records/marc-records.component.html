@@ -19,6 +19,7 @@
         <div>
           <button
             class="border-bright w-full border-b px-2 py-3 hover:cursor-pointer hover:bg-gray-500/5"
+            [attr.data-testid]="'context-record-row-' + $index"
             [ngClass]="
               expandedIndex() === $index ? 'bg-gray-500/10' : 'bg-main-base'
             "
@@ -73,7 +74,10 @@
           </button>
 
           @if (expandedIndex() === $index) {
-            <div class="border-primary-default border-b-2">
+            <div
+              class="border-primary-default border-b-2"
+              [attr.data-testid]="'context-record-expanded-' + $index"
+            >
               <div
                 class="min-h-0 overflow-auto overscroll-contain"
                 [style.max-height.px]="detailMaxHeightPx()"

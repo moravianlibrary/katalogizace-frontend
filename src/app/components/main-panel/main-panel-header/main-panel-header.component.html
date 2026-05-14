@@ -13,6 +13,7 @@
         [attr.tabindex]="canExport() ? null : -1"
         [disabled]="!canExport()"
         (click)="onExport()"
+        data-testid="export-record-button"
         type="button"
       >
         {{ "buttons.export" | translate }}
@@ -31,6 +32,7 @@
         [attr.tabindex]="canWrite() ? null : -1"
         [disabled]="!canWrite() || isSaving() || !canSaveRecord()"
         (click)="onSave()"
+        data-testid="save-record-button"
         type="button"
       >
         {{ "buttons.save_record" | translate }}

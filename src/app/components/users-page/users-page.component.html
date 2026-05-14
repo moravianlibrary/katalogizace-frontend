@@ -1,8 +1,12 @@
-<section class="mx-auto flex h-full min-h-0 flex-col gap-4 p-4">
+<section
+  class="mx-auto flex h-full min-h-0 flex-col gap-4 p-4"
+  data-testid="users-page"
+>
   <div class="flex flex-row items-center justify-between gap-4">
     @if (canManageUsers()) {
       <button
         class="btn btn-l btn-primary group"
+        data-testid="create-user-button"
         (click)="openCreate()"
         type="button"
       >
@@ -20,6 +24,7 @@
       <app-table-search-input
         [value]="searchInput()"
         (valueChange)="searchInput.set($event)"
+        data-testid="users-search"
         placeholderKey="users.search"
       />
     </div>
@@ -85,7 +90,10 @@
             </tr>
           } @else {
             @for (user of filteredUsers(); track user.id; let last = $last) {
-              <tr class="bg-main-base border-bright border-t">
+              <tr
+                class="bg-main-base border-bright border-t"
+                [attr.data-testid]="'user-row-' + user.id"
+              >
                 <td class="px-3 py-3.5" [class.rounded-bl-lg]="last">
                   <div class="flex min-w-0 items-center gap-2">
                     <span class="min-w-0 truncate">
@@ -121,6 +129,7 @@
                     @if (canManageUsers()) {
                       <button
                         class="btn btn-tertiary group enabled:hover:shadow-s p-2"
+                        [attr.data-testid]="'edit-user-' + user.id"
                         [attr.aria-label]="'users.edit' | translate"
                         [title]="'users.edit' | translate"
                         (click)="openEdit(user, $event)"
@@ -138,6 +147,7 @@
                     @if (canManageUsers()) {
                       <button
                         class="btn btn-tertiary group enabled:hover:shadow-s p-2"
+                        [attr.data-testid]="'delete-user-' + user.id"
                         [disabled]="user.id === auth.user()?.id"
                         [attr.aria-label]="'users.delete' | translate"
                         [title]="'users.delete' | translate"

@@ -21,6 +21,7 @@ export class TableFilterMenuComponent {
   value = input<string | null>(null);
   radioName = input.required<string>();
   panelWidthClass = input('w-54');
+  testId = input<string | null>(null);
 
   valueChange = output<string | null>();
 
@@ -57,5 +58,12 @@ export class TableFilterMenuComponent {
   protected select(value: string | null) {
     this.valueChange.emit(value);
     this.close();
+  }
+
+  protected optionTestId(value: string | null): string | null {
+    const prefix = this.testId();
+    if (!prefix) return null;
+
+    return `${prefix}-option-${value ?? 'all'}`;
   }
 }

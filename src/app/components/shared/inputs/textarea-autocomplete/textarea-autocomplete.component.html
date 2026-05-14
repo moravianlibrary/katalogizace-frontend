@@ -5,6 +5,7 @@
     <textarea
       class="text-md w-full resize-none bg-transparent py-3 pr-4 pl-4 font-medium outline-none"
       #ta
+      data-testid="autocomplete-textarea"
       [ngClass]="disabled() ? 'text-disable' : 'text-secondary'"
       [disabled]="disabled()"
       [value]="query()"

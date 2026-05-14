@@ -2,6 +2,7 @@
   <div
     class="fixed top-4 left-1/2 z-9999 flex w-max max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-3 rounded-lg px-3 py-2 font-medium shadow-sm"
     [ngClass]="ui().containerClass"
+    data-testid="toast"
     role="status"
     aria-live="polite"
   >
@@ -12,7 +13,7 @@
       height="24"
     ></svg>
 
-    <span class="text-secondary">
+    <span class="text-secondary" data-testid="toast-message">
       {{ message }}
     </span>
 

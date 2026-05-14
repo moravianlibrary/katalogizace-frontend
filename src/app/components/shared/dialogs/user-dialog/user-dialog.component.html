@@ -8,7 +8,10 @@
   (panelClick)="editor.closePicker()"
   panelClass="max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-2xl"
 >
-  <div class="flex min-h-0 flex-col overflow-hidden py-3">
+  <div
+    class="flex min-h-0 flex-col overflow-hidden py-3"
+    [attr.data-testid]="isCreate() ? 'create-user-dialog' : 'edit-user-dialog'"
+  >
     <div class="border-bright border-b px-4 pb-3">
       <div class="grid shrink-0 gap-4 sm:grid-cols-2">
         <div>
@@ -19,6 +22,7 @@
           <input
             class="border-tertiary-default bg-main-base focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border py-3 pl-4 outline-none"
             #fullNameInput
+            data-testid="user-full-name"
             [value]="fullName()"
             [disabled]="submitting()"
             (input)="onFullNameInput($event)"
@@ -34,6 +38,7 @@
           @if (isCreate()) {
             <input
               class="border-tertiary-default bg-main-base focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border py-3 pl-4 outline-none"
+              data-testid="user-email"
               [value]="email()"
               [disabled]="submitting()"
               (input)="onEmailInput($event)"
@@ -42,6 +47,7 @@
           } @else {
             <input
               class="text-disable border-tertiary-disable w-full cursor-not-allowed overflow-hidden rounded-lg border bg-gray-500/5 py-3 pl-4 outline-none"
+              data-testid="user-email"
               [value]="email()"
               disabled
               type="email"
@@ -58,6 +64,7 @@
         @if (!isCreate()) {
           <button
             class="btn btn-m btn-tertiary group"
+            data-testid="user-reset-password"
             [disabled]="submitting() || resettingPassword()"
             (click)="resetPassword()"
             type="button"
@@ -82,6 +89,7 @@
         >
           <input
             class="peer sr-only"
+            data-testid="user-is-admin"
             [checked]="isAdmin()"
             [disabled]="submitting() || (!isCreate() && isEditingCurrentUser())"
             (change)="onIsAdminInput($event)"
@@ -138,6 +146,7 @@
   >
     <button
       class="btn btn-m btn-tertiary"
+      [attr.data-testid]="isCreate() ? 'create-user-cancel' : 'edit-user-cancel'"
       [disabled]="submitting()"
       (click)="close()"
       type="button"
@@ -147,6 +156,7 @@
 
     <button
       class="btn btn-m btn-primary"
+      [attr.data-testid]="isCreate() ? 'create-user-submit' : 'edit-user-submit'"
       [disabled]="
         submitting() ||
         (isCreate() ? !fullName().trim() || !email().trim() : !edited())

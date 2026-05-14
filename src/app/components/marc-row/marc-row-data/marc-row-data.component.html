@@ -39,6 +39,7 @@
       @if (df().fieldId && (df().candidates?.length ?? 0) > 1) {
         <button
           class="group cursor-pointer"
+          data-testid="show-candidates-button"
           (click)="onShowCandidates(); $event.stopPropagation()"
           type="button"
         >
@@ -54,6 +55,7 @@
       @if (df().selectedCandidateId && df().score) {
         <button
           class="border-base h-5 w-5 rounded-full border shadow hover:cursor-pointer"
+          data-testid="show-provenance-button"
           [ngClass]="scoreClass(df().score)"
           (click)="onShowProvenance(); $event.stopPropagation()"
           type="button"
