@@ -1,4 +1,6 @@
 import { TestBed } from '@angular/core/testing';
+import { expect } from '@playwright/test';
+import { beforeEach, describe, it } from 'node:test';
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
@@ -14,18 +16,11 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'katalogizace-frontend' title`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('katalogizace-frontend');
-  });
-
-  it('should render title', () => {
+  it('should render the global toast and confirm dialog outlets', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain(
-      'Hello, katalogizace-frontend',
-    );
+    expect(compiled.querySelector('app-toast')).not.toBeNull();
+    expect(compiled.querySelector('app-confirm-dialog')).not.toBeNull();
   });
 });
