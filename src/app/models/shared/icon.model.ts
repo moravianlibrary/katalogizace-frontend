@@ -51,10 +51,16 @@ export type AppIconName =
   | 'danger'
   | 'info';
 
+export type IconRule = 'evenodd' | 'nonzero';
+
+export type IconPathDefinition =
+  | string
+  | {
+      d: string;
+      fillRule?: IconRule;
+      clipRule?: IconRule;
+    };
+
 export type IconDefinition = {
-  paths: Array<{
-    d: string;
-    fillRule: 'evenodd' | 'nonzero';
-    clipRule: 'evenodd' | 'nonzero';
-  }>;
+  paths: IconPathDefinition[];
 };
