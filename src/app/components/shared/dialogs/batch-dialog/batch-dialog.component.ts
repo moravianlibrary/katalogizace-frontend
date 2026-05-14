@@ -26,8 +26,9 @@ import {
   ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { forkJoin, Observable, of, switchMap } from 'rxjs';
+import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import {
   PermissionAssignmentEditorComponent,
   type PermissionAssignmentOption,
@@ -36,17 +37,19 @@ import {
 } from '../../../shared/permission-assignment-editor/permission-assignment-editor.component';
 import { DialogShellComponent } from '../dialog-shell/dialog-shell.component';
 
+export type BatchDialogMode = 'create' | 'edit';
+
 @Component({
   standalone: true,
-  selector: 'app-batch-edit-dialog',
+  selector: 'app-batch-dialog',
   imports: [
     TranslateModule,
     DialogShellComponent,
     PermissionAssignmentEditorComponent,
   ],
-  templateUrl: './batch-edit-dialog.component.html',
+  templateUrl: './batch-dialog.component.html',
 })
-export class BatchEditDialogComponent {
+export class BatchDialogComponent {
   private batches = inject(BatchesService);
   private users = inject(UsersService);
   private permissions = inject(PermissionsService);
@@ -54,8 +57,10 @@ export class BatchEditDialogComponent {
   private toast = inject(ToastService);
   private translate = inject(TranslateService);
   private destroyRef = inject(DestroyRef);
+  private router = inject(Router);
 
   open = input<boolean>(false);
+  mode = input<BatchDialogMode>('edit');
   batch = input<BatchDto | null>(null);
 
   readonly closed = output<void>();
@@ -74,6 +79,28 @@ export class BatchEditDialogComponent {
 
   @ViewChild('nameInput')
   nameInput?: ElementRef<HTMLInputElement>;
+
+  readonly isCreate = computed(() => this.mode() === 'create');
+
+  readonly dialogTitle = computed(() => {
+    return this.isCreate()
+      ? this.translate.instant('batches.create')
+      : this.translate.instant('batches.edit');
+  });
+
+  readonly titleId = computed(() => {
+    return this.isCreate()
+      ? 'create-batch-dialog-title'
+      : 'edit-batch-dialog-title';
+  });
+
+  readonly dialogTestId = computed(() => {
+    return this.isCreate() ? 'create-batch-dialog' : 'edit-batch-dialog';
+  });
+
+  readonly openState = computed(() => {
+    return this.open() && (this.isCreate() || !!this.batch());
+  });
 
   readonly userOptions = computed<PermissionAssignmentOption[]>(() => {
     return this.allUsers().map((user) => ({
@@ -95,6 +122,8 @@ export class BatchEditDialogComponent {
   });
 
   readonly edited = computed(() => {
+    if (this.isCreate()) return false;
+
     const batch = this.batch();
     if (!batch) return false;
 
@@ -111,25 +140,19 @@ export class BatchEditDialogComponent {
     return metadataChanged || membersChanged;
   });
 
+  readonly submitDisabled = computed(() => {
+    if (this.saving()) return true;
+
+    return this.isCreate() ? !this.name().trim() : !this.edited();
+  });
+
   constructor() {
     effect(() => {
       if (!this.open()) return;
 
-      const batch = this.batch();
-      if (!batch) return;
+      if (!this.isCreate() && !this.batch()) return;
 
-      this.name.set((batch.name ?? '').trim());
-      this.description.set((batch.description ?? '').trim());
-      this.editMembers.set([]);
-      this.originalEditMembers.set([]);
-      this.saving.set(false);
-
-      this.loadUsersInfo(true);
-      this.loadBatchMembers(batch.batch_id);
-
-      queueMicrotask(() => {
-        this.nameInput?.nativeElement.focus();
-      });
+      this.initializeState();
     });
   }
 
@@ -266,11 +289,43 @@ export class BatchEditDialogComponent {
       });
   }
 
+  submit() {
+    if (this.saving()) return;
+
+    if (this.isCreate()) {
+      this.createBatch();
+      return;
+    }
+
+    this.saveEdit();
+  }
+
   private showForbidden() {
     this.toast.show(
       this.translate.instant('messages.error.forbidden'),
       'error',
     );
+  }
+
+  private initializeState() {
+    const batch = this.batch();
+
+    this.name.set((batch?.name ?? '').trim());
+    this.description.set((batch?.description ?? '').trim());
+    this.editMembers.set([]);
+    this.originalEditMembers.set([]);
+    this.saving.set(false);
+    this.loadingBatchMembers.set(false);
+
+    this.loadUsersInfo(true);
+
+    if (batch) {
+      this.loadBatchMembers(batch.batch_id);
+    }
+
+    queueMicrotask(() => {
+      this.nameInput?.nativeElement.focus();
+    });
   }
 
   private loadUsersInfo(force = false) {
@@ -337,6 +392,72 @@ export class BatchEditDialogComponent {
       });
   }
 
+  private createBatch() {
+    if (!this.permissions.canCreateBatch()) {
+      this.showForbidden();
+      return;
+    }
+
+    const name = this.name().trim();
+    const descRaw = this.description().trim();
+    const description: string | null = descRaw ? descRaw : null;
+
+    if (!name) {
+      this.toast.show(
+        this.translate.instant('messages.error.batches.empty_name'),
+        'error',
+      );
+      return;
+    }
+
+    this.saving.set(true);
+
+    this.batches
+      .createBatch(name, description)
+      .pipe(
+        switchMap((batch) =>
+          this.addInitialBatchMembers(batch, this.effectiveEditMembers()),
+        ),
+      )
+      .subscribe({
+        next: (batch) => {
+          this.toast.show(
+            this.translate.instant('messages.success.batches.create'),
+            'success',
+          );
+
+          this.saved.emit();
+          this.closed.emit();
+
+          this.auth.loadCurrentUser().subscribe({
+            next: () => {
+              this.router.navigate([
+                '/batches',
+                batch.batch_id.toString(),
+                'books',
+              ]);
+            },
+            error: (err) => {
+              console.error(err);
+              this.toast.show(
+                this.translate.instant('messages.error.auth.user_load'),
+                'error',
+              );
+              this.router.navigate(['/batches']);
+            },
+          });
+        },
+        error: (err) => {
+          console.error(err);
+          this.toast.show(
+            this.translate.instant('messages.error.batches.create'),
+            'error',
+          );
+          this.saving.set(false);
+        },
+      });
+  }
+
   private effectiveEditMembers(): BatchMemberPermissionRequest[] {
     return this.editMembers()
       .filter((item) => item.permissions.length > 0)
@@ -344,6 +465,19 @@ export class BatchEditDialogComponent {
         user_id: item.user_id,
         permissions: normalizePermissions(item.permissions),
       }));
+  }
+
+  private addInitialBatchMembers(
+    batch: BatchDto,
+    members: BatchMemberPermissionRequest[],
+  ): Observable<BatchDto> {
+    if (members.length === 0) {
+      return of(batch);
+    }
+
+    return this.batches
+      .addBatchMembers(batch.batch_id, members)
+      .pipe(map(() => batch));
   }
 
   private syncBatchMembers(batchId: number): Observable<unknown> {

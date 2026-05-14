@@ -3,11 +3,9 @@ import {
   Component,
   computed,
   DestroyRef,
-  ElementRef,
   inject,
   Injector,
   signal,
-  ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -18,7 +16,6 @@ import {
   ID,
   PaginatedBatchesResponseDto,
 } from '@/app/models';
-import { AuthService } from '@/app/services/api/auth.service';
 import { BreadcrumbsService } from '@/app/services/breadcrumbs.service';
 import { ConfirmDialogService } from '@/app/services/confirm-dialog.service';
 import { PermissionsService } from '@/app/services/permissions.service';
@@ -30,7 +27,7 @@ import {
   createQuerySyncedTableState,
   type TableSortDirection,
 } from '../../utils/table-query-state.util';
-import { BatchEditDialogComponent } from '../shared/dialogs/batch-edit-dialog/batch-edit-dialog.component';
+import { BatchDialogComponent } from '../shared/dialogs/batch-dialog/batch-dialog.component';
 import { IconComponent } from '../shared/icon/icon.component';
 import { SortableTableHeaderComponent } from '../shared/table/sortable-table-header/sortable-table-header.component';
 import {
@@ -72,7 +69,7 @@ const BATCH_STATE_BADGE_APPEARANCES = {
     BatchStateLabelPipe,
     TranslateModule,
     IconComponent,
-    BatchEditDialogComponent,
+    BatchDialogComponent,
     TableFilterMenuComponent,
     TablePaginationComponent,
     TableStateBadgeComponent,
@@ -91,7 +88,6 @@ export class BatchesPageComponent {
   private breadcrumbs = inject(BreadcrumbsService);
   private translate = inject(TranslateService);
   private permissions = inject(PermissionsService);
-  private auth = inject(AuthService);
   private confirmDialog = inject(ConfirmDialogService);
 
   loading = signal(false);
@@ -108,9 +104,6 @@ export class BatchesPageComponent {
   sortBy = signal<'created_at' | 'modified_at'>('modified_at');
   sortDir = signal<TableSortDirection>('desc');
 
-  newName = signal('');
-  newDescription = signal('');
-  creating = signal(false);
   createDialogOpen = signal(false);
 
   editingBatch = signal<BatchDto | null>(null);
@@ -184,9 +177,6 @@ export class BatchesPageComponent {
   hasPrev = this.tableState.hasPrev;
   hasNext = this.tableState.hasNext;
   visiblePages = this.tableState.visiblePages;
-
-  @ViewChild('createNameInput')
-  createNameInput?: ElementRef<HTMLInputElement>;
 
   ngOnInit() {
     this.breadcrumbs.clearBatch();
@@ -344,75 +334,6 @@ export class BatchesPageComponent {
     });
   }
 
-  onNameInput(event: Event) {
-    this.newName.set((event.target as HTMLInputElement).value);
-  }
-
-  onDescriptionInput(event: Event) {
-    this.newDescription.set((event.target as HTMLInputElement).value);
-  }
-
-  createBatch() {
-    if (this.creating()) return;
-
-    if (!this.canCreateBatch()) {
-      this.showForbidden();
-      return;
-    }
-
-    const name = this.newName().trim();
-    const description = this.newDescription().trim();
-
-    if (!name) {
-      this.toast.show(
-        this.translate.instant('messages.error.batches.empty_name'),
-        'error',
-      );
-      return;
-    }
-
-    this.creating.set(true);
-
-    this.batches.createBatch(name, description ? description : null).subscribe({
-      next: (batch) => {
-        this.toast.show(
-          this.translate.instant('messages.success.batches.create'),
-          'success',
-        );
-
-        this.closeCreate();
-
-        this.auth.loadCurrentUser().subscribe({
-          next: () => {
-            this.router.navigate([
-              '/batches',
-              batch.batch_id.toString(),
-              'books',
-            ]);
-          },
-          error: (err) => {
-            console.error(err);
-
-            this.toast.show(
-              this.translate.instant('messages.error.auth.user_load'),
-              'error',
-            );
-
-            this.router.navigate(['/batches']);
-          },
-        });
-      },
-      error: (err) => {
-        console.error(err);
-        this.toast.show(
-          this.translate.instant('messages.error.batches.create'),
-          'error',
-        );
-        this.creating.set(false);
-      },
-    });
-  }
-
   openEdit(b: BatchDto, event: MouseEvent) {
     event.stopPropagation();
     event.preventDefault();
@@ -437,21 +358,10 @@ export class BatchesPageComponent {
       return;
     }
 
-    this.newName.set('');
-    this.newDescription.set('');
-    this.creating.set(false);
     this.createDialogOpen.set(true);
-
-    setTimeout(() => {
-      this.createNameInput?.nativeElement.focus();
-    });
   }
 
   closeCreate() {
     this.createDialogOpen.set(false);
-
-    this.newName.set('');
-    this.newDescription.set('');
-    this.creating.set(false);
   }
 }

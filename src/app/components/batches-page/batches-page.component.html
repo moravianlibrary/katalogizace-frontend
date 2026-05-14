@@ -6,8 +6,8 @@
     @if (canCreateBatch()) {
       <button
         class="btn btn-l btn-primary group"
-        data-testid="create-batch-button"
         (click)="openCreate()"
+        data-testid="create-batch-button"
         type="button"
       >
         <svg
@@ -294,113 +294,18 @@
     </div>
   </div>
 
-  <app-batch-edit-dialog
+  <app-batch-dialog
     [open]="editDialogOpen()"
     [batch]="editingBatch()"
     (closed)="closeEdit()"
     (saved)="closeEdit(); load()"
+    mode="edit"
   />
 
-  @if (createDialogOpen()) {
-    <div
-      class="fixed inset-0 z-100 flex items-center justify-center bg-black/40 p-4"
-      data-testid="create-batch-dialog"
-      (click)="closeCreate()"
-      (window:keydown.escape)="closeCreate()"
-    >
-      <section
-        class="shadow-s w-full max-w-115 overflow-hidden rounded-2xl bg-white"
-        (click)="$event.stopPropagation()"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="create-batch-dialog-title"
-      >
-        <div
-          class="border-bright flex justify-between gap-3 border-b px-4 pt-4 pb-3"
-        >
-          <span
-            class="text-base-color text-xl font-medium"
-            id="create-batch-dialog-title"
-          >
-            {{ "batches.create" | translate }}
-          </span>
-
-          <button class="btn group" (click)="closeCreate()" type="button">
-            <svg class="icon-tertiary" appIcon="x" width="24" height="24"></svg>
-          </button>
-        </div>
-
-        <div class="flex flex-col gap-6 px-4 pt-4 pb-6">
-          <div>
-            <label class="text-light text-sm-tight mb-2 block font-medium">
-              {{ "batches.title" | translate }}
-            </label>
-
-            <input
-              class="focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border bg-transparent py-3 pl-4 outline-none"
-              #createNameInput
-              data-testid="create-batch-name"
-              [ngClass]="
-                creating()
-                  ? 'text-disable border-tertiary-disable cursor-not-allowed bg-gray-500/5'
-                  : 'border-tertiary-default bg-main-base'
-              "
-              [value]="newName()"
-              [disabled]="creating()"
-              (input)="onNameInput($event)"
-              (keydown.enter)="!creating() && createBatch()"
-              type="text"
-            />
-          </div>
-
-          <div>
-            <label class="text-light text-sm-tight mb-2 block font-medium">
-              {{ "batches.subtitle" | translate }}
-            </label>
-
-            <input
-              class="focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border bg-transparent py-3 pl-4 outline-none"
-              data-testid="create-batch-description"
-              [ngClass]="
-                creating()
-                  ? 'text-disable border-tertiary-disable cursor-not-allowed bg-gray-500/5'
-                  : 'border-tertiary-default bg-main-base'
-              "
-              [value]="newDescription()"
-              [disabled]="creating()"
-              (input)="onDescriptionInput($event)"
-              (keydown.enter)="!creating() && createBatch()"
-              type="text"
-            />
-          </div>
-        </div>
-
-        <div class="border-bright flex justify-center gap-3 border-t px-4 py-3">
-          <button
-            class="btn btn-m btn-tertiary"
-            data-testid="create-batch-cancel"
-            [disabled]="creating()"
-            (click)="closeCreate()"
-            type="button"
-          >
-            {{ "buttons.cancel" | translate }}
-          </button>
-
-          <button
-            class="btn btn-m btn-primary"
-            data-testid="create-batch-submit"
-            [disabled]="creating() || !newName().trim()"
-            (click)="createBatch()"
-            type="button"
-          >
-            @if (creating()) {
-              {{ "buttons.creating" | translate }}
-            } @else {
-              {{ "buttons.create" | translate }}
-            }
-          </button>
-        </div>
-      </section>
-    </div>
-  }
+  <app-batch-dialog
+    [open]="createDialogOpen()"
+    (closed)="closeCreate()"
+    (saved)="closeCreate(); load()"
+    mode="create"
+  />
 </section>
