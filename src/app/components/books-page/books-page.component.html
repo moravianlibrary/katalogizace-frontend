@@ -29,9 +29,9 @@
 
         <button
           class="btn btn-l btn-primary group"
-          data-testid="upload-books-button"
           [disabled]="isUploading"
           (click)="!isUploading && fileInput.click()"
+          data-testid="upload-books-button"
           type="button"
         >
           <svg
@@ -61,8 +61,8 @@
 
   <input
     #fileInput
-    data-testid="books-upload-input"
     (change)="onUploadImages($event)"
+    data-testid="books-upload-input"
     type="file"
     multiple
     accept="image/*"

@@ -293,19 +293,19 @@
       />
     </div>
   </div>
-
-  <app-batch-dialog
-    [open]="editDialogOpen()"
-    [batch]="editingBatch()"
-    (closed)="closeEdit()"
-    (saved)="closeEdit(); load()"
-    mode="edit"
-  />
-
-  <app-batch-dialog
-    [open]="createDialogOpen()"
-    (closed)="closeCreate()"
-    (saved)="closeCreate(); load()"
-    mode="create"
-  />
 </section>
+
+<app-batch-dialog
+  [open]="editDialogOpen()"
+  [batch]="editingBatch()"
+  (closed)="closeEdit()"
+  (saved)="closeEdit(); load()"
+  mode="edit"
+/>
+
+<app-batch-dialog
+  [open]="createDialogOpen()"
+  (closed)="closeCreate()"
+  (saved)="closeCreate(); load()"
+  mode="create"
+/>

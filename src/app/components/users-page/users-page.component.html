@@ -6,8 +6,8 @@
     @if (canManageUsers()) {
       <button
         class="btn btn-l btn-primary group"
-        data-testid="create-user-button"
         (click)="openCreate()"
+        data-testid="create-user-button"
         type="button"
       >
         <svg
@@ -177,28 +177,28 @@
       </div>
     </div>
   </div>
-
-  <app-user-dialog
-    [open]="createDialogOpen()"
-    (closed)="closeCreate()"
-    (saved)="closeCreate(); load()"
-    (passwordGenerated)="onPasswordGenerated($event)"
-    mode="create"
-  />
-
-  <app-user-dialog
-    [open]="editDialogOpen()"
-    [user]="editingUser()"
-    (closed)="closeEdit()"
-    (saved)="closeEdit(); load()"
-    (passwordGenerated)="onPasswordGenerated($event)"
-    mode="edit"
-  />
-
-  <app-generated-password-dialog
-    [open]="resetPasswordDialogOpen()"
-    [password]="generatedPassword()"
-    [titleKey]="passwordDialogTitleKey()"
-    (closed)="closeResetPasswordDialog()"
-  />
 </section>
+
+<app-user-dialog
+  [open]="createDialogOpen()"
+  (closed)="closeCreate()"
+  (saved)="closeCreate(); load()"
+  (passwordGenerated)="onPasswordGenerated($event)"
+  mode="create"
+/>
+
+<app-user-dialog
+  [open]="editDialogOpen()"
+  [user]="editingUser()"
+  (closed)="closeEdit()"
+  (saved)="closeEdit(); load()"
+  (passwordGenerated)="onPasswordGenerated($event)"
+  mode="edit"
+/>
+
+<app-generated-password-dialog
+  [open]="resetPasswordDialogOpen()"
+  [password]="generatedPassword()"
+  [titleKey]="passwordDialogTitleKey()"
+  (closed)="closeResetPasswordDialog()"
+/>
