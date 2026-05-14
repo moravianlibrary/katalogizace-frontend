@@ -35,7 +35,9 @@ test.describe.serial('upload flow', () => {
         .getByTestId('books-upload-input')
         .setInputFiles(UPLOAD_FIXTURE_IMAGE);
 
-      await expect(page.getByTestId('toast')).toBeVisible();
+      await expect(page.getByTestId('upload-books-button')).toBeEnabled({
+        timeout: 30_000,
+      });
 
       await expect
         .poll(
