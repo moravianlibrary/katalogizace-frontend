@@ -48,10 +48,6 @@ export function subfieldsSignature(subfields?: MarcSubfield[] | null): string {
   return parts.join(SEP);
 }
 
-/**
- * Field signature pre data field. Stabilné aj keď sa zmení poradie podpolí.
- * (Používa multiset podpis subfields.)
- */
 export function dataSignature(f: ExistingMarcRecordDataField): string {
   const tag = normStr(f.tag);
   const ind1 = normInd(f.ind1);
@@ -64,9 +60,6 @@ function fieldTag(f: ExistingMarcRecordDataField): string {
   return normStr(f.tag);
 }
 
-/**
- * Vytiahne len diffovateľné data fields (015–830).
- */
 function toDataFields(
   rec: ExistingMarcRecord | null | undefined,
 ): ExistingMarcRecordDataField[] {
@@ -74,10 +67,6 @@ function toDataFields(
   return (rec.data_fields ?? []).filter((f) => isDiffableTag015to830(f.tag));
 }
 
-/**
- * multiset delta medzi dvoma zoznamami subfields (ignoruje poradie, ráta duplicity).
- * Výstup = počet add/remove operácií.
- */
 function subfieldsDeltaCount(
   a: MarcSubfield[] | null | undefined,
   b: MarcSubfield[] | null | undefined,
@@ -104,12 +93,6 @@ function multisetCounts(sfs: MarcSubfield[]): Map<string, number> {
   return m;
 }
 
-/**
- * Cost na pairing dvoch polí rovnakého tagu:
- * +1 za rozdiel ind1
- * +1 za rozdiel ind2
- * + delta multiset subfields
- */
 function matchCost(
   a: ExistingMarcRecordDataField,
   b: ExistingMarcRecordDataField,
@@ -124,10 +107,6 @@ function matchCost(
   return cost;
 }
 
-/**
- * Greedy pairing v rámci jedného tagu:
- * - vygeneruje všetky páry, zoradí podľa cost, a greedy vyberie nekolízne páry
- */
 function greedyPairing(
   opened: ExistingMarcRecordDataField[],
   preview: ExistingMarcRecordDataField[],
@@ -175,10 +154,6 @@ export function subfieldOccKey(
   return `${sf.code}${KV}${sf.value}${OCC}${occIndex}`;
 }
 
-/**
- * Enumerácia podpolí v pôvodnom poradí (po normalizácii)
- * + ku každému “occKey” (index medzi rovnakými (code,value)).
- */
 export function enumerateSubfields(
   subfields?: MarcSubfield[] | null,
 ): Array<{ sf: { code: string; value: string }; key: string }> {
@@ -193,12 +168,6 @@ export function enumerateSubfields(
   });
 }
 
-/**
- * Subfield-level diff pre jedno spárované pole:
- * 1) exact match (code+value) => same (green)
- * 2) zvyšok páruj podľa code => changed (red)
- * 3) leftovers => missing_or_extra (orange)
- */
 function diffSubfieldsWithinPairedField(
   openedSubfields?: MarcSubfield[] | null,
   previewSubfields?: MarcSubfield[] | null,
@@ -218,7 +187,6 @@ function diffSubfieldsWithinPairedField(
   const isNonEmpty = (sf: { code: string; value: string }) =>
     sf.value.length > 0;
 
-  // indexy výskytov podľa exact (code,value)
   const oByExact = new Map<string, number[]>();
   const pByExact = new Map<string, number[]>();
 
@@ -241,7 +209,6 @@ function diffSubfieldsWithinPairedField(
   const usedO = new Set<number>();
   const usedP = new Set<number>();
 
-  // 1) exact matches => same (green)
   const exactKeys = new Set([...oByExact.keys(), ...pByExact.keys()]);
   for (const k of exactKeys) {
     const oi = oByExact.get(k) ?? [];
@@ -256,7 +223,6 @@ function diffSubfieldsWithinPairedField(
     }
   }
 
-  // 2) remaining non-empty => group by code => changed (red)
   const oByCode = new Map<string, number[]>();
   const pByCode = new Map<string, number[]>();
 
@@ -289,7 +255,6 @@ function diffSubfieldsWithinPairedField(
       usedP.add(pi[j]);
     }
 
-    // 3) leftovers => missing_or_extra (orange)
     for (let j = m; j < oi.length; j++) {
       openedKinds.set(o[oi[j]].key, 'missing_or_extra');
     }
@@ -298,7 +263,6 @@ function diffSubfieldsWithinPairedField(
     }
   }
 
-  // 4) všetky empty subfields, ktoré sa nikdy nepoužili => ORANGE
   o.forEach(({ sf, key }, i) => {
     if (!isNonEmpty(sf)) {
       openedKinds.set(key, 'missing_or_extra');
@@ -314,12 +278,6 @@ function diffSubfieldsWithinPairedField(
   return { opened: openedKinds, preview: previewKinds };
 }
 
-/**
- * diff opened vs preview na úrovni podpolí (015–830)
- * - grouping podľa tagu
- * - greedy pairing polí v rámci tagu
- * - potom subfield-level diff v rámci spárovaného poľa
- */
 export function diffMarcRecordsSubfields(
   openedRec: ExistingMarcRecord | null,
   previewRec: ExistingMarcRecord | null,
@@ -341,7 +299,6 @@ export function diffMarcRecordsSubfields(
 
     const { chosen, unpairedO, unpairedP } = greedyPairing(oGroup, pGroup);
 
-    // paired fields => diff subfields
     for (const { o, p } of chosen) {
       const oKey = dataSignature(o);
       const pKey = dataSignature(p);
@@ -355,7 +312,6 @@ export function diffMarcRecordsSubfields(
       previewMap.set(pKey, preview);
     }
 
-    // unpaired => všetky subfields orange na tej strane
     for (const o of unpairedO) {
       const oKey = dataSignature(o);
 
@@ -386,7 +342,7 @@ function normalizeSubfieldsKeepEmpty(
   const sfs = subfields ?? [];
   return sfs
     .map((sf) => ({ code: normStr(sf.code), value: normStr(sf.value) }))
-    .filter((sf) => sf.code.length === 1); // ✅ value môže byť ''
+    .filter((sf) => sf.code.length === 1);
 }
 
 function normalizeSubfieldsNonEmpty(

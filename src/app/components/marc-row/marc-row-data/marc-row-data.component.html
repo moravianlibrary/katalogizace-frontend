@@ -21,7 +21,10 @@
         <div class="flex flex-wrap gap-x-2 gap-y-1">
           @for (e of subfieldsEnumerated(); track $index) {
             @if (e.sf.value.length) {
-              <span [ngClass]="subDiffClass(subDiffKindAt($index))">
+              <span
+                class="rounded-xs px-1"
+                [ngClass]="subDiffClass(subDiffKindAt($index))"
+              >
                 <span class="text-secondary text-md font-bold"
                   >|{{ e.sf.code }}</span
                 >
@@ -39,8 +42,8 @@
       @if (df().fieldId && (df().candidates?.length ?? 0) > 1) {
         <button
           class="group cursor-pointer"
-          data-testid="show-candidates-button"
           (click)="onShowCandidates(); $event.stopPropagation()"
+          data-testid="show-candidates-button"
           type="button"
         >
           <svg
@@ -55,9 +58,9 @@
       @if (df().selectedCandidateId && df().score) {
         <button
           class="border-base h-5 w-5 rounded-full border shadow hover:cursor-pointer"
-          data-testid="show-provenance-button"
           [ngClass]="scoreClass(df().score)"
           (click)="onShowProvenance(); $event.stopPropagation()"
+          data-testid="show-provenance-button"
           type="button"
         ></button>
       }

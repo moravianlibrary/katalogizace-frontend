@@ -1,7 +1,7 @@
 export interface MarcValueDefinition {
-  fullCode: string; // napr. "008.35-37"
+  fullCode: string; // eg. "008.35-37"
   inputType: 'static-dropdown' | 'autocompleter';
-  translationPrefix: string; // napr. "marcData.008.35-37."
+  translationPrefix: string; // eg. "marcData.008.35-37."
   options: string[];
   showCodesRight?: boolean;
 }

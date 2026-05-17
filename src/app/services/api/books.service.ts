@@ -143,16 +143,6 @@ export class BooksService {
     );
   }
 
-  // uploadBookImage(bookId: string, file: Blob | File) {
-  //   const formData = new FormData();
-  //   formData.append('image_file', file);
-
-  //   return this.http.post<BookImageUploadResponseDto>(
-  //     `${this.apiBaseUrl}/books/${bookId}/image`,
-  //     formData,
-  //   );
-  // }
-
   uploadBookImage(bookId: string, file: Blob | File) {
     return this.http
       .post<PresignedPostUploadResponse>(

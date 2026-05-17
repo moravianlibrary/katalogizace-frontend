@@ -23,20 +23,14 @@ import { ContextPanelHeaderComponent } from './context-panel-header/context-pane
   templateUrl: './context-panel.component.html',
 })
 export class ContextPanelComponent {
-  private cps = inject(ContextPanelService);
-  private store = inject(RecordStore);
-  private destroyRef = inject(DestroyRef);
+  private readonly cps = inject(ContextPanelService);
+  private readonly store = inject(RecordStore);
+  private readonly destroyRef = inject(DestroyRef);
 
-  bookId = input<ID | null>(null);
-  canWrite = input<boolean>(false);
+  readonly bookId = input<ID | null>(null);
+  readonly canWrite = input<boolean>(false);
 
-  constructor() {
-    this.destroyRef.onDestroy(() => {
-      this.cps.reset();
-    });
-  }
-
-  hasSingleRecord = computed(() => {
+  protected readonly hasSingleRecord = computed(() => {
     const extracted = this.store.extracted();
     const existing = this.store.existingRecords();
 
@@ -44,9 +38,9 @@ export class ContextPanelComponent {
     return count === 1;
   });
 
-  state = computed(() => this.cps.state());
+  protected readonly state = computed(() => this.cps.state());
 
-  titleKey = computed(() => {
+  protected readonly titleKey = computed(() => {
     const st = this.state();
 
     switch (st.mode) {
@@ -65,8 +59,14 @@ export class ContextPanelComponent {
     }
   });
 
-  titleParams = computed(() => {
+  protected readonly titleParams = computed(() => {
     const st = this.state();
     return { tag: st.tag };
   });
+
+  constructor() {
+    this.destroyRef.onDestroy(() => {
+      this.cps.reset();
+    });
+  }
 }

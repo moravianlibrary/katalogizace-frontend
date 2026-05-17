@@ -227,7 +227,6 @@ export class RecordStateService {
     });
   }
 
-  // TODO rovno predvyplnit polia
   addFieldWithTag(
     tag: number,
     fieldType: FieldType,
