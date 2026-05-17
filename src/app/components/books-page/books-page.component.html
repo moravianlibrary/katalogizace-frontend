@@ -2,54 +2,38 @@
   class="mx-auto flex h-full min-h-0 flex-col gap-4 p-4"
   data-testid="books-page"
 >
-  <div
-    class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-  >
-    <div
-      class="flex w-full flex-wrap items-center justify-center gap-3 sm:w-auto"
-    >
-      @if (canWrite()) {
-        <button
-          class="btn btn-l btn-primary group"
-          [routerLink]="
-            batchId()
-              ? ['/batches', batchId(), 'books', 'capture']
-              : ['/books/capture']
-          "
-          type="button"
-        >
-          <svg
-            class="icon-primary"
-            appIcon="camera"
-            width="20"
-            height="20"
-          ></svg>
-          {{ "buttons.scan" | translate }}
-        </button>
+  <div class="flex items-center gap-3">
+    @if (canWrite()) {
+      <button
+        class="btn btn-l btn-primary group shrink-0 sm:hidden"
+        [routerLink]="
+          batchId()
+            ? ['/batches', batchId(), 'books', 'capture']
+            : ['/books/capture']
+        "
+        type="button"
+      >
+        <svg class="icon-primary" appIcon="camera" width="20" height="20"></svg>
+        {{ "buttons.scan" | translate }}
+      </button>
 
-        <button
-          class="btn btn-l btn-primary group"
-          [disabled]="isUploading"
-          (click)="!isUploading && fileInput.click()"
-          data-testid="upload-books-button"
-          type="button"
-        >
-          <svg
-            class="icon-primary"
-            appIcon="upload"
-            width="20"
-            height="20"
-          ></svg>
-          @if (isUploading) {
-            {{ "buttons.uploading" | translate }}
-          } @else {
-            {{ "buttons.upload" | translate }}
-          }
-        </button>
-      }
-    </div>
+      <button
+        class="btn btn-l btn-primary group hidden shrink-0 sm:flex"
+        [disabled]="isUploading"
+        (click)="!isUploading && fileInput.click()"
+        data-testid="upload-books-button"
+        type="button"
+      >
+        <svg class="icon-primary" appIcon="upload" width="20" height="20"></svg>
+        @if (isUploading) {
+          {{ "buttons.uploading" | translate }}
+        } @else {
+          {{ "buttons.upload" | translate }}
+        }
+      </button>
+    }
 
-    <div class="w-full sm:w-78">
+    <div class="min-w-0 flex-1 sm:ml-auto sm:w-78 sm:flex-none">
       <app-table-search-input
         [value]="searchInput()"
         (valueChange)="searchInput.set($event)"
