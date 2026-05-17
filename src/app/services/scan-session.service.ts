@@ -151,7 +151,6 @@ export class ScanSessionService {
     try {
       await firstValueFrom(this.books.deleteBookRecord(bookId));
     } catch {
-      // best effort cleanup
     } finally {
       this.resetState();
     }
