@@ -59,7 +59,8 @@
     "Unknown": "Neznámý typ str.",
     "Fiducial": "Výchozí typ str.",
     "Article": "Článek",
-    "Map": "Mapa"
+    "Map": "Mapa",
+    "Index": "Rejstřík"
   },
   "buttons": {
     "save": "Uložit",

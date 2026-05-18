@@ -11,6 +11,7 @@ export type PageType =
   | 'Fiducial'
   | 'Article'
   | 'Map'
+  | 'Index'
   | 'Unknown';
 
 export interface ApiImageItem {
