@@ -184,6 +184,7 @@
         "user_load": "Nepodařilo se načíst informace o uživateli."
       },
       "camera": "Nepodařilo se otevřít kameru.",
+      "autocomplete": "Nepodařilo se načíst našeptávání.",
       "aut_record_load": "Nepodařilo se načíst autoritní záznam.",
       "record": {
         "save": "Uložení záznamu selhalo."
@@ -209,7 +210,6 @@
         "rerun_note": "Aktuální výsledek bude nahrazen novým zpracováním."
       },
       "records": {
-        "delete": "Opravdu chcete smazat toto pole?",
         "delete_title": "Opravdu chcete smazat toto pole?"
       },
       "users": {

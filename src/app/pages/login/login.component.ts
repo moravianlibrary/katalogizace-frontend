@@ -11,6 +11,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { IconComponent } from '../../components/shared/icon/icon.component';
 import { AuthService } from '../../services/api/auth.service';
 import { ToastService } from '../../services/toast.service';
+import { extractApiErrorMessage } from '../../utils/api-error.util';
 
 @Component({
   standalone: true,
@@ -73,8 +74,7 @@ export class LoginComponent {
       error: (e) => {
         this.loading.set(false);
         const msg =
-          e?.error?.detail ||
-          e?.error?.message ||
+          extractApiErrorMessage(e?.error) ||
           this.translate.instant('messages.error.auth.login');
         this.toast.show(msg, 'error');
       },

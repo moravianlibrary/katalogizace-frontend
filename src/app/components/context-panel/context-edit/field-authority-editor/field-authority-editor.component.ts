@@ -24,6 +24,8 @@ import { CatalogueService } from '@/app/services/api/catalogue.service';
 import { ContextPanelService } from '@/app/services/context-panel.service';
 import { MarcTranslateService } from '@/app/services/marc-translate.service';
 import { RecordStateService } from '@/app/services/record-state.service';
+import { ToastService } from '@/app/services/toast.service';
+import { resolveApiErrorMessage } from '@/app/utils/api-error.util';
 import { bindAddSubfieldShortcut } from '@/app/utils/bind-add-subfield-shortcut';
 import { compareSubfieldCodes } from '@/app/utils/marc-subfield-sort';
 import { NgClass } from '@angular/common';
@@ -80,6 +82,7 @@ export class FieldAuthorityEditorComponent {
   private readonly catalogue = inject(CatalogueService);
   private readonly translate = inject(TranslateService);
   private readonly cps = inject(ContextPanelService);
+  private readonly toast = inject(ToastService);
 
   private wasEditingThisField = false;
 
@@ -293,13 +296,19 @@ export class FieldAuthorityEditorComponent {
           this.loadedSevenId.set(id);
           this.loadingSevenRecord.set(false);
         },
-        error: () => {
+        error: (err) => {
           if ((this.getFirstSubValue('7') ?? '').trim() === id) {
             this.sevenRecord.set(null);
-            this.loadedSevenId.set(null);
+            this.loadedSevenId.set(id);
           }
           this.loadingSevenRecord.set(false);
-          console.error(this.translate.instant('dialogs.record_load_error'));
+          this.toast.show(
+            resolveApiErrorMessage(
+              err?.error,
+              this.translate.instant('dialogs.record_load_error'),
+            ),
+            'error',
+          );
         },
       });
     });
@@ -713,15 +722,18 @@ export class FieldAuthorityEditorComponent {
 
           this.loading.set(false);
         },
-        error: () => {
+        error: (err) => {
           this.loading.set(false);
           this.searchResults.set([]);
           this.selectedRecordId.set(null);
           this.selectedRecordDetail.set(null);
           this.total.set(0);
-          this.errorMessage.set(
+          const message = resolveApiErrorMessage(
+            err?.error,
             this.translate.instant('dialogs.authorities_load_error'),
           );
+          this.errorMessage.set(message);
+          this.toast.show(message, 'error');
         },
       });
   }
@@ -761,14 +773,17 @@ export class FieldAuthorityEditorComponent {
         this.detailLoading.set(false);
         this.detailError.set(null);
       },
-      error: () => {
+      error: (err) => {
         if (this.selectedRecordId() === String(recordId)) {
           this.selectedRecordDetail.set(null);
         }
         this.detailLoading.set(false);
-        this.detailError.set(
+        const message = resolveApiErrorMessage(
+          err?.error,
           this.translate.instant('dialogs.record_load_error'),
         );
+        this.detailError.set(message);
+        this.toast.show(message, 'error');
       },
     });
   }

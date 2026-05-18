@@ -1,8 +1,7 @@
-import {
-  AutocompletAuthorityResponse,
-  AutocompletDictionaryResponse,
-} from '@/app/models';
+import { AutocompletAuthorityResponse } from '@/app/models';
 import { CatalogueService } from '@/app/services/api/catalogue.service';
+import { ToastService } from '@/app/services/toast.service';
+import { resolveApiErrorMessage } from '@/app/utils/api-error.util';
 import { CommonModule } from '@angular/common';
 import {
   Component,
@@ -16,6 +15,7 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { IconComponent } from '../../icon/icon.component';
 
 @Component({
@@ -26,6 +26,8 @@ import { IconComponent } from '../../icon/icon.component';
 })
 export class InputAutocompleteAuthorityComponent {
   private readonly cat = inject(CatalogueService);
+  private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
 
   picked = output<AutocompletAuthorityResponse>();
 
@@ -52,6 +54,7 @@ export class InputAutocompleteAuthorityComponent {
 
   private debounceTimer: number | null = null;
   private reqSeq = 0;
+  private lastErrorToastMessage: string | null = null;
 
   private readonly inpRef = viewChild<ElementRef<HTMLInputElement>>('inp');
   private readonly listRef = viewChild<ElementRef<HTMLDivElement>>('list');
@@ -118,18 +121,32 @@ export class InputAutocompleteAuthorityComponent {
 
               this.suggestions.set(res);
               this.loading.set(false);
+              this.lastErrorToastMessage = null;
 
               if (!res.length) this.resetActive();
             },
-            error: () => {
+            error: (err) => {
               if (seq !== this.reqSeq) return;
               this.suggestions.set([]);
               this.loading.set(false);
               this.resetActive();
+              this.showAutocompleteError(err);
             },
           });
       }, this.debounceMs());
     });
+  }
+
+  private showAutocompleteError(error: unknown) {
+    const message = resolveApiErrorMessage(
+      error,
+      this.translate.instant('messages.error.autocomplete'),
+    );
+
+    if (this.lastErrorToastMessage === message) return;
+
+    this.lastErrorToastMessage = message;
+    this.toast.show(message, 'error');
   }
 
   onFocus() {
@@ -145,6 +162,7 @@ export class InputAutocompleteAuthorityComponent {
       this.loading.set(false);
       this.resetActive();
       this.hasEditedSinceFocus.set(false);
+      this.lastErrorToastMessage = null;
     }, 120);
   }
 
@@ -160,6 +178,7 @@ export class InputAutocompleteAuthorityComponent {
     this.suggestions.set([]);
     this.loading.set(false);
     this.resetActive();
+    this.lastErrorToastMessage = null;
     this.valueChange.emit('');
   }
 
@@ -172,6 +191,7 @@ export class InputAutocompleteAuthorityComponent {
     this.loading.set(false);
     this.picked.emit(s);
     this.resetActive();
+    this.lastErrorToastMessage = null;
   }
 
   onKeydown(e: KeyboardEvent) {
@@ -246,7 +266,7 @@ export class InputAutocompleteAuthorityComponent {
     this.activeIndex.set(-1);
   }
 
-  getActive(): AutocompletDictionaryResponse | null {
+  getActive(): AutocompletAuthorityResponse | null {
     const i = this.activeIndex();
     const list = this.suggestions();
     return i >= 0 && i < list.length ? list[i] : null;

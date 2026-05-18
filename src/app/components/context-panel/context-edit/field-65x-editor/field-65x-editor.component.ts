@@ -23,6 +23,8 @@ import {
 import { CatalogueService } from '@/app/services/api/catalogue.service';
 import { ContextPanelService } from '@/app/services/context-panel.service';
 import { RecordStateService } from '@/app/services/record-state.service';
+import { ToastService } from '@/app/services/toast.service';
+import { resolveApiErrorMessage } from '@/app/utils/api-error.util';
 import { bindAddSubfieldShortcut } from '@/app/utils/bind-add-subfield-shortcut';
 import { compareSubfieldCodes } from '@/app/utils/marc-subfield-sort';
 import { CommonModule } from '@angular/common';
@@ -37,7 +39,7 @@ import {
   viewChild,
   viewChildren,
 } from '@angular/core';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 type VisibleSubfield = {
   kind: 'template' | 'extra';
@@ -70,6 +72,8 @@ export class Field65xEditorComponent {
   private readonly rs = inject(RecordStateService);
   private readonly catalogue = inject(CatalogueService);
   private readonly cps = inject(ContextPanelService);
+  private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
   private wasEditingThisField = false;
 
   fieldId = input.required<UUID>();
@@ -207,12 +211,19 @@ export class Field65xEditorComponent {
           this.loadedSevenId.set(id);
           this.loadingSevenRecord.set(false);
         },
-        error: () => {
+        error: (err) => {
           if ((this.getTemplateSubValue('7') ?? '').trim() === id) {
             this.sevenRecord.set(null);
-            this.loadedSevenId.set(null);
+            this.loadedSevenId.set(id);
           }
           this.loadingSevenRecord.set(false);
+          this.toast.show(
+            resolveApiErrorMessage(
+              err?.error,
+              this.translate.instant('messages.error.aut_record_load'),
+            ),
+            'error',
+          );
         },
       });
     });

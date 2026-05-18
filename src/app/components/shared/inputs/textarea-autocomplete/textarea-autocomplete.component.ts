@@ -1,5 +1,7 @@
 import { AutocompleteSuggestion, CatalogueBase } from '@/app/models';
 import { CatalogueService } from '@/app/services/api/catalogue.service';
+import { ToastService } from '@/app/services/toast.service';
+import { resolveApiErrorMessage } from '@/app/utils/api-error.util';
 import { CommonModule } from '@angular/common';
 import {
   Component,
@@ -12,6 +14,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { IconComponent } from '../../icon/icon.component';
 
 @Component({
@@ -22,6 +25,8 @@ import { IconComponent } from '../../icon/icon.component';
 })
 export class TextareaAutocompleteComponent {
   private readonly cat = inject(CatalogueService);
+  private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
 
   value = input<string>('');
   valueChange = output<string>();
@@ -54,6 +59,7 @@ export class TextareaAutocompleteComponent {
   private debounceTimer: number | null = null;
   private blurTimer: number | null = null;
   private reqSeq = 0;
+  private lastErrorToastMessage: string | null = null;
 
   focus() {
     const el = this.taRef()?.nativeElement;
@@ -125,16 +131,30 @@ export class TextareaAutocompleteComponent {
               this.suggestions.set(res.suggestions ?? []);
               this.loading.set(false);
               this.activeIndex.set((res.suggestions?.length ?? 0) > 0 ? 0 : -1);
+              this.lastErrorToastMessage = null;
             },
-            error: () => {
+            error: (err) => {
               if (seq !== this.reqSeq) return;
               this.suggestions.set([]);
               this.loading.set(false);
               this.activeIndex.set(-1);
+              this.showAutocompleteError(err);
             },
           });
       }, this.debounceMs());
     });
+  }
+
+  private showAutocompleteError(error: unknown) {
+    const message = resolveApiErrorMessage(
+      error,
+      this.translate.instant('messages.error.autocomplete'),
+    );
+
+    if (this.lastErrorToastMessage === message) return;
+
+    this.lastErrorToastMessage = message;
+    this.toast.show(message, 'error');
   }
 
   private setActive(index: number) {
@@ -177,6 +197,7 @@ export class TextareaAutocompleteComponent {
       this.loading.set(false);
       this.hasEditedSinceFocus.set(false);
       this.resetActive();
+      this.lastErrorToastMessage = null;
       this.blurTimer = null;
     }, 120);
   }
@@ -200,6 +221,7 @@ export class TextareaAutocompleteComponent {
     this.suggestions.set([]);
     this.loading.set(false);
     this.resetActive();
+    this.lastErrorToastMessage = null;
     this.valueChange.emit('');
   }
 
@@ -216,6 +238,7 @@ export class TextareaAutocompleteComponent {
     this.suggestions.set([]);
     this.loading.set(false);
     this.resetActive();
+    this.lastErrorToastMessage = null;
   }
 
   onKeydown(e: KeyboardEvent) {

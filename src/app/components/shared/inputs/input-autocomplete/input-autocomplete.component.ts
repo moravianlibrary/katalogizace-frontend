@@ -1,5 +1,7 @@
 import { AutocompleteSuggestion, CatalogueBase } from '@/app/models';
 import { CatalogueService } from '@/app/services/api/catalogue.service';
+import { ToastService } from '@/app/services/toast.service';
+import { resolveApiErrorMessage } from '@/app/utils/api-error.util';
 import { CommonModule } from '@angular/common';
 import {
   Component,
@@ -13,6 +15,7 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { IconComponent } from '../../icon/icon.component';
 
 @Component({
@@ -23,6 +26,8 @@ import { IconComponent } from '../../icon/icon.component';
 })
 export class InputAutocompleteComponent {
   private readonly cat = inject(CatalogueService);
+  private readonly toast = inject(ToastService);
+  private readonly translate = inject(TranslateService);
 
   value = input<string>('');
   valueChange = output<string>();
@@ -66,6 +71,7 @@ export class InputAutocompleteComponent {
 
   private debounceTimer: number | null = null;
   private reqSeq = 0;
+  private lastErrorToastMessage: string | null = null;
 
   constructor() {
     effect(() => {
@@ -113,15 +119,29 @@ export class InputAutocompleteComponent {
               if (seq !== this.reqSeq) return;
               this.suggestions.set(res.suggestions ?? []);
               this.loading.set(false);
+              this.lastErrorToastMessage = null;
             },
-            error: () => {
+            error: (err) => {
               if (seq !== this.reqSeq) return;
               this.suggestions.set([]);
               this.loading.set(false);
+              this.showAutocompleteError(err);
             },
           });
       }, this.debounceMs());
     });
+  }
+
+  private showAutocompleteError(error: unknown) {
+    const message = resolveApiErrorMessage(
+      error,
+      this.translate.instant('messages.error.autocomplete'),
+    );
+
+    if (this.lastErrorToastMessage === message) return;
+
+    this.lastErrorToastMessage = message;
+    this.toast.show(message, 'error');
   }
 
   private setActive(i: number) {
@@ -166,6 +186,7 @@ export class InputAutocompleteComponent {
       this.loading.set(false);
       this.resetActive();
       this.hasEditedSinceFocus.set(false);
+      this.lastErrorToastMessage = null;
     }, 120);
   }
 
@@ -182,6 +203,7 @@ export class InputAutocompleteComponent {
     this.suggestions.set([]);
     this.loading.set(false);
     this.resetActive();
+    this.lastErrorToastMessage = null;
     this.valueChange.emit('');
   }
 
@@ -193,6 +215,7 @@ export class InputAutocompleteComponent {
     this.suggestions.set([]);
     this.loading.set(false);
     this.resetActive();
+    this.lastErrorToastMessage = null;
   }
 
   onKeydown(e: KeyboardEvent) {
