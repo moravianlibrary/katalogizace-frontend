@@ -19,30 +19,30 @@
 
 /* Primary */
 @utility bg-main-primary-default {
-  background-color: var(--color-teal-500);
+  background-color: var(--color-ocean-500);
 }
 @utility bg-main-primary-hover {
-  background-color: var(--color-teal-600);
+  background-color: var(--color-ocean-600);
 }
 @utility bg-main-primary-pressed {
-  background-color: var(--color-teal-700);
+  background-color: var(--color-ocean-700);
 }
 @utility bg-main-primary-disable {
-  background-color: var(--color-teal-50);
+  background-color: var(--color-ocean-50);
 }
 
 /* Secondary */
 @utility bg-main-secondary-default {
-  background-color: var(--color-teal-50);
+  background-color: var(--color-ocean-50);
 }
 @utility bg-main-secondary-hover {
-  background-color: var(--color-teal-100);
+  background-color: var(--color-ocean-100);
 }
 @utility bg-main-secondary-pressed {
-  background-color: var(--color-teal-200);
+  background-color: var(--color-ocean-200);
 }
 @utility bg-main-secondary-disable {
-  background-color: var(--color-teal-50);
+  background-color: var(--color-ocean-50);
 }
 
 /* Tertiary */
@@ -135,20 +135,20 @@
   color: var(--color-gray-50);
 }
 @utility text-btn-primary-disable {
-  color: var(--color-teal-200);
+  color: var(--color-ocean-200);
 }
 
 @utility text-btn-secondary-default {
-  color: var(--color-teal-500);
+  color: var(--color-ocean-500);
 }
 @utility text-btn-secondary-hover {
-  color: var(--color-teal-600);
+  color: var(--color-ocean-600);
 }
 @utility text-btn-secondary-pressed {
-  color: var(--color-teal-700);
+  color: var(--color-ocean-700);
 }
 @utility text-btn-secondary-disable {
-  color: var(--color-teal-300);
+  color: var(--color-ocean-300);
 }
 
 @utility text-btn-tertiary-default {
@@ -240,30 +240,30 @@
 
 /* Primary */
 @utility border-primary-default {
-  border-color: var(--color-teal-500);
+  border-color: var(--color-ocean-500);
 }
 @utility border-primary-hover {
-  border-color: var(--color-teal-600);
+  border-color: var(--color-ocean-600);
 }
 @utility border-primary-pressed {
-  border-color: var(--color-teal-700);
+  border-color: var(--color-ocean-700);
 }
 @utility border-primary-disable {
-  border-color: var(--color-teal-50);
+  border-color: var(--color-ocean-50);
 }
 
 /* Secondary */
 @utility border-secondary-default {
-  border-color: var(--color-teal-50);
+  border-color: var(--color-ocean-50);
 }
 @utility border-secondary-hover {
-  border-color: var(--color-teal-100);
+  border-color: var(--color-ocean-100);
 }
 @utility border-secondary-pressed {
-  border-color: var(--color-teal-200);
+  border-color: var(--color-ocean-200);
 }
 @utility border-secondary-disable {
-  border-color: var(--color-teal-50);
+  border-color: var(--color-ocean-50);
 }
 
 /* Tertiary */
@@ -338,21 +338,21 @@
   fill: var(--color-gray-50);
 }
 @utility icon-primary-disable {
-  fill: var(--color-teal-200);
+  fill: var(--color-ocean-200);
 }
 
 /* Secondary */
 @utility icon-secondary-default {
-  fill: var(--color-teal-500);
+  fill: var(--color-ocean-500);
 }
 @utility icon-secondary-hover {
-  fill: var(--color-teal-600);
+  fill: var(--color-ocean-600);
 }
 @utility icon-secondary-pressed {
-  fill: var(--color-teal-700);
+  fill: var(--color-ocean-700);
 }
 @utility icon-secondary-disable {
-  fill: var(--color-teal-200);
+  fill: var(--color-ocean-200);
 }
 
 /* Tertiary */
