@@ -1,0 +1,309 @@
+/* ========== BUTTONS ========== */
+
+/* prettier-ignore */
+@utility btn {
+  @apply
+    inline-flex
+    items-center
+    rounded-lg
+    font-medium
+    text-nowrap
+
+    cursor-pointer
+    disabled:cursor-not-allowed
+
+    transition-colors
+    duration-150
+    ease-in-out;
+}
+
+/* prettier-ignore */
+@utility btn-s {
+  @apply
+    px-3
+    py-2
+    text-sm-tight
+    gap-2;
+  line-height: var(--text-sm-tight--line-height);
+}
+
+/* prettier-ignore */
+@utility btn-m {
+  @apply
+    px-4
+    py-3
+    text-sm
+    gap-3;
+  line-height: var(--text-sm-tight--line-height);
+}
+
+/* prettier-ignore */
+@utility btn-l {
+  @apply
+    px-4
+    py-3
+    gap-3
+    text-md;
+}
+
+/* prettier-ignore */
+@utility btn-icon {
+  @apply
+    px-2.75
+    py-2.75
+}
+
+/* prettier-ignore */
+@utility btn-primary {
+  @apply
+    bg-main-primary-default
+    text-btn-primary-default
+
+    hover:bg-main-primary-hover
+    hover:text-btn-primary-hover
+
+    active:bg-main-primary-pressed
+    active:text-btn-primary-pressed
+
+    disabled:bg-main-primary-disable
+    disabled:text-btn-primary-disable;
+}
+
+/* prettier-ignore */
+@utility btn-secondary {
+  @apply
+    bg-main-secondary-default
+    text-btn-secondary-default
+
+    hover:bg-main-secondary-hover
+    hover:text-btn-secondary-hover
+
+    active:bg-main-secondary-pressed
+    active:text-btn-secondary-pressed
+
+    disabled:bg-main-secondary-disable
+    disabled:text-btn-secondary-disable;
+}
+
+/* prettier-ignore */
+@utility btn-tertiary {
+  @apply
+    bg-white
+    text-secondary
+    px-3.75
+    py-2.75
+    border
+    border-tertiary-default
+
+    hover:bg-white
+    hover:text-base-color
+    hover:border-tertiary-hover
+
+    active:bg-white
+    active:text-base-color
+    active:border-tertiary-pressed
+
+    disabled:bg-white
+    disabled:text-btn-tertiary-disable
+    disabled:border-tertiary-disable;
+}
+
+/* prettier-ignore */
+@utility btn-error {
+  @apply
+    bg-main-base
+    text-error
+
+    hover:text-error-hover
+    active:text-error-pressed
+    disabled:text-error-disabled;
+}
+
+/* prettier-ignore */
+@utility btn-error-full {
+  @apply
+    bg-main-error
+    text-white
+
+    hover:bg-red-600
+    active:bg-red-700
+    disabled:text-red-200;
+}
+
+/* ========== ICONS ========== */
+
+/* prettier-ignore */
+@utility icon-primary {
+  @apply
+    icon-primary-default
+    group-hover:icon-primary-hover
+    group-active:icon-primary-pressed
+    group-disabled:icon-primary-disable
+
+    transition-colors
+    duration-150
+    ease-in-out;
+}
+
+/* prettier-ignore */
+@utility icon-secondary {
+  @apply
+    icon-secondary-default
+    group-hover:icon-secondary-hover
+    group-active:icon-secondary-pressed
+    group-disabled:icon-secondary-disable
+
+    transition-colors
+    duration-150
+    ease-in-out;
+}
+
+/* prettier-ignore */
+@utility icon-tertiary {
+  @apply
+    icon-tertiary-default
+    group-hover:icon-tertiary-hover
+    group-active:icon-tertiary-pressed
+    group-disabled:icon-tertiary-disable
+
+    transition-colors
+    duration-150
+    ease-in-out;
+}
+
+/* prettier-ignore */
+@utility icon-btn-error {
+  @apply
+    icon-error
+    group-hover:icon-error-hover
+    group-active:icon-error-pressed
+    group-disabled:icon-error-disabled
+
+    transition-colors
+    duration-150
+    ease-in-out;
+}
+
+/* ========== TABS ========== */
+
+/* prettier-ignore */
+@utility tab-item {
+  @apply
+    inline-flex
+    gap-2
+    px-4 pt-6 pb-5.5
+    font-medium
+    text-md
+    text-nowrap
+
+    text-btn-tertiary-default
+    hover:text-btn-tertiary-hover
+    active:text-btn-tertiary-pressed
+    disabled:text-btn-tertiary-disable
+
+    border-b-2
+    border-transparent
+    hover:border-primary-disable
+    active:border-primary-disable
+
+    hover:cursor-pointer
+    disabled:cursor-not-allowed
+
+    transition-colors
+    duration-150
+    ease-in-out;
+}
+
+.marc-cell {
+  @apply transition-[filter,border-color,background-color] duration-150;
+}
+
+.marc-cell-left,
+.marc-cell-right {
+  background: transparent;
+  @apply border-light;
+  border-top-width: 0.5px;
+  border-bottom-width: 0.5px;
+  border-top-style: solid;
+  border-bottom-style: solid;
+}
+
+.marc-cell-left {
+  border-left-width: 0;
+}
+
+.marc-cell-right {
+  border-right-width: 0;
+}
+
+tr.marc-row-hovered .marc-cell-left,
+tr.marc-row-hovered .marc-cell-right {
+  @apply border-bright;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+  border-top-style: solid;
+  border-bottom-style: solid;
+}
+
+tr.marc-row-hovered .marc-cell-left {
+  @apply border-bright;
+  border-left-width: 1px;
+  border-left-style: solid;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+tr.marc-row-hovered .marc-cell-right {
+  @apply border-bright;
+  border-right-width: 1px;
+  border-right-style: solid;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+tr.marc-row-hovered {
+  position: relative;
+  z-index: 10;
+  filter: drop-shadow(0 1px 6px rgb(15 23 42 / 0.08));
+}
+
+tr.marc-row-neighbor-above .marc-cell-left,
+tr.marc-row-neighbor-above .marc-cell-right {
+  border-bottom-color: transparent;
+}
+
+tr.marc-row-neighbor-below .marc-cell-left,
+tr.marc-row-neighbor-below .marc-cell-right {
+  border-top-color: transparent;
+}
+
+tr.marc-row-active .marc-cell-left,
+tr.marc-row-active .marc-cell-right {
+  @apply border-primary-default;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+  border-top-style: solid;
+  border-bottom-style: solid;
+}
+
+tr.marc-row-active .marc-cell-left {
+  @apply border-primary-default;
+  border-left-width: 1px;
+  border-left-style: solid;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+tr.marc-row-active .marc-cell-right {
+  @apply border-primary-default;
+  border-right-width: 1px;
+  border-right-style: solid;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+tr.marc-row-active {
+  position: relative;
+  z-index: 20;
+  filter: drop-shadow(0 1px 6px rgb(15 23 42 / 0.08));
+}

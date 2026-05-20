@@ -1,4 +1,10 @@
-import { ExistingMarcRecord, MarcCandidate, MarcSubfield } from '@/app/models';
+import {
+  ExistingMarcRecord,
+  MarcCandidate,
+  MarcSubfield,
+  UUID,
+} from '@/app/models';
+import { RecordStore } from '@/app/stores/record.store';
 import { CommonModule } from '@angular/common';
 import {
   Component,
@@ -8,25 +14,34 @@ import {
   input,
   signal,
 } from '@angular/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { CatalogueService } from '../../services/api/catalogue.service';
-import { WorkingPanelService } from '../../services/working-panel.service';
+import { ContextPanelService } from '../../services/context-panel.service';
 import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
+import { IconComponent } from '../shared/icon/icon.component';
 
 @Component({
   standalone: true,
   selector: 'app-candidates-table',
-  imports: [CommonModule, ExistingMarcRecordTableComponent],
+  imports: [
+    CommonModule,
+    ExistingMarcRecordTableComponent,
+    TranslateModule,
+    IconComponent,
+  ],
   templateUrl: './candidates-table.component.html',
 })
 export class CandidatesTableComponent {
-  title = input.required<string>();
+  private translate = inject(TranslateService);
+  private store = inject(RecordStore);
+
   candidates = input.required<MarcCandidate[]>();
 
-  selectedCandidateId = input<string | null>(null);
+  selectedCandidateId = input<UUID | null>(null);
 
   tag = input<string>();
 
-  private wps = inject(WorkingPanelService);
+  private cps = inject(ContextPanelService);
   private catalogue = inject(CatalogueService);
 
   sortedCandidates = computed<MarcCandidate[]>(() => {
@@ -36,17 +51,16 @@ export class CandidatesTableComponent {
     return list.sort((a, b) => norm(b.score) - norm(a.score));
   });
 
-  selectedId = signal<string | null>(null);
+  selectedId = signal<UUID | null>(null);
 
   private autoSelectOnChange = effect(() => {
     const list = this.sortedCandidates();
     const preferred = this.selectedCandidateId();
 
-    if (preferred) {
-      this.selectedId.set(preferred);
-    } else {
-      this.selectedId.set(list[0]?.id ?? null);
-    }
+    const next = preferred ?? list[0]?.id ?? null;
+
+    this.selectedId.set(next);
+    this.cps.setSelectedCandidateId(next);
   });
 
   showAutPreview = computed(() => this.tag() === '100' || this.tag() === '700');
@@ -73,7 +87,7 @@ export class CandidatesTableComponent {
   ): string | null {
     if (!rec) return null;
 
-    const f998 = rec.normal_fields.find((f) => f.tag === '998');
+    const f998 = rec.data_fields.find((f) => f.tag === '998');
     const sfA = f998?.subfields?.find((sf) => sf.code === 'a');
     const value = sfA?.value?.trim();
 
@@ -109,7 +123,7 @@ export class CandidatesTableComponent {
     }
 
     this.autLoading.set(true);
-    this.catalogue.getAutRecord(recordId).subscribe({
+    this.catalogue.getAutRecord(recordId, 'aut').subscribe({
       next: (rec) => {
         this.autCache.set(recordId, rec);
         this.autRecord.set(rec);
@@ -117,7 +131,10 @@ export class CandidatesTableComponent {
       },
       error: (err) => {
         console.error(err);
-        this.autError.set('Nepodařilo se načíst autoritní záznam.');
+
+        this.autError.set(
+          this.translate.instant('messages.error.aut_record_load'),
+        );
         this.autLoading.set(false);
       },
     });
@@ -144,17 +161,16 @@ export class CandidatesTableComponent {
     ];
   }
 
-  onRowClick(id: string) {
+  onRowClick(id: UUID) {
     this.selectedId.set(id);
+    this.cps.setSelectedCandidateId(id);
   }
 
-  onConfirm() {
-    const id = this.selectedId();
-    if (!id) return;
-    this.wps.confirmCandidate(id);
-  }
+  onShowProvenance(candidate: MarcCandidate) {
+    if (!candidate.id) return;
 
-  onClose() {
-    this.wps.showRecords();
+    const tag = this.tag();
+    const steps = this.store.provenance()[candidate.id] ?? [];
+    this.cps.showProvenance(tag!, steps, candidate.id);
   }
 }

@@ -1,0 +1,110 @@
+<app-dialog-shell
+  [open]="openState()"
+  [title]="dialogTitle()"
+  [titleId]="titleId()"
+  (backdropClick)="close()"
+  (closeRequested)="close()"
+  (escapePressed)="onEscape(editor)"
+  (panelClick)="editor.closePicker()"
+  panelClass="max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] max-w-3xl"
+>
+  <div
+    class="flex min-h-0 flex-col overflow-hidden py-3"
+    [attr.data-testid]="dialogTestId()"
+  >
+    <div class="border-bright border-b px-4 pb-3">
+      <div class="grid shrink-0 gap-4 sm:grid-cols-2">
+        <div>
+          <label class="text-light text-sm-tight mb-2 block font-medium">
+            {{ "batches.title" | translate }}
+          </label>
+
+          <input
+            class="border-tertiary-default bg-main-base focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border py-3 pl-4 outline-none"
+            #nameInput
+            [attr.data-testid]="
+              isCreate() ? 'create-batch-name' : 'edit-batch-name'
+            "
+            [value]="name()"
+            [disabled]="saving()"
+            (input)="onNameInput($event)"
+            type="text"
+          />
+        </div>
+
+        <div>
+          <label class="text-light text-sm-tight mb-2 block font-medium">
+            {{ "batches.subtitle" | translate }}
+          </label>
+
+          <input
+            class="border-tertiary-default bg-main-base focus-within:border-primary-default text-secondary w-full overflow-hidden rounded-lg border py-3 pl-4 outline-none"
+            [attr.data-testid]="
+              isCreate() ? 'create-batch-description' : 'edit-batch-description'
+            "
+            [value]="description()"
+            [disabled]="saving()"
+            (input)="onDescriptionInput($event)"
+            type="text"
+          />
+        </div>
+      </div>
+    </div>
+
+    <app-permission-assignment-editor
+      #editor
+      [disabled]="saving()"
+      [loadingOptions]="loadingUsersInfo()"
+      [loadingRows]="!isCreate() && loadingBatchMembers()"
+      [options]="userOptions()"
+      [rows]="memberRows()"
+      [loadingRowsLabelKey]="isCreate() ? null : 'users.loading'"
+      (pickerOpened)="(null)"
+      (addRequested)="addMember($event)"
+      (removeRequested)="removeMember($event)"
+      (removeAllRequested)="removeAllMembers()"
+      (permissionToggled)="toggleMemberPermission($event)"
+      sectionLabelKey="batches.members_and_permissions"
+      searchPlaceholderKey="batches.search_users"
+      noAvailableLabelKey="batches.no_available_users"
+      emptyRowsLabelKey="batches.no_members_added"
+      toggleButtonAriaLabel="toggle users"
+    />
+  </div>
+
+  <div
+    class="border-bright flex shrink-0 justify-center gap-3 border-t px-4 py-3"
+  >
+    <button
+      class="btn btn-m btn-tertiary"
+      [attr.data-testid]="
+        isCreate() ? 'create-batch-cancel' : 'edit-batch-cancel'
+      "
+      [disabled]="saving()"
+      (click)="close()"
+      type="button"
+    >
+      {{ "buttons.cancel" | translate }}
+    </button>
+
+    <button
+      class="btn btn-m btn-primary"
+      [attr.data-testid]="
+        isCreate() ? 'create-batch-submit' : 'edit-batch-submit'
+      "
+      [disabled]="submitDisabled()"
+      (click)="submit()"
+      type="button"
+    >
+      @if (isCreate()) {
+        @if (saving()) {
+          {{ "buttons.creating" | translate }}
+        } @else {
+          {{ "buttons.create" | translate }}
+        }
+      } @else {
+        {{ "buttons.save_changes" | translate }}
+      }
+    </button>
+  </div>
+</app-dialog-shell>

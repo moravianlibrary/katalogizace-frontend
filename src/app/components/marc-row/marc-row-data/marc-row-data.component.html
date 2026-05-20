@@ -1,0 +1,96 @@
+<td
+  class="marc-cell marc-cell-left text-secondary text-md p-2 align-text-top font-bold"
+>
+  {{ df().tag }}
+</td>
+
+<td class="marc-cell marc-cell-right py-2 pr-2" colspan="5">
+  <div class="flex items-start">
+    <div class="mr-8 flex w-11 items-center justify-between">
+      <div class="text-secondary text-md text-left">
+        {{ df().ind1 }}
+      </div>
+
+      <div class="text-secondary text-md text-left">
+        {{ df().ind2 }}
+      </div>
+    </div>
+
+    <div class="min-w-0 flex-1">
+      @if (subfieldsEnumerated().length) {
+        <div class="flex flex-wrap gap-x-2 gap-y-1">
+          @for (e of subfieldsEnumerated(); track $index) {
+            @if (e.sf.value.length) {
+              <span
+                class="rounded-xs px-1"
+                [ngClass]="subDiffClass(subDiffKindAt($index))"
+              >
+                <span class="text-secondary text-md font-bold"
+                  >|{{ e.sf.code }}</span
+                >
+                <span class="text-secondary text-md ml-2 wrap-anywhere">{{
+                  e.sf.value
+                }}</span>
+              </span>
+            }
+          }
+        </div>
+      }
+    </div>
+
+    <div class="flex gap-3 px-2">
+      @if (df().fieldId && (df().candidates?.length ?? 0) > 1) {
+        <button
+          class="group cursor-pointer"
+          (click)="onShowCandidates(); $event.stopPropagation()"
+          data-testid="show-candidates-button"
+          type="button"
+        >
+          <svg
+            class="icon-secondary"
+            appIcon="task"
+            width="20"
+            height="20"
+          ></svg>
+        </button>
+      }
+
+      @if (df().selectedCandidateId && df().score) {
+        <button
+          class="border-base h-5 w-5 rounded-full border shadow hover:cursor-pointer"
+          [ngClass]="scoreClass(df().score)"
+          (click)="onShowProvenance(); $event.stopPropagation()"
+          data-testid="show-provenance-button"
+          type="button"
+        ></button>
+      }
+
+      @if (takeable()) {
+        <button
+          class="group cursor-pointer"
+          (click)="onTakeField(); $event.stopPropagation()"
+          type="button"
+        >
+          <svg
+            class="icon-secondary"
+            appIcon="swapHorizontal"
+            width="20"
+            height="20"
+          ></svg>
+        </button>
+      }
+    </div>
+
+    @if (editable()) {
+      <div class="ml-2 flex w-5 shrink-0 justify-end">
+        <button
+          class="pointer-events-none opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:cursor-pointer group-hover:opacity-100"
+          (click)="onDeleteField($event)"
+          type="button"
+        >
+          <svg class="icon-error" appIcon="trash" width="20" height="20"></svg>
+        </button>
+      </div>
+    }
+  </div>
+</td>

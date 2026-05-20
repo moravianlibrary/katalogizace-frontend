@@ -1,72 +1,132 @@
-<div class="flex flex-col gap-4 p-4">
-  <h2>Naskenujte knihu</h2>
+<section class="flex h-full min-h-0 flex-col overflow-hidden">
+  <div class="flex min-h-0 flex-1 flex-col overflow-hidden">
+    <header
+      class="border-bright bg-main-base flex shrink-0 items-center justify-between border-y px-4 py-2"
+    >
+      <div class="flex flex-col">
+        <span class="text-base-color text-md font-medium">
+          {{ "scanning.title" | translate }}
+        </span>
 
-  @if (!bookId()) {
-    <div class="flex flex-col gap-5">
-      <p class="text-light text-sm">
-        Nejprve založte knihu. Poté se automaticky otevře kamera pro pořízení
-        první stránky.
-      </p>
-
-      <div class="flex gap-4">
-        <button
-          class="bg-main-base border-tertiary-default hover:border-tertiary-hover active:border-tertiary-pressed text-sm-tight cursor-pointer rounded-lg border px-4 py-3 text-base font-medium"
-          (click)="cancel()"
-        >
-          Zpět
-        </button>
-
-        <button
-          class="bg-main-primary-default text-on-color hover:bg-main-primary-hover active:bg-main-primary-pressed text-sm-tight disabled:bg-main-primary-disable disabled:text-btn-primary-disable cursor-pointer rounded-lg px-4 py-3 font-medium disabled:cursor-not-allowed"
-          [disabled]="isCreating()"
-          (click)="startNewBook()"
-        >
-          {{
-            isCreating() ? "Zakládám knihu…" : "Založit knihu a otevřít kameru"
-          }}
-        </button>
+        <span class="text-light font-regular text-sm">
+          {{ "scanning.page_count" | translate }} {{ photoCount() }}
+        </span>
       </div>
-    </div>
-  } @else {
-    <div class="flex flex-col gap-3">
-      <video
-        class="max-h-[70vh] w-full rounded bg-black"
-        #video
-        autoplay
-        playsinline
-      ></video>
+
+      <button
+        class="btn btn-m btn-tertiary group"
+        [disabled]="
+          isCancelling() || isCapturing() || isUploading() || isFinishing()
+        "
+        (click)="cancel()"
+        type="button"
+      >
+        {{ "buttons.cancel" | translate }}
+        <svg class="icon-tertiary" appIcon="x" width="16" height="16"></svg>
+      </button>
+    </header>
+
+    <div class="relative min-h-0 flex-1 overflow-hidden bg-[#2c3239]">
+      @if (!bookId() || isCreating() || isOpeningCamera()) {
+        <div
+          class="absolute inset-0 z-10 flex items-center justify-center text-center text-white/80"
+        >
+          <div class="px-6">
+            <p class="text-xl font-medium">
+              {{ "scanning.loading_text" | translate }}
+            </p>
+          </div>
+        </div>
+      }
+
+      @if (isUploading()) {
+        <div
+          class="absolute inset-0 z-20 flex items-center justify-center bg-[#2c3239]/80 text-center text-white"
+        >
+          <div class="px-6">
+            <p class="text-xl font-medium">
+              {{ "scanning.uploading_page" | translate }}
+            </p>
+          </div>
+        </div>
+      }
+
+      <div class="flex h-full w-full items-center justify-center">
+        <div class="relative aspect-3/4 h-full max-w-full">
+          <video
+            class="h-full w-full object-cover"
+            #video
+            autoplay
+            playsinline
+            muted
+          ></video>
+
+          <div class="pointer-events-none absolute inset-0">
+            <div class="grid h-full w-full grid-cols-3 grid-rows-3">
+              @for (cell of [1, 2, 3, 4, 5, 6, 7, 8, 9]; track cell) {
+                <div class="border-white" [ngClass]="cellClass(cell)"></div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
 
       <canvas #canvas hidden></canvas>
-
-      <div class="flex flex-wrap items-center gap-3">
-        <button
-          class="bg-main-primary-default text-on-color hover:bg-main-primary-hover active:bg-main-primary-pressed text-sm-tight cursor-pointer rounded-lg px-4 py-3 font-medium"
-          [disabled]="isUploading() || isFinishing()"
-          (click)="takePhoto()"
-        >
-          {{ isUploading() ? "Nahrávám…" : "Odfotit stránku" }}
-        </button>
-
-        <button
-          class="bg-main-base text-error hover:bg-main-error hover:text-on-color border-error text-sm-tight cursor-pointer rounded-lg border px-4 py-3 font-medium"
-          (click)="cancel()"
-          type="button"
-        >
-          Zrušit
-        </button>
-
-        <button
-          class="bg-main-base text-success hover:bg-main-success hover:text-on-color border-success text-sm-tight cursor-pointer rounded-lg border px-4 py-3 font-medium"
-          [disabled]="isFinishing()"
-          (click)="finish()"
-        >
-          {{ isFinishing() ? "Spouštím workflow…" : "Hotovo" }}
-        </button>
-      </div>
-
-      <span>
-        Počet naskenovaných stránek: <strong>{{ photoCount() }}</strong>
-      </span>
     </div>
-  }
-</div>
+
+    <footer
+      class="border-bright bg-main-base relative flex shrink-0 items-center border-t px-4 py-2"
+    >
+      <button
+        class="btn btn-m btn-tertiary"
+        [disabled]="
+          photoCount() === 0 ||
+          isCapturing() ||
+          isUploading() ||
+          isFinishing() ||
+          isPreparingNext() ||
+          isCreating() ||
+          !bookId()
+        "
+        (click)="finish()"
+        type="button"
+      >
+        {{ "buttons.save" | translate }}
+      </button>
+
+      <button
+        class="btn btn-xl btn-primary group absolute left-1/2 -translate-x-1/2 rounded-full p-3.5"
+        [disabled]="
+          isCapturing() ||
+          isUploading() ||
+          isFinishing() ||
+          isPreparingNext() ||
+          isCreating() ||
+          isOpeningCamera() ||
+          !bookId()
+        "
+        (click)="takePhoto()"
+        type="button"
+      >
+        <svg class="icon-primary" appIcon="camera" width="20" height="20"></svg>
+      </button>
+
+      <button
+        class="btn btn-m btn-tertiary ml-auto"
+        [disabled]="
+          photoCount() === 0 ||
+          isCapturing() ||
+          isUploading() ||
+          isFinishing() ||
+          isPreparingNext() ||
+          isCreating() ||
+          !bookId()
+        "
+        (click)="nextBook()"
+        type="button"
+      >
+        {{ "buttons.next_book" | translate }}
+      </button>
+    </footer>
+  </div>
+</section>

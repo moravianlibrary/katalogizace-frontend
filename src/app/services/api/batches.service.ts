@@ -1,5 +1,10 @@
 import {
   BatchDto,
+  BatchInfoDto,
+  BatchMemberDto,
+  BatchMemberPermissionRequest,
+  BatchState,
+  BatchWithBooksDto,
   PaginatedBatchesResponseDto,
   UpdateBatchRequest,
 } from '@/app/models';
@@ -21,44 +26,61 @@ export class BatchesService {
       filter_owned_by_user?: boolean;
       page?: number;
       page_size?: number;
+      search_query?: string;
+      sort_by?: 'created_at' | 'modified_at';
+      sort_order?: 'asc' | 'desc';
+      batch_state?: BatchState | null;
     } = {},
   ) {
-    const { filter_owned_by_user = false, page = 1, page_size = 20 } = opts;
+    const {
+      filter_owned_by_user = false,
+      page = 1,
+      page_size = 100,
+      search_query,
+      sort_by = 'modified_at',
+      sort_order = 'desc',
+      batch_state,
+    } = opts;
 
     let params = new HttpParams()
       .set('page', String(page))
-      .set('page_size', String(page_size));
+      .set('page_size', String(page_size))
+      .set('sort_by', sort_by)
+      .set('sort_order', sort_order);
 
     if (filter_owned_by_user) {
       params = params.set('filter_owned_by_user', 'true');
     }
 
+    if (search_query !== undefined) {
+      params = params.set('search_query', search_query.trim());
+    }
+
+    if (batch_state) {
+      params = params.set('batch_state', batch_state);
+    }
+
     return this.http.get<PaginatedBatchesResponseDto>(
       `${this.apiBaseUrl}/batches/`,
-      {
-        params,
-      },
+      { params },
     );
   }
 
   getBatch(batch_id: string) {
-    return this.http.get<BatchDto>(`${this.apiBaseUrl}/batches/${batch_id}`);
+    return this.http.get<BatchWithBooksDto>(
+      `${this.apiBaseUrl}/batches/${batch_id}`,
+    );
   }
 
   createBatch(name: string, description: string | null) {
-    let params = new HttpParams().set('name', name);
-
-    if (description !== null) {
-      params = params.set('description', description);
-    }
-
-    return this.http.post<BatchDto>(`${this.apiBaseUrl}/batches/`, null, {
-      params,
+    return this.http.post<BatchDto>(`${this.apiBaseUrl}/batches/`, {
+      name,
+      description,
     });
   }
 
   updateBatch(batch_id: string, patch: UpdateBatchRequest) {
-    return this.http.put<BatchDto>(
+    return this.http.patch<BatchDto>(
       `${this.apiBaseUrl}/batches/${batch_id}`,
       patch,
     );
@@ -66,5 +88,35 @@ export class BatchesService {
 
   deleteBatch(batch_id: string) {
     return this.http.delete(`${this.apiBaseUrl}/batches/${batch_id}`);
+  }
+
+  getBatchesInfo() {
+    return this.http.get<BatchInfoDto[]>(`${this.apiBaseUrl}/batches/info`);
+  }
+
+  getBatchMembers(batchId: number) {
+    return this.http.get<BatchMemberDto[]>(
+      `${this.apiBaseUrl}/batches/${batchId}/members`,
+    );
+  }
+
+  addBatchMembers(batchId: number, members: BatchMemberPermissionRequest[]) {
+    return this.http.post(
+      `${this.apiBaseUrl}/batches/${batchId}/members`,
+      members,
+    );
+  }
+
+  updateBatchMembers(batchId: number, members: BatchMemberPermissionRequest[]) {
+    return this.http.patch(
+      `${this.apiBaseUrl}/batches/${batchId}/members`,
+      members,
+    );
+  }
+
+  deleteBatchMembers(batchId: number, userIds: number[]) {
+    return this.http.delete(`${this.apiBaseUrl}/batches/${batchId}/members`, {
+      body: userIds,
+    });
   }
 }

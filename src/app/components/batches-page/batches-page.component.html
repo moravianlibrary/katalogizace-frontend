@@ -1,0 +1,311 @@
+<section
+  class="mx-auto flex h-full min-h-0 flex-col gap-4 p-4"
+  data-testid="batches-page"
+>
+  <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
+    @if (canCreateBatch()) {
+      <button
+        class="btn btn-l btn-primary group"
+        (click)="openCreate()"
+        data-testid="create-batch-button"
+        type="button"
+      >
+        <svg
+          class="icon-primary"
+          appIcon="folderAdd"
+          width="20"
+          height="20"
+        ></svg>
+        {{ "batches.create" | translate }}
+      </button>
+    }
+
+    <div class="flex w-full flex-row gap-3 sm:w-lg sm:items-center">
+      <div class="flex items-center gap-2">
+        <button
+          class="btn btn-l group border px-3.75 py-2.75"
+          [ngClass]="
+            !filterMine()
+              ? 'border-primary-default bg-main-secondary-default hover:border-primary-hover active:border-primary-pressed'
+              : 'border-tertiary-default bg-main-base hover:border-tertiary-hover active:border-tertiary-pressed'
+          "
+          (click)="setMine(false)"
+          type="button"
+        >
+          @if (!filterMine()) {
+            <svg
+              class="icon-secondary"
+              appIcon="checkCircle"
+              width="16"
+              height="16"
+            ></svg>
+          }
+
+          {{ "batches.all" | translate }}
+        </button>
+
+        <button
+          class="btn btn-l group border px-3.75 py-2.75"
+          [ngClass]="
+            filterMine()
+              ? 'border-primary-default bg-main-secondary-default hover:border-primary-hover active:border-primary-pressed'
+              : 'border-tertiary-default bg-main-base hover:border-tertiary-hover active:border-tertiary-pressed'
+          "
+          (click)="setMine(true)"
+          type="button"
+        >
+          @if (filterMine()) {
+            <svg
+              class="icon-secondary-default"
+              appIcon="checkCircle"
+              width="16"
+              height="16"
+            ></svg>
+          }
+
+          {{ "batches.just_mine" | translate }}
+        </button>
+      </div>
+
+      <div class="w-full">
+        <app-table-search-input
+          [value]="searchInput()"
+          (valueChange)="searchInput.set($event)"
+          data-testid="batches-search"
+          placeholderKey="batches.search"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="flex min-h-0 flex-1 flex-col justify-between">
+    <div class="bg-main-light overflow-auto rounded-lg">
+      <table class="text-md w-full table-fixed">
+        <colgroup>
+          <col class="w-80" />
+          <col class="w-26" />
+          <col class="w-64" />
+          <col class="w-48" />
+          <col class="w-48" />
+          <col class="w-46" />
+          <col class="w-24" />
+        </colgroup>
+
+        <thead class="bg-main-bright text-secondary sticky top-0 z-2">
+          <tr>
+            <th
+              class="rounded-tl-lg px-3 py-2 text-left font-medium text-nowrap"
+            >
+              {{ "batches.title_and_subtitle" | translate }}
+            </th>
+            <th class="px-3 py-2 text-left font-medium text-nowrap">
+              {{ "batches.num_of_books" | translate }}
+            </th>
+            <th class="px-3 py-2 text-left font-medium">
+              {{ "batches.author" | translate }}
+            </th>
+            <th class="px-3 py-2 text-left font-medium">
+              <app-sortable-table-header
+                [active]="sortBy() === 'created_at'"
+                [direction]="sortDir()"
+                (sort)="setSort('created_at')"
+                labelKey="batches.created"
+              />
+            </th>
+            <th class="px-3 py-2 text-left font-medium">
+              <app-sortable-table-header
+                [active]="sortBy() === 'modified_at'"
+                [direction]="sortDir()"
+                (sort)="setSort('modified_at')"
+                labelKey="batches.edited"
+              />
+            </th>
+            <th class="px-3 py-2 text-left font-medium">
+              <app-table-filter-menu
+                [options]="batchStateOptions"
+                [value]="batchState()"
+                (valueChange)="setBatchStateFilter($event)"
+                labelKey="batches.state"
+                radioName="batch-state-filter"
+              />
+            </th>
+            <th class="rounded-tr-lg px-3 py-2 text-left font-medium">
+              {{ "batches.actions" | translate }}
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @if (loading()) {
+            <tr>
+              <td
+                class="bg-main-base text-secondary rounded-b-lg px-3 py-3.5 text-center"
+                colspan="7"
+              >
+                {{ "batches.loading" | translate }}
+              </td>
+            </tr>
+          } @else if (error()) {
+            <tr>
+              <td
+                class="bg-main-base text-error rounded-b-lg px-3 py-3.5 text-center"
+                colspan="7"
+              >
+                {{ error() }}
+              </td>
+            </tr>
+          } @else if (!data() || rows().length === 0) {
+            <tr>
+              <td
+                class="bg-main-base text-secondary rounded-b-lg px-3 py-3.5 text-center"
+                colspan="7"
+              >
+                {{ "batches.no_batches" | translate }}
+              </td>
+            </tr>
+          } @else {
+            @for (b of rows(); track b.batch_id; let last = $last) {
+              <tr
+                class="bg-main-base border-bright border-t transition-colors"
+                [attr.data-testid]="'batch-row-' + b.batch_id"
+                [ngClass]="
+                  canOpenBatch(b.batch_id)
+                    ? 'cursor-pointer hover:bg-gray-500/5'
+                    : 'cursor-default'
+                "
+                [tabindex]="canOpenBatch(b.batch_id) ? 0 : -1"
+                (click)="open(b.batch_id)"
+                (keyup.enter)="open(b.batch_id)"
+                (keyup.space)="open(b.batch_id)"
+                role="button"
+              >
+                <td
+                  class="min-h-11 max-w-xs px-3 py-1"
+                  [class.rounded-bl-lg]="last"
+                >
+                  <div class="flex min-h-11 flex-col justify-center">
+                    <div class="truncate">{{ b.name }}</div>
+
+                    @if (b.description) {
+                      <div class="text-light truncate text-sm">
+                        {{ b.description }}
+                      </div>
+                    }
+                  </div>
+                </td>
+
+                <td class="px-3 py-1">
+                  <span
+                    class="bg-main-light text-base-color inline-flex items-center rounded-lg px-4 py-1"
+                  >
+                    {{ b.num_books }}
+                  </span>
+                </td>
+
+                <td class="px-3 py-1">{{ b.created_by }}</td>
+
+                <td class="px-3 py-1 text-nowrap">
+                  <span>{{ b.created_at | date: "dd.MM.yyyy" }}</span>
+                  <span class="text-light ml-1">
+                    {{ b.created_at | date: "HH:mm:ss" }}
+                  </span>
+                </td>
+
+                <td class="px-3 py-1 text-nowrap">
+                  <span>{{ b.modified_at | date: "dd.MM.yyyy" }}</span>
+                  <span class="text-light ml-1">
+                    {{ b.modified_at | date: "HH:mm:ss" }}
+                  </span>
+                </td>
+
+                <td class="px-3 py-1 text-nowrap">
+                  <app-table-state-badge
+                    [appearance]="batchStateBadgeAppearances[b.state]"
+                    [label]="b.state | batchStateLabel"
+                  />
+                </td>
+
+                <td class="px-3 py-1" [class.rounded-br-lg]="last">
+                  <div class="flex items-center gap-2">
+                    @if (canEditBatch(b.batch_id)) {
+                      <button
+                        class="btn btn-tertiary group enabled:hover:shadow-s p-2"
+                        [attr.data-testid]="'edit-batch-' + b.batch_id"
+                        (click)="openEdit(b, $event)"
+                        type="button"
+                        aria-label="Upravit skupinu"
+                        title="Upravit"
+                      >
+                        <svg
+                          class="icon-black group-disabled:icon-tertiary-disable"
+                          appIcon="edit"
+                          width="16"
+                          height="16"
+                        ></svg>
+                      </button>
+                    }
+
+                    @if (canDeleteBatch(b.batch_id)) {
+                      <button
+                        class="btn btn-tertiary group enabled:hover:shadow-s p-2"
+                        [attr.data-testid]="'delete-batch-' + b.batch_id"
+                        (click)="onDelete(b.batch_id, $event)"
+                        type="button"
+                        aria-label="Smazat skupinu"
+                      >
+                        <svg
+                          class="icon-black group-disabled:icon-tertiary-disable"
+                          appIcon="trash"
+                          width="16"
+                          height="16"
+                        ></svg>
+                      </button>
+                    }
+
+                    @if (
+                      !canEditBatch(b.batch_id) && !canDeleteBatch(b.batch_id)
+                    ) {
+                      <span class="text-light text-sm italic">{{
+                        "labels.no_permissions" | translate
+                      }}</span>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="shrink-0 pt-4">
+      <app-table-pagination
+        [from]="from()"
+        [hasNext]="hasNext()"
+        [hasPrev]="hasPrev()"
+        [page]="page()"
+        [to]="to()"
+        [total]="data()?.total ?? 0"
+        [visiblePages]="visiblePages()"
+        (next)="goNextPage()"
+        (pageChange)="goToPage($event)"
+        (prev)="goPrevPage()"
+      />
+    </div>
+  </div>
+</section>
+
+<app-batch-dialog
+  [open]="editDialogOpen()"
+  [batch]="editingBatch()"
+  (closed)="closeEdit()"
+  (saved)="closeEdit(); load()"
+  mode="edit"
+/>
+
+<app-batch-dialog
+  [open]="createDialogOpen()"
+  (closed)="closeCreate()"
+  (saved)="closeCreate(); load()"
+  mode="create"
+/>

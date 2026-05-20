@@ -1,11 +1,9 @@
-<td class="text-secondary p-2 align-text-top font-bold">LEADER</td>
-
-<td class="p-2 align-text-top"></td>
-<td class="p-2 align-text-top"></td>
-
-<td class="p-2">
-  <span class="whitespace-pre">{{ leader() }}</span>
+<td
+  class="marc-cell marc-cell-left text-secondary text-md p-2 align-text-top font-bold"
+>
+  {{ "marc_row.leader" | translate }}
 </td>
 
-<td></td>
-<td></td>
+<td class="marc-cell marc-cell-right py-2 pr-2" colspan="5">
+  <span class="text-secondary text-md whitespace-pre">{{ leader() }}</span>
+</td>

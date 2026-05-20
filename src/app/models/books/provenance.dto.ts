@@ -1,4 +1,4 @@
-import { UUID } from '../shared/id.model';
+import { ID, UUID } from '../shared/id.model';
 import { StepKind } from '../shared/states.model';
 
 export interface Step {
@@ -7,7 +7,7 @@ export interface Step {
 }
 
 export interface CandidateProvenanceResponseDto {
-  book_id: UUID;
+  book_id: ID;
   candidate_id: UUID;
   provenance: Step[];
 }

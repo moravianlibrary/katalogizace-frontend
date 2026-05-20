@@ -1,0 +1,48 @@
+<div class="mb-4">
+  <div
+    class="border-bright flex items-center justify-between gap-2 border-b p-4"
+  >
+    <span class="text-md w-full font-medium text-nowrap">
+      {{ "current_record" | translate }}
+    </span>
+
+    <div class="flex items-center gap-2">
+      <button
+        class="btn btn-m btn-tertiary group"
+        [class.invisible]="!canExport()"
+        [attr.tabindex]="canExport() ? null : -1"
+        [disabled]="!canExport()"
+        (click)="onExport()"
+        data-testid="export-record-button"
+        type="button"
+      >
+        {{ "buttons.export" | translate }}
+
+        <svg
+          class="icon-tertiary"
+          appIcon="export"
+          width="16"
+          height="16"
+        ></svg>
+      </button>
+
+      <button
+        class="btn btn-m btn-primary group"
+        [class.invisible]="!canWrite()"
+        [attr.tabindex]="canWrite() ? null : -1"
+        [disabled]="!canWrite() || isSaving() || !canSaveRecord()"
+        (click)="onSave()"
+        data-testid="save-record-button"
+        type="button"
+      >
+        {{ "buttons.save_record" | translate }}
+
+        <svg class="icon-primary" appIcon="check" width="16" height="16"></svg>
+      </button>
+    </div>
+  </div>
+
+  @if (canWrite()) {
+    <app-quick-add [items]="quickAddItems()" (add)="onQuickAdd($event)" />
+  }
+</div>

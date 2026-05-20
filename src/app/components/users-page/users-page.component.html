@@ -1,0 +1,204 @@
+<section
+  class="mx-auto flex h-full min-h-0 flex-col gap-4 p-4"
+  data-testid="users-page"
+>
+  <div class="flex flex-row items-center justify-between gap-4">
+    @if (canManageUsers()) {
+      <button
+        class="btn btn-l btn-primary group"
+        (click)="openCreate()"
+        data-testid="create-user-button"
+        type="button"
+      >
+        <svg
+          class="icon-primary"
+          appIcon="userAdd"
+          width="20"
+          height="20"
+        ></svg>
+        {{ "users.create" | translate }}
+      </button>
+    }
+
+    <div class="w-full sm:w-96">
+      <app-table-search-input
+        [value]="searchInput()"
+        (valueChange)="searchInput.set($event)"
+        data-testid="users-search"
+        placeholderKey="users.search"
+      />
+    </div>
+  </div>
+
+  <div class="flex min-h-0 flex-1 flex-col justify-between">
+    <div class="bg-main-light overflow-auto rounded-lg">
+      <table class="text-md w-full table-fixed">
+        <colgroup>
+          <col class="w-70" />
+          <col class="w-80" />
+          <col class="w-lg" />
+          <col class="w-26" />
+        </colgroup>
+
+        <thead class="bg-main-bright text-secondary sticky top-0 z-2">
+          <tr>
+            <th class="rounded-tl-lg px-3 py-2 text-left font-medium">
+              {{ "users.full_name" | translate }}
+            </th>
+
+            <th class="px-3 py-2 text-left font-medium">
+              {{ "users.email" | translate }}
+            </th>
+
+            <th class="px-3 py-2 text-left font-medium">
+              {{ "users.groups" | translate }}
+            </th>
+
+            <th class="rounded-tr-lg px-3 py-2 text-left font-medium">
+              {{ "users.actions" | translate }}
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @if (loading()) {
+            <tr>
+              <td
+                class="bg-main-base text-secondary rounded-b-lg px-3 py-3.5 text-center"
+                colspan="4"
+              >
+                {{ "users.loading" | translate }}
+              </td>
+            </tr>
+          } @else if (error()) {
+            <tr>
+              <td
+                class="bg-main-base text-error rounded-b-lg px-3 py-3.5 text-center"
+                colspan="4"
+              >
+                {{ error() }}
+              </td>
+            </tr>
+          } @else if (filteredUsers().length === 0) {
+            <tr>
+              <td
+                class="bg-main-base text-secondary rounded-b-lg px-3 py-3.5 text-center"
+                colspan="4"
+              >
+                {{ "users.no_users" | translate }}
+              </td>
+            </tr>
+          } @else {
+            @for (user of filteredUsers(); track user.id; let last = $last) {
+              <tr
+                class="bg-main-base border-bright border-t"
+                [attr.data-testid]="'user-row-' + user.id"
+              >
+                <td class="px-3 py-3.5" [class.rounded-bl-lg]="last">
+                  <div class="flex min-w-0 items-center gap-2">
+                    <span class="min-w-0 truncate">
+                      {{ user.full_name }}
+                    </span>
+
+                    @if (user.role === "admin") {
+                      <svg
+                        class="icon-secondary shrink-0"
+                        appIcon="crown"
+                        width="16"
+                        height="16"
+                      ></svg>
+                    }
+                  </div>
+                </td>
+
+                <td class="px-3 py-1">
+                  <div class="truncate">
+                    {{ user.email }}
+                  </div>
+                </td>
+
+                <td class="px-3 py-1">
+                  <app-user-batches-cell
+                    [groupNames]="groupNames(user)"
+                    [emptyLabel]="'users.no_groups' | translate"
+                  />
+                </td>
+
+                <td class="px-3 py-1" [class.rounded-br-lg]="last">
+                  <div class="flex items-center gap-2">
+                    @if (canManageUsers()) {
+                      <button
+                        class="btn btn-tertiary group enabled:hover:shadow-s p-2"
+                        [attr.data-testid]="'edit-user-' + user.id"
+                        [attr.aria-label]="'users.edit' | translate"
+                        [title]="'users.edit' | translate"
+                        (click)="openEdit(user, $event)"
+                        type="button"
+                      >
+                        <svg
+                          class="icon-black group-disabled:icon-tertiary-disable"
+                          appIcon="edit"
+                          width="16"
+                          height="16"
+                        ></svg>
+                      </button>
+                    }
+
+                    @if (canManageUsers()) {
+                      <button
+                        class="btn btn-tertiary group enabled:hover:shadow-s p-2"
+                        [attr.data-testid]="'delete-user-' + user.id"
+                        [disabled]="user.id === auth.user()?.id"
+                        [attr.aria-label]="'users.delete' | translate"
+                        [title]="'users.delete' | translate"
+                        (click)="onDelete(user, $event)"
+                        type="button"
+                      >
+                        <svg
+                          class="icon-black group-disabled:icon-tertiary-disable"
+                          appIcon="trash"
+                          width="16"
+                          height="16"
+                        ></svg>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="flex shrink-0 items-center justify-between gap-4 pt-4">
+      <div class="text-light text-md text-nowrap">
+        {{ filteredUsers().length }} / {{ usersData().length }}
+      </div>
+    </div>
+  </div>
+</section>
+
+<app-user-dialog
+  [open]="createDialogOpen()"
+  (closed)="closeCreate()"
+  (saved)="closeCreate(); load()"
+  (passwordGenerated)="onPasswordGenerated($event)"
+  mode="create"
+/>
+
+<app-user-dialog
+  [open]="editDialogOpen()"
+  [user]="editingUser()"
+  (closed)="closeEdit()"
+  (saved)="closeEdit(); load()"
+  (passwordGenerated)="onPasswordGenerated($event)"
+  mode="edit"
+/>
+
+<app-generated-password-dialog
+  [open]="resetPasswordDialogOpen()"
+  [password]="generatedPassword()"
+  [titleKey]="passwordDialogTitleKey()"
+  (closed)="closeResetPasswordDialog()"
+/>

@@ -1,0 +1,30 @@
+<section class="bg-main-base flex h-full flex-col rounded-2xl">
+  <div class="flex-1 gap-6 overflow-auto p-4">
+    <label class="text-light text-sm-tight mb-2 block font-medium">
+      {{ "field_edit.value" | translate }}
+    </label>
+
+    <span
+      class="border-tertiary-default focus-within:border-primary-default bg-main-base inline-flex w-full overflow-hidden rounded-lg border"
+    >
+      <input
+        class="text-secondary text-md w-full bg-transparent py-3 pl-4 font-medium outline-none"
+        #ctrl
+        [value]="field()?.value ?? ''"
+        (input)="setValue(ctrl.value)"
+      />
+
+      @if (field()?.value?.length) {
+        <button
+          class="group mx-3 flex cursor-pointer items-center"
+          (click)="setValue('')"
+          (mousedown)="$event.preventDefault()"
+          tabindex="-1"
+          type="button"
+        >
+          <svg class="icon-tertiary" appIcon="x" width="16" height="16"></svg>
+        </button>
+      }
+    </span>
+  </div>
+</section>

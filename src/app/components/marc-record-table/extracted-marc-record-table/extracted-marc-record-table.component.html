@@ -1,69 +1,67 @@
-<table class="w-full border-collapse text-sm">
+<table class="w-full table-fixed border-collapse text-sm">
   <colgroup>
-    <col class="w-16" />
-    <col class="w-10" />
-    <col class="w-10" />
+    <col class="w-25" />
     <col />
-    <col class="w-10" />
-    <col class="w-10" />
   </colgroup>
 
-  <tbody>
+  <tbody
+    class="[&>tr:nth-child(even)]:bg-main-base [&>tr:nth-child(odd)]:bg-gray-500/5"
+  >
     @if (transformed(); as rec) {
       @if (rec.leader) {
         <tr
-          class="border-tertiary-default border-y-[0.5px]"
-          [ngClass]="
-            this.ds.enabledByUser() && this.recordState.viewMode() === 'table'
-              ? 'opacity-60'
-              : ''
-          "
+          class="border-light"
+          [ngClass]="[
+            rec.control_fields.length > 0 || rec.data_fields.length > 0
+              ? 'border-b'
+              : '',
+            this.ds.enabledByUser() ? 'opacity-60' : '',
+          ]"
           [leader]="rec.leader"
           appMarcRowLeader
         ></tr>
       }
 
-      @for (sf of rec.special_fields; track $index) {
+      @for (cf of rec.control_fields; track $index) {
         <tr
-          class="border-tertiary-default border-b-[0.5px]"
+          class="border-light"
           [ngClass]="[
-            $index === 0 && !rec.leader ? 'border-t-[0.5px]' : '',
-            this.ds.enabledByUser() &&
-            !isDiffableTag015to830(sf.tag) &&
-            this.recordState.viewMode() === 'table'
+            $index !== rec.control_fields.length - 1 ||
+            rec.data_fields.length > 0
+              ? 'border-b'
+              : '',
+            this.ds.enabledByUser() && !isDiffableTag015to830(cf.tag)
               ? 'opacity-60'
               : '',
           ]"
-          [sf]="sf"
-          appMarcRowSpecial
+          [cf]="cf"
+          [takeable]="takeable()"
+          appMarcRowControl
         ></tr>
       }
 
-      @for (nf of rec.normal_fields; track $index) {
-        @if (nf.tag != "910") {
+      @for (df of rec.data_fields; track $index) {
+        @if (df.tag != "910") {
           <tr
-            class="border-tertiary-default border-b-[0.5px]"
+            class="border-light"
             [ngClass]="[
-              $index === 0 && rec.special_fields.length === 0 && !rec.leader
-                ? 'border-t-[0.5px]'
-                : '',
-              this.ds.enabledByUser() &&
-              !isDiffableTag015to830(nf.tag) &&
-              this.recordState.viewMode() === 'table'
+              $index !== rec.data_fields.length - 1 ? 'border-b' : '',
+              this.ds.enabledByUser() && !isDiffableTag015to830(df.tag)
                 ? 'opacity-60'
                 : '',
             ]"
-            [nf]="nf"
+            [df]="df"
             [diffIndex]="diffIndex()"
             [diffSide]="diffSide()"
-            appMarcRowNormal
+            [takeable]="takeable()"
+            appMarcRowData
           ></tr>
         }
       }
     } @else {
       <tr>
         <td class="text-light p-2 text-sm" colspan="6">
-          Žádná data k zobrazení.
+          {{ "records.no_data" | translate }}
         </td>
       </tr>
     }

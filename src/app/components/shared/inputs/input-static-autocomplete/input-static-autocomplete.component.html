@@ -1,0 +1,63 @@
+<div class="relative">
+  <span
+    class="focus-within:border-primary-default inline-flex w-full items-center justify-between overflow-hidden rounded-lg border"
+    [ngClass]="
+      disabled()
+        ? 'text-disable border-tertiary-disable bg-gray-500/5'
+        : 'border-tertiary-default bg-main-base text-secondary'
+    "
+  >
+    <input
+      class="w-full bg-transparent py-3 pl-4 font-medium outline-none"
+      #inputEl
+      [ngClass]="disabled() ? 'cursor-not-allowed' : ''"
+      [disabled]="disabled()"
+      [value]="query()"
+      [placeholder]="placeholder()"
+      [attr.maxlength]="maxlength() ?? null"
+      (focus)="onFocus()"
+      (blur)="onBlur()"
+      (input)="onInput(inputEl.value)"
+      (keydown)="onKeydown($event)"
+    />
+
+    @if (query().length && !disabled()) {
+      <button
+        class="group mx-3 flex cursor-pointer items-center"
+        (click)="clear()"
+        (mousedown)="$event.preventDefault()"
+        tabindex="-1"
+        type="button"
+      >
+        <svg class="icon-tertiary" appIcon="x" width="16" height="16"></svg>
+      </button>
+    }
+  </span>
+
+  @if (open()) {
+    <div
+      class="border-primary-default bg-main-base absolute right-0 left-0 z-30 mt-2 overflow-hidden rounded-lg border shadow-md"
+    >
+      <div class="max-h-64 overflow-auto p-2" #list>
+        @for (it of filtered(); track it.code) {
+          <button
+            class="text-secondary hover:bg-main-light active:bg-main-bright flex w-full cursor-pointer items-center justify-between rounded-lg px-4 py-3 text-left transition"
+            [attr.data-idx]="$index"
+            [ngClass]="activeIndex() === $index ? 'bg-gray-500/10' : ''"
+            (mousedown)="$event.preventDefault()"
+            (click)="pick(it.code)"
+            type="button"
+          >
+            <span class="text-sm-tight text-secondary font-medium">
+              {{ it.translatedLabel }}
+            </span>
+
+            <span class="text-light text-sm-tight">
+              {{ it.code }}
+            </span>
+          </button>
+        }
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,44 @@
+<section
+  class="bg-main-base flex h-full flex-col rounded-2xl"
+  data-testid="main-panel"
+>
+  <app-main-panel-header
+    [bookId]="book_id()!"
+    [canWrite]="canWrite()"
+    [canExport]="canExport()"
+    [quickAddItems]="recordState.visibleQuickAdd()"
+    (quickAddClick)="onQuickAdd($event)"
+    (exportClick)="openExportDialog()"
+  ></app-main-panel-header>
+
+  <div class="min-h-0 flex-1 overflow-auto">
+    @if (recordPreview(); as rec) {
+      <div class="flex flex-col px-4 pb-4">
+        <app-editable-marc-record-table
+          [diffIndex]="diffIndex()"
+          [editable]="canWrite()"
+          diffSide="preview"
+        />
+      </div>
+    } @else {
+      <p class="text-light px-4 py-2 text-sm">
+        {{ "records.no_data" | translate }}
+      </p>
+    }
+  </div>
+
+  <app-add-field-dialog
+    [open]="addFieldDialogOpen()"
+    [error]="addFieldDialogError()"
+    (closed)="closeAddFieldDialog()"
+    (confirmed)="onAddFieldConfirm($event)"
+    (clearedError)="addFieldDialogError.set(null)"
+  />
+
+  <app-export-marcxml-dialog
+    [open]="exportDialogOpen()"
+    [marcxml]="exportMarcxml()"
+    [filename]="exportFilename()"
+    (closed)="closeExportDialog()"
+  />
+</section>

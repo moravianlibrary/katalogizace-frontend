@@ -29,6 +29,10 @@ yarn-error.log
 .sass-cache/
 /connect.lock
 /coverage
+/playwright/.auth
+/playwright-report
+/test-results
+/blob-report
 /libpeerconnection.log
 testem.log
 /typings
@@ -41,3 +45,4 @@ Thumbs.db
 /src/environments/environment.local.ts
 src/assets/env.json
 build-info.json
+.env.e2e

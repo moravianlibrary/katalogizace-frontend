@@ -1,18 +1,22 @@
 import {
+  EditableMarcRecord,
+  EditableMarcRecordControlField,
+  EditableMarcRecordDataField,
   ExistingMarcRecord,
+  ExistingMarcRecordControlField,
+  ExistingMarcRecordControlFieldWithMeta,
+  ExistingMarcRecordDataField,
+  ExistingMarcRecordDataFieldWithMeta,
   ExistingMarcRecordFieldMeta,
-  ExistingMarcRecordNormalField,
-  ExistingMarcRecordNormalFieldWithMeta,
-  ExistingMarcRecordSpecialField,
-  ExistingMarcRecordSpecialFieldWithMeta,
   ExistingMarcRecordWithMeta,
-  ExtractedMarcNormalField,
+  ExtractedMarcControlField,
+  ExtractedMarcDataField,
   ExtractedMarcRecord,
-  ExtractedMarcSpecialField,
+  LastEditedRecord,
   UiFieldWithMeta,
 } from '@/app/models';
 
-function pickCandidate(f: ExtractedMarcNormalField) {
+function pickCandidate(f: ExtractedMarcDataField) {
   const cand = f.candidates.find((c) => c.id === f.selected_candidate_id);
   if (!cand) {
     console.warn(
@@ -22,9 +26,9 @@ function pickCandidate(f: ExtractedMarcNormalField) {
   return cand!;
 }
 
-const SPECIAL_TAGS = new Set(['001', '003', '005', '006', '007', '008']);
+const CONTROL_TAGS = new Set(['001', '003', '005', '006', '007', '008']);
 function isControlTag(tag: string): boolean {
-  return SPECIAL_TAGS.has(tag);
+  return CONTROL_TAGS.has(tag);
 }
 
 export function extractedToExisting(
@@ -32,25 +36,25 @@ export function extractedToExisting(
 ): ExistingMarcRecord | null {
   if (!extracted) return null;
 
-  const special: ExistingMarcRecordSpecialField[] = [];
-  const normal: ExistingMarcRecordNormalField[] = [];
+  const control: ExistingMarcRecordControlField[] = [];
+  const data: ExistingMarcRecordDataField[] = [];
 
   for (const [tag, fields] of Object.entries(extracted)) {
     if (!Array.isArray(fields) || fields.length === 0) continue;
 
     for (const f of fields) {
       if (isControlTag(tag)) {
-        const field = f as ExtractedMarcSpecialField;
+        const field = f as ExtractedMarcControlField;
         const value = field.value;
-        special.push({ tag, value });
+        control.push({ tag, value });
       } else {
-        const field = f as ExtractedMarcNormalField;
+        const field = f as ExtractedMarcDataField;
         if (!field.candidates.length) continue;
 
         const cand = pickCandidate(field);
         const rep = cand.MARC_representation;
 
-        normal.push({
+        data.push({
           tag,
           ind1: rep.ind1 ?? '',
           ind2: rep.ind2 ?? '',
@@ -60,8 +64,8 @@ export function extractedToExisting(
     }
   }
 
-  special.sort((a, b) => a.tag.localeCompare(b.tag));
-  normal.sort((a, b) => a.tag.localeCompare(b.tag));
+  control.sort((a, b) => a.tag.localeCompare(b.tag));
+  data.sort((a, b) => a.tag.localeCompare(b.tag));
 
   const existing: ExistingMarcRecord = {
     record_id: 'extracted-synthetic',
@@ -73,8 +77,8 @@ export function extractedToExisting(
       required_if_applicable_present: 0,
       required_if_applicable_total: 0,
     },
-    special_fields: special,
-    normal_fields: normal,
+    control_fields: control,
+    data_fields: data,
   };
 
   return existing;
@@ -92,20 +96,20 @@ export function extractedToUiFields(
 
     for (const f of fields) {
       if (isControlTag(tag)) {
-        const field = f as ExtractedMarcSpecialField;
+        const field = f as ExtractedMarcControlField;
 
         out.push({
-          fieldId: `special-${crypto.randomUUID()}`,
+          fieldId: `control-${crypto.randomUUID()}`,
           tag,
           ind1: null,
           ind2: null,
           subfields: [],
           isManual: false,
-          special: true,
+          control: true,
           value: field.value,
         });
       } else {
-        const field = f as ExtractedMarcNormalField;
+        const field = f as ExtractedMarcDataField;
         if (!field.candidates.length) continue;
         const cand = pickCandidate(field);
         const rep = cand.MARC_representation;
@@ -120,7 +124,7 @@ export function extractedToUiFields(
             value: sf.value,
           })),
           isManual: false,
-          special: false,
+          control: false,
           value: '',
         });
       }
@@ -136,15 +140,15 @@ export function extractedToExistingWithMeta(
 ): ExistingMarcRecordWithMeta | null {
   if (!extracted) return null;
 
-  const special: ExistingMarcRecordSpecialFieldWithMeta[] = [];
-  const normal: ExistingMarcRecordNormalFieldWithMeta[] = [];
+  const control: ExistingMarcRecordControlFieldWithMeta[] = [];
+  const data: ExistingMarcRecordDataFieldWithMeta[] = [];
 
   for (const [tag, fields] of Object.entries(extracted)) {
     if (!Array.isArray(fields) || fields.length === 0) continue;
 
     for (const f of fields) {
       if (isControlTag(tag)) {
-        const field = f as ExtractedMarcSpecialField;
+        const field = f as ExtractedMarcControlField;
         const meta: ExistingMarcRecordFieldMeta = {
           fieldId: '',
           selectedCandidateId: '',
@@ -152,13 +156,13 @@ export function extractedToExistingWithMeta(
           score: 0,
         };
 
-        special.push({
+        control.push({
           tag,
           value: field.value,
           ...meta,
         });
       } else {
-        const field = f as ExtractedMarcNormalField;
+        const field = f as ExtractedMarcDataField;
         if (!field.candidates.length) continue;
         const cand = pickCandidate(field);
         const rep = cand.MARC_representation;
@@ -170,7 +174,7 @@ export function extractedToExistingWithMeta(
           score: cand.score,
         };
 
-        normal.push({
+        data.push({
           tag,
           ind1: rep.ind1 ?? '',
           ind2: rep.ind2 ?? '',
@@ -181,8 +185,8 @@ export function extractedToExistingWithMeta(
     }
   }
 
-  special.sort((a, b) => a.tag.localeCompare(b.tag));
-  normal.sort((a, b) => a.tag.localeCompare(b.tag));
+  control.sort((a, b) => a.tag.localeCompare(b.tag));
+  data.sort((a, b) => a.tag.localeCompare(b.tag));
 
   const existing: ExistingMarcRecordWithMeta = {
     record_id: 'extracted-synthetic',
@@ -194,9 +198,106 @@ export function extractedToExistingWithMeta(
       required_if_applicable_present: 0,
       required_if_applicable_total: 0,
     },
-    special_fields: special,
-    normal_fields: normal,
+    control_fields: control,
+    data_fields: data,
   };
 
   return existing;
+}
+
+export function extractedToEditableWithMeta(
+  extracted: ExtractedMarcRecord | null,
+): EditableMarcRecord | null {
+  if (!extracted) return null;
+
+  const control: EditableMarcRecordControlField[] = [];
+  const data: EditableMarcRecordDataField[] = [];
+
+  for (const [tag, fields] of Object.entries(extracted)) {
+    if (!Array.isArray(fields) || fields.length === 0) continue;
+
+    for (const f of fields) {
+      if (isControlTag(tag)) {
+        const field = f as ExtractedMarcControlField;
+
+        control.push({
+          tag,
+          value: field.value,
+          fieldId: `control-${crypto.randomUUID()}`,
+        });
+      } else {
+        const field = f as ExtractedMarcDataField;
+
+        if (!field.candidates.length) continue;
+
+        const cand = pickCandidate(field);
+        const rep = cand.MARC_representation;
+
+        data.push({
+          tag,
+          ind1: rep.ind1 ?? '',
+          ind2: rep.ind2 ?? '',
+          subfields: rep.subfields,
+          fieldId: field.id,
+        });
+      }
+    }
+  }
+
+  control.sort((a, b) => a.tag.localeCompare(b.tag));
+  data.sort((a, b) => a.tag.localeCompare(b.tag));
+
+  const editable: EditableMarcRecord = {
+    record_id: `editable-${crypto.randomUUID()}`,
+    leader: '',
+    source: '',
+    quality_assessment: {
+      required_present: 0,
+      required_total: 0,
+      required_if_applicable_present: 0,
+      required_if_applicable_total: 0,
+    },
+    control_fields: control,
+    data_fields: data,
+  };
+
+  return editable;
+}
+
+export function existingToEditableWithMeta(
+  existing: ExistingMarcRecord | LastEditedRecord | null,
+): EditableMarcRecord | null {
+  if (!existing) return null;
+
+  const control: EditableMarcRecordControlField[] = existing.control_fields.map(
+    (cf: ExistingMarcRecordControlField) => ({
+      tag: cf.tag,
+      value: cf.value,
+      fieldId: `control-${crypto.randomUUID()}`,
+    }),
+  );
+
+  const data: EditableMarcRecordDataField[] = existing.data_fields.map(
+    (df: any) => ({
+      tag: df.tag,
+      ind1: df.ind1 ?? '',
+      ind2: df.ind2 ?? '',
+      subfields: df.subfields ?? [],
+      fieldId: `data-${crypto.randomUUID()}`,
+    }),
+  );
+
+  control.sort((a, b) => a.tag.localeCompare(b.tag));
+  data.sort((a, b) => a.tag.localeCompare(b.tag));
+
+  const editable: EditableMarcRecord = {
+    record_id: existing.record_id,
+    leader: existing.leader,
+    source: existing.source,
+    quality_assessment: existing.quality_assessment,
+    control_fields: control,
+    data_fields: data,
+  };
+
+  return editable;
 }

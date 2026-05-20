@@ -1,0 +1,15 @@
+<span
+  class="text-sm-tight inline-flex items-center gap-1 rounded-lg p-2 font-medium"
+  [ngClass]="appearance().containerClass"
+>
+  @if (appearance().iconName) {
+    <svg
+      [ngClass]="appearance().iconClass"
+      [appIcon]="appearance().iconName!"
+      width="16"
+      height="16"
+    ></svg>
+  }
+
+  {{ label() }}
+</span>

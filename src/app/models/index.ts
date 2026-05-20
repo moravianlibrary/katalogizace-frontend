@@ -1,16 +1,21 @@
 // shared
+export * from './shared/autocomplete.model';
+export * from './shared/context-panel.model';
+export * from './shared/dropdown.model';
+export * from './shared/field-rules.model';
 export * from './shared/id.model';
-export * from './shared/labels.model';
+export * from './shared/record-patch.model';
+export * from './shared/record-state';
 export * from './shared/states.model';
 export * from './shared/toast.model';
-export * from './shared/working-panel.model';
 
 // books
 export * from './books/book.dto';
+export * from './books/editable-marc-with-meta.model';
+export * from './books/existing-marc-with-meta.model';
 export * from './books/images.model';
 export * from './books/marc-diff.model';
 export * from './books/marc-ui.model';
-export * from './books/marc-with-meta.model';
 export * from './books/marc.dto';
 export * from './books/provenance.dto';
 export * from './books/record-view.model';

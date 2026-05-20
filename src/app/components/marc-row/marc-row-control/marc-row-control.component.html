@@ -1,0 +1,44 @@
+<td
+  class="marc-cell marc-cell-left text-secondary text-md p-2 align-text-top font-bold"
+>
+  {{ cf().tag }}
+</td>
+
+<td class="marc-cell marc-cell-right py-2 pr-2" colspan="5">
+  <div class="flex items-start">
+    <div class="min-w-0 flex-1">
+      <span class="text-secondary text-md wrap-anywhere whitespace-pre">
+        {{ cf().value }}
+      </span>
+    </div>
+
+    <div class="flex gap-3 px-2">
+      @if (takeable()) {
+        <button
+          class="group cursor-pointer"
+          (click)="onTakeField(); $event.stopPropagation()"
+          type="button"
+        >
+          <svg
+            class="icon-secondary"
+            appIcon="swapHorizontal"
+            width="20"
+            height="20"
+          ></svg>
+        </button>
+      }
+    </div>
+
+    @if (editable()) {
+      <div class="ml-2 flex w-5 shrink-0 justify-end">
+        <button
+          class="pointer-events-none opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:cursor-pointer group-hover:opacity-100"
+          (click)="onDeleteField($event)"
+          type="button"
+        >
+          <svg class="icon-error" appIcon="trash" width="20" height="20"></svg>
+        </button>
+      </div>
+    }
+  </div>
+</td>

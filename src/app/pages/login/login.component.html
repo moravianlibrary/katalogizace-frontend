@@ -1,0 +1,99 @@
+<div
+  class="bg-main-base flex min-h-dvh items-center justify-center p-4"
+  data-testid="login-page"
+>
+  <div class="flex w-full max-w-xs flex-col items-center gap-6">
+    <h1 class="text-center text-2xl font-medium">
+      {{ "login.title" | translate }}
+    </h1>
+
+    <form
+      class="flex w-full flex-col items-center gap-5"
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+      data-testid="login-form"
+    >
+      <div class="flex w-full flex-col">
+        <label class="text-light text-sm-tight mb-2 block font-medium">
+          {{ "labels.email" | translate }}
+        </label>
+
+        <span
+          class="bg-main-base focus-within:border-primary-default inline-flex w-full items-center overflow-hidden rounded-lg border px-4"
+          [class.border-error]="emailInvalid()"
+          [class.border-tertiary-default]="!emailInvalid()"
+        >
+          <svg
+            class="icon-tertiary-default shrink-0"
+            appIcon="envelope"
+            width="16"
+            height="16"
+          ></svg>
+
+          <input
+            class="placeholder:text-disable text-secondary w-full bg-transparent py-3 pl-3 outline-none"
+            #emailInput
+            data-testid="login-email"
+            type="email"
+            formControlName="email"
+            autocomplete="username"
+            placeholder="name@example.com"
+          />
+        </span>
+
+        @if (emailInvalid()) {
+          <p class="text-error mt-2 text-sm">
+            {{ "labels.email_invalid" | translate }}
+          </p>
+        }
+      </div>
+
+      <div class="flex w-full flex-col gap-2">
+        <label class="text-light text-sm-tight mb-2 block font-medium">
+          {{ "labels.password" | translate }}
+        </label>
+
+        <span
+          class="bg-main-base focus-within:border-primary-default inline-flex w-full items-center overflow-hidden rounded-lg border px-4"
+          [class.border-error]="passwordInvalid()"
+          [class.border-tertiary-default]="!passwordInvalid()"
+        >
+          <svg
+            class="icon-tertiary-default shrink-0"
+            appIcon="lock"
+            width="16"
+            height="16"
+          ></svg>
+
+          <input
+            class="placeholder:text-disable text-secondary w-full bg-transparent py-3 pl-3 outline-none"
+            data-testid="login-password"
+            type="password"
+            formControlName="password"
+            autocomplete="current-password"
+            placeholder="••••••••"
+          />
+        </span>
+
+        @if (passwordInvalid()) {
+          <p class="text-error mt-2 text-sm">
+            {{ "labels.password_required" | translate }}
+          </p>
+        }
+      </div>
+
+      <button
+        class="btn btn-l btn-primary w-full justify-center"
+        [disabled]="loading() || form.invalid"
+        data-testid="login-submit"
+        type="submit"
+      >
+        @if (loading()) {
+          {{ "buttons.logging_in" | translate }}
+        } @else {
+          {{ "buttons.login" | translate }}
+        }
+      </button>
+    </form>
+  </div>
+</div>

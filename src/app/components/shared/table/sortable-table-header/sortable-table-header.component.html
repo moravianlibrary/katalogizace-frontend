@@ -1,0 +1,17 @@
+<button
+  class="group flex cursor-pointer items-center gap-1 select-none"
+  (click)="onSort()"
+  type="button"
+>
+  {{ labelKey() | translate }}
+
+  <svg
+    class="transition-transform duration-150"
+    [ngClass]="active() ? 'icon-secondary' : 'icon-tertiary'"
+    [class.rotate-90]="active() && direction() === 'asc'"
+    [class.-rotate-90]="!active() || direction() === 'desc'"
+    appIcon="arrowLeft"
+    width="16"
+    height="16"
+  ></svg>
+</button>

@@ -1,0 +1,77 @@
+<table class="w-full table-fixed border-separate border-spacing-0">
+  <colgroup>
+    <col class="w-25" />
+    <col />
+  </colgroup>
+
+  <tbody>
+    @if (recordState.editableRecord()?.leader) {
+      <tr
+        class="group"
+        [ngClass]="getLeaderRowClasses()"
+        [leader]="recordState.editableRecord()?.leader!"
+        (mouseenter)="setHoveredRow('__leader')"
+        (mouseleave)="setHoveredRow(null)"
+        data-testid="editable-record-leader-row"
+        appMarcRowLeader
+      ></tr>
+    }
+
+    @for (
+      cf of recordState.editableRecord()?.control_fields;
+      track cf.fieldId
+    ) {
+      <tr
+        class="group"
+        [attr.data-field-id]="cf.fieldId"
+        [attr.data-field-tag]="cf.tag"
+        [class.cursor-pointer]="rowsInteractive()"
+        [ngClass]="getControlRowClasses(cf.fieldId, cf.tag)"
+        [cf]="cf"
+        [editable]="editable()"
+        [takeable]="takeable() && editable()"
+        (mouseenter)="setHoveredRow(cf.fieldId)"
+        (mouseleave)="setHoveredRow(null)"
+        (click)="enterControlEdit(cf.fieldId, cf.tag, cf.value)"
+        data-testid="editable-record-row"
+        appMarcRowControl
+      ></tr>
+    }
+
+    @for (df of recordState.editableRecord()?.data_fields; track df.fieldId) {
+      @if (df.tag != "910") {
+        <tr
+          class="group"
+          [attr.data-field-id]="df.fieldId"
+          [attr.data-field-tag]="df.tag"
+          [class.cursor-pointer]="rowsInteractive()"
+          [ngClass]="getDataRowClasses(df.fieldId, df.tag)"
+          [df]="df"
+          [diffIndex]="diffIndex()"
+          [diffSide]="diffSide()"
+          [editable]="editable()"
+          [takeable]="takeable() && editable()"
+          (mouseenter)="setHoveredRow(df.fieldId)"
+          (mouseleave)="setHoveredRow(null)"
+          (click)="
+            enterDataEdit(df.fieldId, df.tag, df.ind1, df.ind2, df.subfields)
+          "
+          data-testid="editable-record-row"
+          appMarcRowData
+        ></tr>
+      }
+    }
+
+    @if (
+      !recordState.editableRecord()?.leader &&
+      recordState.editableRecord()?.control_fields?.length === 0 &&
+      recordState.editableRecord()?.data_fields?.length === 0
+    ) {
+      <tr>
+        <td class="text-light p-2 text-sm" colspan="6">
+          {{ "records.no_data" | translate }}
+        </td>
+      </tr>
+    }
+  </tbody>
+</table>

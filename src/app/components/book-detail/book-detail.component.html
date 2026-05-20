@@ -1,15 +1,27 @@
-<section class="h-full min-h-0">
-  <div class="grid h-full min-h-0 grid-cols-1 md:grid-cols-3">
-    <div class="shadow-s z-2 h-full min-h-0 overflow-hidden">
-      <app-images-view [bookId]="bookId" [images]="images()" />
-    </div>
+<section
+  class="grid h-full min-h-0 grid-cols-1 gap-4 p-4 md:grid-cols-3"
+  [class.md:grid-cols-[10rem_1fr_1fr]]="galleryCollapsed()"
+  data-testid="book-detail-page"
+>
+  <app-gallery-panel
+    class="h-full min-h-0 overflow-hidden"
+    [bookId]="bookId()"
+    [images]="images()"
+    (collapsedChange)="onGalleryCollapsedChange($event)"
+    data-testid="gallery-panel"
+  />
 
-    <div class="bg-main-light z-1 h-full min-h-0 overflow-hidden">
-      <app-editing-panel [book_id]="bookId" />
-    </div>
+  <app-main-panel
+    class="h-full min-h-0 overflow-hidden"
+    [book_id]="bookId()"
+    [canWrite]="canWrite()"
+    [canExport]="canExport()"
+    [batchName]="batchName()"
+  />
 
-    <div class="shadow-s z-2 h-full min-h-0 overflow-hidden">
-      <app-working-panel />
-    </div>
-  </div>
+  <app-context-panel
+    class="h-full min-h-0 overflow-hidden"
+    [bookId]="bookId()"
+    [canWrite]="canWrite()"
+  />
 </section>

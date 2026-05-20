@@ -1,14 +1,23 @@
-import { ExistingMarcRecord, MarcRecordsItem } from '@/app/models';
+import { ExistingMarcRecord, ID, MarcRecordsItem } from '@/app/models';
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  ElementRef,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
+import { ContextPanelService } from '../../services/context-panel.service';
 import { MarcDiffService } from '../../services/marc-diff.service';
 import { RecordStateService } from '../../services/record-state.service';
-import { WorkingPanelService } from '../../services/working-panel.service';
 import { RecordStore } from '../../stores/record.store';
-import { filterExistingRecord015to830 } from '../../utils/marc-filter';
 import { extractedToExisting } from '../../utils/marc-transform';
 import { ExistingMarcRecordTableComponent } from '../marc-record-table/existing-marc-record-table/existing-marc-record-table.component';
 import { ExtractedMarcRecordTableComponent } from '../marc-record-table/extracted-marc-record-table/extracted-marc-record-table.component';
+import { IconComponent } from '../shared/icon/icon.component';
 
 @Component({
   standalone: true,
@@ -17,14 +26,19 @@ import { ExtractedMarcRecordTableComponent } from '../marc-record-table/extracte
     ExistingMarcRecordTableComponent,
     CommonModule,
     ExtractedMarcRecordTableComponent,
+    TranslateModule,
+    IconComponent,
   ],
   templateUrl: './marc-records.component.html',
 })
 export class MarcRecordsComponent {
-  store = inject(RecordStore);
   private recordState = inject(RecordStateService);
+  private cps = inject(ContextPanelService);
+  diff = inject(MarcDiffService);
+  store = inject(RecordStore);
 
-  private wps = inject(WorkingPanelService);
+  bookId = input<ID | null>(null);
+  canWrite = input<boolean>(false);
 
   existingRecords = this.store.existingRecords;
   extractedRecord = this.store.extracted;
@@ -33,7 +47,6 @@ export class MarcRecordsComponent {
     return extractedToExisting(this.extractedRecord());
   });
 
-  private diff = inject(MarcDiffService);
   diffIndex = this.diff.diffIndex;
 
   records = computed<MarcRecordsItem[]>(() => {
@@ -57,11 +70,51 @@ export class MarcRecordsComponent {
     return list;
   });
 
-  expandedIndex = signal<number | null>(0);
+  isSingleRecord = computed(() => {
+    const extracted = this.store.extracted();
+    const existing = this.store.existingRecords();
+    return (extracted ? 1 : 0) + existing.length === 1;
+  });
+
+  expandedIndex = signal<number | null>(null);
 
   private lastAppliedKey: string | null = null;
 
+  private hostEl = inject(ElementRef<HTMLElement>);
+
+  private ro: ResizeObserver | null = null;
+
+  private hostHeightPx = signal<number>(0);
+  detailMaxHeightPx = computed(() => Math.floor(this.hostHeightPx() * 0.7));
+
+  ngAfterViewInit(): void {
+    const el = this.hostEl.nativeElement;
+
+    const update = () => {
+      this.hostHeightPx.set(el.getBoundingClientRect().height || 0);
+    };
+
+    update();
+
+    this.ro = new ResizeObserver(() => update());
+    this.ro.observe(el);
+  }
+
+  ngOnDestroy(): void {
+    this.ro?.disconnect();
+    this.ro = null;
+  }
+
   constructor() {
+    effect(() => {
+      const bookId = this.bookId();
+      if (bookId == null) return;
+
+      this.expandedIndex.set(null);
+      this.store.setOpenedExisting(null);
+      this.store.setOpenedExtracted(null);
+    });
+
     effect(() => {
       const idx = this.expandedIndex();
       const list = this.records();
@@ -88,21 +141,21 @@ export class MarcRecordsComponent {
     });
 
     effect(() => {
-      const evt = this.wps.applyCandidate();
+      const evt = this.cps.applyCandidate();
       if (!evt) return;
 
       const key = `${evt.fieldId}:${evt.candidate.id}`;
       if (this.lastAppliedKey === key) return;
       this.lastAppliedKey = key;
 
-      this.recordState.applyCandidateToUiField({
+      this.recordState.applyCandidateToField({
         fieldId: evt.fieldId,
         candidate: evt.candidate,
       });
 
       this.store.applyCandidateToOpenedExtracted(evt.fieldId, evt.candidate);
 
-      this.wps.applyCandidate.set(null);
+      this.cps.applyCandidate.set(null);
     });
   }
 
@@ -110,32 +163,48 @@ export class MarcRecordsComponent {
     this.expandedIndex.update((current) => (current === index ? null : index));
   }
 
-  getTitle(rec: ExistingMarcRecord | null): string | null {
+  getTitle(idx: number, rec?: ExistingMarcRecord | null): string | null {
+    if (idx === 0) {
+      return this.store.title();
+    }
+
     if (!rec) {
       return null;
     }
 
-    const f245 = rec.normal_fields?.find((f) => f.tag === '245');
+    const f245 = rec.data_fields?.find((f) => f.tag === '245');
     if (!f245) return '';
     return f245.subfields?.find((sf) => sf.code === 'a')?.value ?? '';
   }
 
-  getAuthorName(rec: ExistingMarcRecord | null): string | null {
+  getAuthorName(idx: number, rec?: ExistingMarcRecord | null): string | null {
+    if (idx === 0) {
+      return this.store.author();
+    }
+
     if (!rec) {
       return null;
     }
 
-    const f100 = rec.normal_fields?.find((f) => f.tag === '100');
+    const f100 = rec.data_fields?.find((f) => f.tag === '100');
     if (!f100) return '';
     return f100.subfields?.find((sf) => sf.code === 'a')?.value ?? '';
   }
 
-  getPublicationYear(rec: ExistingMarcRecord | null): string | null {
+  getPublicationYear(
+    idx: number,
+    rec?: ExistingMarcRecord | null,
+  ): string | null {
+    if (idx === 0) {
+      const year = this.store.yearOfPublication();
+      return year ? year.toString() : null;
+    }
+
     if (!rec) {
       return null;
     }
 
-    const f264 = rec.normal_fields?.find((f) => f.tag === '264');
+    const f264 = rec.data_fields?.find((f) => f.tag === '264');
     if (f264) {
       const sf264 = f264.subfields?.find((sf) => sf.code === 'c')?.value ?? '';
       if (sf264 !== '') {
@@ -143,7 +212,7 @@ export class MarcRecordsComponent {
       }
     }
 
-    const f260 = rec.normal_fields?.find((f) => f.tag === '260');
+    const f260 = rec.data_fields?.find((f) => f.tag === '260');
     if (f260) {
       const sf260 = f260.subfields?.find((sf) => sf.code === 'c')?.value ?? '';
       if (sf260 !== '') {
@@ -152,24 +221,5 @@ export class MarcRecordsComponent {
     }
 
     return '';
-  }
-
-  onTakeRecord() {
-    const idx = this.expandedIndex();
-    if (idx === null) {
-      return;
-    }
-
-    const rec = this.records()[idx];
-    if (!rec) {
-      return;
-    }
-
-    if (idx === 0) {
-      this.recordState.loadFromExtracted(rec.extracted);
-    } else {
-      const filtered = filterExistingRecord015to830(rec.existing!);
-      this.recordState.loadFromExistingOrLastEdited(filtered);
-    }
   }
 }

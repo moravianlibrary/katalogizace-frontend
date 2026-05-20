@@ -1,0 +1,7 @@
+@for (path of paths(); track $index) {
+  <svg:path
+    [attr.d]="path.d"
+    [attr.fill-rule]="path.fillRule ?? null"
+    [attr.clip-rule]="path.clipRule ?? null"
+  />
+}

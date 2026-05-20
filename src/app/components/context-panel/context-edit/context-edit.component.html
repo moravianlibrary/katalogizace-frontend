@@ -1,0 +1,35 @@
+@if (selected(); as f) {
+  @if (isControl()) {
+    @if (is008()) {
+      <app-field-008-editor [fieldId]="f.fieldId" />
+    } @else {
+      <app-generic-control-field-editor [fieldId]="f.fieldId" />
+    }
+  } @else {
+    @if (is100()) {
+      <app-field-authority-editor [fieldId]="f.fieldId" />
+    } @else if (is264()) {
+      <app-field-264-editor [fieldId]="f.fieldId" />
+    } @else if (is245()) {
+      <app-field-245-editor [fieldId]="f.fieldId" />
+    } @else if (is300()) {
+      <app-field-300-editor [fieldId]="f.fieldId" />
+    } @else if (is500()) {
+      <app-field-500-editor [fieldId]="f.fieldId" />
+    } @else if (is650()) {
+      <app-field-65x-editor [fieldId]="f.fieldId" [fieldType]="'df_650'" />
+    } @else if (is651()) {
+      <app-field-65x-editor [fieldId]="f.fieldId" [fieldType]="'df_651'" />
+    } @else if (is655()) {
+      <app-field-65x-editor [fieldId]="f.fieldId" [fieldType]="'df_655'" />
+    } @else if (is700()) {
+      <app-field-authority-editor [fieldId]="f.fieldId" />
+    } @else {
+      <app-generic-data-field-editor [fieldId]="f.fieldId" />
+    }
+  }
+} @else {
+  <div class="text-light p-4 text-sm">
+    {{ "field_edit.no_field_selected" | translate }}
+  </div>
+}

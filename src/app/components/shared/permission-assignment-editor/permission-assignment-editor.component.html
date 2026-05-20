@@ -1,0 +1,237 @@
+<div class="flex min-h-0 flex-col overflow-hidden px-4 pt-3">
+  <div class="text-light text-sm-tight mb-3 shrink-0 font-medium">
+    {{ sectionLabelKey() | translate }}
+  </div>
+
+  <div class="flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center">
+    <div class="relative min-w-0 flex-1" (click)="$event.stopPropagation()">
+      <div
+        class="border-tertiary-default focus-within:border-primary-default bg-main-base group inline-flex h-12 w-full items-center justify-between overflow-hidden rounded-lg border px-4"
+        [ngClass]="
+          disabled()
+            ? 'border-tertiary-disable cursor-not-allowed bg-gray-500/5'
+            : ''
+        "
+      >
+        <input
+          class="text-secondary disabled:text-disable h-full min-w-0 flex-1 bg-transparent outline-none disabled:cursor-not-allowed"
+          [value]="searchInput()"
+          [disabled]="disabled()"
+          [placeholder]="searchPlaceholderKey() | translate"
+          (focus)="onSearchFocus()"
+          (click)="onSearchFocus()"
+          (input)="onSearchInput($event)"
+          (keydown)="onPickerKeydown($event)"
+          type="text"
+        />
+
+        <button
+          class="ml-3 inline-flex shrink-0 items-center"
+          [disabled]="disabled()"
+          [attr.aria-label]="toggleButtonAriaLabel()"
+          (click)="togglePicker()"
+          type="button"
+        >
+          <svg
+            class="icon-tertiary transition-transform duration-150"
+            [class.rotate-180]="pickerOpen()"
+            appIcon="chevronDown"
+            width="16"
+            height="16"
+          ></svg>
+        </button>
+      </div>
+
+      @if (pickerOpen()) {
+        <div
+          class="border-primary-default bg-main-base absolute right-0 left-0 z-30 mt-2 overflow-hidden rounded-lg border shadow-md"
+        >
+          <div class="max-h-64 overflow-auto scroll-smooth p-2">
+            @if (loadingOptions()) {
+              <div class="text-light px-4 py-3">
+                {{ "labels.loading" | translate }}
+              </div>
+            } @else if (availableOptions().length === 0) {
+              <div class="text-light px-4 py-3">
+                {{ noAvailableLabelKey() | translate }}
+              </div>
+            } @else {
+              @for (option of availableOptions(); track option.id) {
+                <button
+                  class="group text-secondary hover:bg-main-light active:bg-main-bright flex w-full cursor-pointer items-center justify-between rounded-lg px-4 py-3 text-left transition"
+                  #optionButton
+                  [ngClass]="
+                    selectedOptionId() === option.id || activeIndex() === $index
+                      ? 'bg-main-light!'
+                      : ''
+                  "
+                  (mousedown)="$event.preventDefault()"
+                  (click)="selectOption(option)"
+                  type="button"
+                >
+                  <span class="min-w-0">
+                    <span class="block truncate">
+                      {{ option.title }}
+                    </span>
+
+                    @if (option.subtitle) {
+                      <span class="text-light block truncate text-sm">
+                        {{ option.subtitle }}
+                      </span>
+                    }
+                  </span>
+
+                  @if (selectedOptionId() === option.id) {
+                    <svg
+                      class="icon-secondary-default shrink-0"
+                      appIcon="checkCircle"
+                      width="16"
+                      height="16"
+                    ></svg>
+                  }
+                </button>
+              }
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="flex shrink-0 items-center gap-3">
+      <button
+        class="btn btn-l btn-primary group"
+        [disabled]="disabled() || !selectedOption()"
+        (click)="addSelectedOption()"
+        type="button"
+      >
+        <svg class="icon-primary" appIcon="add" width="20" height="20"></svg>
+
+        {{ "buttons.add" | translate }}
+      </button>
+
+      @if (rows().length > 0) {
+        <button
+          class="text-btn-secondary-default hover:text-btn-secondary-hover active:text-btn-secondary-pressed text-sm-tight inline-flex cursor-pointer items-center gap-2 font-medium"
+          [disabled]="disabled()"
+          (click)="removeAll()"
+          type="button"
+        >
+          <svg
+            class="icon-secondary"
+            appIcon="trash"
+            width="16"
+            height="16"
+          ></svg>
+
+          {{ "buttons.remove_all" | translate }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="mt-4 max-h-[calc(100dvh-25rem)] min-h-64 overflow-y-auto">
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      @if (loadingRows() && loadingRowsLabelKey()) {
+        <div
+          class="bg-main-light text-light rounded-lg p-4 text-center sm:col-span-2"
+        >
+          {{ loadingRowsLabelKey()! | translate }}
+        </div>
+      } @else if (rows().length === 0) {
+        <div
+          class="bg-main-light text-light rounded-lg p-4 text-center sm:col-span-2"
+        >
+          {{ emptyRowsLabelKey() | translate }}
+        </div>
+      } @else {
+        @for (row of rows(); track row.id) {
+          <div class="bg-main-light flex flex-col gap-3 rounded-lg p-2">
+            <div class="flex items-start justify-between gap-2 pl-2">
+              <div class="min-w-0">
+                <div class="flex min-w-0 items-center gap-2">
+                  <span class="text-base-color min-w-0 truncate font-medium">
+                    {{ row.title }}
+                  </span>
+
+                  @if (row.role === "admin" || row.icon) {
+                    <svg
+                      class="icon-secondary shrink-0"
+                      [appIcon]="row.icon ?? 'crown'"
+                      width="16"
+                      height="16"
+                    ></svg>
+                  }
+                </div>
+
+                @if (row.subtitle) {
+                  <div class="text-light truncate text-sm">
+                    {{ row.subtitle }}
+                  </div>
+                }
+              </div>
+
+              <button
+                class="btn btn-tertiary group enabled:hover:shadow-s shrink-0 p-2"
+                [disabled]="disabled()"
+                [attr.aria-label]="'buttons.delete' | translate"
+                [title]="'buttons.delete' | translate"
+                (click)="removeRequested.emit(row.id)"
+                type="button"
+              >
+                <svg
+                  class="icon-black group-disabled:icon-tertiary-disable"
+                  appIcon="trash"
+                  width="16"
+                  height="16"
+                ></svg>
+              </button>
+            </div>
+
+            <div class="flex flex-col gap-2 px-2 pb-3">
+              @for (permission of permissionOptions; track permission.value) {
+                <label
+                  class="text-secondary flex cursor-pointer items-center gap-2 has-disabled:cursor-not-allowed"
+                >
+                  <span class="relative flex h-4 w-4 shrink-0">
+                    <input
+                      class="peer absolute inset-0 z-10 h-4 w-4 cursor-pointer opacity-0 disabled:cursor-not-allowed"
+                      [checked]="hasPermission(row.id, permission.value)"
+                      [disabled]="disabled()"
+                      (change)="
+                        togglePermission(row.id, permission.value, $event)
+                      "
+                      type="checkbox"
+                    />
+
+                    <span
+                      class="border-tertiary-default bg-main-base peer-hover:border-primary-hover peer-active:border-primary-pressed peer-checked:border-primary-default peer-checked:bg-main-primary-default peer-checked:peer-hover:border-primary-hover peer-checked:peer-hover:bg-main-primary-hover peer-checked:peer-active:border-primary-pressed peer-checked:peer-active:bg-main-primary-pressed peer-disabled:border-tertiary-disable peer-disabled:peer-checked:border-tertiary-disable pointer-events-none relative flex h-4 w-4 items-center justify-center rounded border transition-colors peer-disabled:bg-gray-500/5 peer-disabled:peer-checked:bg-gray-300 peer-checked:[&>svg]:opacity-100"
+                    >
+                      <svg
+                        class="icon-primary opacity-0 transition-opacity"
+                        aria-hidden="true"
+                        appIcon="check"
+                        width="12"
+                        height="12"
+                      ></svg>
+                    </span>
+                  </span>
+
+                  <span class="text-sm-tight font-medium">
+                    {{ `permissions.${permission.value}` | translate }}
+                  </span>
+
+                  <svg
+                    class="shrink-0 fill-gray-600"
+                    [appIcon]="permission.icon"
+                    width="16"
+                    height="16"
+                  ></svg>
+                </label>
+              }
+            </div>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>

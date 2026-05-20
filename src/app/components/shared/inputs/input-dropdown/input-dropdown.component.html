@@ -1,0 +1,69 @@
+<div class="relative">
+  <button
+    class="border-tertiary-default focus-within:border-primary-default bg-main-base disabled:border-tertiary-disable group inline-flex w-full cursor-pointer items-center justify-between overflow-hidden rounded-lg border px-4 py-3 disabled:cursor-not-allowed disabled:bg-gray-500/5"
+    [disabled]="disabled()"
+    (click)="toggle()"
+    (keydown)="onKeydown($event)"
+    type="button"
+  >
+    <span
+      class="font-medium"
+      [ngClass]="disabled() ? 'text-disable' : 'text-secondary'"
+    >
+      {{ value() ? selectedLabel() : placeholder() }}
+    </span>
+
+    <svg
+      class="icon-tertiary transition-transform duration-150"
+      [class.rotate-180]="open()"
+      appIcon="chevronDown"
+      width="16"
+      height="16"
+    ></svg>
+  </button>
+
+  @if (open()) {
+    <div
+      class="border-primary-default bg-main-base absolute right-0 left-0 z-30 mt-2 overflow-hidden rounded-lg border shadow-md"
+    >
+      <div class="max-h-114 overflow-auto scroll-smooth p-2" #list>
+        @for (opt of options(); track opt.value) {
+          <button
+            class="group text-secondary disabled:text-disable flex w-full items-center justify-between rounded-lg px-4 py-3 text-left transition"
+            [disabled]="disabled()"
+            [attr.data-idx]="$index"
+            [ngClass]="[
+              disabled() ? 'cursor-default opacity-50' : 'cursor-pointer',
+
+              'bg-transparent',
+
+              !disabled() ? 'hover:bg-main-light active:bg-main-bright' : '',
+              activeIndex() === $index ? 'bg-main-light!' : '',
+            ]"
+            (mousedown)="$event.preventDefault()"
+            (click)="select(opt.value)"
+            type="button"
+          >
+            <span class="text-sm-tight font-medium">{{ opt.label }}</span>
+
+            @if (opt.value === value()) {
+              <svg
+                class="icon-secondary-default"
+                appIcon="checkCircle"
+                width="16"
+                height="16"
+              ></svg>
+            }
+          </button>
+        }
+      </div>
+    </div>
+
+    <button
+      class="fixed inset-0 z-20 cursor-default"
+      (click)="close()"
+      type="button"
+      aria-label="close"
+    ></button>
+  }
+</div>

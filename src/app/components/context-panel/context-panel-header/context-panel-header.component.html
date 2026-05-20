@@ -1,0 +1,210 @@
+<div>
+  <div class="border-bright flex items-center gap-2 border-b p-4">
+    @switch (this.cps.state().mode) {
+      @case ("provenance") {
+        <div class="flex w-full items-center gap-4">
+          <button
+            class="btn btn-m btn-icon btn-tertiary group"
+            data-testid="context-back-button"
+            (click)="onBack()"
+            type="button"
+          >
+            <svg
+              class="icon-tertiary"
+              appIcon="arrowLeft"
+              width="16"
+              height="16"
+            ></svg>
+          </button>
+
+          <span class="text-md w-full font-medium">{{ headerTitle() }}</span>
+        </div>
+      }
+      @case ("candidates") {
+        <div class="flex w-full items-center gap-4">
+          <button
+            class="btn btn-m btn-icon btn-tertiary group"
+            data-testid="context-back-button"
+            (click)="onBack()"
+            type="button"
+          >
+            <svg
+              class="icon-tertiary"
+              appIcon="arrowLeft"
+              width="16"
+              height="16"
+            ></svg>
+          </button>
+
+          <span class="text-md w-full font-medium">{{ headerTitle() }}</span>
+        </div>
+
+        <button
+          class="btn btn-m btn-primary"
+          [class.invisible]="!canWrite()"
+          [disabled]="!canWrite()"
+          [attr.tabindex]="canWrite() ? null : -1"
+          (click)="onCandidateConfirm()"
+          type="button"
+        >
+          {{ "buttons.confirm_selection" | translate }}
+        </button>
+      }
+      @case ("candidates_edit") {
+        <div class="flex w-full items-center gap-4">
+          <button
+            class="btn btn-m btn-icon btn-tertiary group"
+            data-testid="context-back-button"
+            (click)="onBack()"
+            type="button"
+          >
+            <svg
+              class="icon-tertiary"
+              appIcon="arrowLeft"
+              width="16"
+              height="16"
+            ></svg>
+          </button>
+
+          <span class="text-md w-full font-medium">{{ headerTitle() }}</span>
+        </div>
+
+        <button
+          class="btn btn-m btn-primary"
+          [class.invisible]="!canWrite()"
+          [disabled]="!canWrite()"
+          [attr.tabindex]="canWrite() ? null : -1"
+          (click)="onCandidateConfirmEdit()"
+          type="button"
+        >
+          {{ "buttons.confirm_selection" | translate }}
+        </button>
+      }
+      @case ("edit") {
+        <span class="text-md w-full font-medium">{{ headerTitle() }}</span>
+
+        <button
+          class="btn btn-m btn-error group"
+          data-testid="reset-field-button"
+          [class.invisible]="!canWrite()"
+          [disabled]="!canResetField()"
+          [attr.tabindex]="canWrite() ? null : -1"
+          (click)="onResetField()"
+          type="button"
+        >
+          {{ "buttons.reset" | translate }}
+          <svg
+            class="icon-btn-error"
+            appIcon="reset"
+            width="16"
+            height="16"
+          ></svg>
+        </button>
+
+        @if (
+          canWrite() &&
+          (cps.state().tag === "100" || cps.state().tag === "700") &&
+          candidatesCount() > 0
+        ) {
+          <button
+            class="btn btn-m btn-tertiary group"
+            (click)="onShowCandidates()"
+            type="button"
+          >
+            {{ "buttons.candidate_selection" | translate }}
+            <svg
+              class="icon-tertiary"
+              appIcon="task"
+              width="16"
+              height="16"
+            ></svg>
+          </button>
+        }
+
+        <button
+          class="btn btn-m btn-tertiary group"
+          data-testid="context-back-button"
+          (click)="onBack()"
+          type="button"
+        >
+          {{ "buttons.cancel" | translate }}
+          <svg class="icon-tertiary" appIcon="x" width="16" height="16"></svg>
+        </button>
+      }
+      @default {
+        <span class="text-md w-full font-medium">{{ headerTitle() }}</span>
+
+        <button
+          class="btn btn-m btn-error group"
+          data-testid="reset-record-button"
+          [class.invisible]="!canWrite()"
+          [disabled]="!canResetRecord()"
+          [attr.tabindex]="canWrite() ? null : -1"
+          (click)="onReset()"
+          type="button"
+        >
+          {{ "buttons.reset" | translate }}
+          <svg
+            class="icon-btn-error"
+            appIcon="reset"
+            width="16"
+            height="16"
+          ></svg>
+        </button>
+
+        <button
+          class="btn btn-m btn-primary group"
+          data-testid="take-record-button"
+          [class.invisible]="!canWrite()"
+          [disabled]="!canTakeRecord()"
+          [attr.tabindex]="canWrite() ? null : -1"
+          (click)="onTakeRecord()"
+          type="button"
+        >
+          {{ "buttons.take_record" | translate }}
+          <svg
+            class="icon-primary"
+            appIcon="swapHorizontal"
+            width="16"
+            height="16"
+          ></svg>
+        </button>
+      }
+    }
+  </div>
+
+  @if (showDiffToggle()) {
+    <div class="flex gap-5 px-4 pt-4">
+      <div class="flex items-center gap-3">
+        <button
+          class="inline-flex h-6 w-10 shrink-0 cursor-pointer items-center rounded-full transition disabled:cursor-not-allowed"
+          data-testid="compare-records-toggle"
+          [ngClass]="
+            diffEnabled()
+              ? 'bg-main-primary-default hover:bg-main-primary-hover active:bg-main-primary-pressed disabled:bg-main-primary-disable'
+              : 'bg-main-bright hover:bg-main-contrast active:bg-main-additionally-1 disabled:bg-main-light'
+          "
+          [attr.aria-checked]="diffEnabled()"
+          [disabled]="toggleDisabled()"
+          (click)="diff.toggle()"
+          type="button"
+          role="switch"
+          aria-label="'context_panel.compare_results' | translate"
+        >
+          <span
+            class="inline-block h-5 w-5 transform rounded-full bg-white transition"
+            [class.translate-x-[18px]]="diffEnabled()"
+            [class.translate-x-[2px]]="!diffEnabled()"
+          ></span>
+        </button>
+
+        <span
+          class="text-md font-medium"
+          [ngClass]="toggleDisabled() ? 'text-disable' : 'text-secondary'"
+        >
+          {{ "context_panel.compare_results" | translate }}
+        </span>
+      </div>
+    </div>
+  }
+</div>

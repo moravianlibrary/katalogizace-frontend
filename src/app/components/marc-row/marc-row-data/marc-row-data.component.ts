@@ -1,0 +1,174 @@
+import {
+  MarcCandidate,
+  MarcSubfield,
+  SubDiffIndex,
+  SubDiffKind,
+  UUID,
+} from '@/app/models';
+import { CommonModule } from '@angular/common';
+import { Component, computed, inject, input } from '@angular/core';
+import { ContextPanelService } from '../../../services/context-panel.service';
+import { RecordStateService } from '../../../services/record-state.service';
+import { RecordStore } from '../../../stores/record.store';
+
+import { ConfirmDialogService } from '@/app/services/confirm-dialog.service';
+import { FieldEditService } from '@/app/services/edit.service';
+import { TranslateService } from '@ngx-translate/core';
+import {
+  dataSignature,
+  enumerateSubfields,
+  isDiffableTag015to830,
+} from '../../../utils/marc-diff';
+import { IconComponent } from '../../shared/icon/icon.component';
+
+@Component({
+  standalone: true,
+  selector: 'tr[appMarcRowData]',
+  imports: [CommonModule, IconComponent],
+  templateUrl: './marc-row-data.component.html',
+})
+export class MarcRowDataComponent {
+  private cps = inject(ContextPanelService);
+  private store = inject(RecordStore);
+  private recordState = inject(RecordStateService);
+  private edit = inject(FieldEditService);
+  private translate = inject(TranslateService);
+  private confirmDialog = inject(ConfirmDialogService);
+
+  rowClass = input<string>('');
+  df = input.required<{
+    fieldId?: UUID;
+    tag: string;
+    ind1?: string;
+    ind2?: string;
+    subfields?: MarcSubfield[];
+    candidates?: MarcCandidate[];
+    selectedCandidateId?: UUID | null;
+    score?: number;
+  }>();
+
+  diffIndex = input<SubDiffIndex | null>(null);
+  diffSide = input<'opened' | 'preview'>('opened');
+  editable = input<boolean>(false);
+  takeable = input<boolean>(false);
+
+  async onDeleteField(event: MouseEvent) {
+    event.stopPropagation();
+    event.preventDefault();
+
+    const confirmed = await this.confirmDialog.confirm({
+      title: this.translate.instant('messages.confirm.records.delete_title'),
+      confirmLabel: this.translate.instant('buttons.delete'),
+      confirmKind: 'error',
+    });
+
+    if (!confirmed) return;
+
+    this.recordState.removeField(this.df().fieldId!);
+    this.edit.field.set(null);
+    this.cps.setMode('records');
+  }
+
+  onShowCandidates() {
+    this.cps.showCandidates(
+      'candidates',
+      this.df().tag,
+      this.df().fieldId!,
+      this.df().candidates!,
+      this.df().selectedCandidateId ?? '',
+    );
+  }
+
+  private readonly SCORE_CLASS: Record<number, string> = {
+    0: 'bg-main-success-rate-0-10',
+    10: 'bg-main-success-rate-10-20',
+    20: 'bg-main-success-rate-20-30',
+    30: 'bg-main-success-rate-30-40',
+    40: 'bg-main-success-rate-40-50',
+    50: 'bg-main-success-rate-50-60',
+    60: 'bg-main-success-rate-60-70',
+    70: 'bg-main-success-rate-70-80',
+    80: 'bg-main-success-rate-80-90',
+    90: 'bg-main-success-rate-90-100',
+  };
+
+  scoreClass(score?: number | null): string {
+    const pct = Math.max(0, Math.min(100, Math.round((score ?? 0) * 100)));
+
+    const bucket = pct === 100 ? 90 : Math.floor(pct / 10) * 10;
+
+    return this.SCORE_CLASS[
+      bucket as 0 | 10 | 20 | 30 | 40 | 50 | 60 | 70 | 80 | 90
+    ];
+  }
+
+  onShowProvenance() {
+    const df = this.df();
+    if (!df.fieldId || !df.selectedCandidateId) return;
+
+    const tag = df.tag;
+    const steps = this.store.provenance()[df.selectedCandidateId] ?? [];
+    this.cps.showProvenance(tag, steps, df.fieldId);
+  }
+
+  onTakeField() {
+    if (!this.takeable()) return;
+
+    this.recordState.takeDataField({
+      tag: this.df().tag,
+      ind1: this.df().ind1 ?? '',
+      ind2: this.df().ind2 ?? '',
+      subfields: this.df().subfields ?? [],
+    });
+  }
+
+  private fieldKey = computed(() => {
+    const f = this.df();
+    return dataSignature({
+      tag: f.tag,
+      ind1: f.ind1 ?? '',
+      ind2: f.ind2 ?? '',
+      subfields: (f.subfields ?? []).map((sf) => ({
+        code: sf.code,
+        value: sf.value,
+      })),
+    });
+  });
+
+  subfieldsEnumerated = computed(() => {
+    const f = this.df();
+    return enumerateSubfields(
+      (f.subfields ?? []).map((sf) => ({ code: sf.code, value: sf.value })),
+    );
+  });
+
+  subDiffKindAt(i: number): SubDiffKind | null {
+    const f = this.df();
+    if (!isDiffableTag015to830(f.tag)) return null;
+
+    const idx = this.diffIndex();
+    if (!idx) return null;
+
+    const side = this.diffSide();
+    const perField = idx[side].get(this.fieldKey());
+    if (!perField) return null;
+
+    const entry = this.subfieldsEnumerated()[i];
+    if (!entry) return null;
+
+    return perField.get(entry.key) ?? null;
+  }
+
+  subDiffClass(kind: SubDiffKind | null): string {
+    switch (kind) {
+      case 'same':
+        return 'bg-green-100 text-green-900';
+      case 'changed':
+        return 'bg-red-100 text-red-900';
+      case 'missing_or_extra':
+        return 'bg-orange-100 text-orange-900';
+      default:
+        return '';
+    }
+  }
+}

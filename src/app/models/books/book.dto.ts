@@ -1,4 +1,4 @@
-import { UUID } from '../shared/id.model';
+import { ID, UUID } from '../shared/id.model';
 import { ProcessState, RecordState } from '../shared/states.model';
 import { ApiImageItem } from './images.model';
 import {
@@ -9,15 +9,19 @@ import {
 import { Step } from './provenance.dto';
 
 export interface BookCommonDto {
-  book_id: UUID;
+  book_id: ID;
+  batch_id: ID | null;
   created_at: string | null;
   modified_at: string | null;
+  title: string;
+  author: string;
+  year_of_publishing: number;
   process_state: ProcessState;
   record_state: RecordState;
   images: ApiImageItem[];
-  hatchet_workflow_id: string | null;
-  batch_id: string | null;
+  hatchet_workflow_id: UUID | null;
   error_message: string | null;
+  created_by: string;
 }
 
 export interface BookRecordInfoDto extends BookCommonDto {}
@@ -34,23 +38,44 @@ export interface PaginatedBooksResponseDto {
 
 export interface BookResultResponseDto extends BookCommonDto {
   extracted_MARC_record: ExtractedMarcRecord | null;
-  library_sigla: string | null;
   existing_MARC_records: ExistingMarcRecord[];
   last_edited_record: LastEditedRecord | null;
   provenance: Record<UUID, Step[]>;
+  warnings: string[];
+  batch_name: string;
 }
 
 export interface BookUploadResponseDto {
-  book_id: UUID;
+  book_id: ID;
   process_state: ProcessState;
   record_state: RecordState;
-  hatchet_workflow_id: string | null;
-  batch_id: string | null;
+  hatchet_workflow_id: UUID | null;
+  batch_id: ID;
   images: ApiImageItem[];
   created_at: string;
 }
 
 export interface BookImageUploadResponseDto {
-  book_id: UUID;
-  image_id: UUID;
+  book_id: ID;
+  image_id: ID;
+}
+
+export interface BookImageDeleteResponseDto {
+  book_id: ID;
+  image_id: ID;
+  deleted: boolean;
+}
+
+export interface PresignedPostUploadResponse {
+  method: 'POST';
+  upload_url: string;
+  fields: Record<string, string>;
+  image_id: ID;
+  object_key: string;
+  expires_in_seconds: number;
+}
+
+export interface BookImageUrlResponse {
+  url: string;
+  expiration_seconds: number;
 }

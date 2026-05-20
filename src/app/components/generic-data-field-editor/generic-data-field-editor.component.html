@@ -1,0 +1,117 @@
+<section class="bg-main-base flex h-full flex-col rounded-2xl">
+  <div
+    class="border-light flex items-center justify-between gap-4 border-b px-4 pt-4 pb-6"
+  >
+    <div class="w-full">
+      <label class="text-light text-sm-tight mb-2 block font-medium">
+        {{ "field_edit.first_indicator" | translate }}
+      </label>
+
+      <app-input-dropdown
+        [value]="field()?.ind1 ?? ''"
+        [options]="INDICATOR_OPTIONS"
+        (valueChange)="setInd(1, $event)"
+      />
+    </div>
+
+    <div class="w-full">
+      <label class="text-light text-sm-tight mb-2 block font-medium">
+        {{ "field_edit.second_indicator" | translate }}
+      </label>
+
+      <app-input-dropdown
+        [value]="field()?.ind2 ?? ''"
+        [options]="INDICATOR_OPTIONS"
+        (valueChange)="setInd(2, $event)"
+      />
+    </div>
+  </div>
+
+  <div class="flex-1 space-y-6 overflow-auto p-4">
+    @for (sf of field()?.subfields ?? []; track $index) {
+      <div>
+        <label class="text-light text-sm-tight mb-2 block font-medium">
+          {{ getSubfieldLabel(sf.code) | translate }}
+        </label>
+
+        <div class="relative">
+          @if (is5XXaSubfield(field()?.tag, sf.code)) {
+            <app-textarea-autocomplete
+              [value]="sf.value"
+              [field]="field()?.tag!"
+              [subfield]="sf.code"
+              [bases]="['NKC', 'SKC', 'SCK']"
+              [minChars]="1"
+              [limit]="20"
+              (valueChange)="setSubfieldValue($index, $event)"
+            />
+
+            @if (!sf.value.length) {
+              <button
+                class="group absolute top-3 right-3 cursor-pointer"
+                (click)="deleteSubfield($index)"
+                (mousedown)="$event.preventDefault()"
+                tabindex="-1"
+                type="button"
+              >
+                <svg
+                  class="icon-btn-error"
+                  appIcon="trash"
+                  width="16"
+                  height="16"
+                ></svg>
+              </button>
+            }
+          } @else {
+            <app-input-autocomplete
+              [value]="sf.value"
+              [field]="field()!.tag"
+              [subfield]="sf.code"
+              [bases]="['NKC', 'SKC', 'SCK']"
+              [minChars]="1"
+              [limit]="20"
+              (valueChange)="setSubfieldValue($index, $event)"
+            />
+            @if (!sf.value.length) {
+              <button
+                class="group absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
+                (click)="deleteSubfield($index)"
+                (mousedown)="$event.preventDefault()"
+                tabindex="-1"
+                type="button"
+              >
+                <svg
+                  class="icon-btn-error"
+                  appIcon="trash"
+                  width="16"
+                  height="16"
+                ></svg>
+              </button>
+            }
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <div
+    class="bg-main-base border-light z-10 flex justify-center rounded-b-2xl border-t px-4 py-3"
+  >
+    <button
+      class="btn btn-m btn-tertiary group items-center justify-center"
+      (click)="openAddSubfieldDialog()"
+      type="button"
+    >
+      <svg class="icon-secondary" appIcon="add" width="20" height="20"></svg>
+      <span>{{ "field_edit.add_subfield" | translate }}</span>
+    </button>
+  </div>
+
+  <app-add-subfield-dialog
+    [open]="addSubfieldDialogOpen()"
+    [error]="addSubfieldDialogError()"
+    (closed)="closeAddSubfieldDialog()"
+    (clearedError)="addSubfieldDialogError.set(null)"
+    (confirmed)="onAddSubfieldConfirm($event)"
+  />
+</section>

@@ -1,0 +1,52 @@
+@if (open()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+    (click)="onBackdropClick()"
+  >
+    <div
+      class="bg-main-base shadow-s w-full max-w-64 rounded-2xl"
+      (click)="onDialogClick($event)"
+    >
+      <div class="flex items-center justify-between gap-3 p-4">
+        <h2 class="text-md font-medium">
+          {{ "subfield_add.title" | translate }}
+        </h2>
+
+        <button class="btn group" (click)="closed.emit()" type="button">
+          <svg class="icon-tertiary" appIcon="x" width="24" height="24"></svg>
+        </button>
+      </div>
+
+      <div class="px-4 pb-5">
+        <div class="flex gap-4">
+          <input
+            class="border-tertiary-default bg-main-base focus:border-primary-default w-full rounded-lg border px-4 py-3 outline-none"
+            #subfieldInput
+            [value]="value()"
+            (input)="onInput(subfieldInput.value)"
+            (keydown)="onKeydown($event)"
+            type="text"
+          />
+
+          <button
+            class="btn btn-l btn-primary"
+            [disabled]="value().length < 1"
+            (click)="onSubmit()"
+            type="button"
+          >
+            {{ "buttons.add" | translate }}
+          </button>
+        </div>
+        @if (touched() && !isValid()) {
+          <p class="mt-2 text-sm text-red-500">
+            {{ "subfield_add.error" | translate }}
+          </p>
+        } @else if (error()) {
+          <p class="mt-2 text-sm text-red-500">
+            {{ error()! | translate }}
+          </p>
+        }
+      </div>
+    </div>
+  </div>
+}

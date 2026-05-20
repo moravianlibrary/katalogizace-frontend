@@ -1,0 +1,78 @@
+<section class="bg-main-base flex h-full flex-col rounded-2xl">
+  <div class="flex-1 overflow-auto">
+    <div class="space-y-6 p-4">
+      @for (s of slices; track $index) {
+        <div>
+          <label class="text-light text-sm-tight mb-2 block font-medium">
+            {{ s.labelKey | translate }}
+          </label>
+
+          @if (s.key === "place") {
+            <app-input-static-autocomplete
+              [value]="getSeg($index)"
+              [items]="placeItems()"
+              [maxlength]="s.len"
+              (valueChange)="setSeg($index, $event)"
+            />
+          } @else if (s.key === "lang") {
+            <app-input-static-autocomplete
+              [value]="getSeg($index)"
+              [items]="langItems()"
+              [maxlength]="s.len"
+              (valueChange)="setSeg($index, $event)"
+            />
+          } @else if (s.key === "typeOfDate") {
+            <app-input-static-autocomplete
+              [value]="getSeg($index)"
+              [items]="typeOfDateItems()"
+              [maxlength]="s.len"
+              (valueChange)="setSeg($index, $event)"
+            />
+          } @else {
+            <span
+              class="border-tertiary-default focus-within:border-primary-default bg-main-base inline-flex w-full overflow-hidden rounded-lg border"
+            >
+              @if ($index === 0) {
+                <input
+                  class="text-secondary w-full bg-transparent py-3 pl-4 font-medium outline-none"
+                  #firstInput
+                  #segInput
+                  #inp
+                  [attr.maxlength]="s.len"
+                  [value]="getSeg($index)"
+                  (input)="onSegInput($index, inp.value, $event)"
+                />
+              } @else {
+                <input
+                  class="text-secondary w-full bg-transparent py-3 pl-4 font-medium outline-none"
+                  #inp
+                  #segInput
+                  [attr.maxlength]="s.len"
+                  [value]="getSeg($index)"
+                  (input)="onSegInput($index, inp.value, $event)"
+                />
+              }
+
+              @if (getSeg($index).length) {
+                <button
+                  class="group mx-3 flex cursor-pointer items-center"
+                  (click)="clearSeg($index)"
+                  (mousedown)="$event.preventDefault()"
+                  tabindex="-1"
+                  type="button"
+                >
+                  <svg
+                    class="icon-tertiary"
+                    appIcon="x"
+                    width="16"
+                    height="16"
+                  ></svg>
+                </button>
+              }
+            </span>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</section>

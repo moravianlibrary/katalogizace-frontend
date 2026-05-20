@@ -1,14 +1,16 @@
-import { BATCH_STATE_LABELS, BatchState } from '@/app/models';
-import { Pipe, PipeTransform } from '@angular/core';
+import { BatchState } from '@/app/models';
+import { inject, Pipe, PipeTransform } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 
 @Pipe({
   name: 'batchStateLabel',
   standalone: true,
 })
 export class BatchStateLabelPipe implements PipeTransform {
+  private translate = inject(TranslateService);
   transform(value: BatchState | null): string {
     if (!value) return '—';
 
-    return BATCH_STATE_LABELS[value] ?? value;
+    return this.translate.instant(`labels.batchState.${value}`);
   }
 }

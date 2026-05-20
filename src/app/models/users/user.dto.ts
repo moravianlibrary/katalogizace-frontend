@@ -1,13 +1,59 @@
-export interface UserDto {
-  email: string;
-  full_name: string;
-  roles: ('admin' | 'user')[];
-  permissions: ('read' | 'write' | 'delete' | 'save')[];
+export type Permission = 'export' | 'read' | 'write' | 'delete' | 'edit';
+
+export interface BatchPermission {
+  batch_id: number;
+  batch_name: string;
+  description: string | null;
+  permissions: Permission[];
 }
 
-export interface CurrentUserDto {
+export type UserRole = 'admin' | 'user';
+
+export interface UserDto {
+  id: number;
   email: string;
   full_name: string;
-  roles: string[];
-  permissions: string[];
+  role: UserRole;
+  batch_permissions: BatchPermission[];
 }
+
+export interface UserInfoDto {
+  id: number;
+  email: string;
+  full_name: string;
+  role: UserRole;
+}
+
+export type BatchPermissionUpdateDto = {
+  batch_id: number;
+  permissions: Permission[];
+};
+
+export interface UserUpdateDto {
+  full_name?: string | null;
+  role?: UserRole | null;
+  batch_permissions?: BatchPermissionUpdateDto[] | null;
+}
+
+export type BatchMemberPermissionRequest = {
+  user_id: number;
+  permissions: Permission[];
+};
+
+export type BatchMemberDto = {
+  id: number;
+  email: string;
+  full_name: string;
+  role: UserRole;
+  permissions: Permission[];
+};
+
+export type EditableBatchMember = BatchMemberPermissionRequest & {
+  full_name: string;
+  email: string;
+  role: UserRole;
+};
+
+export type UserInfoWithPasswdDto = UserInfoDto & {
+  password: string;
+};

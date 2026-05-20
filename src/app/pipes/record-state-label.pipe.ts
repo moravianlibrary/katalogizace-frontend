@@ -1,14 +1,17 @@
-import { RECORD_STATE_LABELS, RecordState } from '@/app/models';
-import { Pipe, PipeTransform } from '@angular/core';
+import { RecordState } from '@/app/models';
+import { inject, Pipe, PipeTransform } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 
 @Pipe({
   name: 'recordStateLabel',
   standalone: true,
 })
 export class RecordStateLabelPipe implements PipeTransform {
+  private translate = inject(TranslateService);
+
   transform(value: RecordState | null): string {
     if (!value) return '—';
 
-    return RECORD_STATE_LABELS[value] ?? value;
+    return this.translate.instant(`labels.recordState.${value}`);
   }
 }

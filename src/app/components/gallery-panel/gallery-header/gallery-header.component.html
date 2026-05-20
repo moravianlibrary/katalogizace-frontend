@@ -1,0 +1,92 @@
+<div class="border-bright flex items-center justify-between gap-4 border-b p-4">
+  <span class="text-md leading-tight font-medium">
+    @if (pageType()) {
+      {{ pageType() }}
+    }
+
+    @if (!collapsed() && orderLabel()) {
+      · {{ orderLabel() }}
+    }
+  </span>
+  <div class="flex gap-2">
+    @if (!collapsed()) {
+      <button
+        class="btn btn-m btn-tertiary btn-icon group"
+        [disabled]="!canZoomOut()"
+        (click)="onZoomOut()"
+        type="button"
+      >
+        <svg class="icon-tertiary" appIcon="minus" width="16" height="16"></svg>
+      </button>
+
+      <button
+        class="btn btn-m btn-tertiary btn-icon group"
+        [disabled]="!canZoomIn()"
+        (click)="onZoomIn()"
+        type="button"
+      >
+        <svg class="icon-tertiary" appIcon="add" width="16" height="16"></svg>
+      </button>
+
+      <button
+        class="btn btn-m btn-tertiary btn-icon group"
+        (click)="onRotateLeft()"
+        type="button"
+      >
+        <svg
+          class="icon-tertiary"
+          appIcon="rotateLeft"
+          width="16"
+          height="16"
+        ></svg>
+      </button>
+
+      <button
+        class="btn btn-m btn-tertiary btn-icon group"
+        [disabled]="!canResetView()"
+        (click)="onResetView()"
+        type="button"
+      >
+        <svg
+          class="icon-tertiary"
+          appIcon="fitToScreen"
+          width="16"
+          height="16"
+        ></svg>
+      </button>
+
+      <button
+        class="btn btn-m btn-tertiary btn-icon group"
+        (click)="onToggleFullscreen()"
+        type="button"
+      >
+        <svg
+          class="icon-tertiary"
+          appIcon="maximize"
+          width="16"
+          height="16"
+        ></svg>
+      </button>
+    }
+
+    <button
+      class="btn btn-m btn-tertiary btn-icon group"
+      [attr.aria-pressed]="collapsed()"
+      [attr.title]="
+        collapsed()
+          ? ('gallery.expand' | translate)
+          : ('gallery.collapse' | translate)
+      "
+      (click)="onToggle()"
+      type="button"
+    >
+      <svg
+        class="icon-tertiary"
+        [class.-scale-x-100]="collapsed()"
+        appIcon="sidebarLeft"
+        width="16"
+        height="16"
+      ></svg>
+    </button>
+  </div>
+</div>

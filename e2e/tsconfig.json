@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../out-tsc/e2e",
+    "types": ["node", "@playwright/test"],
+    "lib": ["ES2022", "DOM", "ESNext"]
+  },
+  "include": ["./**/*.ts"]
+}
