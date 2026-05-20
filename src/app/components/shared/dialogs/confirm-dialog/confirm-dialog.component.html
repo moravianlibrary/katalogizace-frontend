@@ -1,9 +1,9 @@
 @if (confirmDialog.open()) {
   <div
     class="fixed inset-0 z-100 flex items-center justify-center bg-black/40 p-4"
-    data-testid="confirm-dialog"
     (click)="confirmDialog.cancel()"
     (window:keydown.escape)="confirmDialog.cancel()"
+    data-testid="confirm-dialog"
   >
     <section
       class="shadow-s w-[calc(100vw-2rem)] max-w-xl overflow-hidden rounded-2xl bg-white"
@@ -33,11 +33,13 @@
           </div>
         }
 
-        <div class="flex justify-center gap-3 px-4 pt-6 pb-4">
+        <div
+          class="border-bright flex justify-center gap-3 border-t px-4 pt-6 pb-4"
+        >
           <button
             class="btn btn-m btn-tertiary"
-            data-testid="confirm-dialog-cancel"
             (click)="confirmDialog.cancel()"
+            data-testid="confirm-dialog-cancel"
             type="button"
           >
             {{ "buttons.cancel" | translate }}
@@ -45,9 +47,9 @@
 
           <button
             class="btn btn-m"
-            data-testid="confirm-dialog-confirm"
             [ngClass]="confirmButtonClass()"
             (click)="confirmDialog.accept()"
+            data-testid="confirm-dialog-confirm"
             type="button"
           >
             {{ confirmDialog.confirmLabel() }}
