@@ -28,14 +28,12 @@
         </div>
 
         @if (confirmDialog.note(); as note) {
-          <div class="px-4 pt-2">
+          <div class="p-4">
             {{ note }}
           </div>
         }
 
-        <div
-          class="border-bright flex justify-center gap-3 border-t px-4 pt-6 pb-4"
-        >
+        <div class="border-bright flex justify-center gap-3 border-t px-4 py-3">
           <button
             class="btn btn-m btn-tertiary"
             (click)="confirmDialog.cancel()"
